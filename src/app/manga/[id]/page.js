@@ -24,7 +24,7 @@ export async function generateMetadata({ params }) {
   
   const manga = mangaResult.recordset[0];
   const cleanDescription = stripHtml(manga.description).substring(0, 160);
-  const relativeCover = manga.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(manga.cover)}` : manga.cover;
+  const relativeCover = manga.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(manga.cover)}` : (manga.cover || '/placeholder-manga.svg');
   
   const headersList = await headers();
   const host = headersList.get('host') || 'truyenvip.com';
@@ -108,7 +108,7 @@ async function getMangaDetail(id) {
 
   return {
     ...manga,
-    cover: manga.cover.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(manga.cover)}` : manga.cover,
+    cover: (manga.cover && manga.cover.startsWith('http')) ? `/api/proxy?url=${encodeURIComponent(manga.cover)}` : (manga.cover || '/placeholder-manga.svg'),
     genres: genresRes.recordset,
     chapters: chaptersResult.recordset,
     related

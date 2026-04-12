@@ -30,7 +30,7 @@ export async function GET(request) {
 
         return Response.json(res.recordset.map(m => ({
             ...m,
-            cover: m.cover.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : m.cover,
+            cover: m.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : (m.cover || '/placeholder-manga.svg'),
         })));
     } catch (e) {
         return new Response('Error', { status: 500 });
