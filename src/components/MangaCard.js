@@ -103,7 +103,10 @@ function MangaCard({ manga, isNew = false }) {
       {/* Centered Text Content */}
       <h3 className="card-title-centered">{manga.title}</h3>
       <p className="card-chapter-centered">
-        {manga.last_chap_num && isNaN(manga.last_chap_num) ? manga.last_chap_num : `Chapter ${manga.last_chap_num || '0'}`}
+        {manga.last_chap_num && isNaN(manga.last_chap_num) ? 
+            manga.last_chap_num : 
+            (manga.last_chap_num && manga.last_chap_num !== '0' ? `Chương ${manga.last_chap_num}` : 'Đang cập nhật')
+        }
       </p>
     </Link>
   );

@@ -86,20 +86,24 @@ async function getMangaDetail(id) {
   `, { id });
   
   let related = [];
-  if (genresRes.recordset.length > 0) {
+  if (genresRes.recordset && genresRes.recordset.length > 0) {
     const firstGenreId = genresRes.recordset[0].id;
-    const relatedRes = await query(`
-        SELECT TOP 6 m.${MANGA_CARD_FIELDS.replace(/, /g, ', m.')}
-        FROM Manga m
-        JOIN MangaGenres mg ON m.id = mg.manga_id
-        WHERE mg.genre_id = @genreId AND m.id != @id
-        ORDER BY m.last_crawled DESC
-    `, { genreId: firstGenreId, id });
+    try {
+        const relatedRes = await query(`
+            SELECT TOP 6 m.id, m.title, m.cover, m.last_chap_num, m.rating, m.views
+            FROM Manga m
+            JOIN MangaGenres mg ON m.id = mg.manga_id
+            WHERE mg.genre_id = @genreId AND m.id != @id
+            ORDER BY m.last_crawled DESC
+        `, { genreId: firstGenreId, id });
 
-    related = relatedRes.recordset.map(m => ({
-        ...m,
-        cover: m.cover.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : m.cover,
-    }));
+        related = relatedRes.recordset.map(m => ({
+            ...m,
+            cover: m.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : m.cover,
+        }));
+    } catch (e) {
+        console.error('Failed to fetch related manga', e);
+    }
   }
 
   return {
