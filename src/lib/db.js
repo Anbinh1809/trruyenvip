@@ -24,14 +24,13 @@ function translateSql(sql, params) {
     const values = [];
     let paramCount = 1;
 
-    // 1. Convert @paramName to $1, $2, ...
+    // 1. Robust Named Param Mapping (@param -> $n)
     if (params && Object.keys(params).length > 0) {
-        // Sort keys by length descending to prevent partial replacements (e.g. @id before @id_long)
         const keys = Object.keys(params).sort((a, b) => b.length - a.length);
         
         for (const key of keys) {
-            const regex = new RegExp(`@${key}\\b`, 'g');
-            if (translatedSql.includes(`@${key}`)) {
+            const regex = new RegExp(`@${key}\\b`, 'gi');
+            if (translatedSql.match(regex)) {
                 translatedSql = translatedSql.replace(regex, `$${paramCount}`);
                 values.push(params[key]);
                 paramCount++;
@@ -39,51 +38,50 @@ function translateSql(sql, params) {
         }
     }
 
-    // 2. Convert SELECT TOP n to LIMIT n
-    if (translatedSql.toUpperCase().includes('TOP ')) {
-        const topMatch = translatedSql.match(/TOP\s+(\d+)/i);
-        if (topMatch) {
-            const limitValue = topMatch[1];
-            // Remove TOP n from the start
-            translatedSql = translatedSql.replace(/TOP\s+\d+\s+/i, '');
-            // Append LIMIT n if not already present
-            if (!translatedSql.toUpperCase().includes('LIMIT ')) {
-                translatedSql = translatedSql.trim() + ` LIMIT ${limitValue}`;
-            }
+    // 2. String Concatenation Fix (MSSQL + to Postgres ||)
+    // Converts $1 + '%' OR '%' + $1 OR 'A' + 'B'
+    translatedSql = translatedSql.replace(/(\$\d+|'[^']*')\s*\+\s*(\$\d+|'[^']*')/gi, '$1 || $2');
+    // Handle double concatenation like $1 + ' ' + $2
+    translatedSql = translatedSql.replace(/(\$\d+|'[^']*')\s*\+\s*(\$\d+|'[^']*')/gi, '$1 || $2');
+
+    // 3. Robust TOP to LIMIT translation
+    // Handles SELECT TOP 10 ... and SELECT TOP @limit ...
+    const topMatch = translatedSql.match(/SELECT\s+TOP\s+(\d+|\$\d+)/i);
+    if (topMatch) {
+        const limitValue = topMatch[1];
+        translatedSql = translatedSql.replace(/SELECT\s+TOP\s+(\d+|\$\d+)/i, 'SELECT');
+        // Simple append if no LIMIT exists
+        if (!translatedSql.toUpperCase().includes('LIMIT ')) {
+            translatedSql = translatedSql.trim();
+            if (translatedSql.endsWith(';')) translatedSql = translatedSql.slice(0, -1);
+            translatedSql += ` LIMIT ${limitValue}`;
         }
     }
 
-    // 3. Convert SQL Server specific functions & identifiers
+    // 4. Common Function Mapping
     translatedSql = translatedSql.replace(/GETDATE\(\)/gi, 'NOW()');
     translatedSql = translatedSql.replace(/ISNULL/gi, 'COALESCE');
     translatedSql = translatedSql.replace(/LEN\s*\(/gi, 'LENGTH(');
-    
-    // Convert CHARINDEX(sub, str) -> STRPOS(str, sub)
     translatedSql = translatedSql.replace(/CHARINDEX\(([^,]+),\s*([^)]+)\)/gi, 'STRPOS($2, $1)');
 
-    // 4. Convert DATEADD (e.g., DATEADD(hour, -1, GETDATE()) -> NOW() - INTERVAL '1 hour')
-    // Regex matches: DATEADD(unit, amount, date)
+    // 5. Convert DATEADD (e.g., DATEADD(hour, -1, GETDATE()) -> NOW() - INTERVAL '1 hour')
     translatedSql = translatedSql.replace(/DATEADD\s*\(\s*(\w+)\s*,\s*(-?\s*\d+)\s*,\s*([^)]+)\)/gi, (match, unit, amount, date) => {
         const cleanAmount = amount.replace(/\s+/g, '');
         const absAmount = Math.abs(parseInt(cleanAmount));
         const sign = parseInt(cleanAmount) >= 0 ? '+' : '-';
-        // Normalize unit (SQL Server uses 'second', 'hour', etc. - Postgres prefers standard plural)
         const pgUnit = unit.toLowerCase();
         return `(${date} ${sign} INTERVAL '${absAmount} ${pgUnit}')`;
     });
 
-    // 5. Convert SQL Server specific operators (CROSS APPLY / OUTER APPLY / OUTPUT)
+    // 6. Convert SQL Server specific operators (CROSS APPLY / OUTER APPLY / OUTPUT)
     translatedSql = translatedSql.replace(/CROSS APPLY/gi, 'CROSS JOIN LATERAL');
     translatedSql = translatedSql.replace(/OUTER APPLY/gi, 'LEFT JOIN LATERAL');
-    // Convert OUTPUT inserted.col -> RETURNING col
     translatedSql = translatedSql.replace(/OUTPUT\s+inserted\.(\w+)/gi, 'RETURNING $1');
     translatedSql = translatedSql.replace(/OUTPUT\s+inserted\.\*/gi, 'RETURNING *');
 
-    // 6. Clean schema prefixes and case-sensitivity
-    translatedSql = translatedSql.replace(/dbo\./gi, ''); // Remove dbo. prefix
+    // 7. Schema & Identifier Cleanup
+    translatedSql = translatedSql.replace(/dbo\./gi, ''); 
     translatedSql = translatedSql.replace(/\[(\w+)\]/g, '$1'); 
-    
-    // 7. Fix calculateRank call specifically if found
     translatedSql = translatedSql.replace(/calculateRank\(([^)]+)\)/gi, 'calculate_rank($1)');
 
     return { sql: translatedSql, values };
@@ -102,8 +100,8 @@ export async function query(sqlString, params = {}) {
             rowCount: result.rowCount
         };
     } catch (err) {
-        const isProd = process.env.NODE_ENV === 'production';
-        console.error(`[PG ERROR] ${err.message}${!isProd ? ` \nOriginal SQL: ${sqlString.substring(0, 200)} \nTranslated: ${psql.substring(0, 200)}` : ''}`);
+        // Always log translated SQL on error to assist production debugging
+        console.error(`[PG ERROR] ${err.message} \nOriginal SQL: ${sqlString.substring(0, 300)} \nTranslated: ${psql.substring(0, 300)}`);
         throw err;
     }
 }
