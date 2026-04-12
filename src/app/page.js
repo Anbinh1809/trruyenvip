@@ -28,7 +28,7 @@ async function getManga() {
 
     return result.recordset.map(m => ({
       ...m,
-      cover: m.cover.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : m.cover,
+      cover: m.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : (m.cover || '/placeholder-manga.svg'),
     }));
   } catch (err) {
     console.error('DB Fetch Error:', err.message);

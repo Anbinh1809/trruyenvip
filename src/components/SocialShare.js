@@ -1,14 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/components/ToastProvider';
 
 export default function SocialShare({ title }) {
     const { addToast } = useToast();
     const [url, setUrl] = useState('');
 
-    useState(() => {
+    useEffect(() => {
         if (typeof window !== 'undefined') {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setUrl(window.location.href);
         }
     }, []);

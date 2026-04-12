@@ -99,7 +99,7 @@ async function getMangaDetail(id) {
 
         related = relatedRes.recordset.map(m => ({
             ...m,
-            cover: m.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : m.cover,
+            cover: m.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : (m.cover || '/placeholder-manga.svg'),
         }));
     } catch (e) {
         console.error('Failed to fetch related manga', e);

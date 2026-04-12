@@ -14,7 +14,12 @@ export async function GET() {
             ORDER BY COUNT(c.id) DESC
         `);
 
-        return NextResponse.json(trending.recordset);
+        const optimized = trending.recordset.map(m => ({
+            ...m,
+            cover: m.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : (m.cover || '/placeholder-manga.svg')
+        }));
+
+        return NextResponse.json(optimized);
     } catch (err) {
         return new Response('Error', { status: 500 });
     }

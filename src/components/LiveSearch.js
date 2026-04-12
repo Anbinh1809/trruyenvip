@@ -43,7 +43,7 @@ export default function LiveSearch() {
             const data = await res.json();
             const optimized = data.map(m => ({
                 ...m,
-                cover: m.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}&w=100` : m.cover
+                cover: m.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}&w=100` : (m.cover || '/placeholder-manga.svg')
             }));
             setResults(optimized);
             setIsOpen(optimized.length > 0);

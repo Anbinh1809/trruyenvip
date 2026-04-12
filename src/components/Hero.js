@@ -13,7 +13,7 @@ export default function Hero({ manga }) {
 
   return (
     <section className="titan-hero">
-      <div className="titan-hero-bg" style={{ backgroundImage: `url(${manga.cover})` }} />
+      <div className="titan-hero-bg" style={{ backgroundImage: `url(${manga.cover || '/placeholder-manga.svg'})` }} />
       <div className="titan-hero-overlay" />
       
       <div className="container hero-container" style={{ position: 'relative', zIndex: 10, display: 'grid', gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 0.8fr)', alignItems: 'center', gap: '50px' }}>
@@ -44,7 +44,7 @@ export default function Hero({ manga }) {
         <div className="titan-hero-artwork fade-in">
              <div style={{ position: 'relative', width: '320px', height: '480px' }}>
                 <Image 
-                    src={manga.cover} 
+                    src={manga.cover || '/placeholder-manga.svg'} 
                     alt={manga.title} 
                     fill 
                     sizes="320px"

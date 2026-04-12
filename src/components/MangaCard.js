@@ -8,7 +8,7 @@ import { useFavorites } from '@/context/FavoritesContext';
 function MangaCard({ manga, isNew = false }) {
   const coverUrl = manga.cover?.startsWith('http') 
     ? `/api/proxy?url=${encodeURIComponent(manga.cover)}` 
-    : manga.cover;
+    : (manga.cover || '/placeholder-manga.svg');
     
   const [imgSrc, setImgSrc] = useState(coverUrl);
   const [isLoaded, setIsLoaded] = useState(false);
