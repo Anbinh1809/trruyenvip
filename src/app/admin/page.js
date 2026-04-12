@@ -158,8 +158,8 @@ export default function AdminDashboard() {
                         {/* Logs Control */}
                         <div className="action-node-titan">
                             <div className="action-icon-titan">⚙️</div>
-                            <h3 className="action-title-titan">Chẩn Đoán 'Thần Nhãn'</h3>
-                            <p className="action-desc-titan">Phân tích lỗi hàng chờ và tìm ra những bộ truyện đang bị 'kẹt' pháp bảo.</p>
+                            <h3 className="action-title-titan">Chẩn Đoán &apos;Thần Nhãn&apos;</h3>
+                            <p className="action-desc-titan">Phân tích lỗi hàng chờ và tìm ra những bộ truyện đang bị &apos;kẹt&apos; pháp bảo.</p>
                             
                             <div className="failure-list-mini glass" style={{ fontSize: '0.65rem', padding: '10px', borderRadius: '12px', background: 'rgba(255,255,255,0.02)', maxHeight: '100px', overflowY: 'auto' }}>
                                 <div style={{ fontWeight: 900, color: 'var(--text-muted)', marginBottom: '5px' }}>LỖI CẬP NHẬT GẦN NHẤT:</div>

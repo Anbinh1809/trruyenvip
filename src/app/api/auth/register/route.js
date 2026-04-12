@@ -28,7 +28,6 @@ export async function POST(request) {
              return NextResponse.json({ error: 'Email không đúng định dạng' }, { status: 400 });
         }
 
-        const cleanUsername = username.trim();
         const cleanEmail = email ? email.trim().toLowerCase() : null;
 
         // Hash password (Hardened: 10 salt rounds)

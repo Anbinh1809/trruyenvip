@@ -102,7 +102,7 @@ export default function ReaderSettings() {
 
           <div className="setting-group" style={{ marginTop: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', margin: 0 }}>Độ sáng 'Hộ Nhãn'</p>
+                <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', margin: 0 }}>Độ sáng &apos;Hộ Nhãn&apos;</p>
                 <span style={{ fontSize: '0.7rem', color: 'var(--accent)', fontWeight: 800 }}>{Math.round(brightness * 100)}%</span>
             </div>
             <input 
@@ -147,7 +147,7 @@ export default function ReaderSettings() {
           </div>
 
           <div className="setting-group" style={{ marginTop: '20px' }}>
-            <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginBottom: '8px' }}>Chất Lượng 'Truyền Thần'</p>
+            <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginBottom: '8px' }}>Chất Lượng &apos;Truyền Thần&apos;</p>
             <div 
               style={{ 
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between', 

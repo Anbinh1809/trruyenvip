@@ -147,6 +147,7 @@ function ReaderImage({ src, idx }) {
     useEffect(() => {
         // High-Fidelity Check: Adjust width for 4K mode
         if (localStorage.getItem('truyenvip_hifi') === 'true') {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setImgWidth(2000);
         }
 

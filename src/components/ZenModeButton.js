@@ -5,6 +5,16 @@ import { useState, useEffect } from 'react';
 export default function ZenModeButton() {
     const [isFull, setIsFull] = useState(false);
 
+    const toggleZen = () => {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => {
+                console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+            });
+        } else {
+            document.exitFullscreen();
+        }
+    };
+
     useEffect(() => {
         const handleFSChange = () => {
             setIsFull(!!document.fullscreenElement);
@@ -32,16 +42,6 @@ export default function ZenModeButton() {
             document.body.classList.remove('zen-mode-active');
         };
     }, []);
-
-    const toggleZen = () => {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen().catch(err => {
-                console.error(`Error attempting to enable full-screen mode: ${err.message}`);
-            });
-        } else {
-            document.exitFullscreen();
-        }
-    };
 
     return (
         <button 

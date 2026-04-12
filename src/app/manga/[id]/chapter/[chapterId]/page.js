@@ -151,6 +151,7 @@ export default async function ChapterReader({ params }) {
           </div>
         </div>
       </div>
+    </div>
 
       <BackToTop />
       <div style={{ marginBottom: '100px' }} />
