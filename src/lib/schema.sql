@@ -10,6 +10,10 @@ CREATE TABLE IF NOT EXISTS Users (
     password_hash VARCHAR(255),
     xp INTEGER DEFAULT 0,
     vipCoins INTEGER DEFAULT 0,
+    level INTEGER DEFAULT 1,
+    avatar TEXT,
+    contribution_points INTEGER DEFAULT 0,
+    badge_ids TEXT,
     role VARCHAR(50) DEFAULT 'user',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -28,6 +32,7 @@ CREATE TABLE IF NOT EXISTS Manga (
     rating DOUBLE PRECISION DEFAULT 0,
     views BIGINT DEFAULT 0,
     last_crawled TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    migration_count INTEGER DEFAULT 0,
     alternative_titles TEXT
 );
 
@@ -105,7 +110,7 @@ CREATE TABLE IF NOT EXISTS DailyCheckins (
 CREATE TABLE IF NOT EXISTS CrawlerTasks (
     id SERIAL PRIMARY KEY,
     type VARCHAR(50) NOT NULL,
-    target TEXT NOT NULL,
+    target TEXT UNIQUE NOT NULL,
     status VARCHAR(20) DEFAULT 'pending',
     priority INTEGER DEFAULT 1,
     attempts INTEGER DEFAULT 0,

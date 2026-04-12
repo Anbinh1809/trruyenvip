@@ -18,7 +18,7 @@ export async function register() {
                 const rotateLogs = async () => {
                    try {
                        const { query } = await import('./lib/db');
-                       const result = await query("DELETE FROM CrawlLogs WHERE created_at < DATEADD(day, -7, GETDATE())");
+                       const result = await query("DELETE FROM CrawlLogs WHERE created_at < NOW() - INTERVAL '7 days'");
                        if (result.rowsAffected[0] > 0) {
                            console.log(`[Guardian] Maintenance: Purged ${result.rowsAffected[0]} old logs.`);
                        }

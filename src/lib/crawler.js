@@ -302,17 +302,19 @@ async function processQueue() {
 
     if (activeChapterScrapes >= currentLimit) return;
     
-    // TITAN FETCH: Extract next pending task from DB with Atomic Priority
+    // TITAN FETCH: Extract next pending task using PostgreSQL FOR UPDATE SKIP LOCKED
     const pickRes = await query(`
-        WITH NextTask AS (
-            SELECT TOP (1) * 
-            FROM CrawlerTasks WITH (ROWLOCK, READPAST)
+        UPDATE CrawlerTasks
+        SET status = 'processing', updated_at = NOW()
+        WHERE id = (
+            SELECT id
+            FROM CrawlerTasks
             WHERE status = 'pending'
             ORDER BY priority DESC, created_at ASC
+            LIMIT 1
+            FOR UPDATE SKIP LOCKED
         )
-        UPDATE NextTask
-        SET status = 'processing', updated_at = GETDATE()
-        OUTPUT inserted.id, inserted.type, inserted.target;
+        RETURNING id, type, target;
     `);
 
     const taskRow = pickRes.recordset[0];
@@ -351,8 +353,8 @@ async function processQueue() {
         
         // --- GUARDIAN OF SILENCE: Periodic Maintenance (1 in 100 chance) ---
         if (Math.random() < 0.01) {
-            // Prune old logs
-            query("DELETE FROM CrawlLogs WHERE created_at < DATEADD(day, -7, GETDATE())").catch(() => {});
+            // Prune old logs using PostgreSQL intervals
+            query("DELETE FROM CrawlLogs WHERE created_at < NOW() - INTERVAL '7 days'").catch(() => {});
             
             // RESET QUARANTINE: Auto-reset mirrors older than 2 hours to allow self-healing
             const now = Date.now();
@@ -371,11 +373,11 @@ async function processQueue() {
 export function queueChapterScrape(chapId, url, source, force = false, priority = 1) {
     const taskPayload = JSON.stringify({ chapId, url, source, force });
     query(`
-        IF NOT EXISTS (SELECT 1 FROM CrawlerTasks WHERE target = @target AND (status = 'pending' OR status = 'processing'))
-        INSERT INTO CrawlerTasks (type, target, priority) VALUES ('chapter_scrape', @target, @priority)
-        ELSE
-        UPDATE CrawlerTasks SET priority = CASE WHEN priority < @priority THEN @priority ELSE priority END 
-        WHERE target = @target AND status = 'pending'
+        INSERT INTO CrawlerTasks (type, target, priority) 
+        VALUES ('chapter_scrape', @target, @priority)
+        ON CONFLICT (target) DO UPDATE 
+        SET priority = CASE WHEN CrawlerTasks.priority < @priority THEN @priority ELSE CrawlerTasks.priority END 
+        WHERE CrawlerTasks.status = 'pending'
     `, { target: taskPayload, priority }).then(() => { processQueue(); }).catch(() => {});
     return Promise.resolve(null);
 }
@@ -383,11 +385,11 @@ export function queueChapterScrape(chapId, url, source, force = false, priority 
 export function queueMangaSync(mangaId, url, source, earlyExit = false, priority = 5) {
     const taskPayload = JSON.stringify({ mangaId, url, source, earlyExit });
     query(`
-        IF NOT EXISTS (SELECT 1 FROM CrawlerTasks WHERE target = @target AND (status = 'pending' OR status = 'processing'))
-        INSERT INTO CrawlerTasks (type, target, priority) VALUES ('manga_sync', @target, @priority)
-        ELSE
-        UPDATE CrawlerTasks SET priority = CASE WHEN priority < @priority THEN @priority ELSE priority END 
-        WHERE target = @target AND status = 'pending'
+        INSERT INTO CrawlerTasks (type, target, priority) 
+        VALUES ('manga_sync', @target, @priority)
+        ON CONFLICT (target) DO UPDATE 
+        SET priority = CASE WHEN CrawlerTasks.priority < @priority THEN @priority ELSE CrawlerTasks.priority END 
+        WHERE CrawlerTasks.status = 'pending'
     `, { target: taskPayload, priority }).then(() => { processQueue(); }).catch(() => {});
     return Promise.resolve(null);
 }
@@ -647,10 +649,10 @@ export async function crawlNetTruyen(page = 1, full = false, limitless = false) 
         const targetId = existingManga.recordset[0]?.id || id;
 
         await query(`
-          IF NOT EXISTS (SELECT * FROM Manga WHERE id = @targetId)
-          INSERT INTO Manga (id, title, cover, source_url, normalized_title) VALUES (@targetId, @title, @cover, @url, @normTitle)
-          ELSE
-          UPDATE Manga SET cover = @cover, last_crawled = GETDATE(), normalized_title = @normTitle WHERE id = @targetId
+          INSERT INTO Manga (id, title, cover, source_url, normalized_title, last_crawled) 
+          VALUES (@targetId, @title, @cover, @url, @normTitle, NOW())
+          ON CONFLICT (id) DO UPDATE 
+          SET cover = EXCLUDED.cover, last_crawled = NOW(), normalized_title = EXCLUDED.normalized_title
         `, { targetId, title, cover, url: sourceUrl, normTitle: titleSlug });
 
         if (isNewManga) {
@@ -1162,10 +1164,10 @@ export async function crawlTruyenQQ(page = 1, full = false, limitless = false) {
         const actualMangaId = existingManga.recordset[0]?.id || id;
 
         await query(`
-            IF NOT EXISTS (SELECT * FROM Manga WHERE id = @actualMangaId)
-            INSERT INTO Manga (id, title, cover, source_url, normalized_title) VALUES (@actualMangaId, @title, @cover, @url, @normTitle)
-            ELSE
-            UPDATE Manga SET cover = @cover, last_crawled = GETDATE(), normalized_title = @normTitle WHERE id = @actualMangaId
+            INSERT INTO Manga (id, title, cover, source_url, normalized_title, last_crawled) 
+            VALUES (@actualMangaId, @title, @cover, @url, @normTitle, NOW())
+            ON CONFLICT (id) DO UPDATE 
+            SET cover = EXCLUDED.cover, last_crawled = NOW(), normalized_title = EXCLUDED.normalized_title
         `, { actualMangaId, title, cover, url: sourceUrl, normTitle: titleSlug });
 
         if (isNewManga) {

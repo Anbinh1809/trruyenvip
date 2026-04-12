@@ -58,6 +58,10 @@ function translateSql(sql, params) {
     // 3. Convert SQL Server specific functions & identifiers
     translatedSql = translatedSql.replace(/GETDATE\(\)/gi, 'NOW()');
     translatedSql = translatedSql.replace(/ISNULL/gi, 'COALESCE');
+    translatedSql = translatedSql.replace(/LEN\s*\(/gi, 'LENGTH(');
+    
+    // Convert CHARINDEX(sub, str) -> STRPOS(str, sub)
+    translatedSql = translatedSql.replace(/CHARINDEX\(([^,]+),\s*([^)]+)\)/gi, 'STRPOS($2, $1)');
 
     // 4. Convert DATEADD (e.g., DATEADD(hour, -1, GETDATE()) -> NOW() - INTERVAL '1 hour')
     // Regex matches: DATEADD(unit, amount, date)
@@ -65,12 +69,17 @@ function translateSql(sql, params) {
         const cleanAmount = amount.replace(/\s+/g, '');
         const absAmount = Math.abs(parseInt(cleanAmount));
         const sign = parseInt(cleanAmount) >= 0 ? '+' : '-';
-        return `(${date} ${sign} INTERVAL '${absAmount} ${unit}')`;
+        // Normalize unit (SQL Server uses 'second', 'hour', etc. - Postgres prefers standard plural)
+        const pgUnit = unit.toLowerCase();
+        return `(${date} ${sign} INTERVAL '${absAmount} ${pgUnit}')`;
     });
 
-    // 5. Convert SQL Server specific operators (CROSS APPLY / OUTER APPLY)
+    // 5. Convert SQL Server specific operators (CROSS APPLY / OUTER APPLY / OUTPUT)
     translatedSql = translatedSql.replace(/CROSS APPLY/gi, 'CROSS JOIN LATERAL');
     translatedSql = translatedSql.replace(/OUTER APPLY/gi, 'LEFT JOIN LATERAL');
+    // Convert OUTPUT inserted.col -> RETURNING col
+    translatedSql = translatedSql.replace(/OUTPUT\s+inserted\.(\w+)/gi, 'RETURNING $1');
+    translatedSql = translatedSql.replace(/OUTPUT\s+inserted\.\*/gi, 'RETURNING *');
 
     // 6. Clean schema prefixes and case-sensitivity
     translatedSql = translatedSql.replace(/dbo\./gi, ''); // Remove dbo. prefix
@@ -150,8 +159,6 @@ export async function bulkInsert(tableName, columns, rows) {
 export const MANGA_CARD_FIELDS = `id, title, cover, last_chap_num, rating, views, author, status, last_crawled`;
 
 export async function cleanLegacyEncoding() {
-    // Encoding issues like ?? are usually MSSQL NVarChar collation problems.
-    // Postgres handles UTF-8 natively, so we just clear existing artifacts.
     try {
         await query("UPDATE Manga SET last_chap_num = 'Đang cập nhật' WHERE last_chap_num = '??'");
         await query("UPDATE Manga SET author = 'Đang cập nhật' WHERE author = '??'");
@@ -159,5 +166,14 @@ export async function cleanLegacyEncoding() {
     } catch (e) {
         console.error('[Maintenance] Sweep failed:', e.message);
     }
+}
+
+// Helper for template literals found in some crawler versions
+export function sql(strings, ...values) {
+    let result = '';
+    strings.forEach((str, i) => {
+        result += str + (values[i] !== undefined ? values[i] : '');
+    });
+    return result;
 }
 
