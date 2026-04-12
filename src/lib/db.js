@@ -49,7 +49,7 @@ function translateSql(sql, params) {
     // 3. Convert SQL Server specific functions & identifiers
     translatedSql = translatedSql.replace(/GETDATE\(\)/gi, 'NOW()');
     translatedSql = translatedSql.replace(/ISNULL/gi, 'COALESCE');
-    translatedSql = translatedSql.replace(/\[(\w+)\]/g, '"$1"'); // [Column] -> "Column"
+    translatedSql = translatedSql.replace(/\[(\w+)\]/g, '$1'); // [Column] -> Column (Postgres handles unquoted as lowercase)
     
     // 4. Convert MSSQL IF NOT EXISTS INSERT to Postgres ON CONFLICT (Conceptual/Basic)
     // NOTE: Complex procedural IF blocks should be moved to schema.sql or rewritten.
