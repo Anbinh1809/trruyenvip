@@ -508,8 +508,7 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
 }
 
 /* Mobile Optimizations */
-    .hero-title-titan { font-size: clamp(2.2rem, 10vw, 3.5rem); }
-}
+.hero-title-titan { font-size: clamp(2.2rem, 10vw, 3.5rem); }
 
 @media (max-width: 768px) {
     .manga-grid-titan { grid-template-columns: repeat(2, 1fr); gap: 15px; }

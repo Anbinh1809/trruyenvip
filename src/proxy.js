@@ -2,15 +2,48 @@ import { NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 
 /**
- * TruyenVip Global TITAN Proxy (Next.js 16)
- * Orchestrates Edge-level security, RBAC, and Security Headers.
+ * TruyenVip Global TITAN Proxy & Middleware (Next.js 16)
+ * Orchestrates Edge-level security, Rate Limiting, RBAC, and Security Headers.
  */
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 const CRON_SECRET = process.env.CRON_SECRET;
 
+// --- RATE LIMITING STATE (Memory-Safe Guard) ---
+const RATE_LIMIT_MAP = new Map();
+const LIMIT_WINDOW = 60 * 1000; // 1 minute
+const MAX_REQUESTS = 60; // Standard 1 req/sec average
+
 export default async function proxy(request) {
   const { pathname } = request.nextUrl;
+  const ip = request.ip || '127.0.0.1';
+
+  // --- TITAN-0: RATE LIMITING ---
+  if (pathname.startsWith('/api/auth') || pathname.startsWith('/api/admin')) {
+      if (RATE_LIMIT_MAP.size > 5000) {
+          const oldestKey = RATE_LIMIT_MAP.keys().next().value;
+          RATE_LIMIT_MAP.delete(oldestKey);
+      }
+
+      const now = Date.now();
+      const userLog = RATE_LIMIT_MAP.get(ip) || { count: 0, startTime: now };
+      
+      if (now - userLog.startTime > LIMIT_WINDOW) {
+          userLog.count = 1;
+          userLog.startTime = now;
+      } else {
+          userLog.count++;
+      }
+      
+      RATE_LIMIT_MAP.set(ip, userLog);
+      
+      if (userLog.count > MAX_REQUESTS) {
+          return new NextResponse(
+              JSON.stringify({ error: 'Đạo hữu thao tác quá nhanh! Vui lòng tịnh tâm trong giây lát.' }),
+              { status: 429, headers: { 'Content-Type': 'application/json' } }
+          );
+      }
+  }
 
   // --- TITAN-1: API CRON PROTECTION ---
   if (pathname === '/api/cron') {
@@ -94,10 +127,7 @@ export const config = {
     '/rewards',
     '/leaderboard/:path*',
     '/leaderboard',
-    '/api/cron',
-    '/api/transfer/:path*', 
-    '/api/migration/:path*', 
-    '/api/crawler/:path*',
-    '/api/favorites/:path*'
+    '/api/:path*',
+    '/((?!_next/static|_next/image|favicon.ico).*)'
   ],
 };
