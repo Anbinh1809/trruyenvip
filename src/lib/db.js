@@ -39,19 +39,17 @@ function translateSql(sql, params) {
         }
     }
 
-    // 2. Convert SELECT TOP n to LIMIT n (Handling nested subqueries)
-    // We use a regex that matches SELECT TOP n and moves the LIMIT to after the ORDER BY or FROM
-    // This is complex for a regex, so we handle the most common pattern found in this app.
-    translatedSql = translatedSql.replace(/SELECT\s+TOP\s+(\d+)\s+([\s\S]+?)(?=\)|$)/gi, (match, n, content) => {
-        // If it's a subquery (ends with ')'), we put LIMIT inside
-        return `SELECT ${content} LIMIT ${n}`;
-    });
-    // Fallback for non-subqueries if the regex above didn't catch it
-    if (translatedSql.includes('TOP')) {
-        const topMatch = translatedSql.match(/SELECT\s+TOP\s+(\d+)/i);
+    // 2. Convert SELECT TOP n to LIMIT n
+    if (translatedSql.toUpperCase().includes('TOP ')) {
+        const topMatch = translatedSql.match(/TOP\s+(\d+)/i);
         if (topMatch) {
+            const limitValue = topMatch[1];
+            // Remove TOP n from the start
             translatedSql = translatedSql.replace(/TOP\s+\d+\s+/i, '');
-            translatedSql += ` LIMIT ${topMatch[1]}`;
+            // Append LIMIT n if not already present
+            if (!translatedSql.toUpperCase().includes('LIMIT ')) {
+                translatedSql = translatedSql.trim() + ` LIMIT ${limitValue}`;
+            }
         }
     }
 
