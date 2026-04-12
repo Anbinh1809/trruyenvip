@@ -1,0 +1,453 @@
+'use client';
+
+import { createContext, useContext, useReducer, useEffect, useCallback, useRef, useMemo, useState } from 'react';
+import { useToast } from '@/components/ToastProvider';
+import LevelUpOverlay from '@/components/LevelUpOverlay';
+import { useAuth } from './AuthContext';
+
+const EngagementContext = createContext();
+
+export const RANKS = [
+  { lv: 1, title: 'Phàm Nhân', chest: 'Wood' },
+  { lv: 6, title: 'Luyện Khí', chest: 'Stone' },
+  { lv: 11, title: 'Trúc Cơ', chest: 'Bronze' },
+  { lv: 21, title: 'Kim Đan', chest: 'Silver' },
+  { lv: 36, title: 'Nguyên Anh', chest: 'Gold' },
+  { lv: 51, title: 'Hóa Thần', chest: 'Platinum' },
+  { lv: 100, title: 'Đại Thánh', chest: 'Diamond' },
+  { lv: 150, title: 'Tiên Đế', chest: 'Supreme' }
+];
+
+export const calculateRank = (xp) => {
+    const level = Math.floor(xp / 100) + 1;
+    const rank = [...RANKS].reverse().find(r => level >= r.lv);
+    return { level, title: rank ? rank.title : 'Phàm Nhân' };
+};
+
+const MISSION_TYPES = {
+    READ_CHAPTER: 'READ_CHAPTER',
+    READ_PROGRESS: 'READ_PROGRESS',
+    COMMENT: 'COMMENT',
+    DAILY_LOGIN: 'DAILY_LOGIN',
+    GENRE_DIVERSITY: 'GENRE_DIVERSITY'
+};
+
+const CHEST_DATA = {
+    Wood: { name: 'Rương Gỗ Mộc', color: '#8B4513', loot: [{ type: 'xp', range: [10, 20], weight: 100 }] },
+    Stone: { name: 'Rương Đá Thô', color: '#808080', loot: [{ type: 'xp', range: [30, 50], weight: 100 }] },
+    Bronze: { name: 'Rương Đồng Rỉ', color: '#CD7F32', loot: [{ type: 'xp', range: [50, 80], weight: 99 }, { type: 'coin', range: [50, 250], weight: 1 }] },
+    Silver: { name: 'Rương Bạc Trắng', color: '#C0C0C0', loot: [{ type: 'xp', range: [100, 200], weight: 97 }, { type: 'coin', range: [250, 500], weight: 3 }] },
+    Gold: { name: 'Rương Vàng Ròng', color: '#FFD700', loot: [{ type: 'xp', range: [200, 500], weight: 95 }, { type: 'coin', range: [500, 1200], weight: 5 }] },
+    Platinum: { name: 'Rương Bạch Kim', color: '#E5E4E2', loot: [{ type: 'xp', range: [500, 1000], weight: 92.5 }, { type: 'coin', range: [1000, 2500], weight: 7 }, { type: 'coin', range: [5000, 5000], weight: 0.5 }] },
+    Diamond: { name: 'Rương Kim Cương', color: '#B9F2FF', loot: [{ type: 'xp', range: [1000, 2000], weight: 90 }, { type: 'coin', range: [2500, 5000], weight: 10 }] },
+    Supreme: { name: 'Rương Chí Tôn', color: '#FF0000', loot: [{ type: 'xp', range: [2000, 5000], weight: 85 }, { type: 'coin', range: [5000, 10000], weight: 15 }] }
+};
+
+const initialState = {
+  xp: 0,
+  vipCoins: 0,
+  level: 1,
+  rankTitle: 'Phàm Nhân',
+  userUuid: '',
+  checkInStreak: 0,
+  lastCheckIn: '',
+  dailyMissions: {
+    date: new Date().toDateString(),
+    missions: [
+        { id: 1, type: MISSION_TYPES.DAILY_LOGIN, target: 1, current: 0, label: 'Báo danh đạo hữu', xp: 50, claimed: false },
+        { id: 2, type: MISSION_TYPES.READ_CHAPTER, target: 10, current: 0, label: 'Tu hành Cần mẫn (10 chương)', xp: 100, claimed: false },
+        { id: 3, type: MISSION_TYPES.READ_PROGRESS, target: 15, current: 0, label: 'Ngộ tính cao (15 phút đọc)', xp: 150, claimed: false },
+        { id: 4, type: MISSION_TYPES.COMMENT, target: 2, current: 0, label: 'Kết duyên đạo hữu (2 bình luận)', xp: 100, claimed: false },
+        { id: 5, type: MISSION_TYPES.GENRE_DIVERSITY, target: 3, current: 0, label: 'Đa tu đạo pháp (3 thể loại)', xp: 200, claimed: false }
+    ]
+  }
+};
+
+function engagementReducer(state, action) {
+  switch (action.type) {
+    case 'SYNC_USER': {
+        const { xp, vipCoins, uuid, isServerSync } = action.payload;
+        if (state.xp === xp && state.vipCoins === vipCoins && state.userUuid === uuid) return state;
+
+        const level = Math.floor(xp / 100) + 1;
+        const rank = [...RANKS].reverse().find(r => level >= r.lv);
+
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('truyenvip_xp', xp.toString());
+            localStorage.setItem('truyenvip_coins', vipCoins.toString());
+            localStorage.setItem('truyenvip_user_uuid', uuid);
+        }
+
+        return {
+         ...state,
+         xp,
+         vipCoins,
+         userUuid: uuid,
+         level,
+         rankTitle: rank ? rank.title : 'Phàm Nhân'
+        };
+    }
+    case 'ADD_XP': {
+      const nextXp = state.xp + action.amount;
+      const nextLevel = Math.floor(nextXp / 100) + 1;
+      const rank = [...RANKS].reverse().find(r => nextLevel >= r.lv);
+      localStorage.setItem('truyenvip_xp', nextXp.toString());
+      return {
+        ...state,
+        xp: nextXp,
+        level: nextLevel,
+        rankTitle: rank ? rank.title : 'Phàm Nhân'
+      };
+    }
+    case 'ADD_COINS': {
+        const nextCoins = state.vipCoins + action.amount;
+        localStorage.setItem('truyenvip_coins', nextCoins.toString());
+        return { ...state, vipCoins: nextCoins };
+    }
+    case 'DEDUCT_COINS': {
+        const nextCoins = Math.max(0, state.vipCoins - action.amount);
+        localStorage.setItem('truyenvip_coins', nextCoins.toString());
+        return { ...state, vipCoins: nextCoins };
+    }
+    case 'UPDATE_MISSION': {
+        const { type, increment } = action;
+        const idx = state.dailyMissions.missions.findIndex(m => m.type === type);
+        if (idx === -1 || state.dailyMissions.missions[idx].current >= state.dailyMissions.missions[idx].target) return state;
+        
+        const newMissions = [...state.dailyMissions.missions];
+        newMissions[idx] = { ...newMissions[idx], current: Math.min(newMissions[idx].target, newMissions[idx].current + increment) };
+        const nextMissions = { ...state.dailyMissions, missions: newMissions };
+        localStorage.setItem('truyenvip_daily_missions', JSON.stringify(nextMissions));
+        return { ...state, dailyMissions: nextMissions };
+    }
+    case 'CLAIM_MISSION': {
+        const { missionId } = action;
+        const idx = state.dailyMissions.missions.findIndex(m => m.id === missionId);
+        if (idx === -1) return state;
+        const newMissions = [...state.dailyMissions.missions];
+        newMissions[idx] = { ...newMissions[idx], claimed: true };
+        const nextMissions = { ...state.dailyMissions, missions: newMissions };
+        localStorage.setItem('truyenvip_daily_missions', JSON.stringify(nextMissions));
+        return { ...state, dailyMissions: nextMissions };
+    }
+    case 'RESET_MISSIONS': {
+        const nextMissions = { ...initialState.dailyMissions, date: new Date().toDateString() };
+        localStorage.setItem('truyenvip_daily_missions', JSON.stringify(nextMissions));
+        return { ...state, dailyMissions: nextMissions };
+    }
+    case 'CHECK_IN': {
+        const { today, nextStreak } = action;
+        localStorage.setItem('truyenvip_last_checkin', today || '');
+        localStorage.setItem('truyenvip_checkin_streak', (nextStreak || 0).toString());
+        return { ...state, lastCheckIn: today, checkInStreak: nextStreak };
+    }
+    default:
+      return state;
+  }
+}
+
+export function EngagementProvider({ children }) {
+  const { addToast } = useToast();
+  const { user, isAuthenticated } = useAuth();
+  const [state, dispatch] = useReducer(engagementReducer, initialState);
+  const [celebrationQueue, setCelebrationQueue] = useState([]);
+  const [activeCelebration, setActiveCelebration] = useState(null);
+  const [mounted, setMounted] = useState(false);
+  
+  const lastSyncRef = useRef({ xp: -1, coins: -1 });
+  const hasCelebratedLevelRef = useRef(1);
+  const pendingDeltasRef = useRef({ xp: 0, coins: 0 });
+  const isSyncingRef = useRef(false);
+  const lastXpGainTimeRef = useRef(0); // TITAN THROTTLE
+  const [isTabActive, setIsTabActive] = useState(true);
+
+  const syncToServer = useCallback(async () => {
+    // Check if there is anything to sync or if already syncing
+    if (!isAuthenticated || isSyncingRef.current) return;
+    if (pendingDeltasRef.current.xp === 0 && pendingDeltasRef.current.coins === 0) return;
+
+    isSyncingRef.current = true;
+    
+    // ATOMIC SNAPSHOT: Capture current deltas to send, but keep the original ref for new updates
+    const snapshot = { ...pendingDeltasRef.current };
+
+    try {
+        const res = await fetch('/api/auth/update-stats', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ xpDelta: snapshot.xp, coinDelta: snapshot.coins })
+        });
+        
+        if (res.ok) {
+            // SUCCESS: Subtract exactly what we synced from the buffer
+            // This ensures XP earned *during* this fetch is preserved
+            pendingDeltasRef.current.xp -= snapshot.xp;
+            pendingDeltasRef.current.coins -= snapshot.coins;
+        } else {
+             const data = await res.json();
+             // If rate limited, we just wait for next cycle
+             if (res.status !== 429) {
+                console.error('Failed to sync engagement deltas:', data.error);
+             }
+        }
+    } catch (e) {
+        console.error('Network error during engagement sync', e);
+        // On error, we don't subtract; deltas will stay in buffer for next attempt
+    } finally {
+        isSyncingRef.current = false;
+    }
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+        const timer = setInterval(syncToServer, 5000);
+
+        // FINAL SYNC BEFORE DEPARTURE
+        const handleBeforeUnload = () => {
+            if (pendingDeltasRef.current.xp > 0 || pendingDeltasRef.current.coins > 0) {
+               // We use fetch with keepalive: true to ensure the request finishes even after close
+               const body = JSON.stringify({ xpDelta: pendingDeltasRef.current.xp, coinDelta: pendingDeltasRef.current.coins });
+               navigator.sendBeacon('/api/auth/update-stats', body);
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => {
+            clearInterval(timer);
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+            syncToServer();
+        };
+    }
+  }, [isAuthenticated, syncToServer]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const savedXp = parseInt(localStorage.getItem('truyenvip_xp') || '0');
+    const savedCoins = parseInt(localStorage.getItem('truyenvip_coins') || '0');
+    const savedLastCheckIn = localStorage.getItem('truyenvip_last_checkin') || '';
+    const savedStreak = parseInt(localStorage.getItem('truyenvip_checkin_streak') || '0');
+    let savedUuid = localStorage.getItem('truyenvip_user_uuid');
+    if (!savedUuid) {
+        savedUuid = 'v-' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('truyenvip_user_uuid', savedUuid);
+    }
+    hasCelebratedLevelRef.current = Math.floor(savedXp / 100) + 1;
+    setMounted(true);
+
+    // Multi-Tab Presence Sync: Listen for updates from other tabs
+    const handleStorageChange = (e) => {
+        if (e.key === 'truyenvip_xp' || e.key === 'truyenvip_coins') {
+            const nextXp = parseInt(localStorage.getItem('truyenvip_xp') || '0');
+            const nextCoins = parseInt(localStorage.getItem('truyenvip_coins') || '0');
+            const nextUuid = localStorage.getItem('truyenvip_user_uuid') || '';
+            
+            // Sync internal state with the new storage values (ServerSync: false to avoid loop)
+            dispatch({ type: 'SYNC_USER', payload: { xp: nextXp, vipCoins: nextCoins, uuid: nextUuid } });
+        }
+    };
+
+    const handleVisibilityChange = () => {
+        setIsTabActive(document.visibilityState === 'visible');
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+        window.removeEventListener('storage', handleStorageChange);
+        window.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
+  const uXp = user?.xp ?? 0;
+  const uCoins = user?.vipCoins ?? 0;
+  const uUuid = user?.uuid ?? '';
+
+  useEffect(() => {
+    if (isAuthenticated) {
+        // RECONCILIATION: Server baseline + Local unsynced deltas
+        // This prevents the server's slightly-stale session data from wiping out 
+        // local XP that hasn't finished hitting the sync loop yet.
+        const adjustedXp = uXp + pendingDeltasRef.current.xp;
+        const adjustedCoins = uCoins + pendingDeltasRef.current.coins;
+
+        if (adjustedXp !== lastSyncRef.current.xp || adjustedCoins !== lastSyncRef.current.coins) {
+            dispatch({ type: 'SYNC_USER', payload: { 
+                xp: adjustedXp, 
+                vipCoins: adjustedCoins, 
+                uuid: uUuid, 
+                isServerSync: true 
+            }});
+            lastSyncRef.current = { xp: adjustedXp, coins: adjustedCoins };
+        }
+    }
+  }, [isAuthenticated, uXp, uCoins, uUuid]);
+
+  // DAILY MISSION AUTO-RESET (Midnight Guardian - Server Powered)
+  useEffect(() => {
+    if (!mounted) return;
+    const checkDateChange = async () => {
+        try {
+            const timeRes = await fetch('/api/system/time');
+            const { dateString } = await timeRes.json();
+            
+            if (state.dailyMissions.date !== dateString) {
+                console.log('[Engagement] New day detected by Server. Resetting daily missions.');
+                dispatch({ type: 'RESET_MISSIONS' });
+                // We also update the mission date to the server's date string
+                localStorage.setItem('truyenvip_daily_missions', JSON.stringify({ ...state.dailyMissions, date: dateString }));
+            }
+        } catch (e) {
+            // Fallback to local if server time fails
+            const today = new Date().toDateString();
+            if (state.dailyMissions.date !== today) {
+                dispatch({ type: 'RESET_MISSIONS' });
+            }
+        }
+    };
+    checkDateChange();
+    const timer = setInterval(checkDateChange, 300000); // Check every 5 minutes
+    return () => clearInterval(timer);
+  }, [mounted, state.dailyMissions.date, state.dailyMissions]);
+
+  useEffect(() => {
+      if (mounted && state.level > hasCelebratedLevelRef.current) {
+          const newLevels = [];
+          for (let i = hasCelebratedLevelRef.current + 1; i <= state.level; i++) {
+              newLevels.push(i);
+          }
+          setCelebrationQueue(prev => [...prev, ...newLevels]);
+          hasCelebratedLevelRef.current = state.level;
+      }
+  }, [state.level, mounted]);
+
+  useEffect(() => {
+      if (!activeCelebration && celebrationQueue.length > 0) {
+          const nextLevel = celebrationQueue[0];
+          setActiveCelebration(nextLevel);
+          setCelebrationQueue(prev => prev.slice(1));
+      }
+  }, [celebrationQueue, activeCelebration]);
+
+  const addXp = useCallback((amount, silent = false) => {
+    const now = Date.now();
+    // TITAN THROTTLE: Prevent XP spamming (10s cooldown)
+    if (!silent && now - lastXpGainTimeRef.current < 10000) {
+        if (addToast) addToast("Đạo hữu tu hành quá nhanh, hãy bình tâm tĩnh khí!", "info");
+        return;
+    }
+    
+    if (!silent) lastXpGainTimeRef.current = now;
+
+    dispatch({ type: 'ADD_XP', amount });
+    pendingDeltasRef.current.xp += amount;
+    if (!silent && addToast) addToast(`+${amount} XP`, 'xp');
+  }, [addToast]);
+
+  const addCoins = useCallback((amount, silent = false) => {
+    dispatch({ type: 'ADD_COINS', amount });
+    pendingDeltasRef.current.coins += amount;
+    if (!silent && addToast) addToast(`+${amount} VipCoins`, 'coin');
+  }, [addToast]);
+
+  const deductCoins = useCallback((amount) => {
+    dispatch({ type: 'DEDUCT_COINS', amount });
+    pendingDeltasRef.current.coins -= amount;
+  }, []);
+
+  const updateMission = useCallback((type, increment = 1) => {
+    dispatch({ type: 'UPDATE_MISSION', type, increment });
+  }, []);
+
+  const checkIn = useCallback((forcedDate) => {
+    const today = forcedDate || new Date().toDateString();
+    if (state.lastCheckIn === today) return { success: false, msg: 'Đạo hữu đã báo danh hôm nay rồi!' };
+
+    let nextStreak = state.checkInStreak + 1;
+    if (state.lastCheckIn) {
+        const lastDate = new Date(state.lastCheckIn);
+        const nowDate = new Date(today);
+        lastDate.setHours(0,0,0,0);
+        nowDate.setHours(0,0,0,0);
+        const diffDays = Math.round((nowDate - lastDate) / (1000 * 60 * 60 * 24));
+        if (diffDays === 0) return { success: false, msg: 'Đạo hữu đã báo danh hôm nay rồi!' };
+        if (diffDays > 1) nextStreak = 1;
+    }
+
+    dispatch({ type: 'CHECK_IN', today, nextStreak });
+    const xpReward = 50 + (nextStreak * 10);
+    const coinReward = 100 + (nextStreak * 20);
+    addXp(xpReward, true);
+    addCoins(coinReward, true);
+
+    let msg = `Báo danh thành công! Nhận ${xpReward} XP & ${coinReward} VipCoins.`;
+    if (nextStreak === 7) {
+        addCoins(1000, true);
+        msg += " ✨ CHÚC MỪNG: Thưởng chuỗi 7 ngày +1000 VipCoins!";
+    }
+    if (addToast) addToast(msg, 'success');
+    return { success: true, msg };
+  }, [state.lastCheckIn, state.checkInStreak, addXp, addCoins, addToast]);
+
+  const openChest = useCallback((missionId) => {
+    const m = state.dailyMissions.missions.find(mi => mi.id === missionId);
+    if (!m || m.claimed || m.current < m.target) return;
+
+    const currentRank = [...RANKS].reverse().find(r => state.level >= r.lv);
+    const chestType = currentRank ? currentRank.chest : 'Wood';
+    const chest = CHEST_DATA[chestType];
+    const rand = Math.random() * 100;
+    let accumulated = 0;
+    let prize = null;
+
+    for (const item of chest.loot) {
+        accumulated += item.weight;
+        if (rand <= accumulated) {
+            const amount = Math.floor(Math.random() * (item.range[1] - item.range[0] + 1)) + item.range[0];
+            prize = { type: item.type, amount, name: chest.name };
+            break;
+        }
+    }
+
+    if (prize) {
+        dispatch({ type: 'CLAIM_MISSION', missionId });
+        if (prize.type === 'xp') addXp(prize.amount, true);
+        else addCoins(prize.amount, true);
+        if (addToast) addToast(`Mở ${prize.name}: +${prize.amount} ${prize.type === 'xp' ? 'XP' : 'VipCoins'}`, prize.type === 'xp' ? 'xp' : 'coin');
+        return { ...prize, chestName: chest.name };
+    }
+    return null;
+  }, [state.dailyMissions, state.level, addXp, addCoins, addToast]);
+
+  const getRankInfo = useCallback((currentXp) => {
+    const calculatedLevel = Math.floor(currentXp / 100) + 1;
+    return [...RANKS].reverse().find(r => calculatedLevel >= r.lv) || { title: 'Phàm Nhân', chest: 'Wood' };
+  }, []);
+
+  const memoValue = useMemo(() => ({
+    ...state,
+    xpProgress: state.xp % 100,
+    addXp, addCoins, deductCoins,
+    updateMission, openChest, checkIn,
+    getRankInfo,
+    mounted
+  }), [state, addXp, addCoins, deductCoins, updateMission, openChest, checkIn, getRankInfo, mounted]);
+
+  useEffect(() => {
+    if (mounted) document.body.classList.add('titan-mounted');
+  }, [mounted]);
+
+  return (
+    <EngagementContext.Provider value={memoValue}>
+      {children}
+      {mounted && activeCelebration && (
+        <LevelUpOverlay 
+            level={activeCelebration} 
+            rank={[...RANKS].reverse().find(r => activeCelebration >= r.lv)?.title || 'Phàm Nhân'} 
+            onComplete={() => setActiveCelebration(null)} 
+        />
+      )}
+    </EngagementContext.Provider>
+  );
+}
+
+export const useEngagement = () => useContext(EngagementContext);

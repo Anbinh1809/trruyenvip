@@ -1,0 +1,59 @@
+'use client';
+
+import { useState } from 'react';
+
+export default function ExpandableText({ text, limit = 300 }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  if (!text) return null;
+
+  const sanitizeHtml = (rawHtml) => {
+    if (!rawHtml) return '';
+    return rawHtml
+      .replace(/<script\b[^>]*>([\s\S]*?)<\/script>/gim, '')
+      .replace(/<iframe\b[^>]*>([\s\S]*?)<\/iframe>/gim, '')
+      .replace(/<object\b[^>]*>([\s\S]*?)<\/object>/gim, '')
+      .replace(/on\w+="[^"]*"/gim, '')
+      .replace(/on\w+='[^']*'/gim, '')
+      .replace(/on\w+=\S+/gim, '')
+      .replace(/javascript:[^"']*/gim, '#')
+      .replace(/data:[^"']*/gim, '#')
+      .replace(/style="[^"]*"/gim, '');
+  };
+
+  const sanitizedFull = sanitizeHtml(text);
+  const isLong = sanitizedFull.length > limit;
+  const displayText = isExpanded ? sanitizedFull : sanitizedFull.substring(0, limit) + (isLong ? '...' : '');
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <div 
+        className="titan-detail-description" 
+        style={{ marginBottom: '10px', lineHeight: '1.6', color: 'var(--text-secondary)' }}
+        dangerouslySetInnerHTML={{ __html: displayText }}
+      />
+      {isLong && (
+        <button 
+          onClick={() => setIsExpanded(!isExpanded)}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            color: 'var(--accent)',
+            fontWeight: '800',
+            fontSize: '0.9rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px',
+            marginBottom: '30px',
+            padding: 0,
+            transition: 'transform 0.2s ease'
+          }}
+          onMouseOver={(e) => e.currentTarget.style.transform = 'translateX(5px)'}
+          onMouseOut={(e) => e.currentTarget.style.transform = 'translateX(0)'}
+        >
+          {isExpanded ? '⬆️ Thu gọn' : '👇 Xem thêm'}
+        </button>
+      )}
+    </div>
+  );
+}

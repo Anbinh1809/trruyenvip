@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 💎 TruyenVip Gold Master - Nền tảng Đọc Truyện Tranh Tối Thượng
 
-## Getting Started
+![Header Icon](https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/gem.svg)
 
-First, run the development server:
+**TruyenVip** không chỉ là một website đọc truyện, mà là một hệ sinh thái content được gia cố với những tiêu chuẩn khắt khe nhất về bảo mật, hiệu năng và thẩm mỹ.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🚀 Tính năng "God-Tier" Crawler
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Cỗ máy cào dữ liệu của TruyenVip được thiết kế để tự vận hành và tự phục hồi (Self-healing):
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+- **Smart Deduplication**: Tự động hợp nhất dữ liệu từ nhiều nguồn (NetTruyen, TruyenQQ) dựa trên thuật toán so khớp Slug & Title, đảm bảo không bao giờ bị trùng lặp truyện.
+- **Gap Detection & Auto-Backfill**: Tự động phát hiện các chương bị thiếu trong lịch sử và thực hiện đồng bộ hóa sâu (Deep-Sync) để lấp đầy khoảng trống dữ liệu.
+- **Atomic Concurrency Control**: Cơ chế Wait-Lock thông minh ngăn chặn Race Condition khi nhiều tiến trình cùng cào ảnh cho một chương.
+- **Monotonic Progress Protection**: Đảm bảo XP và Coins của người dùng luôn tăng trưởng ổn định, không bị ghi đè bởi dữ liệu cũ từ network.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛡️ Hệ thống Bảo mật & Hạ tầng "Sắt"
 
-## Learn More
+- **SSRF Ironclad**: Image Proxy được bảo vệ bởi danh sách Domain Whitelist nghiêm ngặt, ngăn chặn tấn công SSRF.
+- **Antidote for XSS**: Toàn bộ dữ liệu Metadata và JSON-LD được khử trùng và mã hóa (Sanitized) trước khi render.
+- **Integrity Constraints**: Ràng buộc Database cấp độ cứng (UNIQUE, ON DELETE CASCADE) giúp dữ liệu luôn toàn vẹn và sạch sẽ.
+- **Boot Resilience**: Cơ chế Retry-Wait giúp ứng dụng tự phục hồi và chờ đợi Database khi khởi động lại server.
 
-To learn more about Next.js, take a look at the following resources:
+## ✨ Thẩm mỹ Cinematic
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Typography Mastery**: Sử dụng phông chữ **Outfit** cho tiêu đề mạnh mẽ và **Inter** cho nội dung mượt mà.
+- **Sleek UI/UX**: Ngôn ngữ thiết kế Glassmorphism, Dark mode cao cấp và hiệu ứng Micro-animations đỉnh cao.
+- **Responsive Architecture**: Tối ưu hóa tuyệt đối cho di động với Dashboard Rank & Level riêng biệt.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🛠️ Hướng dẫn Cài đặt
 
-## Deploy on Vercel
+### yêu cầu hệ thống
+- **Node.js**: v18+
+- **Database**: Microsoft SQL Server (MSSQL)
+- **Environment Variables**:
+  ```env
+  DB_USER=your_user
+  DB_PASSWORD=your_password
+  DB_SERVER=your_host
+  DB_NAME=TruyenVip
+  NODE_ENV=production
+  ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Các bước triển khai
+1. **Cài đặt dependencies**: `npm install`
+2. **Khởi tạo Database**: `node db-init.js`
+3. **Build ứng dụng**: `npm run build`
+4. **Khởi chạy**: `npm start`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+**TruyenVip - Nâng tầm trải nghiệm đọc truyện tranh của bạn.**

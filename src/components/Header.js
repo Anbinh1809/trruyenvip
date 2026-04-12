@@ -1,0 +1,162 @@
+'use client';
+
+import { useTheme } from '@/context/ThemeContext';
+import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import { useEngagement } from '@/context/EngagementContext';
+import { useAuth } from '@/context/AuthContext';
+import LiveSearch from './LiveSearch';
+
+export default function Header() {
+  const { theme, toggleTheme } = useTheme();
+  const engagement = useEngagement() || {};
+  const { vipCoins = 0, level = 1, rankTitle = 'Phàm Nhân', xpProgress = 0 } = engagement;
+  const { user, isAuthenticated, logout, loading } = useAuth();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => setMounted(true), 0);
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+
+    // TITAN HEARTBEAT: Extend session every 5 minutes if authenticated
+    let heartbeatInterval;
+    if (isAuthenticated) {
+        heartbeatInterval = setInterval(() => {
+            fetch('/api/auth/heartbeat', { method: 'POST' }).catch(() => {});
+        }, 300000); // 5 mins
+    }
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('scroll', handleScroll);
+      if (heartbeatInterval) clearInterval(heartbeatInterval);
+    };
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+        document.body.style.overflow = '';
+    };
+  }, [isMenuOpen]);
+
+  return (
+    <header className={`titan-header glass-nav ${isScrolled ? 'scrolled' : ''}`}>
+      <div className="container">
+        <div className="header-wrapper">
+          <Link href="/" className="logo">
+            <span>Truyen</span>
+            <span style={{ color: 'var(--accent)' }}>Vip</span>
+          </Link>
+
+          <nav className={`nav-titan ${isMenuOpen ? 'nav-open' : ''}`}>
+            <div className="mobile-only-header" style={{ display: isMenuOpen ? 'flex' : 'none', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: '30px' }}>
+                <span className="logo">Truyen<span style={{ color: 'var(--accent)' }}>Vip</span></span>
+                <button style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '1.5rem', cursor: 'pointer' }} onClick={() => setIsMenuOpen(false)}>×</button>
+            </div>
+            
+            {mounted && isAuthenticated && isMenuOpen && (
+                <div style={{ width: '100%', padding: '15px', borderRadius: '16px', marginBottom: '20px', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontWeight: 800, fontSize: '1.1rem' }}>{user?.username}</span>
+                        <span style={{ fontSize: '0.6rem', background: 'var(--accent)', color: 'white', padding: '2px 6px', borderRadius: '4px' }}>{user?.role === 'admin' ? 'ADMIN' : 'USER'}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px', fontSize: '0.85rem', fontWeight: 700 }}>
+                        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '4px 10px', borderRadius: '20px' }}>💰 {new Intl.NumberFormat().format(vipCoins)}</div>
+                        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '4px 10px', borderRadius: '20px' }}>Lv.{level} - {rankTitle}</div>
+                    </div>
+                </div>
+            )}
+
+            <div className="desktop-search-container desktop-only" style={{ flex: 1, maxWidth: '550px', margin: '0 40px' }}>
+                <LiveSearch />
+            </div>
+            <Link href="/genres" className="nav-link-titan" onClick={() => setIsMenuOpen(false)}>Thể loại</Link>
+            <Link href="/transfer" className="nav-link-titan" onClick={() => setIsMenuOpen(false)}>Dịch chuyển</Link>
+            <Link href="/leaderboard" className="nav-link-titan" onClick={() => setIsMenuOpen(false)}>Xếp hạng</Link>
+          </nav>
+
+          <div className="header-actions">
+            <button 
+              className="search-toggle-mobile mobile-only" 
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', width: '40px', height: '40px', borderRadius: '50%', fontSize: '1rem', cursor: 'pointer' }} 
+              onClick={() => setIsMenuOpen(true)}
+            >
+              🔍
+            </button>
+
+            {!loading && !isAuthenticated && mounted ? (
+               <Link href="/auth/login" className="btn btn-primary login-btn">
+                 {mounted && typeof window !== 'undefined' && window.innerWidth < 600 ? 'Đăng nhập' : 'Đăng nhập'}
+               </Link>
+            ) : (
+                mounted && isAuthenticated ? (
+                    <div className="user-profile-titan desktop-only">
+                        <div style={{ textAlign: 'right', cursor: 'pointer' }}>
+                            <Link href="/rewards" style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '2px', color: '#ffd700', fontSize: '0.85rem', fontWeight: 800, textDecoration: 'none' }}>
+                                🪙 {new Intl.NumberFormat().format(vipCoins)} <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)' }}>VipCoins</span>
+                            </Link>
+                            <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'rgba(255,255,255,0.6)' }}>
+                                <span style={{ color: 'var(--accent)' }}>Cấp {level}</span> {' // '} {rankTitle}
+                            </div>
+                        </div>
+                        
+                        <div className="profile-dropdown-titan glass">
+                            <div style={{ display: 'flex', gap: '15px', padding: '15px' }}>
+                                <div style={{ width: '45px', height: '45px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                                    <img 
+                                        src={`https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(user?.username || 'Guest')}&backgroundColor=transparent`} 
+                                        alt="Avatar" 
+                                        style={{ width: '80%', height: '80%', objectFit: 'contain' }}
+                                    />
+                                </div>
+                                <div>
+                                    <p style={{ fontWeight: 800, color: 'white', fontSize: '0.95rem' }}>{user?.username || 'Đạo Hữu'}</p>
+                                    <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}>{user?.role === 'admin' ? 'Quản trị viên' : 'Độc giả VIP'}</p>
+                                </div>
+                            </div>
+                            <div style={{ height: '1px', background: 'rgba(255,255,255,0.05)', margin: '5px 0' }} />
+                            <Link href="/profile" style={{ display: 'block', padding: '12px 15px', color: 'rgba(255,255,255,0.8)', fontSize: '0.85rem', fontWeight: 700, textDecoration: 'none' }}>Hồ sơ cá nhân</Link>
+                            <Link href="/favorites" style={{ display: 'block', padding: '12px 15px', color: 'rgba(255,255,255,0.8)', fontSize: '0.85rem', fontWeight: 700, textDecoration: 'none' }}>Truyện yêu thích</Link>
+                            {user?.role === 'admin' && (
+                                <Link href="/admin" style={{ display: 'block', padding: '12px 15px', color: 'var(--accent)', fontSize: '0.85rem', fontWeight: 800, textDecoration: 'none' }}>Bảng điều khiển Admin</Link>
+                            )}
+                            <div style={{ height: '1px', background: 'rgba(255,255,255,0.05)', margin: '5px 0' }} />
+                            <button onClick={logout} style={{ width: '100%', textAlign: 'left', padding: '12px 15px', background: 'none', border: 'none', color: '#ff3e3e', fontSize: '0.85rem', fontWeight: 800, cursor: 'pointer' }}>Đăng xuất</button>
+                        </div>
+                    </div>
+                ) : <div style={{ width: 100, opacity: 0 }} />
+            )}
+
+            <button 
+              className="theme-toggle desktop-only" 
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', width: '45px', height: '45px', borderRadius: '50%', fontSize: '1.2rem', cursor: 'pointer' }} 
+              onClick={toggleTheme}
+            >
+              {mounted ? (theme === 'light' ? '🌙' : '☀️') : '...'}
+            </button>
+            <button 
+              className="mobile-menu-btn desktop-hide" 
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', width: '45px', height: '45px', borderRadius: '12px', cursor: 'pointer' }} 
+              onClick={() => setIsMenuOpen(true)}
+            >
+              <div style={{ width: '20px', height: '2px', background: 'white', margin: '0 auto', position: 'relative' }}>
+                  <div style={{ position: 'absolute', width: '100%', height: '2px', background: 'white', top: '-6px' }} />
+                  <div style={{ position: 'absolute', width: '100%', height: '2px', background: 'white', bottom: '-6px' }} />
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+}

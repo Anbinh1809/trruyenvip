@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  /* config options here */
+  // Absolute bare minimum for Next.js 16 Stability
+  images: {
+    unoptimized: true, 
+  },
 };
 
 export default nextConfig;

@@ -1,0 +1,24 @@
+{
+  "name": "TruyenVip Premium",
+  "short_name": "TruyenVip",
+  "description": "Nền tảng đọc truyện tranh online cao cấp nhất Việt Nam.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#ff3e3e",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/apple-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

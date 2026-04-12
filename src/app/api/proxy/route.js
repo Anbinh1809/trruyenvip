@@ -1,0 +1,202 @@
+import sharp from 'sharp';
+import { query } from '@/lib/db';
+
+// RAM OPTIMIZATION: Disable internal cache to prevent memory buildup in long-running processes
+sharp.cache(false);
+
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const imageUrl = searchParams.get('url');
+  const quality = parseInt(searchParams.get('q') || '75');
+  const width = parseInt(searchParams.get('w') || '0');
+
+  if (!imageUrl) {
+    return new Response('Missing URL', { status: 400 });
+  }
+
+
+  const allowedDomains = [
+    'nettruyen.work', 'truyenqqno.com', 'kcgsbok.com', 'nettruyennew.com', 
+    'nettruyen.com', 'nettryuen.com', 'nettruyenmax.com', 'nettruyenon.com',
+    'image.nettruyen.com', 'st.nettruyennew.com', 'st.nettruyen.com',
+    'nettruyen.cc', 'nettruyenhay.com', 'truyen-qq.com', 'truyenqq.com',
+    'hinhhinh.com', 'truyenvua.com', 'cmanga.com', 'cmanga.nu',
+    'nt-cdn.xyz', 'nt-cdn.com', 'imagetruyen.com', 'blogtruyen.vn',
+    'nettruyenco.vn', 'nettruyenco.com', 'nhattruyento.com', 'nhattruyen.com', 
+    'nhattruyenmax.com', 'nhattruyenmin.com', 'st.nhattruyen.com', 'animez.com', 
+    'manga-tx.com', 'manhuavn.com', 'nhattruyenfree.com', 'nhattruyencovn.com',
+    'st.nhattruyennew.com', 'st.nhattruyencovn.com', 'nettruyenme.com',
+    'nettruyenpro.com', 'nettruyenking.com', 'nettruyenvi.com', 'ttquu.com',
+    'tintruyen.net', 'nettruyenone.com', 'nt-cdn1.xyz', 'nt-cdn2.xyz'
+  ];
+  
+  try {
+    const parsedUrl = new URL(imageUrl);
+    const domain = parsedUrl.hostname;
+
+    // PROTOCOL SHIELD: Only allow standard web protocols
+    if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+        return new Response('Forbidden: Invalid protocol', { status: 403 });
+    }
+
+    // SSRF Protection: Titan-grade Numeric IP Shield
+    const blocklist = ['localhost', '127.0.0.1', '0.0.0.0', '::1'];
+    
+    const isPrivateIP = (ip) => {
+        const parts = ip.split('.').map(Number);
+        if (parts.length !== 4 || parts.some(isNaN)) return false;
+        return (
+            parts[0] === 10 ||
+            (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) ||
+            (parts[0] === 192 && parts[1] === 168) ||
+            (parts[0] === 127) ||
+            (parts[0] === 0)
+        );
+    };
+
+    // If the hostname is an IP, check it directly. 
+    // If it's a domain, the whitelist check below is the primary defense.
+    if (/^[0-9.]+$/.test(domain) && isPrivateIP(domain)) {
+        return new Response('Forbidden: Internal IP access blocked', { status: 403 });
+    }
+
+    if (blocklist.includes(domain)) {
+        return new Response('Forbidden: Local address access blocked', { status: 403 });
+    }
+
+    // Proxy Loop Protection
+    if (imageUrl.includes('/api/proxy') || domain.includes('truyenvip.com')) {
+        return new Response('Forbidden: Proxy recursion blocked', { status: 403 });
+    }
+
+    const isAllowed = allowedDomains.some(d => domain === d || domain.endsWith('.' + d));
+    if (!isAllowed) return new Response('Forbidden: Domain not whitelisted', { status: 403 });
+
+    // Multi-Stage Referer Strategies (The "Gauntlet")
+    const strategies = [
+        { name: 'Self-Domain', referer: `https://${domain}/` },
+        { name: 'On-Domain', referer: 'https://nettruyenon.com/' },
+        { name: 'QQ-Domain', referer: 'https://truyenqqno.com/' },
+        { name: 'Co-Domain', referer: 'https://www.nettruyenco.vn/' },
+        { name: 'Stealth', referer: '' }
+    ];
+
+    const userAgents = [
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Mobile/15E148 Safari/604.1',
+        'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Mobile Safari/537.36',
+    ];
+
+    let lastError = null;
+    for (const strategy of strategies) {
+        try {
+            const headers = { 
+                'User-Agent': userAgents[Math.floor(Math.random() * userAgents.length)],
+                'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+                'Accept-Language': 'vi,en-US;q=0.9,en;q=0.8',
+                'Cache-Control': 'no-cache'
+            };
+            if (strategy.referer) headers['Referer'] = strategy.referer;
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout per strategy
+
+            const response = await fetch(imageUrl, { 
+                headers, 
+                signal: controller.signal,
+                next: { revalidate: 3600 } 
+            });
+            
+            clearTimeout(timeoutId);
+
+            if (response.ok) {
+                const buffer = await response.arrayBuffer();
+                const contentType = response.headers.get('content-type') || 'image/jpeg';
+                
+                // --- Smart Image Optimization ---
+                // Skip Sharp for GIFs (to preserve animation) or if Sharp fails
+                if (contentType.includes('gif')) {
+                    return new Response(buffer, {
+                        headers: {
+                            'Content-Type': 'image/gif',
+                            'Cache-Control': 'public, max-age=31536000, stale-while-revalidate=86400, s-maxage=31536000, immutable',
+                            'Access-Control-Allow-Origin': '*',
+                        },
+                    });
+                }
+
+                try {
+                    let transformer = sharp(Buffer.from(buffer));
+                    
+                    // Add resizing if width is specified
+                    if (width > 0) {
+                        transformer = transformer.resize({ 
+                            width: Math.min(width, 2000), // Cap at 2000px for safety
+                            withoutEnlargement: true 
+                        });
+                    }
+
+                    const processedBuffer = await transformer
+                        .webp({ quality: quality, effort: 4 })
+                        .toBuffer();
+
+                    return new Response(processedBuffer, {
+                        headers: {
+                            'Content-Type': 'image/webp',
+                            'Cache-Control': 'public, max-age=31536000, stale-while-revalidate=604800, s-maxage=31536000, immutable',
+                            'Access-Control-Allow-Origin': '*',
+                            'X-Robots-Tag': 'noindex, nofollow',
+                            'Referrer-Policy': 'no-referrer',
+                            'X-Optimization': 'sharp-webp'
+                        },
+                    });
+                } catch (sharpError) {
+                    console.error('Sharp optimization failed, falling back to original:', sharpError.message);
+                    return new Response(buffer, {
+                        headers: {
+                            'Content-Type': response.headers.get('content-type') || 'image/jpeg',
+                            'Cache-Control': 'public, max-age=31536000, stale-while-revalidate=86400, immutable',
+                            'Access-Control-Allow-Origin': '*',
+                            'X-Robots-Tag': 'noindex, nofollow',
+                            'Referrer-Policy': 'no-referrer'
+                        },
+                    });
+                }
+            }
+            lastError = `Status ${response.status} via ${strategy.name}`;
+        } catch (e) {
+            lastError = e.message;
+        }
+    }
+
+    throw new Error(`Exhausted all strategies. Last: ${lastError}`);
+
+  } catch (error) {
+    console.error('Ultimate Proxy Error:', error.message, imageUrl);
+
+    // Diagnostic Logging for persistent failures
+    try {
+        await query("INSERT INTO CrawlLogs (message, status) VALUES (@message, 'error')", { 
+            message: `? Proxy Failure: ${error.message.substring(0, 100)} | URL: ${imageUrl.substring(0, 300)}`
+        });
+    } catch (e) {}
+    
+    // --- SLEEK EMBEDDED PLACEHOLDER ---
+    // A clean, dark-themed SVG so we don't depend on external sites for error states
+    const errorSvg = `
+      <svg width="400" height="600" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+        <rect width="400" height="600" fill="#121212"/>
+        <path d="M150 250 L250 250 L200 180 Z" fill="#333"/>
+        <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" fill="#555" font-weight="bold">TRUYEN VIP</text>
+        <text x="50%" y="58%" dominant-baseline="middle" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#333">Content Unavailable</text>
+        <rect x="100" y="380" width="200" height="2" fill="#222"/>
+      </svg>
+    `.trim();
+
+    return new Response(errorSvg, {
+        headers: {
+            'Content-Type': 'image/svg+xml',
+            'Cache-Control': 'public, max-age=3600'
+        }
+    });
+  }
+}

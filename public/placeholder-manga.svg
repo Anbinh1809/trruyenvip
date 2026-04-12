@@ -1,0 +1,7 @@
+<svg width="400" height="600" viewBox="0 0 400 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="600" fill="#0A0A0A"/>
+  <rect x="0.5" y="0.5" width="399" height="599" stroke="white" stroke-opacity="0.05"/>
+  <path d="M120 250L280 250M200 180V320" stroke="white" stroke-opacity="0.1" stroke-width="4" stroke-linecap="round"/>
+  <text x="50%" y="360" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="900" font-size="24" fill="white" fill-opacity="0.2" letter-spacing="4">TRUYEN VIP</text>
+  <text x="50%" y="390" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="14" fill="white" fill-opacity="0.1">Đang nạp linh khí...</text>
+</svg>

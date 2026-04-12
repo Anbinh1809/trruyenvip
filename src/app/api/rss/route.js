@@ -1,0 +1,71 @@
+import { query } from '@/lib/db';
+
+export const dynamic = 'force-dynamic';
+
+export async function GET(request) {
+    try {
+        const result = await query(`
+            SELECT TOP 50 
+                c.id as chapter_id,
+                c.title as chapter_title,
+                c.chapter_number,
+                c.updated_at,
+                m.id as manga_id,
+                m.title as manga_title,
+                m.cover as manga_cover,
+                m.description as manga_description
+            FROM Chapters c
+            JOIN Manga m ON c.manga_id = m.id
+            ORDER BY c.updated_at DESC
+        `);
+
+        const chapters = result.recordset;
+        const host = request.headers.get('host') || 'truyenvip.com';
+        const protocol = host.startsWith('localhost') ? 'http' : 'https';
+        const origin = `${protocol}://${host}`;
+
+        const rssItems = chapters.map(chap => {
+            const chapUrl = `${origin}/manga/${chap.manga_id}/chapter/${chap.chapter_id}`;
+            const coverUrl = chap.manga_cover.startsWith('http') 
+                ? `${origin}/api/proxy?url=${encodeURIComponent(chap.manga_cover)}` 
+                : `${origin}${chap.manga_cover}`;
+            
+            return `
+                <item>
+                    <title><![CDATA[${chap.manga_title} - ${chap.chapter_title}]]></title>
+                    <link>${chapUrl}</link>
+                    <guid isPermaLink="false">${chap.chapter_id}</guid>
+                    <pubDate>${new Date(chap.updated_at).toUTCString()}</pubDate>
+                    <description><![CDATA[
+                        <img src="${coverUrl}" width="200" style="margin-bottom: 10px;" /><br/>
+                        Chương mới nhất của bộ truyện ${chap.manga_title} đã được cập nhật trên TruyenVip.
+                    ]]></description>
+                </item>
+            `;
+        }).join('');
+
+        const rssFeed = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2001/Atom">
+<channel>
+    <title>TruyenVip - Mới Cập Nhật</title>
+    <link>${origin}</link>
+    <description>Nền tảng đọc truyện tranh online cao cấp, cập nhật chương mới nhanh nhất.</description>
+    <language>vi</language>
+    <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
+    <atom:link href="${origin}/api/rss" rel="self" type="application/rss+xml" />
+    ${rssItems}
+</channel>
+</rss>`.trim();
+
+        return new Response(rssFeed, {
+            headers: {
+                'Content-Type': 'application/xml',
+                'Cache-Control': 'public, s-maxage=1800, stale-while-revalidate=600'
+            }
+        });
+
+    } catch (e) {
+        console.error('RSS Feed Error:', e);
+        return new Response('<error>Lỗi hệ thống</error>', { status: 500 });
+    }
+}
