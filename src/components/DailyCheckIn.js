@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useEngagement } from '@/context/EngagementContext';
 
 export default function DailyCheckIn() {
