@@ -39,24 +39,44 @@ function translateSql(sql, params) {
         }
     }
 
-    // 2. Convert TOP (n) to LIMIT n (Basic regex)
-    translatedSql = translatedSql.replace(/SELECT TOP\s*\(?(\d+)\)?/gi, 'SELECT');
-    const topMatch = sql.match(/SELECT TOP\s*\(?(\d+)\)?/i);
-    if (topMatch && !translatedSql.toLowerCase().includes('limit')) {
-        translatedSql += ` LIMIT ${topMatch[1]}`;
+    // 2. Convert SELECT TOP n to LIMIT n (Handling nested subqueries)
+    // We use a regex that matches SELECT TOP n and moves the LIMIT to after the ORDER BY or FROM
+    // This is complex for a regex, so we handle the most common pattern found in this app.
+    translatedSql = translatedSql.replace(/SELECT\s+TOP\s+(\d+)\s+([\s\S]+?)(?=\)|$)/gi, (match, n, content) => {
+        // If it's a subquery (ends with ')'), we put LIMIT inside
+        return `SELECT ${content} LIMIT ${n}`;
+    });
+    // Fallback for non-subqueries if the regex above didn't catch it
+    if (translatedSql.includes('TOP')) {
+        const topMatch = translatedSql.match(/SELECT\s+TOP\s+(\d+)/i);
+        if (topMatch) {
+            translatedSql = translatedSql.replace(/TOP\s+\d+\s+/i, '');
+            translatedSql += ` LIMIT ${topMatch[1]}`;
+        }
     }
 
-    // 4. Convert SQL Server specific operators (CROSS APPLY / OUTER APPLY)
+    // 3. Convert SQL Server specific functions & identifiers
+    translatedSql = translatedSql.replace(/GETDATE\(\)/gi, 'NOW()');
+    translatedSql = translatedSql.replace(/ISNULL/gi, 'COALESCE');
+
+    // 4. Convert DATEADD (e.g., DATEADD(hour, -1, GETDATE()) -> NOW() - INTERVAL '1 hour')
+    // Regex matches: DATEADD(unit, amount, date)
+    translatedSql = translatedSql.replace(/DATEADD\s*\(\s*(\w+)\s*,\s*(-?\s*\d+)\s*,\s*([^)]+)\)/gi, (match, unit, amount, date) => {
+        const cleanAmount = amount.replace(/\s+/g, '');
+        const absAmount = Math.abs(parseInt(cleanAmount));
+        const sign = parseInt(cleanAmount) >= 0 ? '+' : '-';
+        return `(${date} ${sign} INTERVAL '${absAmount} ${unit}')`;
+    });
+
+    // 5. Convert SQL Server specific operators (CROSS APPLY / OUTER APPLY)
     translatedSql = translatedSql.replace(/CROSS APPLY/gi, 'CROSS JOIN LATERAL');
     translatedSql = translatedSql.replace(/OUTER APPLY/gi, 'LEFT JOIN LATERAL');
-    // Note: for LEFT JOIN LATERAL, ensure you add "ON TRUE" if the original query didn't have a JOIN condition.
-    // The translator handles the basic keyword switch. If complex queries fail, we inline them.
 
-    // 5. Clean schema prefixes and case-sensitivity
+    // 6. Clean schema prefixes and case-sensitivity
     translatedSql = translatedSql.replace(/dbo\./gi, ''); // Remove dbo. prefix
     translatedSql = translatedSql.replace(/\[(\w+)\]/g, '$1'); 
     
-    // 6. Fix calculateRank call specifically if found
+    // 7. Fix calculateRank call specifically if found
     translatedSql = translatedSql.replace(/calculateRank\(([^)]+)\)/gi, 'calculate_rank($1)');
 
     return { sql: translatedSql, values };
