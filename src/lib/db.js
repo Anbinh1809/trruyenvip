@@ -46,14 +46,18 @@ function translateSql(sql, params) {
         translatedSql += ` LIMIT ${topMatch[1]}`;
     }
 
-    // 3. Convert SQL Server specific functions & identifiers
-    translatedSql = translatedSql.replace(/GETDATE\(\)/gi, 'NOW()');
-    translatedSql = translatedSql.replace(/ISNULL/gi, 'COALESCE');
-    translatedSql = translatedSql.replace(/\[(\w+)\]/g, '$1'); // [Column] -> Column (Postgres handles unquoted as lowercase)
+    // 4. Convert SQL Server specific operators (CROSS APPLY / OUTER APPLY)
+    translatedSql = translatedSql.replace(/CROSS APPLY/gi, 'CROSS JOIN LATERAL');
+    translatedSql = translatedSql.replace(/OUTER APPLY/gi, 'LEFT JOIN LATERAL');
+    // Note: for LEFT JOIN LATERAL, ensure you add "ON TRUE" if the original query didn't have a JOIN condition.
+    // The translator handles the basic keyword switch. If complex queries fail, we inline them.
+
+    // 5. Clean schema prefixes and case-sensitivity
+    translatedSql = translatedSql.replace(/dbo\./gi, ''); // Remove dbo. prefix
+    translatedSql = translatedSql.replace(/\[(\w+)\]/g, '$1'); 
     
-    // 4. Convert MSSQL IF NOT EXISTS INSERT to Postgres ON CONFLICT (Conceptual/Basic)
-    // NOTE: Complex procedural IF blocks should be moved to schema.sql or rewritten.
-    // This translator handles simple conditional inserts if they follow standard patterns.
+    // 6. Fix calculateRank call specifically if found
+    translatedSql = translatedSql.replace(/calculateRank\(([^)]+)\)/gi, 'calculate_rank($1)');
 
     return { sql: translatedSql, values };
 }
