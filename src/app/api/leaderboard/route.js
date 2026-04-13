@@ -6,9 +6,10 @@ export const revalidate = 300; // Cache for 5 minutes
 export async function GET() {
     try {
         const result = await query(`
-            SELECT TOP 50 id, username, level, xp, avatar, contribution_points, badge_ids
+            SELECT id, username, level, xp, avatar, contribution_points, badge_ids
             FROM Users
             ORDER BY level DESC, xp DESC
+            LIMIT 50
         `);
 
         // Compute rank in JS instead of dbo.calculateRank

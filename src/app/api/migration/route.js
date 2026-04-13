@@ -86,16 +86,12 @@ export async function POST(req) {
             console.log(`[Migration] New manga detected via link: ${mangaId}. Triggering deep crawl...`);
             
             // Refined URL reconstruction
-            let detailUrl = url;
-            if (chapterSlug) {
-                const chapterIdx = url.indexOf(chapterSlug);
-                detailUrl = url.substring(0, chapterIdx);
-                // Remove trailing slash if present
-                if (detailUrl.endsWith('/')) detailUrl = detailUrl.slice(0, -1);
-                // TruyenQQ needs .html suffix for the main page
-                if (source === 'truyenqq' && !detailUrl.endsWith('.html')) {
-                    detailUrl += '.html';
-                }
+            // Robust URL reconstruction using the base origin and segments
+            let detailUrl = parsedUrl.origin;
+            if (source === 'nettruyen') {
+                detailUrl += `/truyen-tranh/${mangaId}`;
+            } else if (source === 'truyenqq') {
+                detailUrl += `/truyen/${mangaId}.html`;
             }
             
             await crawlFullMangaChapters(mangaId, detailUrl, source);

@@ -153,8 +153,8 @@ export default function RewardsPage() {
                                   <div style={{ fontWeight: 900, fontSize: '1.1rem', marginBottom: '3px' }}>Thẻ {req.card_type} <span style={{ color: 'var(--accent)' }}>{req.card_value}k</span></div>
                                   <div style={{ fontSize: '0.75rem', opacity: 0.4 }}>{new Date(req.created_at).toLocaleString()}</div>
                               </div>
-                              <div style={{ fontWeight: 800, color: req.status === 'Pending' ? '#ffa500' : '#10b981' }}>
-                                  {req.status === 'Pending' ? '⏳ Đang duyệt' : '✅ Hoàn tất'}
+                              <div style={{ fontWeight: 800, color: (req.status || '').toLowerCase() === 'pending' ? '#ffa500' : '#10b981' }}>
+                                  {(req.status || '').toLowerCase() === 'pending' ? '⏳ Đang duyệt' : '✅ Hoàn tất'}
                               </div>
                           </div>
                       ))}

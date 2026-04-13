@@ -7,10 +7,14 @@ export async function GET(request) {
     try {
         if (!mangaId) {
             // Default fallback for new users: Show recently updated top manga
-            const trending = await query("SELECT TOP 4 * FROM Manga ORDER BY views DESC, last_crawled DESC");
+            const trending = await query(`
+                SELECT * FROM Manga 
+                ORDER BY views DESC, last_crawled DESC 
+                LIMIT 4
+            `);
             return Response.json(trending.recordset.map(m => ({
                 ...m,
-                cover: m.cover.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : m.cover
+                cover: m.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : (m.cover || '/placeholder-manga.svg')
             })));
         }
 
@@ -21,10 +25,10 @@ export async function GET(request) {
 
         if (genresRes.recordset.length === 0) {
             // Fallback to trending
-            const trending = await query("SELECT TOP 4 * FROM Manga ORDER BY last_crawled DESC");
+            const trending = await query("SELECT * FROM Manga ORDER BY last_crawled DESC LIMIT 4");
             return Response.json(trending.recordset.map(m => ({
                 ...m,
-                cover: m.cover.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : m.cover
+                cover: m.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : (m.cover || '/placeholder-manga.svg')
             })));
         }
 
@@ -32,18 +36,19 @@ export async function GET(request) {
 
         // Find other manga with same genre
         const recommendationRes = await query(`
-            SELECT TOP 4 m.* FROM Manga m
+            SELECT m.* FROM Manga m
             JOIN MangaGenres mg ON m.id = mg.manga_id
             WHERE mg.genre_id = @genreId AND m.id != @mangaId
             ORDER BY m.last_crawled DESC
+            LIMIT 4
         `, { genreId, mangaId });
 
         return Response.json(recommendationRes.recordset.map(m => ({
             ...m,
-            cover: m.cover.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : m.cover
+            cover: m.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : (m.cover || '/placeholder-manga.svg')
         })));
     } catch (err) {
         console.error('Recommendations API Error:', err);
-        return new Response('Database error', { status: 500 });
+        return Response.json({ error: 'Database error' }, { status: 500 });
     }
 }

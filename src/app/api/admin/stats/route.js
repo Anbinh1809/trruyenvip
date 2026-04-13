@@ -15,15 +15,15 @@ export async function GET() {
 
         const stats = await query(`
             SELECT 
-                (SELECT COUNT(*) FROM Users) as totalUsers,
-                (SELECT COUNT(*) FROM Manga) as totalManga,
-                (SELECT COUNT(*) FROM Chapters) as totalChapters,
-                (SELECT COUNT(*) FROM RedemptionRequests WHERE status = 'Pending') as pendingRewards,
-                (SELECT COUNT(*) FROM CrawlerTasks WHERE status = 'pending') as taskPending,
-                (SELECT COUNT(*) FROM CrawlerTasks WHERE status = 'failed') as taskFailed,
-                (SELECT COUNT(*) FROM Chapters WHERE created_at > DATEADD(hour, -1, GETDATE())) as syncsLastHour,
-                (SELECT COUNT(*) FROM CrawlerTasks WHERE status = 'completed' AND updated_at > DATEADD(hour, -1, GETDATE())) as tasksLastHour,
-                (SELECT TOP 1 created_at FROM CrawlLogs ORDER BY created_at DESC) as lastCrawl
+                (SELECT COUNT(*) FROM Users) as "totalUsers",
+                (SELECT COUNT(*) FROM Manga) as "totalManga",
+                (SELECT COUNT(*) FROM Chapters) as "totalChapters",
+                (SELECT COUNT(*) FROM RedemptionRequests WHERE status = 'Pending') as "pendingRewards",
+                (SELECT COUNT(*) FROM CrawlerTasks WHERE status = 'pending') as "taskPending",
+                (SELECT COUNT(*) FROM CrawlerTasks WHERE status = 'failed') as "taskFailed",
+                (SELECT COUNT(*) FROM Chapters WHERE created_at > NOW() - INTERVAL '1 hour') as "syncsLastHour",
+                (SELECT COUNT(*) FROM CrawlerTasks WHERE status = 'completed' AND updated_at > NOW() - INTERVAL '1 hour') as "tasksLastHour",
+                (SELECT created_at FROM CrawlLogs ORDER BY created_at DESC LIMIT 1) as "lastCrawl"
         `);
 
         const data = stats.recordset[0];
@@ -32,6 +32,6 @@ export async function GET() {
         return Response.json(data);
     } catch (err) {
         console.error('Admin Stats Error:', err);
-        return new Response('Error fetching stats', { status: 500 });
+        return Response.json({ error: 'Error fetching stats', details: err.message }, { status: 500 });
     }
 }

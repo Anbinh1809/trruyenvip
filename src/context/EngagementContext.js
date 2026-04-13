@@ -52,7 +52,7 @@ const initialState = {
   checkInStreak: 0,
   lastCheckIn: '',
   dailyMissions: {
-    date: new Date().toDateString(),
+    date: new Date().toLocaleDateString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }),
     missions: [
         { id: 1, type: MISSION_TYPES.DAILY_LOGIN, target: 1, current: 0, label: 'Báo danh đạo hữu', xp: 50, claimed: false },
         { id: 2, type: MISSION_TYPES.READ_CHAPTER, target: 10, current: 0, label: 'Tu hành Cần mẫn (10 chương)', xp: 100, claimed: false },
@@ -131,7 +131,7 @@ function engagementReducer(state, action) {
         return { ...state, dailyMissions: nextMissions };
     }
     case 'RESET_MISSIONS': {
-        const nextMissions = { ...initialState.dailyMissions, date: new Date().toDateString() };
+        const nextMissions = { ...initialState.dailyMissions, date: new Date().toLocaleDateString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }) };
         localStorage.setItem('truyenvip_daily_missions', JSON.stringify(nextMissions));
         return { ...state, dailyMissions: nextMissions };
     }
@@ -298,7 +298,7 @@ export function EngagementProvider({ children }) {
             }
         } catch (e) {
             // Fallback to local if server time fails
-            const today = new Date().toDateString();
+            const today = new Date().toLocaleDateString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' });
             if (state.dailyMissions.date !== today) {
                 dispatch({ type: 'RESET_MISSIONS' });
             }
@@ -359,7 +359,7 @@ export function EngagementProvider({ children }) {
   }, []);
 
   const checkIn = useCallback((forcedDate) => {
-    const today = forcedDate || new Date().toDateString();
+    const today = forcedDate || new Date().toLocaleDateString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' });
     if (state.lastCheckIn === today) return { success: false, msg: 'Đạo hữu đã báo danh hôm nay rồi!' };
 
     let nextStreak = state.checkInStreak + 1;

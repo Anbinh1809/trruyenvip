@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS Manga (
     last_chap_num VARCHAR(100),
     rating DOUBLE PRECISION DEFAULT 0,
     views BIGINT DEFAULT 0,
+    views_at_source BIGINT DEFAULT 0,
     last_crawled TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     migration_count INTEGER DEFAULT 0,
     alternative_titles TEXT
@@ -133,6 +134,19 @@ CREATE TABLE IF NOT EXISTS GuardianReports (
     event_type VARCHAR(50),
     message TEXT,
     cover TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 8. Financial & Redemptions
+CREATE TABLE IF NOT EXISTS RedemptionRequests (
+    id SERIAL PRIMARY KEY,
+    user_uuid VARCHAR(255) NOT NULL,
+    user_name VARCHAR(255),
+    card_type VARCHAR(100),
+    card_value INTEGER,
+    phone_number VARCHAR(100),
+    status VARCHAR(50) DEFAULT 'pending',
+    reward_id VARCHAR(255),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 

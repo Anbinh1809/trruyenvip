@@ -21,9 +21,10 @@ export const metadata = {
 async function getManga() {
   try {
         const result = await query(`
-            SELECT TOP 60 ${MANGA_CARD_FIELDS}
+            SELECT ${MANGA_CARD_FIELDS}
             FROM Manga 
             ORDER BY last_crawled DESC
+            LIMIT 60
         `);
 
     return result.recordset.map(m => ({
@@ -45,6 +46,11 @@ export default async function Home() {
     <main className="home-page titan-bg" style={{ minHeight: '100vh', paddingBottom: '100px', color: 'white' }}>
       <Header />
       
+      {/* SEO Source of Truth */}
+      <h1 style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0,0,0,0)', border: 0 }}>
+          TruyenVip - Nền tảng Đọc Truyện Tranh Online Cao Cấp từ NetTruyen và TruyenQQ
+      </h1>
+
       <div className="hero-section-titan">
           <FeaturedSlider mangaList={mangaList} />
       </div>

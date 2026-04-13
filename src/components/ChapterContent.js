@@ -37,7 +37,7 @@ export default function ChapterContent({ chapterId, initialImages = [] }) {
             }
 
             try {
-                const res = await fetch(`/api/reader/chapter-images?id=${chapterId}`);
+                const res = await fetch(`/api/reader/chapter-images?id=${encodeURIComponent(chapterId)}`);
                 if (res.ok) {
                     const data = await res.json();
                     if (data.images && data.images.length > 0) {

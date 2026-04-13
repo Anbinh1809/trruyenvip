@@ -3,18 +3,28 @@
 import Header from '@/components/Header';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/components/ToastProvider';
 import Link from 'next/link';
 
 export default function AdminDashboard() {
-  const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const { addToast } = useToast();
   const [stats, setStats] = useState(null);
   const [crawlLoading, setCrawlLoading] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated && user?.role === 'admin') {
-      fetch('/api/admin/stats').then(res => res.json()).then(setStats);
+      fetch('/api/admin/stats')
+        .then(res => {
+          if (!res.ok) throw new Error('Cấm chế ngăn cản việc truy xuất số liệu');
+          return res.json();
+        })
+        .then(setStats)
+        .catch(err => {
+          console.error(err);
+          addToast(err.message, 'error');
+        });
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, addToast]);
 
   const triggerCrawl = async () => {
     if (window.confirm('Đạo hữu có chắc muốn kích hoạt chu kỳ cào ngay bây giờ?')) {
@@ -33,14 +43,14 @@ export default function AdminDashboard() {
                 headers: { 'Authorization': `Bearer ${secret}` }
             });
             if (res.ok) {
-                alert('🚀 Đã kích hoạt máy cào thành công!');
+                addToast('🚀 Đã kích hoạt vạn dặm scraper thành công!', 'success');
             } else {
-                const errorText = await res.text();
-                alert(`❌ Lỗi kích hoạt: ${res.status} - ${errorText || 'Mã cấm chế không chính xác'}`);
+                const errorData = await res.json().catch(() => ({}));
+                addToast(`❌ Lỗi kích hoạt: ${res.status} - ${errorData.error || 'Mã cấm chế không chính xác'}`, 'error');
                 if (res.status === 401) localStorage.removeItem('TRUYENVIP_CRON_SECRET');
             }
         } catch (e) {
-            alert('🚫 Lỗi kết nối pháp bảo!');
+            addToast('🚫 Kết nối với pháp bảo bị gián đoạn!', 'error');
         }
         setCrawlLoading(false);
     }
@@ -138,16 +148,18 @@ export default function AdminDashboard() {
                                 </button>
                                 <button onClick={async () => {
                                     if(confirm('Thử lại toàn bộ các task lỗi?')) {
-                                        await fetch('/api/admin/tasks', { method: 'POST', body: JSON.stringify({ action: 'retry_failed' }) });
-                                        alert('Đã đưa các task lỗi về hàng chờ.');
+                                        const res = await fetch('/api/admin/tasks', { method: 'POST', body: JSON.stringify({ action: 'retry_failed' }) });
+                                        if (res.ok) addToast('Đã đưa các task lỗi về hàng chờ.', 'success');
+                                        else addToast('Thất bại khi khôi phục task.', 'error');
                                     }
                                 }} className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '50px' }}>
                                     🔄
                                 </button>
                                 <button onClick={async () => {
                                     if(confirm('Xóa sạch toàn bộ các task đã hoàn thành?')) {
-                                        await fetch('/api/admin/tasks', { method: 'POST', body: JSON.stringify({ action: 'purge_completed' }) });
-                                        alert('Đã dọn dẹp hàng chờ.');
+                                        const res = await fetch('/api/admin/tasks', { method: 'POST', body: JSON.stringify({ action: 'purge_completed' }) });
+                                        if (res.ok) addToast('Đã dọn dẹp hàng chờ sạch sẽ.', 'success');
+                                        else addToast('Không thể dọn dẹp hàng chờ.', 'error');
                                     }
                                 }} className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '50px' }}>
                                     🧹

@@ -84,7 +84,7 @@ export async function POST(request) {
 
                 await client.query(
                     'INSERT INTO "RedemptionRequests" (user_uuid, user_name, card_type, card_value, phone_number, status) VALUES ($1, $2, $3, $4, $5, $6)',
-                    [session.uuid, userName, cardType, val, phoneNumber, 'Pending']
+                    [session.uuid, userName, cardType, val, phoneNumber, 'pending']
                 );
             });
 

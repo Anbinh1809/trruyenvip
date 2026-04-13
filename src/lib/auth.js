@@ -1,15 +1,17 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 
+import { cache } from 'react';
+ 
 const secretString = process.env.JWT_SECRET;
 if (!secretString && process.env.NODE_ENV === 'production') {
   throw new Error('FATAL: JWT_SECRET environment variable is missing in production!');
 }
-
+ 
 const secret = new TextEncoder().encode(
   secretString || 'truyenvip_default_secret_key_change_me'
 );
-
+ 
 export async function signToken(payload) {
   return await new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
@@ -17,7 +19,7 @@ export async function signToken(payload) {
     .setExpirationTime('7d')
     .sign(secret);
 }
-
+ 
 export async function verifyToken(token) {
   try {
     const { payload } = await jwtVerify(token, secret);
@@ -26,13 +28,13 @@ export async function verifyToken(token) {
     return null;
   }
 }
-
-export async function getSession() {
+ 
+export const getSession = cache(async () => {
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
   if (!token) return null;
   return await verifyToken(token);
-}
+});
 
 export async function setSessionCookie(token) {
   const cookieStore = await cookies();

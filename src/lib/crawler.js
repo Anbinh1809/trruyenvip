@@ -451,12 +451,13 @@ export async function healChapterGaps(limit = 5) {
                 HAVING MAX(chapter_number) > COUNT(*) + 1 
             ) gaps ON m.id = gaps.manga_id
             ORDER BY fav_count DESC, m.views DESC, m.last_crawled ASC
+            LIMIT @limit
         `, { limit });
 
         if (targets.recordset.length > 0) {
             console.log(`[Guardian][Priority] Healing ${targets.recordset.length} hot manga first...`);
             for (const target of targets.recordset) {
-                await logCrawl(`[GAP-HEAL] Dang va chuong cho truyen HOT: ${target.title}`);
+                logCrawl(`[GAP-HEAL] Đang vá chương cho truyện HOT: ${target.title}`);
                 await logGuardianEvent(target.id, 'Nhiều chương', 'FIX_GAP', `Linh Thú phát hiện truyện chiến lược ${target.title} bị thiếu chương và đã tự động vá lỗi.`);
                 await crawlFullMangaChapters(target.id, target.source_url);
             }
@@ -482,15 +483,16 @@ export async function rescueBrokenImages(limit = 10) {
             WHERE (SELECT COUNT(*) FROM ChapterImages ci WHERE ci.chapter_id = c.id) < 3
             AND (c.retry_count < 5 OR c.retry_count IS NULL)
             ORDER BY fav_count DESC, m.views DESC, c.updated_at DESC
+            LIMIT @limit
         `, { limit });
 
         if (targets.recordset.length > 0) {
             console.log(`[Guardian][Priority] Rescuing ${targets.recordset.length} broken chapters...`);
             for (const target of targets.recordset) {
-                await logCrawl(`[RESCUE] Cuu ho uu tien: ${target.manga_title} - ${target.title}`);
+                logCrawl(`[RESCUE] Cứu hộ ưu tiên: ${target.manga_title} - ${target.title}`);
                 
                 // Track retry attempts
-                await query('UPDATE Chapters SET retry_count = ISNULL(retry_count, 0) + 1 WHERE id = @id', { id: target.id });
+                await query('UPDATE Chapters SET retry_count = COALESCE(retry_count, 0) + 1 WHERE id = @id', { id: target.id });
 
                 const success_count = await crawlChapterImages(target.id, target.source_url);
                 
@@ -608,6 +610,7 @@ export async function autoDeepCrawl(limit = 5) {
                 CASE WHEN m.description IS NULL OR m.description = '' THEN 0 ELSE 1 END ASC,
                 ch.c ASC, 
                 m.last_crawled ASC
+            LIMIT @limit
         `, { limit });
 
         await runInParallel(targets.recordset, async (manga) => {
@@ -678,7 +681,7 @@ export async function crawlNetTruyen(page = 1, full = false, limitless = false) 
         const chapTitle = latestChapEl.text().trim();
         const chapUrl = latestChapEl.attr('href');
         const chapNum = parseChapterNumber(chapTitle);
-        const chapSlug = chapUrl.split('/').pop();
+        const chapSlug = chapUrl.split('/').pop()?.split('?')[0];
         const chapId = `${targetId}_${chapSlug}`;
 
         const chapResult = await query(`
@@ -700,7 +703,7 @@ export async function crawlNetTruyen(page = 1, full = false, limitless = false) 
           `, { chapId, mangaId: targetId, title: chapTitle, url: chapUrl, chapNum });
           
           await query(`
-            UPDATE Manga SET last_chap_num = @chapNum, last_crawled = GETDATE() WHERE id = @mangaId
+            UPDATE Manga SET last_chap_num = @chapNum, last_crawled = NOW() WHERE id = @mangaId
           `, { mangaId: targetId, chapNum });
           
           await queueChapterScrape(chapId, chapUrl, 'nettruyen');
@@ -831,8 +834,9 @@ export async function crawlFullMangaChapters(mangaId, detailUrl, source = 'nettr
                 description = @description,
                 alternative_titles = @alt,
                 views_at_source = @sourceViews,
+                views = CASE WHEN views < @sourceViews THEN @sourceViews ELSE views END,
                 last_chap_num = @lastChapNum,
-                last_crawled = GETDATE()
+                last_crawled = NOW()
             WHERE id = @mangaId
         `, { 
             mangaId, 
@@ -937,7 +941,7 @@ export async function crawlFullMangaChapters(mangaId, detailUrl, source = 'nettr
                 console.log(`[${source}] Found ${backupLinks.length} backup chapter links via Regex.`);
                 chapterRows = backupLinks;
             } else {
-                await logCrawl(`Cảnh báo: Không thể tìm thấy danh sách chương cho ${mangaId}`, 'info');
+                logCrawl('Cảnh báo: Không thể tìm thấy danh sách chương cho ' + mangaId, 'info');
             }
         }
 
@@ -994,7 +998,8 @@ export async function crawlFullMangaChapters(mangaId, detailUrl, source = 'nettr
                     console.log(`[Crawler][Skip] Link does not appear to be a chapter: ${chapTitle}`);
                     continue;
                 }
-                const chapId = `${mangaId}_${chapNum.toString().replace('.', '-')}`;
+                const chapSlug = chapUrl.split('/').pop()?.split('?')[0] || chapNum.toString().replace('.', '-');
+                const chapId = `${mangaId}_${chapSlug}`;
 
                 // --- TITAN DEDUPLICATION 3.0 ---
                 // We check existingIds (Slugs) AND existingNums (By MangaId + ChapNum)
@@ -1198,7 +1203,7 @@ export async function crawlTruyenQQ(page = 1, full = false, limitless = false) {
         if (chapUrl && chapUrl.startsWith('/')) chapUrl = safeJoinUrl(SOURCES.TRUYENQQ, chapUrl);
         
         const chapNum = parseChapterNumber(chapTitle);
-        const chapSlug = chapUrl.split('/').pop();
+        const chapSlug = chapUrl.split('/').pop()?.split('?')[0];
         const chapId = `${actualMangaId}_${chapSlug}`;
 
         const chapResult = await query(`
@@ -1216,7 +1221,7 @@ export async function crawlTruyenQQ(page = 1, full = false, limitless = false) {
                 INSERT INTO Chapters (id, manga_id, title, source_url, chapter_number) 
                 VALUES (@chapId, @mangaId, @title, @url, @chapNum);
                 
-                UPDATE Manga SET last_chap_num = @chapNum, last_crawled = GETDATE() WHERE id = @mangaId;
+                UPDATE Manga SET last_chap_num = @chapNum, last_crawled = NOW() WHERE id = @mangaId;
             `, { chapId, mangaId: actualMangaId, title: chapTitle, url: chapUrl, chapNum });
             
             await queueChapterScrape(chapId, chapUrl, 'truyenqq');
@@ -1431,7 +1436,7 @@ export async function runGuardianAutopilot() {
     global.guardianActive = true;
     
     console.log('⚡ [Titan] Continuous Streaming Activated. Engine Warming Up...');
-    await logCrawl('🛡️ Chế độ Titan Continuous Streaming (Dòng chảy liên tục) đã được kích hoạt.');
+    logCrawl('🛡️ Chế độ Titan Continuous Streaming (Dòng chảy liên tục) đã được kích hoạt.');
 
     let cycleCount = 0;
 
@@ -1577,7 +1582,7 @@ async function findAlternativeSource(mangaId, title, fromSource) {
             finalMatchUrl = safeJoinUrl(base, finalMatchUrl);
         }
 
-        await query("UPDATE Manga SET source_url = @url, migration_count = ISNULL(migration_count, 0) + 1, last_crawled = GETDATE() WHERE id = @mangaId", { 
+        await query("UPDATE Manga SET source_url = @url, migration_count = COALESCE(migration_count, 0) + 1, last_crawled = NOW() WHERE id = @mangaId", { 
             url: finalMatchUrl, 
             mangaId 
         });
@@ -1606,10 +1611,10 @@ export async function maintainSystem(level = 0) {
             global.gc();
         }
         
-        // Prune logs if level 1+
+        // Prune logs if level 1+ (PostgreSQL Native Syntax)
         if (level > 0) {
-            await query("DELETE FROM CrawlLogs WHERE created_at < DATEADD(day, -5, GETDATE())");
-            await query("DELETE FROM GuardianReports WHERE created_at < DATEADD(day, -7, GETDATE())");
+            await query("DELETE FROM CrawlLogs WHERE created_at < NOW() - INTERVAL '5 days'");
+            await query("DELETE FROM GuardianReports WHERE created_at < NOW() - INTERVAL '7 days'");
         }
     } catch (e) {}
 }

@@ -20,22 +20,48 @@ import EndPageCelebration from '@/components/EndPageCelebration';
 const CommentSection = dynamic(() => import('@/components/CommentSection'), { 
   loading: () => <div className="loading-dots" style={{ padding: '40px', textAlign: 'center' }}>Đang tải bình luận...</div>
 });
+ 
+export async function generateMetadata({ params }) {
+  const { id, chapterId } = await params;
+  const [mangaRes, chapRes] = await Promise.all([
+    query("SELECT title FROM Manga WHERE id = @id", { id }),
+    query("SELECT title FROM Chapters WHERE id = @id", { id: chapterId })
+  ]);
+ 
+  const manga = mangaRes.recordset[0];
+  const chapter = chapRes.recordset[0];
+ 
+  if (!manga || !chapter) return { title: 'Đang tải chương... - TruyenVip' };
+ 
+  return {
+    title: `${chapter.title}: ${manga.title} - TruyenVip`,
+    description: `Đọc truyện tranh ${manga.title} - ${chapter.title} chất lượng cao, cập nhật mới nhất tại TruyenVip.`
+  };
+}
 
 async function getChapterData(mangaId, chapterId) {
-  // Execute all major queries in parallel to minimize TTFB
-  const [mangaResult, chapResult, imgResult, allChaps] = await Promise.all([
+  const [mangaResult, chapResult, imgResult] = await Promise.all([
     query("SELECT id, title, cover FROM Manga WHERE id = @id", { id: mangaId }),
     query("SELECT id, title, source_url, chapter_number FROM Chapters WHERE id = @id", { id: chapterId }),
-    query("SELECT image_url FROM ChapterImages WHERE chapter_id = @id ORDER BY [order] ASC", { id: chapterId }),
-    query("SELECT id, title, chapter_number FROM Chapters WHERE manga_id = @mangaId ORDER BY chapter_number ASC, updated_at ASC", { mangaId })
+    query("SELECT image_url FROM ChapterImages WHERE chapter_id = @id ORDER BY [order] ASC", { id: chapterId })
   ]);
 
   if (mangaResult.recordset.length === 0 || chapResult.recordset.length === 0) return null;
   const chapter = chapResult.recordset[0];
+  const currentNum = chapter.chapter_number;
 
-  const sorted = [...allChaps.recordset].sort((a, b) => (a.chapter_number || 0) - (b.chapter_number || 0));
-  const currentIdx = sorted.findIndex(c => c.id === chapterId);
-  const nextChapterId = (currentIdx < sorted.length - 1) ? sorted[currentIdx + 1].id : null;
+  // Targeted Next/Prev Queries for performance
+  const [prevChapRes, nextChapRes] = await Promise.all([
+    query(`SELECT id, title, chapter_number FROM Chapters 
+           WHERE manga_id = @mangaId AND chapter_number < @num 
+           ORDER BY chapter_number DESC LIMIT 1`, { mangaId, num: currentNum }),
+    query(`SELECT id, title, chapter_number FROM Chapters 
+           WHERE manga_id = @mangaId AND chapter_number > @num 
+           ORDER BY chapter_number ASC LIMIT 1`, { mangaId, num: currentNum })
+  ]);
+
+  const prevChapter = prevChapRes.recordset[0] || null;
+  const nextChapterId = nextChapRes.recordset[0]?.id || null;
 
   let nextChapterImages = [];
   if (nextChapterId) {
@@ -47,8 +73,8 @@ async function getChapterData(mangaId, chapterId) {
     manga: mangaResult.recordset[0],
     chapter,
     images: imgResult.recordset.map(img => `/api/proxy?url=${encodeURIComponent(img.image_url)}&w=1200`),
-    allChapters: allChaps.recordset,
-    nextChapter: { id: nextChapterId, images: nextChapterImages }
+    prevChapter,
+    nextChapter: { id: nextChapterId, title: nextChapRes.recordset[0]?.title, images: nextChapterImages }
   };
 }
 
@@ -62,10 +88,8 @@ export default async function ChapterReader({ params }) {
     </div>
   );
 
-  const sortedChapters = [...data.allChapters].sort((a, b) => (a.chapter_number || 0) - (b.chapter_number || 0));
-  const sortedIdx = sortedChapters.findIndex(c => c.id === chapterId);
-  const prevChapter = sortedIdx > 0 ? sortedChapters[sortedIdx - 1] : null; 
-  const nextChapter = sortedIdx < sortedChapters.length - 1 ? sortedChapters[sortedIdx + 1] : null;
+  const prevChapter = data.prevChapter; 
+  const nextChapter = data.nextChapter.id ? data.nextChapter : null;
 
   return (
     <main className="reader-page titan-bg" style={{ minHeight: '100vh', color: 'white' }}>

@@ -9,12 +9,14 @@ export async function POST() {
             return NextResponse.json({ authenticated: false }, { status: 401 });
         }
 
-        // TITAN HEARTBEAT: Refresh the token to extend the sliding window session
-        // Only refresh if the token is valid
-        const cookieStore = await cookies();
-        const oldToken = cookieStore.get('token')?.value;
-        
-        if (oldToken) {
+        // TITAN HEARTBEAT: Optimized Sliding Window
+        // Only refresh the token if it's older than 24 hours to reduce overhead
+        const now = Math.floor(Date.now() / 1000);
+        const tokenAge = now - (session.iat || 0);
+        const ONE_DAY = 24 * 60 * 60;
+
+        if (tokenAge > ONE_DAY) {
+            console.log(`[Auth] Session sliding: Refreshing token for ${session.username} (Age: ${tokenAge}s)`);
             const freshToken = await signToken({ 
                 uuid: session.uuid, 
                 username: session.username, 

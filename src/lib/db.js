@@ -1,17 +1,20 @@
 import pg from 'pg';
 const { Pool } = pg;
 import 'dotenv/config';
+ 
+if (!process.env.DATABASE_URL) {
+    throw new Error('FATAL: DATABASE_URL environment variable is missing!');
+}
 
 // TITAN-GRADE POSTGRESQL POOL
 // Native support for Neon.tech and Vercel Edge performance requirements.
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false // Required for Neon/Vercel
-  },
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 10000,
+const pool = new Pool({ 
+    connectionString: process.env.DATABASE_URL,
+    connectionTimeoutMillis: 10000, // 10s timeout
+    max: 10, // Max clients in pool
+    ssl: process.env.DATABASE_URL?.includes('supabase') || process.env.DATABASE_URL?.includes('neon') 
+        ? { rejectUnauthorized: false } 
+        : false
 });
 
 /**
@@ -45,10 +48,10 @@ function translateSql(sql, params) {
     // 3. Robust TOP to LIMIT translation
     // Handles SELECT TOP 10 ..., SELECT DISTINCT TOP 10 ..., and subqueries
     // Postgres LIMIT must be at the end of the clause.
-    translatedSql = translatedSql.replace(/(SELECT\s+(?:DISTINCT\s+)?TOP\s+\(?(\d+|\$\d+)\)?)(.*?)(?=\bSELECT\b|$|;|\))/gis, (match, prefix, limit, rest) => {
+    // Refined: Stop only at query terminator (;) or end of string ($) to support subqueries.
+    translatedSql = translatedSql.replace(/(SELECT\s+(?:DISTINCT\s+)?TOP\s+\(?(\d+|\$\d+)\)?)(.*?)(?=;|$)/gis, (match, prefix, limit, rest) => {
         const selectStmt = prefix.toUpperCase().includes('DISTINCT') ? 'SELECT DISTINCT' : 'SELECT';
-        // If the 'rest' already contains a LIMIT, don't append another one (prevents recursive issues)
-        if (rest.toUpperCase().includes('LIMIT ')) return match;
+        if (/\bLIMIT\b/i.test(rest)) return match;
         return `${selectStmt}${rest} LIMIT ${limit}`;
     });
 
@@ -60,12 +63,17 @@ function translateSql(sql, params) {
     translatedSql = translatedSql.replace(/CHARINDEX\(([^,]+),\s*([^)]+)\)/gi, 'STRPOS($2, $1)');
 
     // 5. Convert DATEADD (e.g., DATEADD(hour, -1, GETDATE()) -> NOW() - INTERVAL '1 hour')
-    translatedSql = translatedSql.replace(/DATEADD\s*\(\s*(\w+)\s*,\s*(-?\s*\d+)\s*,\s*([^)]+)\)/gi, (match, unit, amount, date) => {
+    // Supports hardcoded values, $1 placeholders, and @params
+    translatedSql = translatedSql.replace(/DATEADD\s*\(\s*(\w+)\s*,\s*(-?\s*(?:\d+|\$\d+|@\w+))\s*,\s*([^)]+)\)/gi, (match, unit, amount, date) => {
+        const isParam = amount.includes('$') || amount.includes('@');
+        if (isParam) {
+            // Complex case: dynamic interval
+            return `(${date} + (${amount} * INTERVAL '1 ${unit}'))`;
+        }
         const cleanAmount = amount.replace(/\s+/g, '');
         const absAmount = Math.abs(parseInt(cleanAmount));
         const sign = parseInt(cleanAmount) >= 0 ? '+' : '-';
-        const pgUnit = unit.toLowerCase();
-        return `(${date} ${sign} INTERVAL '${absAmount} ${pgUnit}')`;
+        return `(${date} ${sign} INTERVAL '${absAmount} ${unit}')`;
     });
 
     // 6. Convert SQL Server specific operators (CROSS APPLY / OUTER APPLY / OUTPUT)
@@ -76,8 +84,7 @@ function translateSql(sql, params) {
 
     // 7. Schema & Identifier Cleanup
     translatedSql = translatedSql.replace(/dbo\./gi, ''); 
-    translatedSql = translatedSql.replace(/\[(\w+)\]/g, '"$1"'); 
-    translatedSql = translatedSql.replace(/calculateRank\(([^)]+)\)/gi, 'calculate_rank($1)');
+    translatedSql = translatedSql.replace(/\[([^\]]+)\]/g, '"$1"'); 
 
     return { sql: translatedSql, values };
 }
@@ -88,9 +95,10 @@ export async function query(sqlString, params = {}) {
     try {
         const result = await pool.query(psql, values);
         
-        // Emulate mssql .recordset for backward compatibility
+        // Emulate mssql .recordset and .recordsets for backward compatibility
         return {
             recordset: result.rows,
+            recordsets: [result.rows],
             rowsAffected: [result.rowCount],
             rowCount: result.rowCount
         };
@@ -131,16 +139,14 @@ export async function bulkInsert(tableName, columns, rows) {
         const valuePlaceholders = [];
         const flatValues = [];
         
-        rows.forEach((row, rowIndex) => {
-            const rowPlaceholders = [];
-            columns.forEach((col) => {
-                flatValues.push(row[col]);
-                rowPlaceholders.push(`$${flatValues.length}`);
-            });
-            valuePlaceholders.push(`(${rowPlaceholders.join(', ')})`);
-        });
+        const placeholders = rows.map((_, i) => 
+            `(${columns.map((_, j) => {
+                flatValues.push(rows[i][columns[j]]);
+                return `$${i * columns.length + j + 1}`;
+            }).join(', ')})`
+        ).join(', ');
 
-        const sql = `INSERT INTO "${tableName}" (${colNames}) VALUES ${valuePlaceholders.join(', ')} ON CONFLICT DO NOTHING`;
+        const sql = `INSERT INTO "${tableName}" (${colNames}) VALUES ${placeholders} ON CONFLICT DO NOTHING`;
         await client.query(sql, flatValues);
     } finally {
         client.release();

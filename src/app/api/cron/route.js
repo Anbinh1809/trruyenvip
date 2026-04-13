@@ -9,10 +9,13 @@ export async function GET(request) {
   }
 
   try {
-    await crawlLatest();
-    return new Response('Crawler started successfully', { status: 200 });
+    // TITAN ARCHITECTURE: Instead of running the heavy crawl in the HTTP request (timeout risk),
+    // we queue it in our background task system.
+    await queueMangaSync('priority_discovery', SOURCES.NETTRUYEN, 'nettruyen', false, 10);
+    
+    return new Response('Cron triggered: Priority discovery queued in background.', { status: 200 });
   } catch (error) {
     console.error('Cron error:', error.message);
-    return new Response('Crawler failed', { status: 500 });
+    return new Response(`Cron failed to queue: ${error.message}`, { status: 500 });
   }
 }

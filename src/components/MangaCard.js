@@ -23,10 +23,11 @@ function MangaCard({ manga, isNew = false }) {
   };
 
   const formatViews = (val) => {
-    if (!val || isNaN(val)) return '0';
-    if (val >= 1000000) return (val / 1000000).toFixed(1) + 'M';
-    if (val >= 1000) return (val / 1000).toFixed(1) + 'k';
-    return val.toString();
+    const num = Number(val);
+    if (!val || isNaN(num) || num === 0) return '0';
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
+    return num.toString();
   };
 
 
@@ -82,6 +83,7 @@ function MangaCard({ manga, isNew = false }) {
         {/* Bookmark Button on Top-Right */}
         <button 
             className={`bookmark-btn-nebula ${favorited ? 'active' : ''}`}
+            aria-label={favorited ? "Xóa khỏi yêu thích" : "Thêm vào yêu thích"}
             onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -112,8 +114,4 @@ function MangaCard({ manga, isNew = false }) {
   );
 }
 
-export default memo(MangaCard, (prev, next) => {
-    return prev.manga.id === next.manga.id && 
-           prev.manga.last_chap_num === next.manga.last_chap_num &&
-           prev.manga.views === next.manga.views;
-});
+export default memo(MangaCard);

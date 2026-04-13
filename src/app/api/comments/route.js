@@ -20,7 +20,7 @@ export async function GET(request) {
         `, { chapterId });
         return Response.json(res.recordset);
     } catch (err) {
-        return new Response('Database error', { status: 500 });
+        return Response.json({ error: 'Database error' }, { status: 500 });
     }
 }
 export async function PATCH(request) {
@@ -32,13 +32,12 @@ export async function PATCH(request) {
         const { id, action } = body;
 
         if (action === 'like') {
-            // OPTIONAL: Preventive measure against vote manipulation could go here
             await query("UPDATE Comments SET likes = likes + 1 WHERE id = @id", { id });
-            return new Response('Liked', { status: 200 });
+            return Response.json({ success: true });
         }
-        return new Response('Invalid action', { status: 400 });
+        return Response.json({ error: 'Invalid action' }, { status: 400 });
     } catch (err) {
-        return new Response('Database error', { status: 500 });
+        return Response.json({ error: 'Database error' }, { status: 500 });
     }
 }
 
@@ -92,13 +91,14 @@ export async function POST(request) {
         // --- RATE LIMITING (HARDENED) ---
         // Check if user recently commented (within 10 seconds) by UUID to prevent name-change bypass
         const recentCheck = await query(`
-            SELECT TOP 1 created_at FROM Comments 
+            SELECT created_at FROM Comments 
             WHERE user_uuid = @userUuid 
-            AND created_at > DATEADD(second, -10, GETDATE())
+            AND created_at > NOW() - INTERVAL '10 seconds'
+            LIMIT 1
         `, { userUuid });
 
         if (recentCheck.recordset.length > 0) {
-            return new Response('Yêu cầu bình luận quá nhanh. Vui lòng đợi 10 giây.', { status: 429 });
+            return Response.json({ error: 'Yêu cầu bình luận quá nhanh. Vui lòng đợi 10 giây.' }, { status: 429 });
         }
 
         await query(`

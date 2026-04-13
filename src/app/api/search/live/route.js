@@ -17,7 +17,7 @@ export async function GET(request) {
 
     try {
         const res = await query(`
-            SELECT TOP 6 id, title, cover, last_chap_num, views_at_source as views
+            SELECT id, title, cover, last_chap_num, views_at_source as views
             FROM Manga 
             WHERE normalized_title LIKE @q + '%' -- Indexed prefix search
             OR normalized_title LIKE '%-' + @q + '%' -- Mid-word match
@@ -25,6 +25,7 @@ export async function GET(request) {
                 CASE WHEN normalized_title LIKE @q + '%' THEN 0 ELSE 1 END,
                 views_at_source DESC,
                 last_crawled DESC
+            LIMIT 6
         `, { q: cleanQ });
 
 
@@ -33,6 +34,7 @@ export async function GET(request) {
             cover: m.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : (m.cover || '/placeholder-manga.svg'),
         })));
     } catch (e) {
-        return new Response('Error', { status: 500 });
+        console.error('Live Search Error:', e);
+        return Response.json([]);
     }
 }

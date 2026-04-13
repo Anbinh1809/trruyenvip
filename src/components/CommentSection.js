@@ -107,7 +107,7 @@ const CommentItem = ({ comment, isReply = false, chapterId, userName, fetchComme
                         )}
                     </div>
                 </div>
-                <p style={{ fontSize: '0.95rem', lineHeight: 1.5, marginBottom: '15px' }}>{comment.content}</p>
+                <p style={{ fontSize: '0.95rem', lineHeight: 1.5, marginBottom: '15px', whiteSpace: 'pre-wrap' }}>{comment.content}</p>
                 
                 <div style={{ display: 'flex', gap: '20px' }}>
                     <button 

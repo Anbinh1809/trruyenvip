@@ -4,4 +4,4 @@ Disallow: /api/
 Disallow: /admin/
 Disallow: /transfer
 
-Sitemap: https://truyenvip.com/sitemap.xml
+Sitemap: https://truyenvip.com/api/sitemap.xml

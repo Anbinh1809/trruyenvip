@@ -19,34 +19,38 @@ export default function TransferPage() {
         setResults([]);
         
         const processResults = [];
-
-        for (const url of urlList) {
-            try {
-                const res = await fetch('/api/migration', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url: url.trim() })
-                });
-                const data = await res.json();
-                
-                if (data.success) {
-                    processResults.push({ url, status: 'success', title: data.mangaId });
-                    fetchMangaAndAddToHistory(data.mangaId, data.chapterId);
-                } else {
-                    processResults.push({ url, status: 'error', msg: data.error });
+        
+        // TITAN PARALLELISM: Process in chunks of 3 to avoid overloading the local network or server
+        for (let i = 0; i < urlList.length; i += 3) {
+            const chunk = urlList.slice(i, i + 3);
+            await Promise.all(chunk.map(async (url) => {
+                try {
+                    const res = await fetch('/api/migration', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ url: url.trim() })
+                    });
+                    const data = await res.json();
+                    
+                    if (data.success) {
+                        processResults.push({ url, status: 'success', title: data.mangaId });
+                        fetchMangaAndAddToHistory(data.mangaId, data.chapterId);
+                    } else {
+                        processResults.push({ url, status: 'error', msg: data.error });
+                    }
+                } catch (err) {
+                    processResults.push({ url, status: 'error', msg: 'Lỗi kết nối' });
                 }
-            } catch (err) {
-                processResults.push({ url, status: 'error', msg: 'Lỗi kết nối' });
-            }
+            }));
             setResults([...processResults]);
         }
         setIsProcessing(false);
     };
 
     const fetchMangaAndAddToHistory = async (mangaId, chapterId) => {
-        if (!chapterId) return; // Don't guess slugs
+        if (!chapterId) return; 
         try {
-            await fetch(`/api/chapter-images/${chapterId}`);
+            await fetch(`/api/chapter-images/${encodeURIComponent(chapterId)}`);
         } catch (e) {}
     };
 

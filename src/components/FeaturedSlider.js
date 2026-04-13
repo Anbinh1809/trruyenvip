@@ -87,7 +87,7 @@ export default function FeaturedSlider({ mangaList }) {
                         <div className="titan-slide-overlay-premium" />
                         <div className="titan-slide-content-premium container">
                             <div className="badge-red" style={{ padding: '8px 18px', borderRadius: '50px', fontSize: '0.7rem', letterSpacing: '1px', marginBottom: '25px', width: 'fit-content' }}>TRUYỆN NỔI BẬT</div>
-                            <h1 className="hero-title-titan">{manga.title}</h1>
+                            <h2 className="hero-title-titan">{manga.title}</h2>
                             <p style={{ fontSize: '1.2rem', color: 'var(--text-primary)', opacity: 0.9, marginBottom: '40px', lineHeight: '1.6', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', maxWidth: '600px', textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
                                 Khám phá hành trình đầy kịch tính của {manga.title}. Đọc ngay để theo dõi những tình tiết mới nhất vừa được cập nhật tại TruyenVip.
                             </p>

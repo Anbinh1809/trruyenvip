@@ -36,7 +36,7 @@ export async function generateMetadata({ params }) {
     title: `${manga.title} - TruyenVip`,
     description: cleanDescription || 'Đọc truyện tranh online chất lượng cao tại TruyenVip.',
     alternates: {
-      canonical: `${origin}/manga/${id}`,
+      canonical: `${origin}/manga/${encodeURIComponent(id)}`,
     },
     keywords: `${manga.title}, doc truyen ${manga.title}, manga ${manga.title}, truyen tranh online, truyen vip`,
     openGraph: {
@@ -90,11 +90,12 @@ async function getMangaDetail(id) {
     const firstGenreId = genresRes.recordset[0].id;
     try {
         const relatedRes = await query(`
-            SELECT TOP 6 m.id, m.title, m.cover, m.last_chap_num, m.rating, m.views
+            SELECT m.id, m.title, m.cover, m.last_chap_num, m.rating, m.views
             FROM Manga m
-            JOIN MangaGenres mg ON m.id = mg.manga_id
+            JOIN MangaGenres mg ON m.id = mg.genre_id
             WHERE mg.genre_id = @genreId AND m.id != @id
             ORDER BY m.last_crawled DESC
+            LIMIT 6
         `, { genreId: firstGenreId, id });
 
         related = relatedRes.recordset.map(m => ({

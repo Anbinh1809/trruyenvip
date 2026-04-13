@@ -173,12 +173,12 @@ export async function GET(request) {
   } catch (error) {
     console.error('Ultimate Proxy Error:', error.message, imageUrl);
 
-    // Diagnostic Logging for persistent failures
-    try {
-        await query("INSERT INTO CrawlLogs (message, status) VALUES (@message, 'error')", { 
-            message: `? Proxy Failure: ${error.message.substring(0, 100)} | URL: ${imageUrl.substring(0, 300)}`
-        });
-    } catch (e) {}
+    // Diagnostic Logging: Sampled to avoid DB saturation (5% rate)
+    if (Math.random() < 0.05) {
+      query("INSERT INTO CrawlLogs (message, status) VALUES (@message, 'error')", { 
+          message: `🛠️ Proxy Failure: ${error.message.substring(0, 100)} | URL: ${imageUrl.substring(0, 300)}`
+      }).catch(() => {});
+    }
     
     // --- SLEEK EMBEDDED PLACEHOLDER ---
     // A clean, dark-themed SVG so we don't depend on external sites for error states

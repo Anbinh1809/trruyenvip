@@ -35,12 +35,13 @@ async function getData(currentSlug) {
     if (currentSlug) {
         // Optimized for Scale: TOP 36 instead of all
         const mangaRes = await query(`
-            SELECT DISTINCT TOP 36 m.${MANGA_CARD_FIELDS.replace(/, /g, ', m.')}
+            SELECT DISTINCT m.${MANGA_CARD_FIELDS.replace(/, /g, ', m.')}
             FROM Manga m
             JOIN MangaGenres mg ON m.id = mg.manga_id
             JOIN Genres g ON mg.genre_id = g.id
             WHERE g.slug = @slug
             ORDER BY m.views_at_source DESC, m.last_crawled DESC
+            LIMIT 36
         `, { slug: currentSlug });
 
         manga = mangaRes.recordset.map(item => ({
@@ -50,7 +51,7 @@ async function getData(currentSlug) {
 
         activeGenre = allGenres.find(g => g.slug === currentSlug);
     } else {
-        const mangaRes = await query(`SELECT TOP 36 ${MANGA_CARD_FIELDS} FROM Manga ORDER BY last_crawled DESC`);
+        const mangaRes = await query(`SELECT ${MANGA_CARD_FIELDS} FROM Manga ORDER BY last_crawled DESC LIMIT 36`);
         manga = mangaRes.recordset.map(item => ({
             ...item,
             cover: item.cover.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(item.cover)}` : item.cover
@@ -92,7 +93,7 @@ export default async function GenresPage({ searchParams }) {
       '@type': 'ListItem',
       'position': 3,
       'name': activeGenre.name,
-      'item': `${origin}/genres?type=${activeGenre.slug}`
+      'item': `${origin}/genres?type=${encodeURIComponent(activeGenre.slug)}`
     });
   }
 
@@ -128,10 +129,9 @@ export default async function GenresPage({ searchParams }) {
                         >
                             Tất cả truyện
                         </Link>
-                        {allGenres.map(g => (
                             <Link 
                                 key={g.slug}
-                                href={`/genres?type=${g.slug}`}
+                                href={`/genres?type=${encodeURIComponent(g.slug)}`}
                                 className={`titan-nav-item ${type === g.slug ? 'active' : ''}`}
                             >
                                 {g.name}

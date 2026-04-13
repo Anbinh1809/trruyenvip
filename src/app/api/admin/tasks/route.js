@@ -19,21 +19,23 @@ export async function GET() {
 
         // Get recent failures for diagnostics
         const recentFailures = await query(`
-            SELECT TOP 10 id, type, last_error, attempts, updated_at
+            SELECT id, type, last_error, attempts, updated_at
             FROM CrawlerTasks
             WHERE status = 'failed'
             ORDER BY updated_at DESC
+            LIMIT 10
         `);
 
         // ERROR HEATmap: Group errors by signature
         const errorHeatmap = await query(`
-            SELECT TOP 5 
+            SELECT 
                 LEFT(last_error, 50) as signature,
                 COUNT(*) as count
             FROM CrawlerTasks
             WHERE status = 'failed'
             GROUP BY LEFT(last_error, 50)
             ORDER BY count DESC
+            LIMIT 5
         `);
 
         return NextResponse.json({
@@ -58,13 +60,13 @@ export async function POST(request) {
 
         if (action === 'retry_failed') {
             await query("UPDATE CrawlerTasks SET status = 'pending', attempts = 0 WHERE status = 'failed'");
-            await query("INSERT INTO AuditLogs (admin_uuid, action, details) VALUES (@uuid, 'RETRY_FAILED_TASKS', 'Admin triggered bulk retry for all failed tasks')", { uuid: session.user.id });
+            await query("INSERT INTO AuditLogs (admin_uuid, action, details) VALUES (@uuid, 'RETRY_FAILED_TASKS', 'Admin triggered bulk retry for all failed tasks')", { uuid: session.uuid });
             return NextResponse.json({ message: 'Retrying failed tasks' });
         }
 
         if (action === 'purge_completed') {
             await query("DELETE FROM CrawlerTasks WHERE status = 'completed'");
-            await query("INSERT INTO AuditLogs (admin_uuid, action, details) VALUES (@uuid, 'PURGE_COMPLETED_TASKS', 'Admin purged all completed crawler task records')", { uuid: session.user.id });
+            await query("INSERT INTO AuditLogs (admin_uuid, action, details) VALUES (@uuid, 'PURGE_COMPLETED_TASKS', 'Admin purged all completed crawler task records')", { uuid: session.uuid });
             return NextResponse.json({ message: 'Purged completed tasks' });
         }
 
