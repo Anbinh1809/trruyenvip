@@ -20,7 +20,7 @@ async function searchManga(q, page = 1) {
     const countRes = await query(`
       SELECT COUNT(*) as total 
       FROM Manga 
-      WHERE title LIKE N'%' + @q + N'%' OR author LIKE N'%' + @q + N'%'
+      WHERE title ILIKE '%' || @q || '%' OR author ILIKE '%' || @q || '%'
     `, { q: sanitizedQ });
     
     const total = countRes.recordset[0]?.total || 0;
@@ -29,9 +29,9 @@ async function searchManga(q, page = 1) {
     const result = await query(`
       SELECT ${MANGA_CARD_FIELDS}
       FROM Manga 
-      WHERE title LIKE N'%' + @q + N'%' OR author LIKE N'%' + @q + N'%' 
+      WHERE title ILIKE '%' || @q || '%' OR author ILIKE '%' || @q || '%' 
       ORDER BY last_crawled DESC
-      OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY
+      LIMIT @pageSize OFFSET @offset
     `, { q: sanitizedQ, offset, pageSize });
 
 

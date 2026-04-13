@@ -6,13 +6,29 @@ export const revalidate = 300; // Cache for 5 minutes
 export async function GET() {
     try {
         const result = await query(`
-            SELECT TOP 50 stats.title as rank, id, username, level, xp, avatar, contribution_points, badge_ids
-            FROM (SELECT id, username, level, xp, avatar, contribution_points, badge_ids FROM Users) as u
-            CROSS APPLY (SELECT * FROM dbo.calculateRank(u.level)) as stats
-            ORDER BY u.level DESC, u.xp DESC
+            SELECT TOP 50 id, username, level, xp, avatar, contribution_points, badge_ids
+            FROM Users
+            ORDER BY level DESC, xp DESC
         `);
 
-        return NextResponse.json(result.recordset);
+        // Compute rank in JS instead of dbo.calculateRank
+        const usersWithRank = result.recordset.map(u => {
+            let rankStr = 'Tân Binh';
+            if (u.level >= 100) rankStr = 'Thần Thoại';
+            else if (u.level >= 75) rankStr = 'Truyền Thuyết';
+            else if (u.level >= 50) rankStr = 'Tông Sư';
+            else if (u.level >= 30) rankStr = 'Đại Cao Thủ';
+            else if (u.level >= 20) rankStr = 'Cao Thủ';
+            else if (u.level >= 10) rankStr = 'Tinh Anh';
+            else if (u.level >= 5) rankStr = 'Sơ Cấp';
+            
+            return {
+                ...u,
+                rank: rankStr
+            };
+        });
+
+        return NextResponse.json(usersWithRank);
     } catch (e) {
         console.error('Leaderboard API Error:', e);
         return NextResponse.json({ error: 'Không thể tải bảng xếp hạng' }, { status: 500 });
