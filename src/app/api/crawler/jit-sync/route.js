@@ -7,8 +7,8 @@ import { NextResponse } from 'next/server';
 const jitRateLimit = new Map();
 
 export const runtime = 'nodejs';
-// Give Vercel serverless enough time to complete the crawl
-export const maxDuration = 60;
+// Allow up to 55 seconds for the crawl to complete on Vercel
+export const maxDuration = 55;
 
 export async function POST(req) {
     try {
@@ -30,6 +30,17 @@ export async function POST(req) {
                 error: `Thao tác quá nhanh, vui lòng đợi ${remaining}s` 
             }, { status: 429 });
         }
+
+        // Check if images already exist - avoid crawling if already done by another request
+        const existingCheck = await query(
+            'SELECT COUNT(*) as count FROM ChapterImages WHERE chapter_id = @id',
+            { id: chapterId }
+        );
+        const existingCount = parseInt(existingCheck.recordset[0]?.count || 0);
+        if (existingCount > 5) {
+            return NextResponse.json({ success: true, message: 'Already synced', imageCount: existingCount });
+        }
+
         jitRateLimit.set(rateLimitKey, now);
 
         const chapData = await query("SELECT source_url FROM Chapters WHERE id = @id", { id: chapterId });
@@ -44,24 +55,44 @@ export async function POST(req) {
         
         const source = chapter.source_url.includes('nettruyen') ? 'nettruyen' : 'truyenqq';
 
-        // VERCEL FIX: Run the crawl synchronously within the request lifecycle.
-        // Fire-and-forget tasks are killed by Vercel immediately after the response.
-        // We await here — maxDuration = 60s gives plenty of time.
         console.log(`[JIT-SYNC] Crawling ${chapterId} from ${chapter.source_url}`);
-        await crawlChapterImages(chapterId, chapter.source_url, source);
 
-        // Verify images were actually saved
+        // Race the crawl against a 45s timeout to avoid Vercel 504
+        const CRAWL_TIMEOUT = 45000;
+        const crawlPromise = crawlChapterImages(chapterId, chapter.source_url, source);
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('CRAWL_TIMEOUT')), CRAWL_TIMEOUT)
+        );
+
+        try {
+            await Promise.race([crawlPromise, timeoutPromise]);
+        } catch (crawlErr) {
+            if (crawlErr.message === 'CRAWL_TIMEOUT') {
+                console.warn(`[JIT-SYNC] Crawl timed out for ${chapterId}, checking partial results`);
+            } else {
+                throw crawlErr;
+            }
+        }
+
+        // Check how many images were saved (partial or complete)
         const imgCheck = await query(
             'SELECT COUNT(*) as count FROM ChapterImages WHERE chapter_id = @id',
             { id: chapterId }
         );
         const imageCount = parseInt(imgCheck.recordset[0]?.count || 0);
 
-        console.log(`[JIT-SYNC] Done: ${imageCount} images saved for ${chapterId}`);
+        console.log(`[JIT-SYNC] Done: ${imageCount} images for ${chapterId}`);
+
+        if (imageCount === 0) {
+            return NextResponse.json({ 
+                error: 'Không thể cào ảnh từ nguồn này. Nguồn có thể đang bảo trì hoặc không hỗ trợ chương này.',
+                imageCount: 0
+            }, { status: 503 });
+        }
 
         return NextResponse.json({ 
             success: true, 
-            message: `Sync complete: ${imageCount} images`,
+            message: `Sync done: ${imageCount} images`,
             imageCount
         });
     } catch (err) {
