@@ -8,11 +8,11 @@ import { useAuth } from '@/context/AuthContext';
 import LiveSearch from './LiveSearch';
 import { Search, Coins, Trophy, Gem, X, Menu, Settings, LogOut, User, Sun, Moon } from 'lucide-react';
 
-// - [x] Fix Mobile Search UX (Dedicated Search HUD) in `src/components/Header.js`
-// - [x] Universal Icon Replacement (Lucide SVGs) across all components
-// - [ ] Upgrade Genre HUD Tags in `src/components/MobileGenreNav.js`
-// - [ ] Polish Empty States in `src/components/EmptyState.js`
-// - [ ] Final Multi-Page UI Audit on Vercel
+// - [x] Fix Header button overlaps and Search HUD z-index/position in `src/components/Header.js`
+// - [ ] Implement Lucide icons in `src/components/ZenModeButton.js`
+// - [ ] Implement Lucide icons in `src/components/ReaderSettings.js`
+// - [ ] Sanitize Crawler Logs and Garbled characters in `src/lib/crawler.js`
+// - [ ] Final Multi-Page UI Audit with Browser Subagent
 
 export default function Header() {
   const { theme, toggleTheme } = useTheme();
@@ -101,19 +101,19 @@ export default function Header() {
 
           {/* MOBILE SEARCH HUD */}
           {isSearchOpen && (
-              <div className="mobile-search-hud fade-in" style={{ position: 'fixed', inset: 0, background: 'var(--bg-primary)', zIndex: 10002, padding: '20px' }}>
+              <div className="mobile-search-hud fade-in" style={{ position: 'fixed', inset: 0, background: 'rgba(2, 6, 23, 0.98)', backdropFilter: 'blur(30px)', zIndex: 30005, padding: '20px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '30px' }}>
-                      <button onClick={() => setIsSearchOpen(false)} style={{ background: 'none', border: 'none', color: 'white' }}><X size={24} /></button>
-                      <h3 style={{ margin: 0, fontWeight: 900 }}>Tìm Kiếm</h3>
+                      <button onClick={() => setIsSearchOpen(false)} style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: 'white', padding: '10px', borderRadius: '50%' }}><X size={24} /></button>
+                      <h3 style={{ margin: 0, fontWeight: 950, letterSpacing: '-1px' }}>Tìm Kiếm Tuyệt Đỉnh</h3>
                   </div>
                   <LiveSearch onSelect={() => setIsSearchOpen(false)} />
               </div>
           )}
 
-          <div className="header-actions">
+          <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button 
               className="search-toggle-mobile mobile-only" 
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', cursor: 'pointer' }} 
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', cursor: 'pointer', flexShrink: 0 }} 
               onClick={() => setIsSearchOpen(true)}
             >
               <Search size={20} />
@@ -171,7 +171,7 @@ export default function Header() {
             </button>
             <button 
               className="mobile-menu-btn desktop-hide" 
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', width: '45px', height: '45px', borderRadius: '12px', cursor: 'pointer' }} 
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', width: '45px', height: '45px', borderRadius: '12px', cursor: 'pointer', flexShrink: 0 }} 
               onClick={() => setIsMenuOpen(true)}
             >
               <div style={{ width: '20px', height: '2px', background: 'white', margin: '0 auto', position: 'relative' }}>

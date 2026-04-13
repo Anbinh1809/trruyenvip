@@ -60,7 +60,9 @@ export default function LeaderboardPage() {
             <div className="container" style={{ paddingTop: '120px', maxWidth: '1000px' }}>
                 <section style={{ textAlign: 'center', marginBottom: '60px' }} className="fade-up">
                     <div style={{ display: 'inline-block', padding: '6px 20px', background: 'rgba(255, 62, 62, 0.08)', border: '1px solid rgba(255, 62, 62, 0.2)', color: 'var(--accent)', fontSize: '0.75rem', fontWeight: 950, letterSpacing: '2px', borderRadius: '50px', marginBottom: '25px', textTransform: 'uppercase' }}>
-                        Bảng Xếp Hạng Tuyệt Đỉnh
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <Trophy size={14} /> Bảng Xếp Hạng Tuyệt Đỉnh
+                        </div>
                     </div>
                     <h1 style={{ fontSize: '4rem', fontWeight: 950, marginBottom: '15px', letterSpacing: '-3px', lineHeight: 1 }}>Điện Thờ Đại Thánh</h1>
                     <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '1.2rem', fontWeight: 600, maxWidth: '600px', margin: '0 auto' }}>Nơi vinh danh những thiên tài có tu vi cao nhất lục địa TruyenVip.</p>

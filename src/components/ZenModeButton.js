@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Maximize2, Minimize2 } from 'lucide-react';
 
 export default function ZenModeButton() {
     const [isFull, setIsFull] = useState(false);
@@ -48,9 +49,11 @@ export default function ZenModeButton() {
             onClick={toggleZen}
             className={`titan-zen-btn ${isFull ? 'active' : ''}`}
             title={isFull ? "Thoát Zen" : "Chế độ Zen (Toàn màn hình)"}
-            style={{ position: 'relative', zIndex: 1001 }}
+            style={{ position: 'relative', zIndex: 1001, display: 'flex', alignItems: 'center', gap: '10px' }}
         >
-            <span style={{ fontSize: '1.1rem' }}>{isFull ? '🧘' : '👁️'}</span>
+            <span style={{ display: 'flex', alignItems: 'center' }}>
+                {isFull ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+            </span>
             <span className="titan-zen-text">{isFull ? 'Thoát Zen' : 'Zen Mode'}</span>
         </button>
     );

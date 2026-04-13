@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useEngagement } from '@/context/EngagementContext';
+import { Zap } from 'lucide-react';
 
 /**
  * RewardTimer (Repurposed for Mission Tracking)
@@ -28,8 +29,8 @@ export default function RewardTimer({ chapterId }) {
 
   // UI tinh giản, không gây phiền nhiễu khi đọc
   return (
-    <div className="mission-progress-hint" style={{ position: 'fixed', right: '30px', bottom: '170px', fontSize: '0.65rem', opacity: 0.4, pointerEvents: 'none' }}>
-        ⚛️ Đang thiền định... ({seconds}s)
+    <div className="mission-progress-hint" style={{ position: 'fixed', right: '30px', bottom: '170px', fontSize: '0.65rem', opacity: 0.4, pointerEvents: 'none', display: 'flex', alignItems: 'center', gap: '5px' }}>
+        <Zap size={10} color="var(--accent)" /> Đang thiền định... ({seconds}s)
     </div>
   );
 }

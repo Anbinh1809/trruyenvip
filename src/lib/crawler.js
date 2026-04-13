@@ -101,7 +101,8 @@ async function logGuardianEvent(mangaId, chapterTitle, eventType, message) {
             cover: cover || ''
         });
         
-        console.log(`🛡️ [Guardian] ${eventType}: ${message}`);
+        const logPrefix = `[Aegis:SYNC]`;
+        console.log(`${logPrefix} ${eventType}: ${message}`);
     } catch (e) {
         console.error('[Guardian] Failed to log event:', e.message);
     }
@@ -415,7 +416,7 @@ export function queueMangaSync(mangaId, url, source, earlyExit = false, priority
  * in case of a crash during execution.
  */
 export async function bootstrapCrawler() {
-    console.log('🕷️ [Titan] Initializing Crawler Persistence System...');
+    console.log('Initializing Crawler Persistence System...');
     try {
         await query("UPDATE CrawlerTasks SET status = 'pending' WHERE status = 'processing'");
         processQueue(); // Start the motor
@@ -464,8 +465,8 @@ export async function healChapterGaps(limit = 5) {
         if (targets.recordset.length > 0) {
             console.log(`[Guardian][Priority] Healing ${targets.recordset.length} hot manga first...`);
             for (const target of targets.recordset) {
-                logCrawl(`[GAP-HEAL] Đang vá chương cho truyện HOT: ${target.title}`);
-                await logGuardianEvent(target.id, 'Nhiều chương', 'FIX_GAP', `Linh Thú phát hiện truyện chiến lược ${target.title} bị thiếu chương và đã tự động vá lỗi.`);
+                logCrawl(`[GAP-HEAL] Dang va chuong cho truyen HOT: ${target.title}`);
+                await logGuardianEvent(target.id, 'Nhieu chuong', 'FIX_GAP', `Linh Thu phat hien truyen chien luoc ${target.title} bi thieu chuong va da tu dong va loi.`);
                 await crawlFullMangaChapters(target.id, target.source_url);
             }
         }
@@ -496,7 +497,7 @@ export async function rescueBrokenImages(limit = 10) {
         if (targets.recordset.length > 0) {
             console.log(`[Guardian][Priority] Rescuing ${targets.recordset.length} broken chapters...`);
             for (const target of targets.recordset) {
-                logCrawl(`[RESCUE] Cứu hộ ưu tiên: ${target.manga_title} - ${target.title}`);
+                logCrawl(`[RESCUE] Cuu ho uu tien: ${target.manga_title} - ${target.title}`);
                 
                 // Track retry attempts
                 await query('UPDATE Chapters SET retry_count = COALESCE(retry_count, 0) + 1 WHERE id = @id', { id: target.id });
@@ -504,7 +505,7 @@ export async function rescueBrokenImages(limit = 10) {
                 const success_count = await crawlChapterImages(target.id, target.source_url);
                 
                 if (success_count >= 3) {
-                    await logGuardianEvent(target.manga_id, target.title, 'FIX_IMAGE', `Linh Thú đã phục hồi thành công ${success_count} ảnh cho truyện chiến lược ${target.manga_title}.`);
+                    await logGuardianEvent(target.manga_id, target.title, 'FIX_IMAGE', `Linh Thu da phuc hoi thanh cong ${success_count} anh cho truyen chien luoc ${target.manga_title}.`);
                     await query('UPDATE Chapters SET retry_count = 0, last_error = NULL WHERE id = @id', { id: target.id });
                 }
             }
@@ -515,7 +516,7 @@ export async function rescueBrokenImages(limit = 10) {
 }
 
 export async function crawlAllManga() {
-    console.log('--- BẮT ĐẦU CHU KỲ CÀO TOÀN BỘ (APOGEE V2) ---');
+    console.log('--- BAT DAU CHU KY CAO TOAN BO (APOGEE V2) ---');
     await maintainSystem(1);
     
     try {
@@ -584,8 +585,8 @@ export async function refreshActiveManga(limit = 20) {
         `, { limit });
 
         await runInParallel(targets.recordset, async (manga) => {
-            // Aegis: Skip "Ho?n th?nh" manga if crawled within last 10 days
-            if (manga.status?.includes('Ho?n th?nh')) {
+            // Aegis: Skip "Hoan thanh" manga if crawled within last 10 days
+            if (manga.status?.includes('Hoan thanh')) {
                 const lastCrawled = new Date(manga.last_crawled);
                 const tenDaysAgo = new Date();
                 tenDaysAgo.setDate(tenDaysAgo.getDate() - 10);
@@ -662,7 +663,7 @@ export async function crawlNetTruyen(page = 1, full = false, limitless = false) 
             WHERE id = @id 
             OR id = @slug 
             OR title = @title 
-            OR REPLACE(REPLACE(REPLACE(title, ' (Full)', ''), ' [Truyện Tranh]', ''), ' ', '-') = @slug
+            OR REPLACE(REPLACE(REPLACE(title, ' (Full)', ''), ' [Truyen Tranh]', ''), ' ', '-') = @slug
         `, { id, slug: titleSlug, title });
         
         const isNewManga = existingManga.recordset.length === 0;
@@ -812,9 +813,9 @@ export async function crawlFullMangaChapters(mangaId, detailUrl, source = 'nettr
                 genres.push($(el).text().trim());
             });
         } else {
-            author = $('.list-info li:contains("Tác giả")').text().replace('Tác giả', '').trim() || 
+            author = $('.list-info li:contains("Tac gia")').text().replace('Tac gia', '').trim() || 
                      $('.book_info li:nth-child(2)').text().trim();
-            status = $('.list-info li:contains("Tình trạng")').text().replace('Tình trạng', '').trim();
+            status = $('.list-info li:contains("Tinh trang")').text().replace('Tinh trang', '').trim();
             
             // Hardened Clean for TruyenQQ
             const descContainer = $('.book_detail, .detail-content').clone();
@@ -822,8 +823,8 @@ export async function crawlFullMangaChapters(mangaId, detailUrl, source = 'nettr
             description = descContainer.find('p').map((i, p) => $(p).text().trim()).get().join('\n') || descContainer.text().trim();
             description = description.substring(0, 3000);
             
-            alternativeTitles = $('.list-info li:contains("Tên khác")').text().replace('Tên khác', '').trim();
-            const viewsText = $('.list-info li:contains("Lượt xem")').text().replace(/[^0-9]/g, '');
+            alternativeTitles = $('.list-info li:contains("Ten khac")').text().replace('Ten khac', '').trim();
+            const viewsText = $('.list-info li:contains("Luot xem")').text().replace(/[^0-9]/g, '');
             sourceViews = parseInt(viewsText) || 0;
             
             $('.list01 li a').each((i, el) => {
@@ -847,9 +848,9 @@ export async function crawlFullMangaChapters(mangaId, detailUrl, source = 'nettr
             WHERE id = @mangaId
         `, { 
             mangaId, 
-            author: author || 'Đang cập nhật', 
-            status: status || 'Đang cập nhật', 
-            description: description || 'Nội dung đang được cập nhật.',
+            author: author || 'Dang cap nhat', 
+            status: status || 'Dang cap nhat', 
+            description: description || 'Noi dung dang duoc cap nhat.',
             alt: alternativeTitles,
             sourceViews,
             lastChapNum: lastChapNum.toString()
@@ -948,7 +949,7 @@ export async function crawlFullMangaChapters(mangaId, detailUrl, source = 'nettr
                 console.log(`[${source}] Found ${backupLinks.length} backup chapter links via Regex.`);
                 chapterRows = backupLinks;
             } else {
-                logCrawl('Cảnh báo: Không thể tìm thấy danh sách chương cho ' + mangaId, 'info');
+                logCrawl('Canh bao: Khong the tim thay danh sach chuong cho ' + mangaId, 'info');
             }
         }
 
@@ -1110,7 +1111,7 @@ async function saveGenres(mangaId, genres) {
         const associations = [];
 
         for (const genreName of genres) {
-            if (!genreName || genreName === 'Đang cập nhật' || genreName.includes('Thể loại')) continue;
+            if (!genreName || genreName === 'Dang cap nhat' || genreName.includes('The loai')) continue;
             
             let genreId = genreMap.get(genreName.toLowerCase());
             

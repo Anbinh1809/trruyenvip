@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Settings, Eye, Layout, Sun, Monitor, Smartphone, Type } from 'lucide-react';
 
 export default function ReaderSettings() {
   const [isOpen, setIsOpen] = useState(false);
@@ -68,42 +69,47 @@ export default function ReaderSettings() {
   };
 
   useEffect(() => {
-    // Initial sync
     handleFilterChange(filter);
   }, [filter]);
 
   return (
     <>
-      <div className="titan-reader-hud" onClick={() => setIsOpen(!isOpen)}>
-        ⚙️
+      <div className="titan-reader-hud" onClick={() => setIsOpen(!isOpen)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Settings size={22} className={isOpen ? 'rotate-90' : ''} style={{ transition: 'transform 0.3s' }} />
       </div>
 
       {isOpen && (
-        <div className="titan-reader-panel fade-in">
-          <h4 style={{ margin: '0 0 15px', fontSize: '0.9rem', fontWeight: 900 }}>Tu Luyện Ẩn Kỳ</h4>
+        <div className="titan-reader-panel fade-in glass glass-scrollbar" style={{ zIndex: 10005 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+              <Monitor size={16} color="var(--accent)" />
+              <h4 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 950, letterSpacing: '0.5px' }}>Tu Luyện Ẩn Kỳ</h4>
+          </div>
           
           <div className="setting-group">
-            <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginBottom: '8px' }}>Chế độ hiển thị</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                <Layout size={14} color="rgba(255,255,255,0.4)" />
+                <p style={{ margin: 0, fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', fontWeight: 700 }}>Chế độ hiển thị</p>
+            </div>
             <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', padding: '4px', borderRadius: '12px' }}>
               <button 
-                style={{ flex: 1, border: 'none', padding: '8px', borderRadius: '8px', fontSize: '0.75rem', cursor: 'pointer', background: isWebtoon ? 'var(--accent)' : 'transparent', color: isWebtoon ? 'white' : 'rgba(255,255,255,0.6)', fontWeight: 700 }} 
+                style={{ flex: 1, border: 'none', padding: '10px', borderRadius: '8px', fontSize: '0.75rem', cursor: 'pointer', background: isWebtoon ? 'var(--accent)' : 'transparent', color: isWebtoon ? 'white' : 'rgba(255,255,255,0.6)', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }} 
                 onClick={() => handleModeChange(true)}
               >
-                Cuộn dọc
+                <Smartphone size={14} /> Cuộn dọc
               </button>
               <button 
-                style={{ flex: 1, border: 'none', padding: '8px', borderRadius: '8px', fontSize: '0.75rem', cursor: 'pointer', background: !isWebtoon ? 'var(--accent)' : 'transparent', color: !isWebtoon ? 'white' : 'rgba(255,255,255,0.6)', fontWeight: 700 }} 
+                style={{ flex: 1, border: 'none', padding: '10px', borderRadius: '8px', fontSize: '0.75rem', cursor: 'pointer', background: !isWebtoon ? 'var(--accent)' : 'transparent', color: !isWebtoon ? 'white' : 'rgba(255,255,255,0.6)', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }} 
                 onClick={() => handleModeChange(false)}
               >
-                Từng trang
+                <Type size={14} /> Từng trang
               </button>
             </div>
           </div>
 
           <div className="setting-group" style={{ marginTop: '20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', margin: 0 }}>Độ sáng &apos;Hộ Nhãn&apos;</p>
-                <span style={{ fontSize: '0.7rem', color: 'var(--accent)', fontWeight: 800 }}>{Math.round(brightness * 100)}%</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                <Sun size={14} color="rgba(255,255,255,0.4)" />
+                <p style={{ margin: 0, fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', fontWeight: 700 }}>Độ sáng linh khí</p>
             </div>
             <input 
                 type="range" 
