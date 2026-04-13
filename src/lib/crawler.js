@@ -193,7 +193,7 @@ global.mirrorQuarantine = global.mirrorQuarantine || {}; // { mirror_url: timest
 
 
 
-async function fetchWithRetry(url, options = {}, retries = 3) {
+async function fetchWithRetry(url, options = {}, retries = 2) {
     let finalUrl = url;
     let mirrors = url.includes('nettruyen') ? [...SOURCES.NETTRUYEN_MIRRORS] : [url];
     
@@ -208,12 +208,12 @@ async function fetchWithRetry(url, options = {}, retries = 3) {
         mirrors.sort((a, b) => (global.mirrorScores[b] || 0) - (global.mirrorScores[a] || 0));
     }
 
-    const defaultTimeout = options.isDiscovery ? 15000 : 30000;
+    const defaultTimeout = options.isDiscovery ? 12000 : 25000;
     const ua = USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
     const searchReferer = SEARCH_REFERERS[Math.floor(Math.random() * SEARCH_REFERERS.length)];
 
     let attempt = 0;
-    while (attempt < retries) {
+    while (attempt < (retries || 2) * mirrors.length) {
         const currentMirror = mirrors[attempt % mirrors.length];
         
         if (url.includes('nettruyen')) {
@@ -227,17 +227,20 @@ async function fetchWithRetry(url, options = {}, retries = 3) {
         }
 
         try {
-            const jitter = 1000 + Math.random() * 2000;
-            const adaptiveBase = jitter + (global.globalFailureRate * 5000); 
-            await new Promise(r => setTimeout(r, adaptiveBase * attempt));
+            // Jitter for human-like behavior
+            const adaptiveBase = 200 + (global.globalFailureRate * 2500); 
+            if (attempt > 0) await new Promise(r => setTimeout(r, adaptiveBase));
+
+            console.log(`[Crawler] Attempt ${attempt+1}: Fetching ${finalUrl}`);
 
             const response = await axiosAgent.get(finalUrl, { 
                 ...options, 
                 timeout: options.timeout || defaultTimeout,
                 headers: { 
                     'User-Agent': ua,
-                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
                     'Accept-Language': 'vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7',
+                    'Accept-Encoding': 'gzip, deflate, br',
                     'Referer': options.headers?.Referer || (url.includes('truyenqq') ? 'https://truyenqqno.com/' : searchReferer),
                     'Sec-Ch-Ua': '"Google Chrome";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
                     'Sec-Ch-Ua-Mobile': '?0',
@@ -245,53 +248,41 @@ async function fetchWithRetry(url, options = {}, retries = 3) {
                     'Sec-Fetch-Dest': 'document',
                     'Sec-Fetch-Mode': 'navigate',
                     'Sec-Fetch-Site': (url.includes('truyenqq') ? 'same-origin' : 'cross-site'),
+                    'Sec-Fetch-User': '?1',
                     'Upgrade-Insecure-Requests': '1',
                     'Cache-Control': 'max-age=0',
                     ...options.headers 
                 }
             });
 
-            // Cloudflare Sentinel: Detect challenge pages disguised as 200 OK
-            if (response.data && typeof response.data === 'string') {
-                const isChallenge = response.data.includes('cf-browser-verification') || 
-                                   response.data.includes('Checking your browser') ||
-                                   response.data.includes('captcha');
-                
-                if (isChallenge) {
-                    throw { response: { status: 403, data: 'Cloudflare Challenge Detected' } };
-                }
-
-                // Empty page detection for mirrors (detecting mirrors that serve skeletons or blanks)
-                if (options.isDiscovery && response.data.length < 500) {
-                    throw new Error('Empypage or skeletal response detected on mirror');
-                }
-            }
-            
+            // If we get here, mirror seems okay.
             if (url.includes('nettruyen')) {
                 global.mirrorScores[currentMirror] = Math.min((global.mirrorScores[currentMirror] || 100) + 5, 200);
             }
             global.globalFailureRate = Math.max(0, global.globalFailureRate - 0.05);
+
             return response;
         } catch (err) {
-            if (url.includes('nettruyen')) {
-                global.mirrorScores[currentMirror] = Math.max((global.mirrorScores[currentMirror] || 100) - 30, 0);
-                if (global.mirrorScores[currentMirror] <= 10) {
-                    global.mirrorQuarantine[currentMirror] = Date.now() + 15 * 60 * 1000;
-                }
-            }
+            const isBlock = err.code === 'ECONNRESET' || err.response?.status === 403 || err.response?.status === 401 || err.code === 'ETIMEDOUT' || err.message?.includes('timeout');
             
-            if (err.response?.status === 403 || err.response?.status === 429) {
-                console.log(`[Ghost] Sentinel: Blocked on ${currentMirror} (${err.response.status}). Increasing back-off.`);
-                global.globalFailureRate = Math.min(1.2, global.globalFailureRate + 0.2);
-            } else {
-                global.globalFailureRate = Math.min(1, global.globalFailureRate + 0.1);
+            if (isBlock) {
+                console.warn(`[Crawler] Mirror ${currentMirror} blocked request or timed out. Quarantining.`);
+                global.mirrorQuarantine[currentMirror] = Date.now() + 600000; // 10 mins
+                global.mirrorScores[currentMirror] = Math.max(0, (global.mirrorScores[currentMirror] || 100) - 20);
+                attempt++;
+                continue;
             }
 
+            if (url.includes('nettruyen')) {
+                global.mirrorScores[currentMirror] = Math.max((global.mirrorScores[currentMirror] || 100) - 10, 0);
+            }
+            global.globalFailureRate = Math.min(1.2, global.globalFailureRate + 0.1);
+            
+            if (attempt >= (retries || 2) * mirrors.length - 1) throw err;
             attempt++;
-            if (attempt === retries) throw err;
-            await new Promise(r => setTimeout(r, 5000 * attempt));
         }
     }
+}
 }
 
 let activeDeepCrawls = 0;

@@ -19,10 +19,10 @@ export async function POST(req) {
         const { chapterId } = await req.json();
         if (!chapterId) return NextResponse.json({ error: 'Missing chapterId' }, { status: 400 });
 
-        // Rate Limit: 1 sync per 15 seconds per user, 45s per guest
+        // Rate Limit: 1 sync per 10 seconds per user, 30s per guest
         const now = Date.now();
         const lastSync = jitRateLimit.get(rateLimitKey) || 0;
-        const cooldown = session ? 15000 : 45000;
+        const cooldown = session ? 10000 : 30000;
 
         if (now - lastSync < cooldown) {
             const remaining = Math.ceil((cooldown - (now - lastSync)) / 1000);
@@ -37,7 +37,7 @@ export async function POST(req) {
             { id: chapterId }
         );
         const existingCount = parseInt(existingCheck.recordset[0]?.count || 0);
-        if (existingCount > 5) {
+        if (existingCount >= 1) {
             return NextResponse.json({ success: true, message: 'Already synced', imageCount: existingCount });
         }
 
@@ -55,23 +55,21 @@ export async function POST(req) {
         
         const source = chapter.source_url.includes('nettruyen') ? 'nettruyen' : 'truyenqq';
 
-        console.log(`[JIT-SYNC] Crawling ${chapterId} from ${chapter.source_url}`);
+        console.log(`[JIT-SYNC] HARDENED: Crawling ${chapterId} from ${chapter.source_url}`);
 
-        // Race the crawl against a 45s timeout to avoid Vercel 504
-        const CRAWL_TIMEOUT = 45000;
-        const crawlPromise = crawlChapterImages(chapterId, chapter.source_url, source);
-        const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('CRAWL_TIMEOUT')), CRAWL_TIMEOUT)
-        );
-
+        // Race the crawl against a 40s timeout to avoid Vercel 504
+        const CRAWL_TIMEOUT = 40000;
+        let crawlError = null;
+        
         try {
+            const crawlPromise = crawlChapterImages(chapterId, chapter.source_url, source, true);
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('CRAWL_TIMEOUT')), CRAWL_TIMEOUT)
+            );
             await Promise.race([crawlPromise, timeoutPromise]);
-        } catch (crawlErr) {
-            if (crawlErr.message === 'CRAWL_TIMEOUT') {
-                console.warn(`[JIT-SYNC] Crawl timed out for ${chapterId}, checking partial results`);
-            } else {
-                throw crawlErr;
-            }
+        } catch (err) {
+            crawlError = err.message;
+            console.warn(`[JIT-SYNC] Crawl exit status: ${crawlError}`);
         }
 
         // Check how many images were saved (partial or complete)
@@ -81,22 +79,26 @@ export async function POST(req) {
         );
         const imageCount = parseInt(imgCheck.recordset[0]?.count || 0);
 
-        console.log(`[JIT-SYNC] Done: ${imageCount} images for ${chapterId}`);
+        console.log(`[JIT-SYNC] Final Check: ${imageCount} images for ${chapterId}`);
 
-        if (imageCount === 0) {
+        if (imageCount >= 1) {
             return NextResponse.json({ 
-                error: 'Không thể cào ảnh từ nguồn này. Nguồn có thể đang bảo trì hoặc không hỗ trợ chương này.',
-                imageCount: 0
-            }, { status: 503 });
+                success: true, 
+                message: `Sync done: ${imageCount} images${crawlError === 'CRAWL_TIMEOUT' ? ' (Partial)' : ''}`,
+                imageCount,
+                isPartial: crawlError === 'CRAWL_TIMEOUT'
+            });
         }
 
+        // Failure Case: No images found
         return NextResponse.json({ 
-            success: true, 
-            message: `Sync done: ${imageCount} images`,
-            imageCount
-        });
+            error: 'Không thể cào ảnh từ các nguồn hiện tại. Có thể nguồn đang bị chặn hoặc URL đã thay đổi.',
+            status: crawlError,
+            imageCount: 0
+        }, { status: 503 });
+
     } catch (err) {
-        console.error('[JIT-SYNC] Error:', err.message);
+        console.error('[JIT-SYNC] Critical Error:', err.message);
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
