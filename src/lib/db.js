@@ -81,7 +81,7 @@ function translateSql(sql, params) {
 
     // 7. Schema & Identifier Cleanup
     translatedSql = translatedSql.replace(/dbo\./gi, ''); 
-    translatedSql = translatedSql.replace(/\[(\w+)\]/g, '$1'); 
+    translatedSql = translatedSql.replace(/\[(\w+)\]/g, '"$1"'); 
     translatedSql = translatedSql.replace(/calculateRank\(([^)]+)\)/gi, 'calculate_rank($1)');
 
     return { sql: translatedSql, values };

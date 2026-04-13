@@ -1094,8 +1094,7 @@ async function saveGenres(mangaId, genres) {
             if (!genreId) {
                 const slug = genreName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-');
                 await query(`
-                    IF NOT EXISTS (SELECT * FROM Genres WHERE name = @name)
-                    INSERT INTO Genres (name, slug) VALUES (@name, @slug)
+                    INSERT INTO Genres (name, slug) VALUES (@name, @slug) ON CONFLICT (name) DO NOTHING
                 `, { name: genreName, slug });
                 
                 const newGenreRes = await query("SELECT id FROM Genres WHERE name = @name", { name: genreName });
