@@ -3,14 +3,14 @@ import { query } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 
-// In-memory rate limiting map for JIT sync
-const jitRateLimit = new Map();
+// In-memory telemetry for real-time debugging
+const jitTelemetry = new Map();
 
 export const runtime = 'nodejs';
-// Allow up to 55 seconds for the crawl to complete on Vercel
 export const maxDuration = 55;
 
 export async function POST(req) {
+    const startTime = Date.now();
     try {
         const session = await getSession();
         const clientIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'local';
@@ -19,86 +19,75 @@ export async function POST(req) {
         const { chapterId } = await req.json();
         if (!chapterId) return NextResponse.json({ error: 'Missing chapterId' }, { status: 400 });
 
-        // Rate Limit: 1 sync per 10 seconds per user, 30s per guest
-        const now = Date.now();
-        const lastSync = jitRateLimit.get(rateLimitKey) || 0;
-        const cooldown = session ? 10000 : 30000;
-
-        if (now - lastSync < cooldown) {
-            const remaining = Math.ceil((cooldown - (now - lastSync)) / 1000);
+        // Cooldown checks
+        const lastSync = jitTelemetry.get(rateLimitKey) || 0;
+        const cooldown = session ? 8000 : 25000;
+        if (Date.now() - lastSync < cooldown) {
+            const remaining = Math.ceil((cooldown - (Date.now() - lastSync)) / 1000);
             return NextResponse.json({ 
-                error: `Thao tác quá nhanh, vui lòng đợi ${remaining}s` 
+                error: `Hệ thống đang xử lý, vui lòng chờ ${remaining}s...`,
+                isCooldown: true
             }, { status: 429 });
         }
 
-        // Check if images already exist - avoid crawling if already done by another request
-        const existingCheck = await query(
-            'SELECT COUNT(*) as count FROM ChapterImages WHERE chapter_id = @id',
-            { id: chapterId }
-        );
-        const existingCount = parseInt(existingCheck.recordset[0]?.count || 0);
-        if (existingCount >= 1) {
-            return NextResponse.json({ success: true, message: 'Already synced', imageCount: existingCount });
+        // Fast-path: Check if already exists
+        const existing = await query('SELECT COUNT(*) as count FROM ChapterImages WHERE chapter_id = @id', { id: chapterId });
+        if (parseInt(existing.recordset[0].count) >= 1) {
+            return NextResponse.json({ success: true, imageCount: existing.recordset[0].count });
         }
 
-        jitRateLimit.set(rateLimitKey, now);
+        jitTelemetry.set(rateLimitKey, Date.now());
 
         const chapData = await query("SELECT source_url FROM Chapters WHERE id = @id", { id: chapterId });
-        if (chapData.recordset.length === 0) {
-            return NextResponse.json({ error: 'Chapter not found in database' }, { status: 404 });
-        }
+        if (chapData.recordset.length === 0) return NextResponse.json({ error: 'Chapter not found' }, { status: 404 });
 
         const chapter = chapData.recordset[0];
-        if (!chapter.source_url) {
-            return NextResponse.json({ error: 'Chapter has no source URL' }, { status: 422 });
-        }
-        
-        const source = chapter.source_url.includes('nettruyen') ? 'nettruyen' : 'truyenqq';
+        const source = chapter.source_url?.includes('nettruyen') ? 'nettruyen' : 'truyenqq';
 
-        console.log(`[JIT-SYNC] HARDENED: Crawling ${chapterId} from ${chapter.source_url}`);
+        console.log(`[JIT-TELEMETRY] Start: ${chapterId}`);
 
-        // Race the crawl against a 40s timeout to avoid Vercel 504
-        const CRAWL_TIMEOUT = 40000;
-        let crawlError = null;
-        
+        // Execution with race timeout
+        const CRAWL_TIMEOUT = 45000;
+        let crawlResult = 0;
+        let errorStatus = 'UNKNOWN';
+
         try {
             const crawlPromise = crawlChapterImages(chapterId, chapter.source_url, source, true);
-            const timeoutPromise = new Promise((_, reject) => 
-                setTimeout(() => reject(new Error('CRAWL_TIMEOUT')), CRAWL_TIMEOUT)
-            );
-            await Promise.race([crawlPromise, timeoutPromise]);
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT_LIMIT')), CRAWL_TIMEOUT));
+            crawlResult = await Promise.race([crawlPromise, timeoutPromise]);
         } catch (err) {
-            crawlError = err.message;
-            console.warn(`[JIT-SYNC] Crawl exit status: ${crawlError}`);
+            errorStatus = err.code || err.message;
+            console.error(`[JIT-TELEMETRY] Phase failed: ${errorStatus}`);
         }
 
-        // Check how many images were saved (partial or complete)
-        const imgCheck = await query(
-            'SELECT COUNT(*) as count FROM ChapterImages WHERE chapter_id = @id',
-            { id: chapterId }
-        );
-        const imageCount = parseInt(imgCheck.recordset[0]?.count || 0);
+        // Verification
+        const imgCheck = await query('SELECT COUNT(*) as count FROM ChapterImages WHERE chapter_id = @id', { id: chapterId });
+        const finalCount = parseInt(imgCheck.recordset[0].count);
 
-        console.log(`[JIT-SYNC] Final Check: ${imageCount} images for ${chapterId}`);
+        const duration = Date.now() - startTime;
 
-        if (imageCount >= 1) {
+        if (finalCount > 0) {
             return NextResponse.json({ 
                 success: true, 
-                message: `Sync done: ${imageCount} images${crawlError === 'CRAWL_TIMEOUT' ? ' (Partial)' : ''}`,
-                imageCount,
-                isPartial: crawlError === 'CRAWL_TIMEOUT'
+                imageCount: finalCount,
+                duration,
+                status: errorStatus === 'TIMEOUT_LIMIT' ? 'PARTIAL_SYNC' : 'COMPLETE_SYNC'
             });
         }
 
-        // Failure Case: No images found
+        // 503 Critical Failure: Provide telemetry in response for UI troubleshooting
         return NextResponse.json({ 
-            error: 'Không thể cào ảnh từ các nguồn hiện tại. Có thể nguồn đang bị chặn hoặc URL đã thay đổi.',
-            status: crawlError,
-            imageCount: 0
+            error: 'Nguồn ảnh bị chặn hoặc không phản hồi. Đang thử kích hoạt Aegis Auto-Repair...',
+            telemetry: {
+                chapterId,
+                source,
+                error: errorStatus,
+                elapsed: duration,
+                attempts: 1
+            }
         }, { status: 503 });
 
     } catch (err) {
-        console.error('[JIT-SYNC] Critical Error:', err.message);
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }

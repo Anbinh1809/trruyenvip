@@ -231,8 +231,7 @@ async function fetchWithRetry(url, options = {}, retries = 2) {
             const adaptiveBase = 200 + (global.globalFailureRate * 2500); 
             if (attempt > 0) await new Promise(r => setTimeout(r, adaptiveBase));
 
-            console.log(`[Crawler] Attempt ${attempt+1}: Fetching ${finalUrl}`);
-
+            const host = new URL(finalUrl).host;
             const response = await axiosAgent.get(finalUrl, { 
                 ...options, 
                 timeout: options.timeout || defaultTimeout,
@@ -241,6 +240,7 @@ async function fetchWithRetry(url, options = {}, retries = 2) {
                     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
                     'Accept-Language': 'vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7',
                     'Accept-Encoding': 'gzip, deflate, br',
+                    'Host': host,
                     'Referer': options.headers?.Referer || (url.includes('truyenqq') ? 'https://truyenqqno.com/' : searchReferer),
                     'Sec-Ch-Ua': '"Google Chrome";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
                     'Sec-Ch-Ua-Mobile': '?0',
