@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Absolute bare minimum for Next.js 16 Stability
+  reactStrictMode: true,
+  poweredByHeader: false,
+  // Using custom /api/proxy with Sharp for superior control and reliability
   images: {
     unoptimized: true, 
   },

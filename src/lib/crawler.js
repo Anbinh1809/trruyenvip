@@ -19,7 +19,7 @@ function safeJoinUrl(base, path) {
     return baseUrl + pathUrl;
 }
 
-const SOURCES = {
+export const SOURCES = {
     NETTRUYEN: 'https://www.nettruyenme.com/',
     NETTRUYEN_MIRRORS: [
         'https://www.nettruyenpro.com/', 

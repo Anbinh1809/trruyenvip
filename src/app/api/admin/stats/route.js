@@ -13,7 +13,7 @@ export async function GET() {
             return Response.json(global.adminStatsCache.data);
         }
 
-        const stats = await query(`
+        const statsRes = await query(`
             SELECT 
                 (SELECT COUNT(*) FROM Users) as "totalUsers",
                 (SELECT COUNT(*) FROM Manga) as "totalManga",
@@ -22,11 +22,31 @@ export async function GET() {
                 (SELECT COUNT(*) FROM CrawlerTasks WHERE status = 'pending') as "taskPending",
                 (SELECT COUNT(*) FROM CrawlerTasks WHERE status = 'failed') as "taskFailed",
                 (SELECT COUNT(*) FROM Chapters WHERE created_at > NOW() - INTERVAL '1 hour') as "syncsLastHour",
-                (SELECT COUNT(*) FROM CrawlerTasks WHERE status = 'completed' AND updated_at > NOW() - INTERVAL '1 hour') as "tasksLastHour",
                 (SELECT created_at FROM CrawlLogs ORDER BY created_at DESC LIMIT 1) as "lastCrawl"
         `);
-
-        const data = stats.recordset[0];
+ 
+        const recentFailures = await query(`
+            SELECT id, type, last_error 
+            FROM CrawlerTasks 
+            WHERE status = 'failed' 
+            ORDER BY updated_at DESC 
+            LIMIT 5
+        `);
+ 
+        const heatmap = await query(`
+            SELECT SUBSTRING(last_error, 1, 50) as signature, COUNT(*) as count
+            FROM CrawlerTasks
+            WHERE status = 'failed' AND updated_at > NOW() - INTERVAL '24 hours'
+            GROUP BY signature
+            ORDER BY count DESC
+            LIMIT 5
+        `);
+ 
+        const data = {
+            ...statsRes.recordset[0],
+            recentFailures: recentFailures.recordset,
+            heatmap: heatmap.recordset
+        };
         global.adminStatsCache = { data, time: Date.now() };
 
         return Response.json(data);

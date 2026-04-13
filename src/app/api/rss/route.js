@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(request) {
     try {
         const result = await query(`
-            SELECT TOP 50 
+            SELECT 
                 c.id as chapter_id,
                 c.title as chapter_title,
                 c.chapter_number,
@@ -17,6 +17,7 @@ export async function GET(request) {
             FROM Chapters c
             JOIN Manga m ON c.manga_id = m.id
             ORDER BY c.updated_at DESC
+            LIMIT 50
         `);
 
         const chapters = result.recordset;

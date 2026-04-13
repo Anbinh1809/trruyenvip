@@ -43,7 +43,7 @@ async function getChapterData(mangaId, chapterId) {
   const [mangaResult, chapResult, imgResult] = await Promise.all([
     query("SELECT id, title, cover FROM Manga WHERE id = @id", { id: mangaId }),
     query("SELECT id, title, source_url, chapter_number FROM Chapters WHERE id = @id", { id: chapterId }),
-    query("SELECT image_url FROM ChapterImages WHERE chapter_id = @id ORDER BY [order] ASC", { id: chapterId })
+    query('SELECT image_url FROM ChapterImages WHERE chapter_id = @id ORDER BY "order" ASC', { id: chapterId })
   ]);
 
   if (mangaResult.recordset.length === 0 || chapResult.recordset.length === 0) return null;
@@ -65,7 +65,7 @@ async function getChapterData(mangaId, chapterId) {
 
   let nextChapterImages = [];
   if (nextChapterId) {
-      const nextImgRes = await query("SELECT image_url FROM ChapterImages WHERE chapter_id = @id ORDER BY [order] ASC", { id: nextChapterId });
+      const nextImgRes = await query('SELECT image_url FROM ChapterImages WHERE chapter_id = @id ORDER BY "order" ASC', { id: nextChapterId });
       nextChapterImages = nextImgRes.recordset;
   }
 

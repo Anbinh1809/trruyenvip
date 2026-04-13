@@ -12,7 +12,10 @@ export default function TransferPage() {
 
     const handleBatchTransfer = async (e) => {
         e.preventDefault();
-        const urlList = urls.split('\n').filter(u => u.trim().startsWith('http'));
+        const urlList = urls.split('\n')
+            .map(u => u.trim())
+            .filter(u => u.length > 5)
+            .map(u => u.startsWith('http') ? u : `https://${u}`);
         if (urlList.length === 0) return;
 
         setIsProcessing(true);
@@ -33,7 +36,12 @@ export default function TransferPage() {
                     const data = await res.json();
                     
                     if (data.success) {
-                        processResults.push({ url, status: 'success', title: data.mangaId });
+                        processResults.push({ 
+                            url, 
+                            status: 'success', 
+                            title: data.mangaId,
+                            link: data.redirectUrl 
+                        });
                         fetchMangaAndAddToHistory(data.mangaId, data.chapterId);
                     } else {
                         processResults.push({ url, status: 'error', msg: data.error });
@@ -106,8 +114,13 @@ export default function TransferPage() {
                                         border: `1px solid ${res.status === 'success' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255, 62, 62, 0.1)'}`
                                     }}>
                                         <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '65%' }}>{res.url}</div>
-                                        <div style={{ fontWeight: 900, fontSize: '0.75rem', textTransform: 'uppercase', color: res.status === 'success' ? '#10b981' : 'var(--accent)' }}>
-                                            {res.status === 'success' ? '✅ Thành công' : '❌ Thất bại'}
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                                            {res.status === 'success' && (
+                                                <a href={res.link} target="_blank" rel="noreferrer" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 800, fontSize: '0.75rem' }}>XEM NGAY ↗</a>
+                                            )}
+                                            <div style={{ fontWeight: 900, fontSize: '0.75rem', textTransform: 'uppercase', color: res.status === 'success' ? '#10b981' : 'var(--accent)' }}>
+                                                {res.status === 'success' ? '✅' : '❌'}
+                                            </div>
                                         </div>
                                     </div>
                                 ))}

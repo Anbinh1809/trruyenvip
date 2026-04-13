@@ -14,9 +14,10 @@ export async function GET(req) {
 
         // 1. Get Latest Logs
         const logs = await query(`
-            SELECT TOP (@limit) id, message, status, created_at 
+            SELECT id, message, status, created_at 
             FROM CrawlLogs 
             ORDER BY created_at DESC
+            LIMIT @limit
         `, { limit });
 
         // 2. Get Today's Summary
@@ -26,7 +27,7 @@ export async function GET(req) {
                 SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as success_logs,
                 SUM(CASE WHEN status = 'error' THEN 1 ELSE 0 END) as error_logs
             FROM CrawlLogs
-            WHERE CAST(created_at AS DATE) = CAST(GETDATE() AS DATE)
+            WHERE CAST(created_at AS DATE) = CURRENT_DATE
         `);
 
         // 3. Get Manga Stats

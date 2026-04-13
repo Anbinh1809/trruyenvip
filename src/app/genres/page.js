@@ -129,6 +129,7 @@ export default async function GenresPage({ searchParams }) {
                         >
                             Tất cả truyện
                         </Link>
+                        {allGenres.map(g => (
                             <Link 
                                 key={g.slug}
                                 href={`/genres?type=${encodeURIComponent(g.slug)}`}

@@ -73,20 +73,18 @@ export async function POST(req) {
             return NextResponse.json({ error: 'Unsupported URL format' }, { status: 400 });
         }
 
-        // 2. Lookup or Initialize Manga (Hardened lookup to avoid fuzzy overlap)
+        // 2. Lookup or Initialize Manga (Hardened lookup with Postgres-native concatenation)
         let manga = await query(`
             SELECT id FROM Manga 
             WHERE id = @mangaId 
             OR source_url = @url
-            OR source_url LIKE '%/' + @mangaId
-            OR source_url LIKE '%/' + @mangaId + '.html'
+            OR source_url LIKE '%/' || @mangaId
+            OR source_url LIKE '%/' || @mangaId || '.html'
         `, { mangaId, url });
         
         if (manga.recordset.length === 0) {
-            console.log(`[Migration] New manga detected via link: ${mangaId}. Triggering deep crawl...`);
+            console.log(`[Migration] New manga detected: ${mangaId}. Queueing background sync...`);
             
-            // Refined URL reconstruction
-            // Robust URL reconstruction using the base origin and segments
             let detailUrl = parsedUrl.origin;
             if (source === 'nettruyen') {
                 detailUrl += `/truyen-tranh/${mangaId}`;
@@ -94,7 +92,8 @@ export async function POST(req) {
                 detailUrl += `/truyen/${mangaId}.html`;
             }
             
-            await crawlFullMangaChapters(mangaId, detailUrl, source);
+            // TITAN BACKFILL: Add to queue instead of awaiting, preventing 504 timeouts
+            await queueMangaSync(mangaId, detailUrl, source, false, 8); // Priority 8 (User-triggered)
         }
 
 

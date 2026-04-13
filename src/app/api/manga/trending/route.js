@@ -7,11 +7,12 @@ export async function GET() {
         // For simplicity, we'll take top 5 most viewed (if views column existed) 
         // OR just top 5 with most chapters as a proxy for 'active/popular'
         const trending = await query(`
-            SELECT TOP 5 m.id, m.title, m.cover
+            SELECT m.id, m.title, m.cover
             FROM Manga m
             JOIN Chapters c ON m.id = c.manga_id
             GROUP BY m.id, m.title, m.cover
             ORDER BY COUNT(c.id) DESC
+            LIMIT 5
         `);
 
         const optimized = trending.recordset.map(m => ({

@@ -7,6 +7,7 @@ import { useToast } from '@/components/ToastProvider';
 import Link from 'next/link';
 
 export default function AdminDashboard() {
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
   const { addToast } = useToast();
   const [stats, setStats] = useState(null);
   const [crawlLoading, setCrawlLoading] = useState(false);

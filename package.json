@@ -1,6 +1,6 @@
 {
   "name": "truyenvip",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "private": true,
   "scripts": {
@@ -17,7 +17,6 @@
     "cheerio": "^1.2.0",
     "dotenv": "^17.4.1",
     "jose": "^6.2.2",
-    "mssql": "^12.2.1",
     "next": "16.2.2",
     "pg": "^8.20.0",
     "react": "19.2.4",

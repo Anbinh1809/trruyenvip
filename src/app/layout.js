@@ -1,4 +1,5 @@
 import "./globals.css";
+import { Inter, Outfit } from 'next/font/google';
 import { ThemeProvider } from "@/context/ThemeContext";
 import { HistoryProvider } from "@/context/HistoryContext";
 import { FavoritesProvider } from "@/context/FavoritesContext";
@@ -8,6 +9,18 @@ import { AuthProvider } from "@/context/AuthContext";
 import MissionPanel from "@/components/MissionPanel";
 import MobileNav from "@/components/MobileNav";
 import BackToTop from "@/components/BackToTop";
+
+const inter = Inter({
+  subsets: ['latin', 'vietnamese'],
+  display: 'swap',
+  variable: '--font-inter',
+});
+
+const outfit = Outfit({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-outfit',
+});
 
 export const metadata = {
   title: "TruyenVip - Nền tảng Đọc Truyện Tranh Online Cao Cấp",
@@ -51,7 +64,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="vi" suppressHydrationWarning>
+    <html lang="vi" className={`${inter.variable} ${outfit.variable}`} suppressHydrationWarning>
       <body suppressHydrationWarning>
         <AuthProvider>
           <ThemeProvider>
