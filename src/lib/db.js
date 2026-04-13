@@ -83,7 +83,8 @@ function translateSql(sql, params) {
     translatedSql = translatedSql.replace(/OUTPUT\s+inserted\.\*/gi, 'RETURNING *');
 
     // 7. Schema & Identifier Cleanup
-    translatedSql = translatedSql.replace(/dbo\./gi, ''); 
+    // More aggressive dbo removal to handle [dbo]. / "dbo". / dbo. prefixes
+    translatedSql = translatedSql.replace(/(?:\[dbo\]|"dbo"|dbo)\./gi, ''); 
     translatedSql = translatedSql.replace(/\[([^\]]+)\]/g, '"$1"'); 
 
     return { sql: translatedSql, values };
@@ -135,7 +136,9 @@ export async function bulkInsert(tableName, columns, rows) {
     
     const client = await pool.connect();
     try {
-        const colNames = columns.map(c => `"${c}"`).join(', ');
+        // Force lowercase and unquote table/column names to avoid case-sensitivity issues in PG
+        const cleanTable = tableName.replace(/[\[\]"]/g, '').toLowerCase();
+        const colNames = columns.map(c => `"${c.toLowerCase()}"`).join(', ');
         const valuePlaceholders = [];
         const flatValues = [];
         
@@ -146,7 +149,7 @@ export async function bulkInsert(tableName, columns, rows) {
             }).join(', ')})`
         ).join(', ');
 
-        const sql = `INSERT INTO "${tableName}" (${colNames}) VALUES ${placeholders} ON CONFLICT DO NOTHING`;
+        const sql = `INSERT INTO ${cleanTable} (${colNames}) VALUES ${placeholders} ON CONFLICT DO NOTHING`;
         await client.query(sql, flatValues);
     } finally {
         client.release();

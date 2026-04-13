@@ -91,8 +91,8 @@ async function logGuardianEvent(mangaId, chapterTitle, eventType, message) {
         }
 
         await query(`
-            INSERT INTO GuardianReports (manga_name, chapter_title, event_type, message, cover, created_at)
-            VALUES (@name, @chap, @type, @msg, @cover, GETDATE())
+            INSERT INTO guardianreports (manga_name, chapter_title, event_type, message, cover, created_at)
+            VALUES (@name, @chap, @type, @msg, @cover, NOW())
         `, {
             name: mangaName,
             chap: chapterTitle || 'System',
@@ -295,11 +295,13 @@ async function fetchWithRetry(url, options = {}, retries = 2) {
             }
             global.globalFailureRate = Math.min(1.2, global.globalFailureRate + 0.1);
             
-            if (attempt >= (retries || 2) * mirrors.length - 1) throw err;
+            if (attempt >= (retries || 2) * mirrors.length - 1) {
+                throw err || new Error(`Exhausted all ${mirrors.length} mirrors without success.`);
+            }
             attempt++;
         }
     }
-}
+    throw new Error(`Failed to fetch ${url} - All mirrors exhausted or blocked.`);
 }
 
 let activeDeepCrawls = 0;
@@ -354,7 +356,7 @@ async function processQueue() {
         }
         
         // Mark as completed
-        await query("UPDATE CrawlerTasks SET status = 'completed', updated_at = GETDATE() WHERE id = @id", { id: taskRow.id });
+        await query("UPDATE crawlertasks SET status = 'completed', updated_at = NOW() WHERE id = @id", { id: taskRow.id });
     } catch (e) {
         // Mark as failed and increment attempts
         await query(`
@@ -428,9 +430,9 @@ export async function bootstrapCrawler() {
 async function logCrawl(message, status = 'success') {
     try {
         console.log(`[CrawlLog][${status.toUpperCase()}] ${message}`);
-        await query("INSERT INTO CrawlLogs (message, status) VALUES (@message, @status)", { 
-            message: message.substring(0, 500), 
-            status 
+        await query("INSERT INTO crawllogs (message, status) VALUES (@message, @status)", {
+            message: message.substring(0, 500),
+            status: status
         });
     } catch (e) {
         // Silently fail logging to prioritize crawl stability
@@ -450,11 +452,11 @@ export async function healChapterGaps(limit = 5) {
         
         // Find manga with inconsistent chapter counts, prioritize by Favorites & Views
         const targets = await query(`
-            SELECT m.id, m.source_url, m.title, (SELECT COUNT(*) FROM Favorites f WHERE f.manga_id = m.id) as fav_count
-            FROM Manga m
+            SELECT m.id, m.source_url, m.title, (SELECT COUNT(*) FROM favorites f WHERE f.manga_id = m.id) as fav_count
+            FROM manga m
             JOIN (
                 SELECT manga_id, MAX(chapter_number) as max_n, COUNT(*) as count_n
-                FROM Chapters
+                FROM chapters
                 GROUP BY manga_id
                 HAVING MAX(chapter_number) > COUNT(*) + 1 
             ) gaps ON m.id = gaps.manga_id
@@ -485,10 +487,10 @@ export async function rescueBrokenImages(limit = 10) {
         // Find chapters with fewer than 3 images, prioritizing Popular Manga & Newer chapters
         const targets = await query(`
             SELECT c.id, c.title, c.source_url, m.title as manga_title, m.id as manga_id, 
-                   (SELECT COUNT(*) FROM Favorites f WHERE f.manga_id = m.id) as fav_count
-            FROM Chapters c
-            JOIN Manga m ON c.manga_id = m.id
-            WHERE (SELECT COUNT(*) FROM ChapterImages ci WHERE ci.chapter_id = c.id) < 3
+                   (SELECT COUNT(*) FROM favorites f WHERE f.manga_id = m.id) as fav_count
+            FROM chapters c
+            JOIN manga m ON c.manga_id = m.id
+            WHERE (SELECT COUNT(*) FROM chapterimages ci WHERE ci.chapter_id = c.id) < 3
             AND (c.retry_count < 5 OR c.retry_count IS NULL)
             ORDER BY fav_count DESC, m.views DESC, c.updated_at DESC
             LIMIT @limit
@@ -500,13 +502,13 @@ export async function rescueBrokenImages(limit = 10) {
                 logCrawl(`[RESCUE] Cuu ho uu tien: ${target.manga_title} - ${target.title}`);
                 
                 // Track retry attempts
-                await query('UPDATE Chapters SET retry_count = COALESCE(retry_count, 0) + 1 WHERE id = @id', { id: target.id });
+                await query('UPDATE chapters SET retry_count = COALESCE(retry_count, 0) + 1 WHERE id = @id', { id: target.id });
 
                 const success_count = await crawlChapterImages(target.id, target.source_url);
                 
                 if (success_count >= 3) {
                     await logGuardianEvent(target.manga_id, target.title, 'FIX_IMAGE', `Linh Thu da phuc hoi thanh cong ${success_count} anh cho truyen chien luoc ${target.manga_title}.`);
-                    await query('UPDATE Chapters SET retry_count = 0, last_error = NULL WHERE id = @id', { id: target.id });
+                    await query('UPDATE chapters SET retry_count = 0, last_error = NULL WHERE id = @id', { id: target.id });
                 }
             }
         }
@@ -577,8 +579,8 @@ export async function refreshActiveManga(limit = 20) {
     try {
         const targets = await query(`
             SELECT m.id, m.source_url, m.title, m.status, m.last_crawled, COUNT(f.id) as fav_count
-            FROM Manga m
-            LEFT JOIN Favorites f ON m.id = f.manga_id
+            FROM manga m
+            LEFT JOIN favorites f ON m.id = f.manga_id
             GROUP BY m.id, m.source_url, m.title, m.status, m.last_crawled
             ORDER BY fav_count DESC, m.last_crawled ASC
             LIMIT @limit
@@ -612,8 +614,8 @@ export async function autoDeepCrawl(limit = 5) {
     try {
         const targets = await query(`
             SELECT m.id, m.source_url, m.title 
-            FROM Manga m
-            LEFT JOIN (SELECT manga_id, COUNT(*) as c FROM Chapters GROUP BY manga_id) ch ON m.id = ch.manga_id
+            FROM manga m
+            LEFT JOIN (SELECT manga_id, COUNT(*) as c FROM chapters GROUP BY manga_id) ch ON m.id = ch.manga_id
             ORDER BY 
                 CASE WHEN m.description IS NULL OR m.description = '' THEN 0 ELSE 1 END ASC,
                 ch.c ASC, 
@@ -702,7 +704,7 @@ export async function crawlNetTruyen(page = 1, full = false, limitless = false) 
           
           // --- GAP DETECTION ---
           // Check if we are missing chapters between our DB and this new one
-          const maxNumRes = await query("SELECT MAX(chapter_number) as m FROM Chapters WHERE manga_id = @mangaId", { mangaId: targetId });
+          const maxNumRes = await query("SELECT MAX(chapter_number) as m FROM chapters WHERE manga_id = @mangaId", { mangaId: targetId });
           const currentMax = maxNumRes.recordset[0]?.m || 0;
           
           await query(`
@@ -778,7 +780,7 @@ export async function crawlFullMangaChapters(mangaId, detailUrl, source = 'nettr
             // Aegis Auto-Migration: If 404, look for alternative source
             if (err.response?.status === 404) {
                  console.warn(`[Aegis] Status 404 for ${mangaId}. Attempting auto-migration...`);
-                 const mangaData = await query("SELECT title FROM Manga WHERE id = @mangaId", { mangaId });
+                 const mangaData = await query("SELECT title FROM manga WHERE id = @mangaId", { mangaId });
                  const title = mangaData.recordset[0]?.title;
                  if (title) {
                      await findAlternativeSource(mangaId, title, source);
@@ -832,7 +834,7 @@ export async function crawlFullMangaChapters(mangaId, detailUrl, source = 'nettr
             });
         }
 
-        const maxNumRes = await query("SELECT MAX(chapter_number) as m FROM Chapters WHERE manga_id = @mangaId", { mangaId });
+        const maxNumRes = await query("SELECT MAX(chapter_number) as m FROM chapters WHERE manga_id = @mangaId", { mangaId });
         const lastChapNum = maxNumRes.recordset[0]?.m || '0';
 
         await query(`
@@ -1011,7 +1013,7 @@ export async function crawlFullMangaChapters(mangaId, detailUrl, source = 'nettr
 
                 // --- TITAN DEDUPLICATION 3.0 ---
                 // We check existingIds (Slugs) AND existingNums (By MangaId + ChapNum)
-                const existingNumCheck = await query("SELECT id FROM Chapters WHERE manga_id = @mangaId AND chapter_number = @chapNum", { mangaId, chapNum });
+                const existingNumCheck = await query("SELECT id FROM chapters WHERE manga_id = @mangaId AND chapter_number = @chapNum", { mangaId, chapNum });
                 const alreadyExists = existingIds.has(chapId) || existingUrls.has(chapUrl) || existingNumCheck.recordset.length > 0;
 
                 if (alreadyExists) {
@@ -1027,7 +1029,7 @@ export async function crawlFullMangaChapters(mangaId, detailUrl, source = 'nettr
                 existingInARow = 0;
 
                 await query(`
-                    INSERT INTO Chapters (id, manga_id, title, source_url, chapter_number) 
+                    INSERT INTO chapters (id, manga_id, title, source_url, chapter_number) 
                     VALUES (@chapId, @mangaId, @title, @url, @chapNum)
                 `, { chapId, mangaId, title: chapTitle, url: chapUrl, chapNum });
 
@@ -1055,7 +1057,7 @@ export async function crawlFullMangaChapters(mangaId, detailUrl, source = 'nettr
         }).filter(Boolean);
 
         // 1. Get all chapters of this manga that ALREADY have images
-        const chaptersWithImages = await query("SELECT DISTINCT chapter_id FROM ChapterImages WHERE chapter_id LIKE @pattern", { pattern: `${mangaId}_%` });
+        const chaptersWithImages = await query("SELECT DISTINCT chapter_id FROM chapterimages WHERE chapter_id LIKE @pattern", { pattern: `${mangaId}_%` });
         const existingSet = new Set(chaptersWithImages.recordset.map(r => r.chapter_id));
 
         // 2. Queue ONLY those that are truly missing
@@ -1076,7 +1078,7 @@ export async function crawlFullMangaChapters(mangaId, detailUrl, source = 'nettr
 
         // --- CHAPTER PRUNING (PHANTOM CLEANUP) ---
         if (uniqueChapterRows.length > 5 && !earlyExit) {
-            const dbChapters = await query("SELECT source_url FROM Chapters WHERE manga_id = @mangaId", { mangaId });
+            const dbChapters = await query("SELECT source_url FROM chapters WHERE manga_id = @mangaId", { mangaId });
             const sourceBase = source === 'nettruyen' ? 'nettruyen' : 'truyenqq';
             
             const toDelete = dbChapters.recordset.filter(row => {
@@ -1089,7 +1091,7 @@ export async function crawlFullMangaChapters(mangaId, detailUrl, source = 'nettr
             if (toDelete.length > 0 && toDelete.length < uniqueChapterRows.length * 0.5) { // Safety: don't wipe more than 50%
                 console.log(`[Prune][${mangaId}] Removing ${toDelete.length} phantom chapters.`);
                 for (const ghost of toDelete) {
-                    await query("DELETE FROM Chapters WHERE manga_id = @mangaId AND source_url = @url", { mangaId, url: ghost.source_url });
+                    await query("DELETE FROM chapters WHERE manga_id = @mangaId AND source_url = @url", { mangaId, url: ghost.source_url });
                 }
             }
         }
@@ -1105,7 +1107,7 @@ async function saveGenres(mangaId, genres) {
         if (!genres || genres.length === 0) return;
 
         // 1. Fetch current Genres to map names to IDs
-        const allGenresRes = await query("SELECT id, name FROM Genres");
+        const allGenresRes = await query("SELECT id, name FROM genres");
         const genreMap = new Map(allGenresRes.recordset.map(g => [g.name.toLowerCase(), g.id]));
         
         const associations = [];
@@ -1119,10 +1121,10 @@ async function saveGenres(mangaId, genres) {
             if (!genreId) {
                 const slug = genreName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-');
                 await query(`
-                    INSERT INTO Genres (name, slug) VALUES (@name, @slug) ON CONFLICT (name) DO NOTHING
+                    INSERT INTO genres (name, slug) VALUES (@name, @slug) ON CONFLICT (name) DO NOTHING
                 `, { name: genreName, slug });
                 
-                const newGenreRes = await query("SELECT id FROM Genres WHERE name = @name", { name: genreName });
+                const newGenreRes = await query("SELECT id FROM genres WHERE name = @name", { name: genreName });
                 genreId = newGenreRes.recordset[0]?.id;
                 if (genreId) genreMap.set(genreName.toLowerCase(), genreId);
             }
@@ -1134,7 +1136,7 @@ async function saveGenres(mangaId, genres) {
 
         if (associations.length > 0) {
             await withTransaction(async (tx) => {
-                await query("DELETE FROM MangaGenres WHERE manga_id = @mangaId", { mangaId }, tx);
+                await query("DELETE FROM mangagenres WHERE manga_id = @mangaId", { mangaId }, tx);
                 
                 let values = [];
                 let params = { mangaId };
@@ -1143,7 +1145,7 @@ async function saveGenres(mangaId, genres) {
                     values.push(`(@mangaId, @g${idx})`);
                 });
 
-                const sqlStr = `INSERT INTO MangaGenres (manga_id, genre_id) VALUES ${values.join(', ')}`;
+                const sqlStr = `INSERT INTO mangagenres (manga_id, genre_id) VALUES ${values.join(', ')}`;
                 await query(sqlStr, params, tx);
             });
         }
@@ -1179,7 +1181,7 @@ export async function crawlTruyenQQ(page = 1, full = false, limitless = false) {
 
         // --- SMART DEDUPLICATION ---
         const existingManga = await query(`
-            SELECT id FROM Manga 
+            SELECT id FROM manga 
             WHERE id = @id 
             OR id = @slug 
             OR title = @title 
@@ -1190,7 +1192,7 @@ export async function crawlTruyenQQ(page = 1, full = false, limitless = false) {
         const actualMangaId = existingManga.recordset[0]?.id || id;
 
         await query(`
-            INSERT INTO Manga (id, title, cover, source_url, normalized_title, last_crawled) 
+            INSERT INTO manga (id, title, cover, source_url, normalized_title, last_crawled) 
             VALUES (@actualMangaId, @title, @cover, @url, @normTitle, NOW())
             ON CONFLICT (id) DO UPDATE 
             SET cover = EXCLUDED.cover, last_crawled = NOW(), normalized_title = EXCLUDED.normalized_title
@@ -1277,14 +1279,14 @@ export async function crawlChapterImages(chapId, url, source = 'nettruyen', forc
 
   try {
     if (!force) {
-        const existing = await query("SELECT COUNT(*) as count FROM ChapterImages WHERE chapter_id = @chapId", { chapId });
+        const existing = await query("SELECT COUNT(*) as count FROM chapterimages WHERE chapter_id = @chapId", { chapId });
         if (existing.recordset[0].count > 3) {
             inProgressChapters.delete(chapId);
             return existing.recordset[0].count;
         }
     }
 
-    const mangaInfo = await query("SELECT m.title, m.id as manga_id FROM Manga m JOIN Chapters c ON m.id = c.manga_id WHERE c.id = @chapId", { chapId });
+    const mangaInfo = await query("SELECT m.title, m.id as manga_id FROM manga m JOIN chapters c ON m.id = c.manga_id WHERE c.id = @chapId", { chapId });
     const mangaTitle = mangaInfo.recordset[0]?.title || 'Unknown Manga';
 
     const strategies = [
@@ -1317,18 +1319,20 @@ export async function crawlChapterImages(chapId, url, source = 'nettruyen', forc
             const $ = cheerio.load(response.data);
             
             let imgElements = $(`
-                #chapter_content .page-chapter img, 
                 .page-chapter img, 
                 .reading-detail .page-chapter img, 
+                #chapter_content .page-chapter img,
                 .chapter_content img, 
                 #chapter_content img,
                 .chapter-content img,
                 .read-content img,
                 .box-chap img,
+                .read-content .page-chapter img,
                 img.lazy,
                 img[data-src],
                 img[data-original],
-                img[data-cdn]
+                img[data-cdn],
+                img[data-index]
             `);
             
             if (imgElements.length >= MIN_IMAGE_COUNT) {
@@ -1355,9 +1359,9 @@ export async function crawlChapterImages(chapId, url, source = 'nettruyen', forc
 
                 if (batchImages.length >= MIN_IMAGE_COUNT) {
                     await withTransaction(async (tx) => {
-                        await query("DELETE FROM ChapterImages WHERE chapter_id = @chapId", { chapId }, tx);
+                        await query("DELETE FROM chapterimages WHERE chapter_id = @chapId", { chapId }, tx);
                     });
-                    await bulkInsert('ChapterImages', ['chapter_id', 'image_url', 'order'], batchImages.map(img => ({
+                    await bulkInsert('chapterimages', ['chapter_id', 'image_url', 'order'], batchImages.map(img => ({
                         chapter_id: img.chapId,
                         image_url: img.url,
                         order: img.order
@@ -1432,8 +1436,9 @@ export async function runGuardianAutopilot() {
     if (global.guardianActive) return;
     global.guardianActive = true;
     
-    console.log('⚡ [Titan] Continuous Streaming Activated. Engine Warming Up...');
-    logCrawl('🛡️ Chế độ Titan Continuous Streaming (Dòng chảy liên tục) đã được kích hoạt.');
+    
+    console.log('[Titan] Continuous Streaming Activated. Engine Warming Up...');
+    logCrawl('[System:Titan] Continuous Streaming mode has been activated.');
 
     let cycleCount = 0;
 
@@ -1490,8 +1495,8 @@ export async function runGuardianAutopilot() {
             await new Promise(r => setTimeout(r, breathSeconds * 1000));
 
         } catch (e) {
-            console.error('🛑 [Titan] Engine Stalled:', e.message);
-            await logCrawl(`⚠️ Lỗi Titan Stream: ${e.message}`, 'error');
+            console.error('[Titan] Engine Stalled:', e.message);
+            await logCrawl(`[System:Error] Titan Stream Error: ${e.message}`, 'error');
             await new Promise(r => setTimeout(r, 30000)); // Quick 30s reset
         }
     }
@@ -1584,8 +1589,9 @@ async function findAlternativeSource(mangaId, title, fromSource) {
             mangaId 
         });
         
-        await logCrawl(`🔄 Aegis: Da tu dong di cu truyen "${title}" sang nguon moi (${targetSource})`, 'info');
-        await logGuardianEvent(mangaId, 'Migration', 'AEGIS_ACTIVE', `Linh Thú đã tự động di chuyển nguồn dữ liệu cho ${title} để vượt qua Cloudflare.`);
+        
+        await logCrawl(`[Aegis:Sync] Automatically migrated manga "${title}" to new source (${targetSource})`, 'info');
+        await logGuardianEvent(mangaId, 'Migration', 'AEGIS_ACTIVE', `System automatically migrated data source for ${title} to bypass provider blocks.`);
         
         // Immediate priority re-sync
         return crawlFullMangaChapters(mangaId, finalMatchUrl, targetSource, true);

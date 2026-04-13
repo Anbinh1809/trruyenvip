@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import RecrawlButton from './RecrawlButton';
+import { Link as LinkIcon, AlertCircle, RefreshCw } from 'lucide-react';
 
 export default function ChapterContent({ chapterId, initialImages = [] }) {
     const [images, setImages] = useState(initialImages);
@@ -130,7 +131,9 @@ export default function ChapterContent({ chapterId, initialImages = [] }) {
         return (
             <div className="syncing-container" style={{ padding: '120px 20px', textAlign: 'center' }}>
                 <div className="loader-ring" style={{ width: '80px', height: '80px', margin: '0 auto 30px' }}></div>
-                <h3 style={{ fontWeight: 800, fontSize: '1.4rem', marginBottom: '10px' }}>⛓️ Đang cào dữ liệu...</h3>
+                <h3 style={{ fontWeight: 800, fontSize: '1.4rem', marginBottom: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                    <LinkIcon size={24} color="var(--accent)" /> Đang cào dữ liệu...
+                </h3>
                 <p style={{ color: 'var(--text-muted)', maxWidth: '400px', margin: '0 auto' }}>
                     Chương này chưa được lưu sẵn. Hệ thống đang đồng bộ dữ liệu trực tiếp từ nguồn cho ông, vui lòng đợi vài giây!
                 </p>
@@ -202,9 +205,11 @@ function ReaderImage({ src, idx }) {
     if (error) {
         return (
             <div className="reader-img-wrapper" style={{ minHeight: '300px', border: '1px dashed rgba(255,62,62,0.2)', gap: '15px', flexDirection: 'column' }}>
-                <span style={{ fontSize: '2rem' }}>⚠️</span>
+                <AlertCircle size={32} color="var(--accent)" />
                 <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem' }}>Trang {idx + 1} mất kết nối.</p>
-                <button onClick={handleRetry} className="btn btn-glass btn-small" style={{ padding: '8px 20px', fontSize: '0.75rem' }}>🔄 Thử lại</button>
+                <button onClick={handleRetry} className="btn btn-glass btn-small" style={{ padding: '8px 20px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <RefreshCw size={14} /> Thử lại
+                </button>
             </div>
         );
     }

@@ -145,7 +145,7 @@ export default function Header() {
                                     />
                                 </div>
                                 <div>
-                                    <p style={{ fontWeight: 800, color: 'white', fontSize: '0.95rem' }}>{user?.username || 'Đạo Hữu'}</p>
+                                    <p style={{ fontWeight: 800, color: 'white', fontSize: '0.95rem' }}>{user?.username || 'Người dùng'}</p>
                                     <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}>{user?.role === 'admin' ? 'Quản trị viên' : 'Độc giả VIP'}</p>
                                 </div>
                             </div>

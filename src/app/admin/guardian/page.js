@@ -52,8 +52,8 @@ export default function GuardianHub() {
                             <span style={{ width: '8px', height: '8px', background: '#10b981', borderRadius: '50%', boxShadow: '0 0 10px #10b981' }}></span>
                             <span style={{ fontSize: '0.65rem', fontWeight: 900, color: '#10b981', letterSpacing: '1px' }}>HỆ THỐNG ĐANG BẢO VỆ (AUTOPILOT)</span>
                         </div>
-                        <h1 style={{ fontSize: '2.5rem', fontWeight: 950, marginBottom: '10px' }}>🛡️ Guardian Hub</h1>
-                        <p style={{ color: 'rgba(255,255,255,0.5)', fontWeight: 600 }}>Chi tiết các chiến tích &quot;vá lỗi ngầm&quot; của Linh Thú</p>
+                        <h1 style={{ fontSize: '2.5rem', fontWeight: 950, marginBottom: '10px' }}>⚙️ Titan Control Center</h1>
+                        <p style={{ color: 'rgba(255,255,255,0.5)', fontWeight: 600 }}>Chi tiết lịch sử vá lỗi và phục hồi dữ liệu tự động</p>
                     </div>
                     <button className="btn btn-outline" style={{ padding: '10px 25px', borderRadius: '14px' }} onClick={fetchHistory}>
                         🔄 Làm mới danh sách
@@ -63,18 +63,18 @@ export default function GuardianHub() {
                 {/* Dashboard Metrics */}
                 <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', marginBottom: '40px' }}>
                     <div className="glass-card" style={{ padding: '30px', background: 'rgba(255,255,255,0.02)', borderRadius: '28px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                        <div style={{ fontSize: '0.75rem', opacity: 0.5, marginBottom: '5px', fontWeight: 700 }}>TỔNG LẦN CỨU HỘ (24H)</div>
+                        <div style={{ fontSize: '0.75rem', opacity: 0.5, marginBottom: '5px', fontWeight: 700 }}>TỔNG LẦN PHỤC HỒI (24H)</div>
                         <div style={{ fontSize: '2.5rem', fontWeight: 950, color: 'var(--accent)' }}>{data?.metrics?.total_fixes || 0}</div>
                         <div style={{ fontSize: '0.8rem', marginTop: '10px', color: 'rgba(255,255,255,0.4)' }}>Hệ thống đã tự động phục hồi dữ liệu thành công.</div>
                     </div>
                     <div className="glass-card" style={{ padding: '30px', background: 'rgba(255,255,255,0.02)', borderRadius: '28px', border: '1px solid rgba(255,255,255,0.05)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
                             <div>
-                                <div style={{ fontSize: '0.7rem', opacity: 0.5, fontWeight: 700 }}>VÁ CHƯƠNG THIẼU</div>
+                                <div style={{ fontSize: '0.7rem', opacity: 0.5, fontWeight: 700 }}>VÁ CHƯƠNG THIẾU</div>
                                 <div style={{ fontSize: '1.5rem', fontWeight: 900 }}>{data?.metrics?.gaps_filled || 0}</div>
                             </div>
                             <div style={{ textAlign: 'right' }}>
-                                <div style={{ fontSize: '0.7rem', opacity: 0.5, fontWeight: 700 }}>CỨU HỘ HÌNH ẢNH</div>
+                                <div style={{ fontSize: '0.7rem', opacity: 0.5, fontWeight: 700 }}>PHỤC HỒI HÌNH ẢNH</div>
                                 <div style={{ fontSize: '1.5rem', fontWeight: 900 }}>{data?.metrics?.images_rescued || 0}</div>
                             </div>
                         </div>
@@ -87,7 +87,7 @@ export default function GuardianHub() {
                 {/* Detailed History List */}
                 <div className="glass-card" style={{ borderRadius: '32px', overflow: 'hidden', background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.08)' }}>
                     <div style={{ padding: '25px 30px', borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)' }}>
-                        <h3 style={{ fontWeight: 900, fontSize: '1.2rem' }}>📜 Nhật Ký Cứu Hộ Chi Tiết</h3>
+                        <h3 style={{ fontWeight: 900, fontSize: '1.2rem' }}>📜 Nhật Ký Hệ Thống Chi Tiết</h3>
                     </div>
                     
                     {data?.reports.length > 0 ? (
@@ -98,8 +98,9 @@ export default function GuardianHub() {
                                         <th style={{ padding: '20px 30px', fontSize: '0.7rem', opacity: 0.4 }}>THỜI GIAN</th>
                                         <th style={{ padding: '20px', fontSize: '0.7rem', opacity: 0.4 }}>BỘ TRUYỆN</th>
                                         <th style={{ padding: '20px', fontSize: '0.7rem', opacity: 0.4 }}>CHƯƠNG</th>
-                                        <th style={{ padding: '20px', fontSize: '0.7rem', opacity: 0.4 }}>LOẠI CỨU HỘ</th>
-                                        <th style={{ padding: '20px', fontSize: '0.7rem', opacity: 0.4 }}>CHI TIẼT</th>
+                                        <th style={{ padding: '20px', fontSize: '0.7rem', opacity: 0.4 }}>LOẠI SỰ CỐ</th>
+                                        <th style={{ padding: '20px', fontSize: '0.7rem', opacity: 0.4 }}>CỐ GẮNG</th>
+                                        <th style={{ padding: '20px', fontSize: '0.7rem', opacity: 0.4 }}>CHI TIẾT</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -126,7 +127,7 @@ export default function GuardianHub() {
                                                     color: report.event_type === 'FIX_IMAGE' ? '#ef4444' : '#10b981',
                                                     border: `1px solid ${report.event_type === 'FIX_IMAGE' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)'}`
                                                 }}>
-                                                    {report.event_type === 'FIX_IMAGE' ? '📸 CỨU ẢNH' : '🔧 VÁ CHƯƠNG'}
+                                                    {report.event_type === 'FIX_IMAGE' ? '📸 PHỤC HỒI ẢNH' : '🔧 VÁ DỮ LIỆU'}
                                                 </span>
                                             </td>
                                             <td style={{ padding: '20px', textAlign: 'center' }}>
@@ -142,8 +143,8 @@ export default function GuardianHub() {
                         </div>
                     ) : (
                         <div style={{ padding: '100px', textAlign: 'center' }}>
-                            <div style={{ fontSize: '4rem', marginBottom: '20px', opacity: 0.2 }}>🛡️</div>
-                            <h3 style={{ opacity: 0.5 }}>Chưa có vụ cứu hộ nào diễn ra. Hệ thống đang rất ổn định!</h3>
+                            <div style={{ fontSize: '4rem', marginBottom: '20px', opacity: 0.2 }}>🔍</div>
+                            <h3 style={{ opacity: 0.5 }}>Hệ thống ổn định. Không có bản ghi sự cố.</h3>
                         </div>
                     )}
                 </div>

@@ -14,7 +14,7 @@ export async function POST(req) {
 
         return NextResponse.json({ 
             success: true, 
-            message: 'Đã kích hoạt trận pháp vá lỗi (Gap Healing) thành công!' 
+            message: 'Quy trình vá lỗi (Gap Healing) đã được kích hoạt thành công!' 
         });
     } catch (err) {
         return NextResponse.json({ error: err.message }, { status: 500 });

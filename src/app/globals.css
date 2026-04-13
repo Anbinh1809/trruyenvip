@@ -4,9 +4,9 @@
 }
 
 @keyframes glow-pulse {
-    0% { box-shadow: 0 0 5px rgba(255, 62, 62, 0.2); }
-    50% { box-shadow: 0 0 20px rgba(255, 62, 62, 0.6); }
-    100% { box-shadow: 0 0 5px rgba(255, 62, 62, 0.2); }
+    0% { box-shadow: 0 0 5px rgba(255, 62, 62, 0.1); }
+    50% { box-shadow: 0 0 12px rgba(255, 62, 62, 0.3); }
+    100% { box-shadow: 0 0 5px rgba(255, 62, 62, 0.1); }
 }
 
 .skeleton-shimmer {

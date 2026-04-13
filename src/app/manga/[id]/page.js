@@ -11,6 +11,7 @@ import DetailCover from '@/components/DetailCover';
 import ContinueReadingButton from '@/components/ContinueReadingButton';
 import { headers } from 'next/headers';
 import Footer from '@/components/Footer';
+import { AlertCircle, PenTool, Info, Library } from 'lucide-react';
 
 const stripHtml = (html) => {
     if (!html) return '';
@@ -123,9 +124,12 @@ export default async function MangaDetail({ params }) {
   if (!manga) return (
       <main className="titan-bg" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
           <div style={{ textAlign: 'center' }}>
-              <h1 style={{ fontSize: '4rem' }}>🚫</h1>
-              <h2>Không tìm thấy bộ tịch này</h2>
-              <Link href="/" className="btn btn-primary" style={{ marginTop: '30px' }}>Quay lại trần giới</Link>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '30px' }}>
+                <AlertCircle size={80} color="var(--accent)" />
+              </div>
+              <h1 style={{ fontSize: '2.5rem', fontWeight: 900 }}>KHÔNG TÌM THẤY</h1>
+              <p style={{ color: 'var(--text-muted)', marginBottom: '30px' }}>Bộ truyện bạn yêu cầu không tồn tại hoặc đã bị gỡ bỏ.</p>
+              <Link href="/" className="btn btn-primary" style={{ padding: '12px 30px' }}>Quay lại trang chủ</Link>
           </div>
       </main>
   );
@@ -204,7 +208,9 @@ export default async function MangaDetail({ params }) {
                 </p>
             )}
             <div className="pill-group">
-                <span className="pill author-pill">✍️ {manga.author || 'Đang cập nhật'}</span>
+                <span className="pill author-pill" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <PenTool size={14} /> {manga.author || 'Đang cập nhật'}
+                </span>
                 <span className="pill status-pill accent">{manga.status || 'Đang cập nhật'}</span>
                 {(manga.genres || []).map(g => (
                     <Link key={g.id} href={`/genres?type=${g.slug}`} className="pill genre-pill glass">
@@ -221,8 +227,9 @@ export default async function MangaDetail({ params }) {
                     text={cleanDescription || 'Nội dung bộ truyện đang được cập nhật. Hãy cùng đón chờ những tình tiết hấp dẫn nhất của siêu phẩm này tại TruyenVip.'} 
                 />
                 {!manga.description && manga.id && (
-                    <div style={{ marginTop: '15px', padding: '10px 15px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', fontSize: '0.85rem' }}>
-                        💡 <Link href={`https://truyenqqno.com/truyen-tranh/${manga.id}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', fontWeight: 800, textDecoration: 'underline' }}>Xem chi tiết tại nguồn gốc</Link>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '15px', padding: '10px 15px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', fontSize: '0.85rem' }}>
+                        <Info size={14} color="var(--accent)" />
+                        <Link href={`https://truyenqqno.com/truyen-tranh/${manga.id}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', fontWeight: 800, textDecoration: 'underline' }}>Xem chi tiết tại nguồn gốc</Link>
                     </div>
                 )}
             </div>
@@ -244,7 +251,9 @@ export default async function MangaDetail({ params }) {
         {manga.related.length > 0 && (
             <section className="section-titan" style={{ marginBottom: '80px' }}>
                 <div className="section-header-titan">
-                    <h2 className="title-titan" style={{ fontSize: '1.8rem' }}>📺 Truyện liên quan</h2>
+                    <h2 className="title-titan" style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '1.8rem' }}>
+                        <Library size={28} color="var(--accent)" /> Truyện liên quan
+                    </h2>
                 </div>
                 <div className="manga-grid-titan">
                     {manga.related.map(m => (

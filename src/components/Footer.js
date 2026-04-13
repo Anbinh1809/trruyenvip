@@ -13,7 +13,7 @@ export default function Footer() {
                 TRUYEN<span style={{ color: 'var(--accent)' }}>VIP</span>
             </div>
             <p className="footer-brand-text">
-                Nền tảng đọc truyện tranh trực tuyến hàng đầu, nơi hội tụ tinh hoa của vạn bộ truyện. Tu luyện tâm tính, khai phá trí tuệ qua từng khung hình.
+                Nền tảng đọc truyện tranh trực tuyến hàng đầu, nơi hội tụ tinh hoa của vạn bộ truyện. Đọc truyện tranh đỉnh cao, khám phá thế giới qua từng khung hình.
             </p>
             <div className="social-pills-titan">
                 <div className="social-pill">FB</div>
@@ -35,11 +35,11 @@ export default function Footer() {
 
           {/* COLUMN 3: COMMUNITY */}
           <div className="footer-col">
-            <h4 className="footer-heading">Đạo Hữu</h4>
+            <h4 className="footer-heading">Cá Nhân</h4>
             <ul className="footer-links">
                 <li><Link href="/leaderboard">Bảng Xếp Hạng</Link></li>
-                <li><Link href="/bookmarks">Tàng Kinh Các</Link></li>
-                <li><Link href="/history">Tu Hành Lộ</Link></li>
+                <li><Link href="/bookmarks">Truyện Yêu Thích</Link></li>
+                <li><Link href="/history">Lịch Sử Đọc</Link></li>
                 <li><Link href="/missions">Nhiệm Vụ Hàng Ngày</Link></li>
             </ul>
           </div>
@@ -57,7 +57,7 @@ export default function Footer() {
         </div>
 
         <div className="footer-bottom-titan">
-          <p>© {new Date().getFullYear()} TruyenVip Golden Sovereign. Nền tảng được tối ưu hóa cho trải nghiệm tu luyện cao cấp.</p>
+          <p>© {new Date().getFullYear()} TruyenVip Golden Sovereign. Nền tảng được tối ưu hóa cho trải nghiệm đọc truyện cao cấp.</p>
           <div className="tech-stack-badges">
                 <span>Next.js 15+</span>
                 <span>Titan Engine v2.0</span>

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Header from '@/components/Header';
 import { useRouter } from 'next/navigation';
+import { Zap, RefreshCw, CheckCircle, XCircle, ExternalLink } from 'lucide-react';
 
 export default function TransferPage() {
     const [urls, setUrls] = useState('');
@@ -23,7 +24,6 @@ export default function TransferPage() {
         
         const processResults = [];
         
-        // TITAN PARALLELISM: Process in chunks of 3 to avoid overloading the local network or server
         for (let i = 0; i < urlList.length; i += 3) {
             const chunk = urlList.slice(i, i + 3);
             await Promise.all(chunk.map(async (url) => {
@@ -68,9 +68,9 @@ export default function TransferPage() {
             <div className="container fade-up" style={{ paddingTop: '140px', maxWidth: '900px' }}>
                 <header className="section-header" style={{ marginBottom: '50px', textAlign: 'center' }}>
                     <div style={{ display: 'inline-block', padding: '6px 14px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 900, letterSpacing: '2px', marginBottom: '20px' }}>DI CẦN TIẾP NỐI</div>
-                    <h1 style={{ fontSize: '3.5rem', fontWeight: 950, letterSpacing: '-3px', marginBottom: '15px' }}>Đại Lễ Dịch Chuyển</h1>
+                    <h1 style={{ fontSize: '3.5rem', fontWeight: 950, letterSpacing: '-3px', marginBottom: '15px' }}>Dịch Chuyển Nội Dung</h1>
                     <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', maxWidth: '650px', margin: '0 auto', fontWeight: 600, lineHeight: 1.6 }}>
-                        Hệ thống giúp đạo hữu chuyển lộ trình tu hành từ các tầng thủ quán khác (NetTruyen, TruyenQQ) về TruyenVip chỉ trong chớp mắt.
+                        Hệ thống giúp bạn chuyển dữ liệu từ nguồn ngoài về TruyenVip nhanh chóng và ổn định.
                     </p>
                 </header>
 
@@ -97,15 +97,15 @@ export default function TransferPage() {
                             type="submit" 
                             disabled={isProcessing || !urls.trim()}
                             className={`btn btn-primary ${isProcessing ? 'processing' : ''}`}
-                            style={{ width: '100%', height: '70px', borderRadius: '18px', fontWeight: 950, fontSize: '1.1rem' }}
+                            style={{ width: '100%', height: '70px', borderRadius: '18px', fontWeight: 950, fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}
                         >
-                            {isProcessing ? '🕒 Đang dịch chuyển...' : '🚀 Kích hoạt Cổng Dịch Chuyển'}
+                            {isProcessing ? <><RefreshCw className="spin" size={24} /> Đang xử lý...</> : <><Zap size={24} /> Kích hoạt dịch chuyển</>}
                         </button>
                     </form>
 
                     {results.length > 0 && (
                         <div className="fade-in" style={{ marginTop: '50px' }}>
-                            <h3 style={{ fontSize: '1.2rem', fontWeight: 900, marginBottom: '20px', opacity: 0.6 }}>Bản ghi dịch chuyển gần nhất</h3>
+                            <h3 style={{ fontSize: '1.2rem', fontWeight: 900, marginBottom: '20px', opacity: 0.6 }}>Bản ghi dịch chuyển</h3>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                                 {results.map((res, i) => (
                                     <div key={i} style={{ 
@@ -116,10 +116,12 @@ export default function TransferPage() {
                                         <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '65%' }}>{res.url}</div>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                                             {res.status === 'success' && (
-                                                <a href={res.link} target="_blank" rel="noreferrer" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 800, fontSize: '0.75rem' }}>XEM NGAY ↗</a>
+                                                <a href={res.link} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#3b82f6', textDecoration: 'none', fontWeight: 800, fontSize: '0.75rem' }}>
+                                                    XEM NGAY <ExternalLink size={14} />
+                                                </a>
                                             )}
-                                            <div style={{ fontWeight: 900, fontSize: '0.75rem', textTransform: 'uppercase', color: res.status === 'success' ? '#10b981' : 'var(--accent)' }}>
-                                                {res.status === 'success' ? '✅' : '❌'}
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontWeight: 900, fontSize: '0.75rem', textTransform: 'uppercase', color: res.status === 'success' ? '#10b981' : 'var(--accent)' }}>
+                                                {res.status === 'success' ? <CheckCircle size={18} /> : <XCircle size={18} />}
                                             </div>
                                         </div>
                                     </div>

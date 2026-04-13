@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useEngagement } from '@/context/EngagementContext';
+import { Gift, Lock } from 'lucide-react';
 
 export default function DailyCheckIn() {
   const { checkIn, checkInStreak, lastCheckIn, mounted } = useEngagement();
@@ -41,10 +42,10 @@ export default function DailyCheckIn() {
                 <div className="streak-container-nebula" style={{ position: 'relative', marginTop: '30px' }}>
                     <div className="streak-bar-titan">
                         {[1, 2, 3, 4, 5, 6, 7].map((d) => (
-                            <div key={d} className={`streak-step ${d <= currentStreak ? 'active' : ''}`} style={{ position: 'relative' }}>
+                            <div key={d} className={`streak-step ${d <= currentStreak ? 'active' : ''}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
                                 {d === 7 && (
-                                    <div style={{ position: 'absolute', top: '-40px', right: '-10px', fontSize: '1.5rem', animation: currentStreak >= 7 ? 'bounce 2s infinite' : 'none' }}>
-                                        {currentStreak >= 7 ? '🎁' : '🔒'}
+                                    <div style={{ position: 'absolute', top: '-30px', color: currentStreak >= 7 ? 'var(--accent)' : 'rgba(255,255,255,0.2)', animation: currentStreak >= 7 ? 'bounce 2s infinite' : 'none' }}>
+                                        {currentStreak >= 7 ? <Gift size={20} /> : <Lock size={18} />}
                                     </div>
                                 )}
                             </div>

@@ -8,20 +8,20 @@ import { useAuth } from './AuthContext';
 const EngagementContext = createContext();
 
 export const RANKS = [
-  { lv: 1, title: 'Phàm Nhân', chest: 'Wood' },
-  { lv: 6, title: 'Luyện Khí', chest: 'Stone' },
-  { lv: 11, title: 'Trúc Cơ', chest: 'Bronze' },
-  { lv: 21, title: 'Kim Đan', chest: 'Silver' },
-  { lv: 36, title: 'Nguyên Anh', chest: 'Gold' },
-  { lv: 51, title: 'Hóa Thần', chest: 'Platinum' },
-  { lv: 100, title: 'Đại Thánh', chest: 'Diamond' },
-  { lv: 150, title: 'Tiên Đế', chest: 'Supreme' }
+  { lv: 1, title: 'Cấp 1 (Phổ thông)', chest: 'Wood' },
+  { lv: 6, title: 'Cấp 2 (Trung cấp)', chest: 'Stone' },
+  { lv: 11, title: 'Cấp 3 (Cao cấp)', chest: 'Bronze' },
+  { lv: 21, title: 'Cấp 4 (Chuyên gia)', chest: 'Silver' },
+  { lv: 36, title: 'Cấp 5 (Bậc thầy)', chest: 'Gold' },
+  { lv: 51, title: 'Cấp 6 (Huyền thoại)', chest: 'Platinum' },
+  { lv: 100, title: 'Cấp 7 (Vô song)', chest: 'Diamond' },
+  { lv: 150, title: 'Cấp 8 (Tối thượng)', chest: 'Supreme' }
 ];
 
 export const calculateRank = (xp) => {
     const level = Math.floor(xp / 100) + 1;
     const rank = [...RANKS].reverse().find(r => level >= r.lv);
-    return { level, title: rank ? rank.title : 'Phàm Nhân' };
+    return { level, title: rank ? rank.title : 'Cấp 1' };
 };
 
 const MISSION_TYPES = {
@@ -33,32 +33,32 @@ const MISSION_TYPES = {
 };
 
 const CHEST_DATA = {
-    Wood: { name: 'Rương Gỗ Mộc', color: '#8B4513', loot: [{ type: 'xp', range: [10, 20], weight: 100 }] },
-    Stone: { name: 'Rương Đá Thô', color: '#808080', loot: [{ type: 'xp', range: [30, 50], weight: 100 }] },
-    Bronze: { name: 'Rương Đồng Rỉ', color: '#CD7F32', loot: [{ type: 'xp', range: [50, 80], weight: 99 }, { type: 'coin', range: [50, 250], weight: 1 }] },
-    Silver: { name: 'Rương Bạc Trắng', color: '#C0C0C0', loot: [{ type: 'xp', range: [100, 200], weight: 97 }, { type: 'coin', range: [250, 500], weight: 3 }] },
-    Gold: { name: 'Rương Vàng Ròng', color: '#FFD700', loot: [{ type: 'xp', range: [200, 500], weight: 95 }, { type: 'coin', range: [500, 1200], weight: 5 }] },
+    Wood: { name: 'Rương Gỗ', color: '#8B4513', loot: [{ type: 'xp', range: [10, 20], weight: 100 }] },
+    Stone: { name: 'Rương Đá', color: '#808080', loot: [{ type: 'xp', range: [30, 50], weight: 100 }] },
+    Bronze: { name: 'Rương Đồng', color: '#CD7F32', loot: [{ type: 'xp', range: [50, 80], weight: 99 }, { type: 'coin', range: [50, 250], weight: 1 }] },
+    Silver: { name: 'Rương Bạc', color: '#C0C0C0', loot: [{ type: 'xp', range: [100, 200], weight: 97 }, { type: 'coin', range: [250, 500], weight: 3 }] },
+    Gold: { name: 'Rương Vàng', color: '#FFD700', loot: [{ type: 'xp', range: [200, 500], weight: 95 }, { type: 'coin', range: [500, 1200], weight: 5 }] },
     Platinum: { name: 'Rương Bạch Kim', color: '#E5E4E2', loot: [{ type: 'xp', range: [500, 1000], weight: 92.5 }, { type: 'coin', range: [1000, 2500], weight: 7 }, { type: 'coin', range: [5000, 5000], weight: 0.5 }] },
     Diamond: { name: 'Rương Kim Cương', color: '#B9F2FF', loot: [{ type: 'xp', range: [1000, 2000], weight: 90 }, { type: 'coin', range: [2500, 5000], weight: 10 }] },
-    Supreme: { name: 'Rương Chí Tôn', color: '#FF0000', loot: [{ type: 'xp', range: [2000, 5000], weight: 85 }, { type: 'coin', range: [5000, 10000], weight: 15 }] }
+    Supreme: { name: 'Rương Tối Thượng', color: '#FF0000', loot: [{ type: 'xp', range: [2000, 5000], weight: 85 }, { type: 'coin', range: [5000, 10000], weight: 15 }] }
 };
 
 const initialState = {
   xp: 0,
   vipCoins: 0,
   level: 1,
-  rankTitle: 'Phàm Nhân',
+  rankTitle: 'Cấp 1',
   userUuid: '',
   checkInStreak: 0,
   lastCheckIn: '',
   dailyMissions: {
     date: new Date().toLocaleDateString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }),
     missions: [
-        { id: 1, type: MISSION_TYPES.DAILY_LOGIN, target: 1, current: 0, label: 'Báo danh đạo hữu', xp: 50, claimed: false },
-        { id: 2, type: MISSION_TYPES.READ_CHAPTER, target: 10, current: 0, label: 'Tu hành Cần mẫn (10 chương)', xp: 100, claimed: false },
-        { id: 3, type: MISSION_TYPES.READ_PROGRESS, target: 15, current: 0, label: 'Ngộ tính cao (15 phút đọc)', xp: 150, claimed: false },
-        { id: 4, type: MISSION_TYPES.COMMENT, target: 2, current: 0, label: 'Kết duyên đạo hữu (2 bình luận)', xp: 100, claimed: false },
-        { id: 5, type: MISSION_TYPES.GENRE_DIVERSITY, target: 3, current: 0, label: 'Đa tu đạo pháp (3 thể loại)', xp: 200, claimed: false }
+        { id: 1, type: MISSION_TYPES.DAILY_LOGIN, target: 1, current: 0, label: 'Điểm danh hằng ngày', xp: 50, claimed: false },
+        { id: 2, type: MISSION_TYPES.READ_CHAPTER, target: 10, current: 0, label: 'Đọc 10 chương truyện', xp: 100, claimed: false },
+        { id: 3, type: MISSION_TYPES.READ_PROGRESS, target: 15, current: 0, label: 'Đọc truyện 15 phút', xp: 150, claimed: false },
+        { id: 4, type: MISSION_TYPES.COMMENT, target: 2, current: 0, label: 'Gửi 2 bình luận', xp: 100, claimed: false },
+        { id: 5, type: MISSION_TYPES.GENRE_DIVERSITY, target: 3, current: 0, label: 'Đọc 3 thể loại khác nhau', xp: 200, claimed: false }
     ]
   }
 };
@@ -332,7 +332,7 @@ export function EngagementProvider({ children }) {
     const now = Date.now();
     // TITAN THROTTLE: Prevent XP spamming (10s cooldown)
     if (!silent && now - lastXpGainTimeRef.current < 10000) {
-        if (addToast) addToast("Đạo hữu tu hành quá nhanh, hãy bình tâm tĩnh khí!", "info");
+        if (addToast) addToast("Hệ thống ghi nhận hoạt động quá nhanh, vui lòng chờ giây lát!", "info");
         return;
     }
     
@@ -360,7 +360,7 @@ export function EngagementProvider({ children }) {
 
   const checkIn = useCallback((forcedDate) => {
     const today = forcedDate || new Date().toLocaleDateString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' });
-    if (state.lastCheckIn === today) return { success: false, msg: 'Đạo hữu đã báo danh hôm nay rồi!' };
+    if (state.lastCheckIn === today) return { success: false, msg: 'Bạn đã điểm danh hôm nay rồi!' };
 
     let nextStreak = state.checkInStreak + 1;
     if (state.lastCheckIn) {
@@ -369,7 +369,7 @@ export function EngagementProvider({ children }) {
         lastDate.setHours(0,0,0,0);
         nowDate.setHours(0,0,0,0);
         const diffDays = Math.round((nowDate - lastDate) / (1000 * 60 * 60 * 24));
-        if (diffDays === 0) return { success: false, msg: 'Đạo hữu đã báo danh hôm nay rồi!' };
+        if (diffDays === 0) return { success: false, msg: 'Bạn đã điểm danh hôm nay rồi!' };
         if (diffDays > 1) nextStreak = 1;
     }
 
@@ -379,10 +379,10 @@ export function EngagementProvider({ children }) {
     addXp(xpReward, true);
     addCoins(coinReward, true);
 
-    let msg = `Báo danh thành công! Nhận ${xpReward} XP & ${coinReward} VipCoins.`;
+    let msg = `Điểm danh thành công! Nhận ${xpReward} XP & ${coinReward} VipCoins.`;
     if (nextStreak === 7) {
         addCoins(1000, true);
-        msg += " ✨ CHÚC MỪNG: Thưởng chuỗi 7 ngày +1000 VipCoins!";
+        msg += " CHÚC MỪNG: Thưởng chuỗi 7 ngày +1000 VipCoins!";
     }
     if (addToast) addToast(msg, 'success');
     return { success: true, msg };
@@ -442,7 +442,7 @@ export function EngagementProvider({ children }) {
       {mounted && activeCelebration && (
         <LevelUpOverlay 
             level={activeCelebration} 
-            rank={[...RANKS].reverse().find(r => activeCelebration >= r.lv)?.title || 'Phàm Nhân'} 
+            rank={[...RANKS].reverse().find(r => activeCelebration >= r.lv)?.title || 'Cấp 1'} 
             onComplete={() => setActiveCelebration(null)} 
         />
       )}

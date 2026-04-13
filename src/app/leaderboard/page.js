@@ -4,7 +4,8 @@ import Header from '@/components/Header';
 import { calculateRank } from '@/context/EngagementContext';
 import { useAuth } from '@/context/AuthContext';
 import { useState, useEffect, useMemo } from 'react';
-import { Trophy, Crown, Medal } from 'lucide-react';
+import { Trophy, Crown, Medal, Shield, User } from 'lucide-react';
+
 
 export const dynamic = "force-dynamic";
 
@@ -64,8 +65,8 @@ export default function LeaderboardPage() {
                             <Trophy size={14} /> Bảng Xếp Hạng Tuyệt Đỉnh
                         </div>
                     </div>
-                    <h1 style={{ fontSize: '4rem', fontWeight: 950, marginBottom: '15px', letterSpacing: '-3px', lineHeight: 1 }}>Điện Thờ Đại Thánh</h1>
-                    <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '1.2rem', fontWeight: 600, maxWidth: '600px', margin: '0 auto' }}>Nơi vinh danh những thiên tài có tu vi cao nhất lục địa TruyenVip.</p>
+                    <h1 style={{ fontSize: '4rem', fontWeight: 950, marginBottom: '15px', letterSpacing: '-3px', lineHeight: 1 }}>Bảng Xếp Hạng</h1>
+                    <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '1.2rem', fontWeight: 600, maxWidth: '600px', margin: '0 auto' }}>Vinh danh những thành viên có hoạt động tích cực nhất.</p>
                 </section>
 
                 <div className="leaderboard-list fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginBottom: '100px' }}>
@@ -102,8 +103,8 @@ export default function LeaderboardPage() {
                                     {player.avatar ? (
                                         <img src={player.avatar} alt={player.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                     ) : (
-                                        <div style={{ fontSize: idx < 3 ? '2rem' : '1.5rem', opacity: 0.3 }}>
-                                            {player.role === 'admin' ? '🛡️' : '👤'}
+                                        <div style={{ fontSize: idx < 3 ? '1.5rem' : '1.2rem', opacity: 0.3 }}>
+                                            {player.role === 'admin' ? <Shield size={idx < 3 ? 32 : 24} /> : <User size={idx < 3 ? 32 : 24} />}
                                         </div>
                                     )}
                                 </div>
@@ -116,14 +117,14 @@ export default function LeaderboardPage() {
                                     {player.role === 'admin' && <span style={{ fontSize: '0.6rem', background: 'rgba(255,255,255,0.1)', padding: '4px 10px', borderRadius: '10px', color: 'rgba(255,255,255,0.6)' }}>ADMIN</span>}
                                 </h4>
                                 <div style={{ display: 'flex', gap: '20px', fontSize: '0.9rem', fontWeight: 700 }}>
-                                    <span style={{ color: 'rgba(255,255,255,0.4)' }}>Tu vi: <span style={{ color: 'white' }}>Lv.{player.level}</span></span>
+                                    <span style={{ color: 'rgba(255,255,255,0.4)' }}>Cấp độ: <span style={{ color: 'white' }}>Lv.{player.level}</span></span>
                                     <span style={{ color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{player.rank}</span>
                                 </div>
                             </div>
 
                             <div style={{ textAlign: 'right' }}>
                                 <div style={{ fontSize: idx < 3 ? '2.2rem' : '1.8rem', fontWeight: 950, letterSpacing: '-1.5px', color: idx === 0 ? '#ffd700' : 'white' }}>{new Intl.NumberFormat().format(player.xp)}</div>
-                                <div style={{ fontSize: '0.7rem', fontWeight: 800, color: 'rgba(255,255,255,0.3)', letterSpacing: '1px' }}>CHIẾN TÍCH XP</div>
+                                <div style={{ fontSize: '0.7rem', fontWeight: 800, color: 'rgba(255,255,255,0.3)', letterSpacing: '1px' }}>TỔNG XP</div>
                             </div>
                         </div>
                     ))}

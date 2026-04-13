@@ -4,14 +4,14 @@ import Link from 'next/link';
 
 export default function GuardianBeastEmptyState({ 
     keyword = '', 
-    title = 'LINH THÚ TRẤN ẢI', 
+    title = 'HỆ THỐNG TRỐNG', 
     message = '',
-    buttonText = 'Quay Lại Thiên Giới',
+    buttonText = 'Quay Lại Trang Chủ',
     buttonHref = '/'
 }) {
     const defaultMessage = keyword 
-        ? `"Đạo hữu dừng bước! Linh thú canh giữ tàng thư báo rằng từ khóa <strong style="color: var(--accent)">${keyword}</strong> chưa từng xuất hiện trong cõi này. Hãy thử tìm một cơ duyên khác."`
-        : `"Đạo hữu dừng bước! Linh thú canh giữ tàng thư báo rằng cõi này hiện chưa có bí tịch nào được thu thập. Hãy quay lại sau."`;
+        ? `Hệ thống dữ liệu báo rằng từ khóa <strong style="color: var(--accent)">${keyword}</strong> hiện chưa có trong cơ sở dữ liệu. Vui lòng thử tìm với từ khóa khác.`
+        : `Hiện tại chưa có dữ liệu nào được cập nhật trong mục này. Vui lòng quay lại sau ít phút.`;
 
     return (
         <div className="empty-state-titan fade-in">

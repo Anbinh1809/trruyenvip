@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import { CheckCircle, AlertCircle, Info as InfoIcon } from 'lucide-react';
 
 const ToastContext = createContext(null);
 
@@ -28,9 +29,9 @@ export function ToastProvider({ children }) {
             className={`toast-titan ${toast.type} fade-up`}
           >
             <div className="toast-icon">
-              {toast.type === 'success' ? '✅' : (toast.type === 'error' ? '❌' : 'ℹ️')}
+              {toast.type === 'success' ? <CheckCircle size={18} /> : (toast.type === 'error' ? <AlertCircle size={18} /> : <InfoIcon size={18} />)}
             </div>
-            <div className="toast-content">
+            <div className="toast-content" style={{ fontWeight: 600 }}>
               {toast.message}
             </div>
           </div>

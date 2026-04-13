@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Search, X, Zap } from 'lucide-react';
 import { useToast } from '@/components/ToastProvider';
 import EmptyState from '@/components/EmptyState';
 
@@ -87,13 +88,13 @@ export default function LiveSearch() {
           });
           const data = await res.json();
           if (data.success) {
-              if (addToast) addToast('Dịch chuyển bộ tịch thành công!', 'success');
+              if (addToast) addToast('Đồng bộ dữ liệu thành công!', 'success');
               router.push(data.redirectUrl);
           } else {
-              if (addToast) addToast(data.error || 'Dịch chuyển thất bại. Vui lòng kiểm tra lại liên kết.', 'error');
+              if (addToast) addToast(data.error || 'Tính năng này hiện đang bảo trì. Vui lòng thử lại sau.', 'error');
           }
       } catch (e) {
-          if (addToast) addToast('Lỗi kết nối pháp bảo. Vui lòng thử lại!', 'error');
+          if (addToast) addToast('Lỗi kết nối máy chủ. Vui lòng thử lại!', 'error');
       } finally {
           setLoading(false);
       }
@@ -151,12 +152,12 @@ export default function LiveSearch() {
                     <button 
                         type="button" 
                         onClick={() => { setQ(''); setResults([]); setIsOpen(false); }}
-                        style={{ fontSize: '1.2rem', opacity: 0.3, cursor: 'pointer', background: 'none', border: 'none', color: 'white' }}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.3, cursor: 'pointer', background: 'none', border: 'none', color: 'white' }}
                     >
-                        ✕
+                        <X size={18} />
                     </button>
                 )}
-                {loading ? <span className="loader-mini"></span> : <button type="submit" style={{ cursor: 'pointer', fontSize: '1.1rem', opacity: 0.8, background: 'none', border: 'none' }}>🔍</button>}
+                {loading ? <span className="loader-mini"></span> : <button type="submit" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.8, background: 'none', border: 'none', color: 'white' }}><Search size={18} /></button>}
             </div>
         </form>
 
@@ -164,10 +165,10 @@ export default function LiveSearch() {
             <div id="live-search-results" className="titan-results-panel fade-slide-up">
                 {isUrl && (
                     <div style={{ padding: '15px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                        <button onClick={handleMigration} className="btn-migrate-pulse" style={{ width: '100%', background: 'var(--accent)', color: 'white', border: 'none', padding: '12px', borderRadius: '12px', fontWeight: 900, fontSize: '0.75rem', cursor: 'pointer', letterSpacing: '1px' }}>
-                            {loading ? '🔮 ĐANG DỊCH CHUYỂN...' : '⚡ DỊCH CHUYỂN TOÀN BỘ TRUYỆN'}
+                        <button onClick={handleMigration} className="btn-migrate-pulse" style={{ width: '100%', background: 'var(--accent)', color: 'white', border: 'none', padding: '12px', borderRadius: '12px', fontWeight: 900, fontSize: '0.75rem', cursor: 'pointer', letterSpacing: '1px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                            <Zap size={16} /> {loading ? 'ĐANG XỬ LÝ...' : 'DỒN DỮ LIỆU TỪ NGUỒN NGOÀI'}
                         </button>
-                        <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textAlign: 'center', marginTop: '8px', fontWeight: 700, textTransform: 'uppercase' }}>Phát hiện liên kết từ nguồn ngoài</div>
+                        <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textAlign: 'center', marginTop: '8px', fontWeight: 700, textTransform: 'uppercase' }}>Hệ thống phát hiện liên kết ngoài</div>
                     </div>
                 )}
                 
@@ -208,9 +209,9 @@ export default function LiveSearch() {
                                     style={{ width: '120px', height: '120px', objectFit: 'contain', filter: 'drop-shadow(0 0 20px rgba(255,62,62,0.2))' }} 
                                 />
                             </div>
-                            <div style={{ fontWeight: 900, fontSize: '1.1rem', color: 'white', marginBottom: '8px' }}>VÔ VỌNG!</div>
+                            <div style={{ fontWeight: 900, fontSize: '1.1rem', color: 'white', marginBottom: '8px' }}>KHÔNG TÌM THẤY</div>
                             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600, maxWidth: '200px', marginInline: 'auto' }}>
-                                Linh thú canh giữ báo rằng từ khóa chưa từng xuất hiện.
+                                Kết quả tìm kiếm hiện chưa có trong cơ sở dữ liệu.
                             </p>
                         </div>
                     )}

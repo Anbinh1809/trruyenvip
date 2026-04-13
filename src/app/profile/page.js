@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useEngagement } from '@/context/EngagementContext';
 import { useToast } from '@/components/ToastProvider';
 import Link from 'next/link';
+import { User, Shield, Coins, Sparkles, Activity, Heart, History, LogOut, ShieldCheck, AlertOctagon, ChevronRight } from 'lucide-react';
 
 export default function ProfilePage() {
   const { user, isAuthenticated, logout, loading, refreshUser } = useAuth();
@@ -33,12 +34,12 @@ export default function ProfilePage() {
         });
         if (res.ok) {
             await refreshUser();
-            addToast('✨ Đã cập nhật ảnh đại diện!', 'success');
+            addToast('Đã cập nhật ảnh đại diện!', 'success');
         } else {
-            addToast('❌ Lỗi cập nhật! Vui lòng thử lại.', 'error');
+            addToast('Lỗi cập nhật! Vui lòng thử lại.', 'error');
         }
     } catch (e) {
-        addToast('🚫 Lỗi kết nối máy chủ.', 'error');
+        addToast('Lỗi kết nối máy chủ.', 'error');
     }
     setUpdating(false);
   };
@@ -50,8 +51,11 @@ export default function ProfilePage() {
         <main className="main-wrapper titan-bg" style={{ minHeight: '100vh', paddingBottom: '100px', color: 'white' }}>
             <Header />
             <div className="container" style={{ marginTop: '200px', textAlign: 'center' }}>
-                <h1 style={{ fontSize: '3rem', fontWeight: 900 }}>DỪNG BƯỚC! 🛑</h1>
-                <p style={{ color: 'var(--text-muted)', marginBottom: '30px', fontWeight: 600 }}>Đạo hữu cần đăng nhập để xem thông tin tu hành của mình.</p>
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '30px' }}>
+                    <AlertOctagon size={80} color="var(--accent)" />
+                </div>
+                <h1 style={{ fontSize: '3rem', fontWeight: 900 }}>DỪNG BƯỚC!</h1>
+                <p style={{ color: 'var(--text-muted)', marginBottom: '30px', fontWeight: 600 }}>Cần đăng nhập để xem thông tin cá nhân.</p>
                 <Link href="/auth/login" className="btn btn-primary" style={{ padding: '15px 40px', borderRadius: '15px' }}>Đăng Nhập Ngay</Link>
             </div>
         </main>
@@ -64,15 +68,17 @@ export default function ProfilePage() {
       
       <div className="container fade-in" style={{ marginTop: '120px', maxWidth: '800px' }}>
         <section className="profile-card-titan" style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <div style={{ width: '140px', height: '140px', borderRadius: '70px', background: 'rgba(255,255,255,0.05)', margin: '0 auto 25px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3.5rem', border: '4px solid var(--accent)', boxShadow: '0 0 30px rgba(255, 62, 62, 0.2)' }}>
+          <div style={{ width: '140px', height: '140px', borderRadius: '70px', background: 'rgba(255,255,255,0.05)', margin: '0 auto 25px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '4px solid var(--accent)', boxShadow: '0 0 30px rgba(255, 62, 62, 0.2)' }}>
             {user.avatar ? (
                 <img src={user.avatar} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
-                '👤'
+                <User size={60} color="rgba(255,255,255,0.2)" />
             )}
           </div>
           <h1 style={{ fontSize: '3rem', fontWeight: 950, marginBottom: '5px' }}>{user.username}</h1>
-          <p style={{ color: 'var(--accent)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', fontSize: '0.9rem' }}>{user.role === 'admin' ? '🏰 Đạo Chủ Quản Trị' : '🥋 Đệ Tử Nội Môn'}</p>
+          <p style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: 'var(--accent)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', fontSize: '0.8rem' }}>
+            {user.role === 'admin' ? <><Shield size={16} /> Quản trị viên</> : <><User size={16} /> Độc giả VIP</>}
+          </p>
           
           <div style={{ marginTop: '35px', display: 'flex', gap: '10px', maxWidth: '450px', margin: '35px auto 0' }}>
             <input 
@@ -92,27 +98,33 @@ export default function ProfilePage() {
             </button>
           </div>
           {user.role === 'admin' && (
-              <Link href="/admin" className="btn btn-outline" style={{ marginTop: '25px', padding: '12px 35px', borderRadius: '30px', fontWeight: 800, color: 'var(--accent)', textDecoration: 'none', display: 'inline-block' }}>
-                🛡️ Vào Đạo Đường Admin
+              <Link href="/admin" className="btn btn-outline" style={{ marginTop: '25px', padding: '12px 35px', borderRadius: '30px', fontWeight: 800, color: 'var(--accent)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '10px' }}>
+                <ShieldCheck size={18} /> Bảng điều khiển Admin
               </Link>
           )}
         </section>
 
         <div className="stat-grid-titan" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '40px' }}>
             <div className="stat-card-titan glass" style={{ padding: '25px', borderRadius: '25px', textAlign: 'center', border: '1px solid var(--glass-border)' }}>
-                <div style={{ fontSize: '3rem', marginBottom: '10px' }}>💰</div>
-                <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>VipCoins</div>
-                <div style={{ fontSize: '2rem', fontWeight: 900 }}>{new Intl.NumberFormat().format(vipCoins)}</div>
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
+                    <Coins size={32} color="var(--nebula-orange)" />
+                </div>
+                <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>VipCoins</div>
+                <div style={{ fontSize: '1.8rem', fontWeight: 900 }}>{new Intl.NumberFormat().format(vipCoins)}</div>
             </div>
             <div className="stat-card-titan glass" style={{ padding: '25px', borderRadius: '25px', textAlign: 'center', border: '1px solid var(--glass-border)' }}>
-                <div style={{ fontSize: '3rem', marginBottom: '10px' }}>✨</div>
-                <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>Cấp Độ</div>
-                <div style={{ fontSize: '2rem', fontWeight: 900 }}>Lv.{level}</div>
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
+                    <Sparkles size={32} color="var(--accent)" />
+                </div>
+                <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>Cấp Độ</div>
+                <div style={{ fontSize: '1.8rem', fontWeight: 900 }}>Lv.{level}</div>
             </div>
             <div className="stat-card-titan glass" style={{ padding: '25px', borderRadius: '25px', textAlign: 'center', border: '1px solid var(--glass-border)' }}>
-                <div style={{ fontSize: '3rem', marginBottom: '10px' }}>🐉</div>
-                <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>Cảnh Giới</div>
-                <div style={{ fontSize: '1.6rem', fontWeight: 900, color: 'var(--accent)' }}>{rankTitle}</div>
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
+                    <Activity size={32} color="var(--nebula-blue)" />
+                </div>
+                <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>Cảnh Giới</div>
+                <div style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--accent)' }}>{rankTitle}</div>
             </div>
         </div>
 
@@ -130,17 +142,17 @@ export default function ProfilePage() {
         </section>
 
         <div className="profile-actions" style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginBottom: '100px' }}>
-            <Link href="/favorites" className="nav-link-titan glass" style={{ display: 'flex', justifyContent: 'space-between', padding: '25px 35px', borderRadius: '25px', fontSize: '1.1rem', textDecoration: 'none', color: 'white' }}>
-                <span>💎 Linh Tịch Yêu Thích</span>
-                <span style={{ opacity: 0.5 }}>→</span>
+            <Link href="/favorites" className="nav-link-titan glass" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '25px 35px', borderRadius: '25px', fontSize: '1.05rem', textDecoration: 'none', color: 'white' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><Heart size={20} color="var(--accent)" /> Truyện yêu thích</span>
+                <ChevronRight size={20} style={{ opacity: 0.3 }} />
             </Link>
-            <Link href="/history" className="nav-link-titan glass" style={{ display: 'flex', justifyContent: 'space-between', padding: '25px 35px', borderRadius: '25px', fontSize: '1.1rem', textDecoration: 'none', color: 'white' }}>
-                <span>📜 Bước Chân Tu Hành</span>
-                <span style={{ opacity: 0.5 }}>→</span>
+            <Link href="/history" className="nav-link-titan glass" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '25px 35px', borderRadius: '25px', fontSize: '1.05rem', textDecoration: 'none', color: 'white' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><History size={20} color="var(--nebula-blue)" /> Lịch sử đọc truyện</span>
+                <ChevronRight size={20} style={{ opacity: 0.3 }} />
             </Link>
             <div style={{ height: '1px', background: 'var(--glass-border)', margin: '15px 0' }} />
-            <button onClick={logout} style={{ background: 'rgba(255, 62, 62, 0.05)', color: '#ff4d4d', border: '1px solid rgba(255, 62, 62, 0.15)', padding: '25px 35px', borderRadius: '25px', fontWeight: 800, fontSize: '1rem', cursor: 'pointer', transition: 'all 0.3s ease' }}>
-                🚪 Rời Khỏi Đạo Đường
+            <button onClick={logout} style={{ background: 'rgba(255, 62, 62, 0.05)', color: '#ff4d4d', border: '1px solid rgba(255, 62, 62, 0.15)', padding: '25px 35px', borderRadius: '25px', fontWeight: 800, fontSize: '1rem', cursor: 'pointer', transition: 'all 0.3s ease', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
+                <LogOut size={20} /> Đăng xuất
             </button>
         </div>
       </div>

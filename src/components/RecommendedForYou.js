@@ -3,6 +3,7 @@
 import { useHistory } from '@/context/HistoryContext';
 import { useState, useEffect, useCallback } from 'react';
 import MangaCard from './MangaCard';
+import { Sparkles } from 'lucide-react';
 
 export default function RecommendedForYou() {
   const { history, mounted } = useHistory();
@@ -38,7 +39,9 @@ export default function RecommendedForYou() {
         <div className="section-header-titan">
           <div className="header-label">
             <span className="badge-red">GỢI Ý</span>
-            <h2 className="title-titan">🏹 Dành riêng cho bạn</h2>
+            <h2 className="title-titan" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Sparkles size={20} color="var(--accent)" /> Dành riêng cho bạn
+            </h2>
           </div>
         </div>
         <div className="shimmer-grid-titan">
@@ -55,7 +58,9 @@ export default function RecommendedForYou() {
       <div className="section-header-titan">
         <div className="header-label">
           <span className="badge-red">GỢI Ý</span>
-          <h2 className="title-titan">🏹 Dành riêng cho bạn</h2>
+          <h2 className="title-titan" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Sparkles size={24} color="var(--accent)" /> Dành riêng cho bạn
+          </h2>
           <p className="subtitle-titan">Dựa trên sở thích đọc truyện của bạn</p>
         </div>
       </div>

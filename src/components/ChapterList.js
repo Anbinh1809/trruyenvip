@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { Search, ArrowUpDown } from 'lucide-react';
 
 export default function ChapterList({ mangaId, chapters }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -62,7 +63,7 @@ export default function ChapterList({ mangaId, chapters }) {
                     gap: '8px'
                 }}
             >
-                {sortOrder === 'desc' ? '🆕 Mới nhất' : '⏳ Cũ nhất'}
+                <ArrowUpDown size={14} /> {sortOrder === 'desc' ? 'Mới nhất' : 'Cũ nhất'}
             </button>
 
             <div className="chapter-search-container" style={{ position: 'relative', width: '100%', maxWidth: '300px' }}>
@@ -87,7 +88,7 @@ export default function ChapterList({ mangaId, chapters }) {
                     transition: 'all 0.3s ease'
                 }}
               />
-              <span style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }}>🔍</span>
+              <Search size={16} style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)', opacity: 0.3 }} />
             </div>
         </div>
       </div>

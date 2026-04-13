@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useEngagement } from '@/context/EngagementContext';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/components/ToastProvider';
+import { ShieldCheck, Trash2, Heart, MessageSquare } from 'lucide-react';
 
 const CommentItem = ({ comment, isReply = false, chapterId, userName, fetchComments, comments, handleLike }) => {
     const [replying, setReplying] = useState(false);
@@ -76,8 +77,8 @@ const CommentItem = ({ comment, isReply = false, chapterId, userName, fetchComme
             }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontWeight: 800, color: isAdmin ? '#ffd700' : 'var(--accent)' }}>
-                          {isAdmin && '🏰 '}{comment.user_name}
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 800, color: isAdmin ? '#ffd700' : 'var(--accent)' }}>
+                          {isAdmin && <ShieldCheck size={16} />}{comment.user_name}
                         </span>
                         {comment.user_xp !== null && (
                             <span className="badge" style={{ 
@@ -99,10 +100,10 @@ const CommentItem = ({ comment, isReply = false, chapterId, userName, fetchComme
                         {canDelete && (
                             <button 
                                 onClick={() => handleDelete(comment.id)} 
-                                style={{ background: 'none', border: 'none', color: '#ff4d4d', cursor: 'pointer', fontSize: '1rem', opacity: 0.7 }}
+                                style={{ background: 'none', border: 'none', color: '#ff4d4d', cursor: 'pointer', fontSize: '1rem', opacity: 0.7, display: 'flex', alignItems: 'center' }}
                                 title="Xóa bình luận"
                             >
-                                🗑️
+                                <Trash2 size={16} />
                             </button>
                         )}
                     </div>
@@ -114,14 +115,14 @@ const CommentItem = ({ comment, isReply = false, chapterId, userName, fetchComme
                         onClick={() => handleLike(comment.id)} 
                         style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}
                     >
-                        ❤️ {comment.likes || 0}
+                        <Heart size={14} /> {comment.likes || 0}
                     </button>
                     {!isReply && isAuthenticated && (
                         <button 
                             onClick={() => setReplying(!replying)} 
-                            style={{ background: 'none', border: 'none', color: 'var(--accent)', fontSize: '0.85rem', cursor: 'pointer', fontWeight: 700 }}
+                            style={{ background: 'none', border: 'none', color: 'var(--accent)', fontSize: '0.85rem', cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '5px' }}
                         >
-                            💬 Trả lời
+                            <MessageSquare size={14} /> Trả lời
                         </button>
                     )}
                 </div>
@@ -266,7 +267,9 @@ export default function CommentSection({ chapterId }) {
   return (
     <section className="comment-section container" style={{ marginTop: '60px', padding: '40px', background: 'var(--bg-secondary)', borderRadius: '30px', border: '1px solid var(--glass-border)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-        <h3 style={{ fontWeight: 800 }}>💬 Bình luận ({comments?.length || 0})</h3>
+        <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', fontWeight: 800 }}>
+            <MessageSquare size={20} color="var(--accent)" /> Bình luận ({comments?.length || 0})
+        </h3>
         {isAuthenticated && (
            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
              Đang bình luận bằng: <strong style={{ color: 'var(--accent)' }}>{user.username}</strong>

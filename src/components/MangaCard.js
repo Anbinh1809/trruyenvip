@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState, memo } from 'react';
 import { useFavorites } from '@/context/FavoritesContext';
+import { Bookmark, Star } from 'lucide-react';
 
 function MangaCard({ manga, isNew = false }) {
   const coverUrl = manga.cover?.startsWith('http') 
@@ -90,13 +91,14 @@ function MangaCard({ manga, isNew = false }) {
                 toggleFavorite(manga);
             }}
         >
-            {favorited ? '🔖' : '📑'}
+            {favorited ? <Bookmark size={18} fill="currentColor" /> : <Bookmark size={18} />}
         </button>
 
         {/* Subtle hover overlay */}
         <div className="card-overlay-titan">
-             <div style={{ display: 'flex', gap: '10px', fontSize: '0.75rem', fontWeight: 800, color: 'white' }}>
-                  <span>{manga.rating || '4.5'} ★</span>
+             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', fontWeight: 800, color: 'white' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>{manga.rating || '4.5'} <Star size={10} fill="currentColor" /></span>
+                  <span style={{ color: 'rgba(255,255,255,0.4)' }}>|</span>
                   <span>{formatViews(views)} lượt xem</span>
              </div>
         </div>

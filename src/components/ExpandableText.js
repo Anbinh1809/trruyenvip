@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function ExpandableText({ text, limit = 300 }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -48,10 +49,10 @@ export default function ExpandableText({ text, limit = 300 }) {
             padding: 0,
             transition: 'transform 0.2s ease'
           }}
-          onMouseOver={(e) => e.currentTarget.style.transform = 'translateX(5px)'}
-          onMouseOut={(e) => e.currentTarget.style.transform = 'translateX(0)'}
+          onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(2px)'}
+          onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
         >
-          {isExpanded ? '⬆️ Thu gọn' : '👇 Xem thêm'}
+          {isExpanded ? <><ChevronUp size={16} /> Thu gọn</> : <><ChevronDown size={16} /> Xem thêm</>}
         </button>
       )}
     </div>

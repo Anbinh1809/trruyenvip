@@ -28,10 +28,10 @@ export default function FavoritesPage() {
               </h2>
               <p className="subtitle-titan">
                 {!mounted 
-                    ? 'Đang triệu hồi bộ sưu tập...' 
+                    ? 'Đang tải bộ sưu tập...' 
                     : favorites.length > 0 
                         ? `Lưu giữ ${favorites.length} bộ truyện tuyệt phẩm` 
-                        : 'Đạo hữu chưa tìm được bộ truyện nào tâm đắc sao?'}
+                        : 'Bắt đầu xây dựng danh sách của bạn.'}
               </p>
             </div>
             {!isAuthenticated && mounted && (
@@ -58,9 +58,9 @@ export default function FavoritesPage() {
             </div>
           ) : (
             <EmptyState 
-              title="Thư tịch còn trống"
-              subtitle="Đạo hữu chưa tìm được bộ truyện nào tâm đắc sao? Hãy cùng linh thú khám phá vạn hành tinh truyện tranh ngay!"
-              actionText="Khai phá thế giới"
+              title="Danh sách trống"
+              subtitle="Hãy cùng khám phá hàng ngàn bộ truyện hấp dẫn tại trang chủ ngay!"
+              actionText="Khám phá ngay"
               actionUrl="/"
             />
           )}

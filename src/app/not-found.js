@@ -8,9 +8,9 @@ export default function NotFound() {
       
       <div className="titan-abyss fade-in" style={{ padding: '100px 0' }}>
         <GuardianBeastEmptyState 
-            title="LINH GIỚI HƯ VÔ"
-            message={`"Đạo hữu dừng bước! Linh thú canh giữ tàng thư báo rằng đạo hữu đã lạc vào một cẩm chú cổ xưa. Không gian này <strong>không chứa đựng bất kỳ bí tịch nào</strong>."`}
-            buttonText="Quay Lại Hiện Thực"
+            title="KHÔNG TÌM THẤY TRANG"
+            message={`Đường dẫn bạn truy cập hiện không tồn tại hoặc đã được di dời sang địa chỉ mới. Vui lòng kiểm tra lại liên kết.`}
+            buttonText="Quay Lại Trang Chủ"
         />
       </div>
     </main>

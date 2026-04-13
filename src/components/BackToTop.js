@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { ArrowUp } from 'lucide-react';
+
 
 export default function BackToTop() {
   const [isVisible, setIsVisible] = useState(false);
@@ -41,7 +43,8 @@ export default function BackToTop() {
         className={`back-to-top-titan ${isVisible ? 'visible' : ''} ${isLaunching ? 'launch' : ''}`} 
         onClick={scrollToTop}
     >
-      <div className="rocket-icon">🚀</div>
+      <div className="rocket-icon"><ArrowUp size={24} /></div>
+
       <div className="shimmer-effect"></div>
     </div>
   );

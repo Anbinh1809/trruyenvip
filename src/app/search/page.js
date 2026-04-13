@@ -4,6 +4,7 @@ import MangaCard from '@/components/MangaCard';
 import { query, MANGA_CARD_FIELDS } from '@/lib/db';
 import Footer from '@/components/Footer';
 import GuardianBeastEmptyState from '@/components/GuardianBeastEmptyState';
+import { Search } from 'lucide-react';
 
 async function searchManga(q, page = 1) {
   if (!q) return { manga: [], total: 0 };
@@ -64,7 +65,9 @@ export default async function SearchPage({ searchParams }) {
         <section className="section">
           <div className="section-header" style={{ marginBottom: '40px' }}>
             <div>
-              <h1 className="section-title" style={{ fontSize: '2.5rem' }}>🔍 Tìm kiếm: &quot;{q}&quot;</h1>
+              <h1 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '15px', fontSize: '2.5rem' }}>
+                <Search size={32} color="var(--accent)" /> Kết quả: &quot;{q}&quot;
+              </h1>
               <p style={{ color: 'var(--text-muted)', fontWeight: 600, marginTop: '10px' }}>
                 Tìm thấy {total} bộ truyện phù hợp
               </p>

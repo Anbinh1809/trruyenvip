@@ -176,7 +176,7 @@ export async function GET(request) {
     // Diagnostic Logging: Sampled to avoid DB saturation (5% rate)
     if (Math.random() < 0.05) {
       query("INSERT INTO CrawlLogs (message, status) VALUES (@message, 'error')", { 
-          message: `🛠️ Proxy Failure: ${error.message.substring(0, 100)} | URL: ${imageUrl.substring(0, 300)}`
+          message: `Proxy Failure: ${error.message.substring(0, 100)} | URL: ${imageUrl.substring(0, 300)}`
       }).catch(() => {});
     }
     

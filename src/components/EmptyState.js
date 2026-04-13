@@ -11,7 +11,7 @@ export default function EmptyState({ title, subtitle, actionText = 'Tiếp tục
         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle, rgba(255, 62, 62, 0.15) 0%, transparent 70%)', zIndex: -1, animation: 'pulse 3s infinite' }}></div>
         <Image 
           src="/illustrations/empty-guardian.png" 
-          alt="Linh Thú Canh Giữ" 
+          alt="Không có dữ liệu" 
           fill
           style={{ objectFit: 'contain' }}
         />

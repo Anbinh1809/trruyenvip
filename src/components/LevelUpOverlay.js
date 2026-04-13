@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Sparkles } from 'lucide-react';
 
 export default function LevelUpOverlay({ level, rank, onComplete }) {
   const [visible, setVisible] = useState(level > 0);
@@ -44,11 +45,13 @@ export default function LevelUpOverlay({ level, rank, onComplete }) {
       {/* GLOW AURA BASED ON RANK */}
       <div className={`titan-celebration-box rank-aura-${rank.replace(/\s+/g, '-').toLowerCase()}`}>
         <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-            <div className="celebration-icon-titan">✨</div>
+            <div className="celebration-icon-titan">
+                <Sparkles size={32} color="var(--accent)" />
+            </div>
             <div>
-                <h3 className="celebration-title-titan">ĐỘT PHÁ CẢNH GIỚI!</h3>
+                <h3 className="celebration-title-titan">THĂNG CẤP ĐỘ!</h3>
                 <div className="rank-tag-premium">{rank}</div>
-                <p className="celebration-subtitle-titan">Thăng lên cấp {level}</p>
+                <p className="celebration-subtitle-titan">Cấp {level}</p>
             </div>
         </div>
       </div>

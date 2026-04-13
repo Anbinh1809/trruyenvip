@@ -44,14 +44,14 @@ export default function AdminDashboard() {
                 headers: { 'Authorization': `Bearer ${secret}` }
             });
             if (res.ok) {
-                addToast('🚀 Đã kích hoạt vạn dặm scraper thành công!', 'success');
+                addToast('🚀 Đã kích hoạt quy trình vá lỗi (Gap Healing) thành công!', 'success');
             } else {
                 const errorData = await res.json().catch(() => ({}));
-                addToast(`❌ Lỗi kích hoạt: ${res.status} - ${errorData.error || 'Mã cấm chế không chính xác'}`, 'error');
+                addToast(`❌ Lỗi kích hoạt: ${res.status} - ${errorData.error || 'Mã xác thực không chính xác'}`, 'error');
                 if (res.status === 401) localStorage.removeItem('TRUYENVIP_CRON_SECRET');
             }
         } catch (e) {
-            addToast('🚫 Kết nối với pháp bảo bị gián đoạn!', 'error');
+            addToast('🚫 Kết nối với hệ thống bị gián đoạn!', 'error');
         }
         setCrawlLoading(false);
     }
@@ -61,7 +61,7 @@ export default function AdminDashboard() {
       return (
           <main className="main-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
               <div className="loader-ring"></div>
-              <p style={{ marginTop: '20px', fontWeight: 700 }}>Đang nhận diện danh tính...</p>
+              <p style={{ marginTop: '20px', fontWeight: 700 }}>Đang xác thực...</p>
           </main>
       );
   }
@@ -70,9 +70,9 @@ export default function AdminDashboard() {
     return (
         <main className="main-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', flexDirection: 'column', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
             <h1 style={{ fontSize: '5rem' }}>🚫</h1>
-            <h2>Bậc tiền bối không phải admin?</h2>
+            <h2>Bạn không có quyền truy cập admin</h2>
             <p style={{ color: 'var(--text-muted)', marginTop: '10px' }}>Quyền hạn hiện tại: {user?.role || 'Guest'}</p>
-            <Link href="/" className="btn btn-primary" style={{ marginTop: '30px' }}>Quay lại trần thế</Link>
+            <Link href="/" className="btn btn-primary" style={{ marginTop: '30px' }}>Quay lại trang chủ</Link>
         </main>
     );
   }
@@ -84,20 +84,20 @@ export default function AdminDashboard() {
             <div className="container" style={{ paddingTop: '120px' }}>
                 <header style={{ marginBottom: '50px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                     <div>
-                        <h1 style={{ fontSize: '3rem', fontWeight: 950, marginBottom: '10px' }}>🏰 Đạo Đường Quản Trị</h1>
-                        <p style={{ color: 'rgba(255,255,255,0.5)', fontWeight: 600 }}>Cung điện điều hành tối cao của TruyenVip</p>
+                        <h1 style={{ fontSize: '3rem', fontWeight: 950, marginBottom: '10px' }}>🏰 Bảng Điều Khiển Quản Trị</h1>
+                        <p style={{ color: 'rgba(255,255,255,0.5)', fontWeight: 600 }}>Chi tiết các chỉ số vận hành & hiệu suất của Titan Engine</p>
                     </div>
                 </header>
 
                 <div className="dash-grid-titan">
                     <div className="stat-item-titan">
-                        <div className="stat-label-titan">📊 TỔNG ĐỆ TỬ</div>
+                        <div className="stat-label-titan">📊 TỔNG NGƯỜI DÙNG</div>
                         <div className="stat-value-titan">
                             {stats ? stats.totalUsers : <div className="skeleton-shimmer" style={{ height: '3rem', width: '80px', borderRadius: '10px' }} />}
                         </div>
                     </div>
                     <div className="stat-item-titan">
-                        <div className="stat-label-titan">📚 TỔNG BỘ TỊCH</div>
+                        <div className="stat-label-titan">📚 TỔNG TRUYỆN</div>
                         <div className="stat-value-titan">
                             {stats ? stats.totalManga : <div className="skeleton-shimmer" style={{ height: '3rem', width: '80px', borderRadius: '10px' }} />}
                         </div>
@@ -124,7 +124,7 @@ export default function AdminDashboard() {
                         {/* Crawler Control */}
                         <div className="action-node-titan">
                             <div className="action-icon-titan">🕷️</div>
-                            <h3 className="action-title-titan">Linh Thú Scraper (V2)</h3>
+                            <h3 className="action-title-titan">Titan Scraper (V2)</h3>
                             <p className="action-desc-titan">Hệ thống cào truyện thông minh, tự động đồng bộ chương mới và xử lý ảnh cao cấp.</p>
                             
                             {/* TASK MONITOR MINI */}
@@ -171,8 +171,8 @@ export default function AdminDashboard() {
                         {/* Logs Control */}
                         <div className="action-node-titan">
                             <div className="action-icon-titan">⚙️</div>
-                            <h3 className="action-title-titan">Chẩn Đoán &apos;Thần Nhãn&apos;</h3>
-                            <p className="action-desc-titan">Phân tích lỗi hàng chờ và tìm ra những bộ truyện đang bị &apos;kẹt&apos; pháp bảo.</p>
+                            <h3 className="action-title-titan">Chẩn Đoán Hệ Thống</h3>
+                            <p className="action-desc-titan">Phân tích lỗi hàng chờ và tìm ra những bộ truyện đang gặp sự cố.</p>
                             
                             <div className="failure-list-mini glass" style={{ fontSize: '0.65rem', padding: '10px', borderRadius: '12px', background: 'rgba(255,255,255,0.02)', maxHeight: '100px', overflowY: 'auto' }}>
                                 <div style={{ fontWeight: 900, color: 'var(--text-muted)', marginBottom: '5px' }}>LỖI CẬP NHẬT GẦN NHẤT:</div>

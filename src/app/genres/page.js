@@ -152,9 +152,9 @@ export default async function GenresPage({ searchParams }) {
                     </div>
                 ) : (
                     <GuardianBeastEmptyState 
-                        title="GIỚI HẠN TÀNG THƯ"
-                        message={`"Đạo hữu dừng bước! Linh thú canh giữ tàng thư báo rằng thể loại <strong style="color: var(--accent)">${activeGenre?.name || 'này'}</strong> hiện chưa có bí tịch nào được thu thập. Hãy quay lại sau."`}
-                        buttonText="Khám Phá Trang Chủ"
+                        title="DỮ LIỆU ĐANG CẬP NHẬT"
+                        message={`Hiện tại thể loại <strong style="color: var(--accent)">${activeGenre?.name || 'này'}</strong> chưa có truyện nào được cập nhật. Vui lòng quay lại sau.`}
+                        buttonText="Quay Lại Trang Chủ"
                     />
                 )}
             </div>
