@@ -11,7 +11,7 @@ export async function GET(request) {
 
     try {
         const res = await query(`
-            SELECT c.id, c.chapter_id, c.user_name, c.content, c.parent_id, c.likes, c.created_at,
+            SELECT c.id, c.chapter_id, c.username as user_name, c.content, c.parent_id, c.likes, c.created_at,
                    u.xp as user_xp, u.role as user_role
             FROM Comments c
             LEFT JOIN Users u ON c.user_uuid = u.uuid
@@ -102,7 +102,7 @@ export async function POST(request) {
         }
 
         await query(`
-            INSERT INTO Comments (chapter_id, user_name, content, parent_id, user_uuid)
+            INSERT INTO Comments (chapter_id, username, content, parent_id, user_uuid)
             VALUES (@chapterId, @userName, @content, @parentId, @userUuid)
         `, { chapterId, userName, content, parentId, userUuid });
 
