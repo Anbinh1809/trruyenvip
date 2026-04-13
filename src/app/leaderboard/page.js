@@ -4,8 +4,16 @@ import Header from '@/components/Header';
 import { calculateRank } from '@/context/EngagementContext';
 import { useAuth } from '@/context/AuthContext';
 import { useState, useEffect, useMemo } from 'react';
+import { Trophy, Crown, Medal } from 'lucide-react';
 
 export const dynamic = "force-dynamic";
+
+const RankingIcon = ({ index }) => {
+    if (index === 0) return <Crown size={32} color="#fbbf24" style={{ filter: 'drop-shadow(0 0 15px rgba(251, 191, 36, 0.4))' }} />;
+    if (index === 1) return <Trophy size={28} color="#94a3b8" style={{ filter: 'drop-shadow(0 0 12px rgba(148, 163, 184, 0.4))' }} />;
+    if (index === 2) return <Medal size={28} color="#b45309" style={{ filter: 'drop-shadow(0 0 12px rgba(180, 83, 9, 0.4))' }} />;
+    return <span style={{ fontSize: '1.2rem', fontWeight: 900, opacity: 0.2 }}>#{index + 1}</span>;
+}
 
 export default function LeaderboardPage() {
   const { user: currentUser } = useAuth();
@@ -52,7 +60,7 @@ export default function LeaderboardPage() {
             <div className="container" style={{ paddingTop: '120px', maxWidth: '1000px' }}>
                 <section style={{ textAlign: 'center', marginBottom: '60px' }} className="fade-up">
                     <div style={{ display: 'inline-block', padding: '6px 20px', background: 'rgba(255, 62, 62, 0.08)', border: '1px solid rgba(255, 62, 62, 0.2)', color: 'var(--accent)', fontSize: '0.75rem', fontWeight: 950, letterSpacing: '2px', borderRadius: '50px', marginBottom: '25px', textTransform: 'uppercase' }}>
-                        Bảng Xếp Hạng 🏆
+                        Bảng Xếp Hạng Tuyệt Đỉnh
                     </div>
                     <h1 style={{ fontSize: '4rem', fontWeight: 950, marginBottom: '15px', letterSpacing: '-3px', lineHeight: 1 }}>Điện Thờ Đại Thánh</h1>
                     <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '1.2rem', fontWeight: 600, maxWidth: '600px', margin: '0 auto' }}>Nơi vinh danh những thiên tài có tu vi cao nhất lục địa TruyenVip.</p>
@@ -74,8 +82,8 @@ export default function LeaderboardPage() {
                                 borderLeft: player.isUser ? '4px solid var(--accent)' : ''
                             }}
                         >
-                            <div style={{ width: '60px', fontSize: '1.8rem', fontWeight: 950, color: idx < 3 ? 'white' : 'rgba(255,255,255,0.1)' }}>
-                                {idx === 0 ? '🥇' : (idx === 1 ? '🥈' : (idx === 2 ? '🥉' : `#${idx + 1}`))}
+                            <div style={{ width: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <RankingIcon index={idx} />
                             </div>
                             
                             <div style={{ position: 'relative' }}>
@@ -86,19 +94,20 @@ export default function LeaderboardPage() {
                                     background: 'rgba(255,255,255,0.05)', 
                                     border: '2px solid rgba(255,255,255,0.08)',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center', 
-                                    fontSize: idx < 3 ? '2.5rem' : '1.8rem',
                                     overflow: 'hidden',
                                     transition: 'all 0.3s ease'
                                 }}>
                                     {player.avatar ? (
                                         <img src={player.avatar} alt={player.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                     ) : (
-                                        player.role === 'admin' ? '🛡️' : '👤'
+                                        <div style={{ fontSize: idx < 3 ? '2rem' : '1.5rem', opacity: 0.3 }}>
+                                            {player.role === 'admin' ? '🛡️' : '👤'}
+                                        </div>
                                     )}
                                 </div>
                             </div>
 
-                            <div style={{ flex: 1, paddingLeft: '10px' }}>
+                            <div style={{ flex: 1, paddingLeft: '20px' }}>
                                 <h4 style={{ fontSize: idx < 3 ? '1.5rem' : '1.2rem', fontWeight: 900, marginBottom: '5px', display: 'flex', alignItems: 'center', gap: '12px' }}>
                                     {player.name}
                                     {player.isUser && <span style={{ fontSize: '0.65rem', background: 'var(--accent)', padding: '4px 10px', borderRadius: '10px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>BẠN</span>}

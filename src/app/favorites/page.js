@@ -7,6 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useHistory } from '@/context/HistoryContext';
 import Link from 'next/link';
 import EmptyState from '@/components/EmptyState';
+import { Gem, Sparkles } from 'lucide-react';
 
 export default function FavoritesPage() {
   const { favorites, mounted } = useFavorites();
@@ -21,7 +22,10 @@ export default function FavoritesPage() {
         <section className="section-titan">
           <div className="section-header-titan">
             <div className="header-label">
-              <h2 className="title-titan">💎 Bộ sưu tập của bạn</h2>
+              <h2 className="title-titan" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <Gem size={28} color="var(--accent)" />
+                  Bộ sưu tập của bạn
+              </h2>
               <p className="subtitle-titan">
                 {!mounted 
                     ? 'Đang triệu hồi bộ sưu tập...' 

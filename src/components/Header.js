@@ -6,6 +6,13 @@ import { useState, useEffect } from 'react';
 import { useEngagement } from '@/context/EngagementContext';
 import { useAuth } from '@/context/AuthContext';
 import LiveSearch from './LiveSearch';
+import { Search, Coins, Trophy, Gem, X, Menu, Settings, LogOut, User, Sun, Moon } from 'lucide-react';
+
+// - [x] Fix Mobile Search UX (Dedicated Search HUD) in `src/components/Header.js`
+// - [x] Universal Icon Replacement (Lucide SVGs) across all components
+// - [ ] Upgrade Genre HUD Tags in `src/components/MobileGenreNav.js`
+// - [ ] Polish Empty States in `src/components/EmptyState.js`
+// - [ ] Final Multi-Page UI Audit on Vercel
 
 export default function Header() {
   const { theme, toggleTheme } = useTheme();
@@ -14,6 +21,7 @@ export default function Header() {
   const { user, isAuthenticated, logout, loading } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   
   useEffect(() => {
@@ -61,7 +69,7 @@ export default function Header() {
           <nav className={`nav-titan ${isMenuOpen ? 'nav-open' : ''}`}>
             <div className="mobile-only-header" style={{ display: isMenuOpen ? 'flex' : 'none', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: '30px' }}>
                 <span className="logo">Truyen<span style={{ color: 'var(--accent)' }}>Vip</span></span>
-                <button style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '1.5rem', cursor: 'pointer' }} onClick={() => setIsMenuOpen(false)}>×</button>
+                <button style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '1.5rem', cursor: 'pointer' }} onClick={() => setIsMenuOpen(false)}><X size={24} /></button>
             </div>
             
             {mounted && isAuthenticated && isMenuOpen && (
@@ -71,8 +79,14 @@ export default function Header() {
                         <span style={{ fontSize: '0.6rem', background: 'var(--accent)', color: 'white', padding: '2px 6px', borderRadius: '4px' }}>{user?.role === 'admin' ? 'ADMIN' : 'USER'}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px', fontSize: '0.85rem', fontWeight: 700 }}>
-                        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '4px 10px', borderRadius: '20px' }}>💰 {new Intl.NumberFormat().format(vipCoins)}</div>
-                        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '4px 10px', borderRadius: '20px' }}>Lv.{level} - {rankTitle}</div>
+                        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '4px 10px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <Coins size={14} color="var(--nebula-orange)" /> 
+                            {new Intl.NumberFormat().format(vipCoins)}
+                        </div>
+                        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '4px 10px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <Trophy size={14} color="var(--nebula-blue)" /> 
+                            Lv.{level} - {rankTitle}
+                        </div>
                     </div>
                 </div>
             )}
@@ -85,13 +99,24 @@ export default function Header() {
             <Link href="/leaderboard" className="nav-link-titan" onClick={() => setIsMenuOpen(false)}>Xếp hạng</Link>
           </nav>
 
+          {/* MOBILE SEARCH HUD */}
+          {isSearchOpen && (
+              <div className="mobile-search-hud fade-in" style={{ position: 'fixed', inset: 0, background: 'var(--bg-primary)', zIndex: 10002, padding: '20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '30px' }}>
+                      <button onClick={() => setIsSearchOpen(false)} style={{ background: 'none', border: 'none', color: 'white' }}><X size={24} /></button>
+                      <h3 style={{ margin: 0, fontWeight: 900 }}>Tìm Kiếm</h3>
+                  </div>
+                  <LiveSearch onSelect={() => setIsSearchOpen(false)} />
+              </div>
+          )}
+
           <div className="header-actions">
             <button 
               className="search-toggle-mobile mobile-only" 
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', width: '40px', height: '40px', borderRadius: '50%', fontSize: '1rem', cursor: 'pointer' }} 
-              onClick={() => setIsMenuOpen(true)}
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', cursor: 'pointer' }} 
+              onClick={() => setIsSearchOpen(true)}
             >
-              🔍
+              <Search size={20} />
             </button>
 
             {!loading && !isAuthenticated && mounted ? (
@@ -102,8 +127,8 @@ export default function Header() {
                 mounted && isAuthenticated ? (
                     <div className="user-profile-titan desktop-only">
                         <div style={{ textAlign: 'right', cursor: 'pointer' }}>
-                            <Link href="/rewards" style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '2px', color: '#ffd700', fontSize: '0.85rem', fontWeight: 800, textDecoration: 'none' }}>
-                                🪙 {new Intl.NumberFormat().format(vipCoins)} <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)' }}>VipCoins</span>
+                            <Link href="/rewards" style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '2px', color: 'var(--nebula-orange)', fontSize: '0.85rem', fontWeight: 800, textDecoration: 'none' }}>
+                                <Coins size={14} /> {new Intl.NumberFormat().format(vipCoins)} <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)' }}>VipCoins</span>
                             </Link>
                             <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'rgba(255,255,255,0.6)' }}>
                                 <span style={{ color: 'var(--accent)' }}>Cấp {level}</span> {' // '} {rankTitle}
@@ -139,10 +164,10 @@ export default function Header() {
 
             <button 
               className="theme-toggle desktop-only" 
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', width: '45px', height: '45px', borderRadius: '50%', fontSize: '1.2rem', cursor: 'pointer' }} 
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', width: '45px', height: '45px', borderRadius: '50%', fontSize: '1.2rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }} 
               onClick={toggleTheme}
             >
-              {mounted ? (theme === 'light' ? '🌙' : '☀️') : '...'}
+              {mounted ? (theme === 'light' ? <Moon size={20} /> : <Sun size={20} />) : <div style={{ width: 20 }} />}
             </button>
             <button 
               className="mobile-menu-btn desktop-hide" 
