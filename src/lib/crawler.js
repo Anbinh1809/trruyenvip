@@ -254,6 +254,19 @@ async function fetchWithRetry(url, options = {}, retries = 2) {
                 }
             });
 
+            // Cloudflare Sentinel: Detect challenge pages disguised as 200 OK
+            if (response.data && typeof response.data === 'string') {
+                const isChallenge = response.data.includes('cf-browser-verification') || 
+                                   response.data.includes('Checking your browser') ||
+                                   response.data.includes('captcha') ||
+                                   response.data.includes('Dung mạo đạo hữu');
+                
+                if (isChallenge) {
+                    console.warn(`[Crawler] Challenge detected on ${currentMirror}. Rotating.`);
+                    throw { code: 'CHALLENGE_DETECTED', response: { status: 403 } };
+                }
+            }
+
             // If we get here, mirror seems okay.
             if (url.includes('nettruyen')) {
                 global.mirrorScores[currentMirror] = Math.min((global.mirrorScores[currentMirror] || 100) + 5, 200);
