@@ -11,11 +11,15 @@ if (!process.env.DATABASE_URL) {
 const pool = new Pool({ 
     connectionString: process.env.DATABASE_URL,
     connectionTimeoutMillis: 10000, // 10s timeout
-    max: 10, // Max clients in pool
+    max: 20, // Increased for peak performance
     ssl: process.env.DATABASE_URL?.includes('supabase') || process.env.DATABASE_URL?.includes('neon') 
         ? { rejectUnauthorized: false } 
         : false
 });
+
+// Cache for translated SQL to avoid regex overhead on every query
+const translationCache = new Map();
+const MAX_CACHE_SIZE = 500;
 
 /**
  * TITAN QUERY TRANSLATOR
@@ -23,8 +27,20 @@ const pool = new Pool({
  * Supports: @params -> $n, TOP -> LIMIT, GETDATE() -> NOW(), [col] -> "col"
  */
 function translateSql(sql, params) {
+    if (translationCache.has(sql)) {
+        const cached = translationCache.get(sql);
+        const mappedValues = [];
+        if (params && cached.paramOrder) {
+            for (const key of cached.paramOrder) {
+                mappedValues.push(params[key]);
+            }
+        }
+        return { sql: cached.translatedSql, values: mappedValues };
+    }
+
     let translatedSql = sql;
     const values = [];
+    const paramOrder = [];
     let paramCount = 1;
 
     // 1. Robust Named Param Mapping (@param -> $n)
@@ -36,6 +52,7 @@ function translateSql(sql, params) {
             if (translatedSql.match(regex)) {
                 translatedSql = translatedSql.replace(regex, `$${paramCount}`);
                 values.push(params[key]);
+                paramOrder.push(key);
                 paramCount++;
             }
         }
@@ -86,6 +103,11 @@ function translateSql(sql, params) {
     // More aggressive dbo removal to handle [dbo]. / "dbo". / dbo. prefixes
     translatedSql = translatedSql.replace(/(?:\[dbo\]|"dbo"|dbo)\./gi, ''); 
     translatedSql = translatedSql.replace(/\[([^\]]+)\]/g, '"$1"'); 
+
+    // Cache the result for future identical queries
+    if (translationCache.size < MAX_CACHE_SIZE) {
+        translationCache.set(sql, { translatedSql, paramOrder });
+    }
 
     return { sql: translatedSql, values };
 }
@@ -162,7 +184,12 @@ export async function cleanLegacyEncoding() {
     try {
         await query("UPDATE Manga SET last_chap_num = 'Đang cập nhật' WHERE last_chap_num = '??'");
         await query("UPDATE Manga SET author = 'Đang cập nhật' WHERE author = '??'");
-        console.log('[Maintenance] Clean sweep completed (PG Mode).');
+        
+        // TITAN SEARCH OPTIMIZATION: Ensure B-Tree indexes for fast prefix and fuzzy searches
+        await query("CREATE INDEX IF NOT EXISTS idx_manga_normalized_title ON Manga(normalized_title)");
+        await query("CREATE INDEX IF NOT EXISTS idx_manga_alternative_titles ON Manga(alternative_titles)");
+        
+        console.log('[Maintenance] Clean sweep and indexing completed (PG Mode).');
     } catch (e) {
         console.error('[Maintenance] Sweep failed:', e.message);
     }

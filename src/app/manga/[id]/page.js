@@ -6,7 +6,6 @@ import Image from 'next/image';
 import ChapterPrefetcher from '@/components/ChapterPrefetcher';
 import ExpandableText from '@/components/ExpandableText';
 import ChapterList from '@/components/ChapterList';
-import SocialShare from '@/components/SocialShare';
 import DetailCover from '@/components/DetailCover';
 import ContinueReadingButton from '@/components/ContinueReadingButton';
 import { headers } from 'next/headers';
@@ -240,7 +239,6 @@ export default async function MangaDetail({ params }) {
               )}
             </div>
 
-            <SocialShare title={manga.title} />
           </div>
         </div>
 

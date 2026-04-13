@@ -125,28 +125,43 @@ export async function GET(request) {
                 }
 
                 try {
+                    const accept = request.headers.get('accept') || '';
+                    const supportsAvif = accept.includes('image/avif');
+                    
                     let transformer = sharp(Buffer.from(buffer));
                     
-                    // Add resizing if width is specified
                     if (width > 0) {
                         transformer = transformer.resize({ 
-                            width: Math.min(width, 2000), // Cap at 2000px for safety
+                            width: Math.min(width, 2000), 
                             withoutEnlargement: true 
                         });
                     }
 
-                    const processedBuffer = await transformer
-                        .webp({ quality: quality, effort: 4 })
-                        .toBuffer();
+                    let processedBuffer;
+                    let finalMime = 'image/webp';
+                    let optTag = 'sharp-webp';
+
+                    if (supportsAvif) {
+                        processedBuffer = await transformer
+                            .avif({ quality: Math.min(quality, 65), effort: 2 }) // AVIF is better at lower quality
+                            .toBuffer();
+                        finalMime = 'image/avif';
+                        optTag = 'sharp-avif';
+                    } else {
+                        processedBuffer = await transformer
+                            .webp({ quality: quality, effort: 4 })
+                            .toBuffer();
+                    }
 
                     return new Response(processedBuffer, {
                         headers: {
-                            'Content-Type': 'image/webp',
+                            'Content-Type': finalMime,
                             'Cache-Control': 'public, max-age=31536000, stale-while-revalidate=604800, s-maxage=31536000, immutable',
+                            'Vary': 'Accept', // CRITICAL: Tell CDNs that response varies by Accept header
                             'Access-Control-Allow-Origin': '*',
                             'X-Robots-Tag': 'noindex, nofollow',
                             'Referrer-Policy': 'no-referrer',
-                            'X-Optimization': 'sharp-webp'
+                            'X-Optimization': optTag
                         },
                     });
                 } catch (sharpError) {

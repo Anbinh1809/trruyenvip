@@ -53,7 +53,7 @@ export default function ChapterContent({ chapterId, initialImages = [] }) {
             } catch (e) {
                 // Continue polling
             }
-        }, 1500); 
+        }, 800); // Tightened from 1500ms to 800ms
     }, [chapterId, stopPolling]);
 
     const startSync = useCallback(async () => {
@@ -181,17 +181,11 @@ function ReaderImage({ src, idx }) {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    // STABILITY DELAY: Only load if it stays in view for 200ms
-                    const timer = setTimeout(() => {
-                        setShouldLoad(true);
-                        observer.disconnect();
-                    }, 200);
-                    entry.target._titanTimer = timer;
-                } else if (entry.target._titanTimer) {
-                    clearTimeout(entry.target._titanTimer);
+                    setShouldLoad(true);
+                    observer.disconnect();
                 }
             });
-        }, { rootMargin: '400px' });
+        }, { rootMargin: '600px' }); // Increased rootMargin for better prefetching
 
         if (containerRef.current) observer.observe(containerRef.current);
         return () => observer.disconnect();

@@ -52,7 +52,7 @@ export async function POST(req) {
         let errorStatus = 'UNKNOWN';
 
         try {
-            const crawlPromise = crawlChapterImages(chapterId, chapter.source_url, source, true);
+            const crawlPromise = crawlChapterImages(chapterId, chapter.source_url, source, true, true);
             const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT_LIMIT')), CRAWL_TIMEOUT));
             crawlResult = await Promise.race([crawlPromise, timeoutPromise]);
         } catch (err) {

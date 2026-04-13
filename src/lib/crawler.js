@@ -58,11 +58,12 @@ global.crawlerState = global.crawlerState || {
     lastAction: Date.now()
 };
 
+let lastTelemetryWrite = 0;
+const TELEMETRY_THROTTLE_MS = 1000;
+
 function updateTelemetry(data) {
     if (!data) return;
     
-    // Mutate properties directly to prevent race conditions during parallel execution
-    // (spread { ...state, ...data } would be risky for high-frequency parallel calls)
     if (data.status) global.crawlerState.status = data.status;
     if (data.currentManga !== undefined) global.crawlerState.currentManga = data.currentManga;
     if (data.currentChapter !== undefined) global.crawlerState.currentChapter = data.currentChapter;
@@ -75,6 +76,8 @@ function updateTelemetry(data) {
     }
     
     global.crawlerState.lastAction = Date.now();
+
+    // Throttling persistent writes if we were to add any here
 }
 
 async function logGuardianEvent(mangaId, chapterTitle, eventType, message) {
@@ -116,8 +119,12 @@ async function runInParallel(items, mapper, concurrency = 2) {
     const results = [];
     const executing = new Set();
     
-    const mem = process.memoryUsage().heapUsed / 1024 / 1024;
-    const finalLimit = mem > 800 ? 1 : concurrency;
+    const usage = process.memoryUsage();
+    const memUsed = usage.heapUsed / 1024 / 1024;
+    const memTotal = usage.heapTotal / 1024 / 1024;
+    
+    // Even more conservative if heapTotal is nearing limits
+    const finalLimit = (memUsed > 800 || memTotal > 1200) ? 1 : concurrency;
 
     for (const item of items) {
         const p = Promise.resolve().then(() => mapper(item, items));
@@ -338,8 +345,8 @@ async function processQueue() {
 
     const taskRow = pickRes.recordset[0];
     if (!taskRow) {
-        // SMART HEARTBEAT: If idle, poll much slower (5 seconds) to save DB/CPU
-        setTimeout(processQueue, 5000);
+        // SMART HEARTBEAT: If idle, poll much slower (10 seconds)
+        setTimeout(processQueue, 10000);
         return;
     }
 
@@ -385,7 +392,8 @@ async function processQueue() {
             }
         }
 
-        setTimeout(processQueue, 500); // Wait 500ms before next cycle to be gentle on CPU
+        // TIGHT CYCLE: Reduced from 500ms to 50ms for faster processing when queue is hot
+        setTimeout(processQueue, 50); 
     }
 }
 
@@ -1267,7 +1275,7 @@ export async function crawlTruyenQQ(page = 1, full = false, limitless = false) {
   }
 }
 
-export async function crawlChapterImages(chapId, url, source = 'nettruyen', force = false) {
+export async function crawlChapterImages(chapId, url, source = 'nettruyen', force = false, isJitSync = false) {
   // Concurrency Guard: Early return if already processing to avoid busy-wait loops
   if (inProgressChapters.has(chapId)) {
       console.log(`[Crawler] Chapter ${chapId} is already being processed. skipping.`);

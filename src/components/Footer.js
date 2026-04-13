@@ -15,11 +15,6 @@ export default function Footer() {
             <p className="footer-brand-text">
                 Nền tảng đọc truyện tranh trực tuyến hàng đầu, nơi hội tụ tinh hoa của vạn bộ truyện. Đọc truyện tranh đỉnh cao, khám phá thế giới qua từng khung hình.
             </p>
-            <div className="social-pills-titan">
-                <div className="social-pill">FB</div>
-                <div className="social-pill">DC</div>
-                <div className="social-pill">TG</div>
-            </div>
           </div>
 
           {/* COLUMN 2: DISCOVERY */}
@@ -77,31 +72,6 @@ export default function Footer() {
             line-height: 1.7;
             color: rgba(255,255,255,0.4);
             margin-bottom: 25px;
-        }
-        .social-pills-titan {
-            display: flex;
-            gap: 12px;
-        }
-        .social-pill {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.08);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            font-weight: 800;
-            color: rgba(255,255,255,0.6);
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .social-pill:hover {
-            background: var(--accent);
-            color: white;
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(255, 62, 62, 0.4);
         }
         .footer-heading {
             font-size: 0.95rem;

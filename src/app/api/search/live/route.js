@@ -17,12 +17,17 @@ export async function GET(request) {
 
     try {
         const res = await query(`
-            SELECT id, title, cover, last_chap_num, views_at_source as views
+            SELECT id, title, cover, last_chap_num, views_at_source as views, alternative_titles
             FROM Manga 
             WHERE normalized_title LIKE @q + '%' -- Indexed prefix search
             OR normalized_title LIKE '%-' + @q + '%' -- Mid-word match
+            OR alternative_titles LIKE '%' + @q + '%' -- Alternative titles match
             ORDER BY 
-                CASE WHEN normalized_title LIKE @q + '%' THEN 0 ELSE 1 END,
+                CASE 
+                    WHEN normalized_title LIKE @q + '%' THEN 0 
+                    WHEN normalized_title LIKE '%-' + @q + '%' THEN 1
+                    ELSE 2 
+                END,
                 views_at_source DESC,
                 last_crawled DESC
             LIMIT 6
