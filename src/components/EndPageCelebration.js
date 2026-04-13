@@ -2,6 +2,7 @@
 
 import { useEngagement } from '@/context/EngagementContext';
 import Link from 'next/link';
+import { Scroll, Search, Library } from 'lucide-react';
 
 export default function EndPageCelebration({ mangaId, mangaTitle }) {
     const { rankTitle } = useEngagement();
@@ -9,7 +10,9 @@ export default function EndPageCelebration({ mangaId, mangaTitle }) {
     return (
         <div className="end-celebration-titan fade-in">
             <div className="celebration-glass-box">
-                <div className="celebration-icon-large">📜</div>
+                <div className="celebration-icon-large">
+                    <Scroll size={80} strokeWidth={1} />
+                </div>
                 <h2 className="celebration-headline">CỐNG HỈ ĐẠO HỮU!</h2>
                 <div className="rank-badge-finish">{rankTitle}</div>
                 <p className="celebration-message">
@@ -20,12 +23,14 @@ export default function EndPageCelebration({ mangaId, mangaTitle }) {
                 <div className="celebration-divider" />
                 
                 <div className="next-steps-titan">
-                    <p style={{ fontSize: '0.8rem', opacity: 0.6, marginBottom: '15px' }}>Duyên nợ chưa dứt, mời đạo hữu tiếp tục tu luyện:</p>
+                    <p style={{ fontSize: '0.8rem', opacity: 0.6, marginBottom: '20px', textTransform: 'uppercase', letterSpacing: '1px' }}>Duyên nợ chưa dứt, mời đạo hữu tiếp tục tu luyện:</p>
                     <div className="action-grid-finish">
-                        <Link href="/" className="btn btn-accent btn-large">
+                        <Link href="/" className="btn btn-accent btn-large" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                            <Search size={18} />
                             Tìm Kiếm Cơ Duyên Mới
                         </Link>
-                        <Link href="/bookmarks" className="btn btn-glass btn-large">
+                        <Link href="/bookmarks" className="btn btn-glass btn-large" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                            <Library size={18} />
                             Lướt Xem Tàng Kinh Các
                         </Link>
                     </div>
@@ -45,43 +50,57 @@ export default function EndPageCelebration({ mangaId, mangaTitle }) {
                     background: rgba(255, 255, 255, 0.02);
                     border: 1px solid rgba(255, 255, 255, 0.08);
                     backdrop-filter: blur(20px);
-                    border-radius: 30px;
-                    padding: 50px;
+                    border-radius: 40px;
+                    padding: 60px 40px;
                     text-align: center;
                     box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+                    position: relative;
+                    overflow: hidden;
+                }
+                .celebration-glass-box::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    width: 150px;
+                    height: 150px;
+                    background: radial-gradient(circle, rgba(255, 62, 62, 0.1) 0%, transparent 70%);
+                    z-index: -1;
                 }
                 .celebration-icon-large {
-                    font-size: 4rem;
-                    margin-bottom: 20px;
-                    filter: drop-shadow(0 0 20px var(--accent));
+                    color: var(--accent);
+                    margin-bottom: 25px;
+                    display: flex;
+                    justify-content: center;
+                    filter: drop-shadow(0 0 20px rgba(255, 62, 62, 0.4));
                 }
                 .celebration-headline {
-                    font-size: 2rem;
+                    font-size: 2.2rem;
                     font-weight: 950;
-                    letter-spacing: 4px;
-                    color: var(--accent);
+                    letter-spacing: 2px;
+                    color: white;
                     margin-bottom: 15px;
                 }
                 .rank-badge-finish {
                     display: inline-block;
-                    padding: 5px 20px;
-                    background: var(--accent);
+                    padding: 6px 24px;
+                    background: var(--accent-gradient);
                     color: white;
-                    border-radius: 20px;
+                    border-radius: 30px;
                     font-weight: 900;
                     font-size: 0.8rem;
-                    margin-bottom: 25px;
-                    box-shadow: 0 5px 15px rgba(255, 62, 62, 0.3);
+                    margin-bottom: 30px;
+                    box-shadow: 0 10px 20px rgba(255, 62, 62, 0.3);
                 }
                 .celebration-message {
                     font-size: 1.1rem;
-                    line-height: 1.6;
-                    color: rgba(255,255,255,0.8);
+                    line-height: 1.8;
+                    color: rgba(255,255,255,0.7);
                     margin-bottom: 30px;
                 }
                 .celebration-divider {
                     height: 1px;
-                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
                     margin: 40px 0;
                 }
                 .action-grid-finish {
@@ -89,9 +108,26 @@ export default function EndPageCelebration({ mangaId, mangaTitle }) {
                     grid-template-columns: 1fr 1fr;
                     gap: 15px;
                 }
+                .btn-large {
+                    padding: 18px 25px;
+                    border-radius: 15px;
+                    font-weight: 800;
+                    font-size: 0.9rem;
+                    transition: var(--transition);
+                }
+                .btn-accent:hover {
+                    transform: translateY(-3px);
+                    box-shadow: 0 15px 30px rgba(255, 62, 62, 0.4);
+                }
                 @media (max-width: 600px) {
                     .action-grid-finish {
                         grid-template-columns: 1fr;
+                    }
+                    .celebration-glass-box {
+                        padding: 40px 20px;
+                    }
+                    .celebration-headline {
+                        font-size: 1.8rem;
                     }
                 }
             `}</style>
