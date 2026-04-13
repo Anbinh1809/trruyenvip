@@ -46,10 +46,10 @@ function translateSql(sql, params) {
 
     // 3. Robust TOP to LIMIT translation
     // Handles SELECT TOP 10 ... and SELECT TOP @limit ...
-    const topMatch = translatedSql.match(/SELECT\s+TOP\s+(\d+|\$\d+)/i);
+    const topMatch = translatedSql.match(/SELECT\s+TOP\s+\(?(\d+|\$\d+)\)?/i);
     if (topMatch) {
         const limitValue = topMatch[1];
-        translatedSql = translatedSql.replace(/SELECT\s+TOP\s+(\d+|\$\d+)/i, 'SELECT');
+        translatedSql = translatedSql.replace(/SELECT\s+TOP\s+\(?(\d+|\$\d+)\)?/i, 'SELECT');
         // Simple append if no LIMIT exists
         if (!translatedSql.toUpperCase().includes('LIMIT ')) {
             translatedSql = translatedSql.trim();

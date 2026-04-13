@@ -686,10 +686,12 @@ export async function crawlNetTruyen(page = 1, full = false, limitless = false) 
           
           await query(`
             INSERT INTO Chapters (id, manga_id, title, source_url, chapter_number) 
-            VALUES (@chapId, @mangaId, @title, @url, @chapNum);
-            
-            UPDATE Manga SET last_chap_num = @chapNum, last_crawled = GETDATE() WHERE id = @mangaId;
+            VALUES (@chapId, @mangaId, @title, @url, @chapNum)
           `, { chapId, mangaId: targetId, title: chapTitle, url: chapUrl, chapNum });
+          
+          await query(`
+            UPDATE Manga SET last_chap_num = @chapNum, last_crawled = GETDATE() WHERE id = @mangaId
+          `, { mangaId: targetId, chapNum });
           
           await queueChapterScrape(chapId, chapUrl, 'nettruyen');
           
