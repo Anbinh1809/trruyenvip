@@ -1309,14 +1309,12 @@ export async function crawlChapterImages(chapId, url, source = 'nettruyen', forc
             });
 
             if (response.status === 404) {
-                console.error(`[Crawler] 404 Found for chapter ${chapId}. Link may be outdated.`);
-                await logCrawl(`[404] Link die: ${mangaTitle} (${chapId})`, 'error');
-                break;
+                console.error(`[Crawler] 404 Link Die: ${mangaTitle} (${chapId})`);
+                continue; // Try next mirror if one 404s
             }
 
             const $ = cheerio.load(response.data);
             
-            // Refined Selectors specifically for TruyenQQ and NetTruyen V2
             let imgElements = $(`
                 #chapter_content .page-chapter img, 
                 .page-chapter img, 
@@ -1324,8 +1322,6 @@ export async function crawlChapterImages(chapId, url, source = 'nettruyen', forc
                 .chapter_content img, 
                 #chapter_content img,
                 .chapter-content img,
-                .container-detail img,
-                .chapter-images img,
                 .read-content img,
                 .box-chap img,
                 img.lazy,
@@ -1337,72 +1333,58 @@ export async function crawlChapterImages(chapId, url, source = 'nettruyen', forc
             if (imgElements.length >= MIN_IMAGE_COUNT) {
                 const batchImages = [];
                 let currentOrder = 0;
-                
-                const AD_KEYWORDS = ['ads', 'analytics', 'tracking', 'pixel', 'click', 'google', 'doubleclick', 'amazon-ad', 'pop.js', 'banner'];
                 const IMAGE_BLACKLIST = ['lazyload.', 'pixel.', 'loading.', 'spacer.', 'transparent.', 'base64,', 'logo.', 'icon.'];
 
                 for (let i = 0; i < imgElements.length; i++) {
-                    if (currentOrder >= 300) break; 
-
+                    if (currentOrder >= 400) break; 
                     const el = imgElements[i];
-                    // Smart Attribute Selection: Prioritize data-src for TruyenQQ
-                    const imgUrl = $(el).attr('data-src') || 
-                                   $(el).attr('data-original') || 
-                                   $(el).attr('data-index') ||
-                                   $(el).attr('data-cdn') ||
-                                   $(el).attr('src');
+                    const imgUrl = $(el).attr('data-src') || $(el).attr('data-original') || $(el).attr('data-cdn') || $(el).attr('src');
                     
-                    if (!imgUrl || imgUrl.length < 10) continue;
+                    if (!imgUrl || imgUrl.length < 12) continue;
+                    if (IMAGE_BLACKLIST.some(k => imgUrl.toLowerCase().includes(k))) continue;
 
-                    const lowerUrl = imgUrl.toLowerCase();
-                    const isAd = AD_KEYWORDS.some(k => lowerUrl.includes(k));
-                    const isBlacklisted = IMAGE_BLACKLIST.some(k => lowerUrl.includes(k));
-                    
-                    if (!isAd && !isBlacklisted) {
-                        let finalUrl = imgUrl.startsWith('//') ? `https:${imgUrl}` : imgUrl;
-                        
-                        // Titan-Fidelity: Ensure URLs are absolute
-                        if (!finalUrl.startsWith('http')) {
-                            try {
-                                const base = new URL(url).origin;
-                                finalUrl = new URL(finalUrl, base).href;
-                            } catch (e) {}
-                        }
-
-                        updateTelemetry({ currentImage: `Found: ...${finalUrl.substring(finalUrl.length - 20)}` });
-                        batchImages.push({ chapId, url: finalUrl, order: currentOrder++ });
+                    let finalUrl = imgUrl.startsWith('//') ? `https:${imgUrl}` : imgUrl;
+                    if (!finalUrl.startsWith('http')) {
+                        try {
+                            finalUrl = new URL(finalUrl, url).href;
+                        } catch (e) {}
                     }
+                    batchImages.push({ chapId, url: finalUrl, order: currentOrder++ });
                 }
 
-                if (currentOrder < MIN_IMAGE_COUNT && imgElements.length > 0) {
-                     await logGuardianEvent(null, mangaTitle, 'LOW_FIELD_FIDELITY', `Chapter ${chapId} fallback: Found ${currentOrder} real images, but ${imgElements.length} elements.`);
-                }
-
-                if (currentOrder >= MIN_IMAGE_COUNT) {
-                    try {
-                        await withTransaction(async (tx) => {
-                            await query("DELETE FROM ChapterImages WHERE chapter_id = @chapId", { chapId }, tx);
-                        });
-
-                        // RELOADED BULK V2: Using robust SQL Batch Insert
-                        await bulkInsert('ChapterImages', ['chapter_id', 'image_url', 'order'], batchImages.map(img => ({
-                            chapter_id: img.chapId,
-                            image_url: img.url,
-                            order: img.order
-                        })));
-                        
-                        success = true;
-                        imagesFound = currentOrder;
-                        batchImages.length = 0; 
-                        break; 
-                    } catch (transErr) {
-                        console.error(`[Crawler] Ingestion failed for ${chapId}:`, transErr.message);
-                        throw transErr;
-                    }
+                if (batchImages.length >= MIN_IMAGE_COUNT) {
+                    await withTransaction(async (tx) => {
+                        await query("DELETE FROM ChapterImages WHERE chapter_id = @chapId", { chapId }, tx);
+                    });
+                    await bulkInsert('ChapterImages', ['chapter_id', 'image_url', 'order'], batchImages.map(img => ({
+                        chapter_id: img.chapId,
+                        image_url: img.url,
+                        order: img.order
+                    })));
+                    success = true;
+                    imagesFound = batchImages.length;
+                    break; 
                 }
             }
         } catch (e) {
-            console.error(`Scrape Strategy failed for ${chapId}:`, e.message);
+            console.error(`[Crawler] Scrape strategy failed on ${strat.source}:`, e.message);
+        }
+    }
+
+    // --- MAXIMUM INGESTION FALLBACK ---
+    // If all primary mirrors failed, trigger a cross-platform recursive search
+    if (imagesFound < MIN_IMAGE_COUNT && !isJitSync) {
+        console.log(`[Aegis] Strategy failover for ${mangaTitle}. Attempting Cross-Platform Search...`);
+        try {
+            const altSource = source === 'nettruyen' ? 'truyenqq' : 'nettruyen';
+            // searchAndIngestChapter is a helper that performs a headless-like search and ingestion
+            const discoveryRes = await searchAndIngestChapter(mangaTitle, chapId, altSource);
+            if (discoveryRes > 0) {
+                success = true;
+                imagesFound = discoveryRes;
+            }
+        } catch (err) {
+            console.warn(`[Aegis] Ultimate failover failed:`, err.message);
         }
     }
 
@@ -1631,4 +1613,60 @@ export async function maintainSystem(level = 0) {
             await query("DELETE FROM GuardianReports WHERE created_at < NOW() - INTERVAL '7 days'");
         }
     } catch (e) {}
+}
+
+/**
+ * searchAndIngestChapter: The ultimate 'Aegis' failover for JIT-Sync
+ * Searches for a manga on a different platform and attempts to ingest a specific chapter.
+ */
+export async function searchAndIngestChapter(title, originalChapId, targetPlatform = 'truyenqq') {
+    try {
+        console.log(`[Aegis-JIT] Searching for "${title}" on ${targetPlatform}...`);
+        const searchResults = await searchSource(title, targetPlatform);
+        
+        if (searchResults.length === 0) return 0;
+        
+        const cleanTitle = normalizeTitle(title);
+        const match = searchResults.find(r => normalizeTitle(r.title).includes(cleanTitle) || cleanTitle.includes(normalizeTitle(r.title)));
+        
+        if (!match) return 0;
+        
+        console.log(`[Aegis-JIT] Found candidate: ${match.title} at ${match.url}`);
+        
+        // Fetch the candidate manga page to get chapter list
+        const res = await fetchWithRetry(match.url, { isDiscovery: true });
+        const $ = cheerio.load(res.data);
+        const chapters = [];
+        
+        if (targetPlatform === 'truyenqq') {
+            $('.works-chapter-list .works-chapter-item a').each((i, el) => {
+                chapters.push({ title: $(el).text().trim(), url: $(el).attr('href') });
+            });
+        } else {
+            $('.list-chapter li.row a').each((i, el) => {
+                chapters.push({ title: $(el).text().trim(), url: $(el).attr('href') });
+            });
+        }
+        
+        // Find original chapter number
+        const origData = await query("SELECT chapter_number FROM Chapters WHERE id = @id", { id: originalChapId });
+        const targetNum = origData.recordset[0]?.chapter_number;
+        
+        if (!targetNum) return 0;
+        
+        const targetChap = chapters.find(c => {
+            const numMatch = c.title.match(/(\d+(\.\d+)?)/);
+            return numMatch && parseFloat(numMatch[0]) === targetNum;
+        });
+        
+        if (targetChap) {
+            console.log(`[Aegis-JIT] Found matching chapter ${targetNum} at ${targetChap.url}`);
+            return await crawlChapterImages(originalChapId, targetChap.url, targetPlatform, true);
+        }
+        
+        return 0;
+    } catch (e) {
+        console.error(`[Aegis-JIT] Failover ingestion failed:`, e.message);
+        return 0;
+    }
 }
