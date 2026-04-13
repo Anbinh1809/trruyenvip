@@ -6,7 +6,6 @@ import { FavoritesProvider } from "@/context/FavoritesContext";
 import { EngagementProvider } from "@/context/EngagementContext";
 import { ToastProvider } from "@/components/ToastProvider";
 import { AuthProvider } from "@/context/AuthContext";
-import MissionPanel from "@/components/MissionPanel";
 import MobileNav from "@/components/MobileNav";
 import BackToTop from "@/components/BackToTop";
 
@@ -73,7 +72,6 @@ export default function RootLayout({ children }) {
                 <HistoryProvider>
                   <FavoritesProvider>
                     {children}
-                    <MissionPanel />
                     <MobileNav />
                     <BackToTop />
                   </FavoritesProvider>

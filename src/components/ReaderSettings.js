@@ -82,7 +82,7 @@ export default function ReaderSettings() {
         <div className="titan-reader-panel fade-in glass glass-scrollbar" style={{ zIndex: 10005 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
               <Monitor size={16} color="var(--accent)" />
-              <h4 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 950, letterSpacing: '0.5px' }}>Tu Luyện Ẩn Kỳ</h4>
+              <h4 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 950, letterSpacing: '0.5px' }}>Đọc Ẩn Danh</h4>
           </div>
           
           <div className="setting-group">
@@ -109,51 +109,26 @@ export default function ReaderSettings() {
           <div className="setting-group" style={{ marginTop: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
                 <Sun size={14} color="rgba(255,255,255,0.4)" />
-                <p style={{ margin: 0, fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', fontWeight: 700 }}>Độ sáng linh khí</p>
+                <p style={{ margin: 0, fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', fontWeight: 700 }}>Nền màn hình</p>
             </div>
-            <input 
-                type="range" 
-                min="0.1" 
-                max="1.0" 
-                step="0.05" 
-                value={brightness} 
-                onChange={(e) => handleBrightnessChange(parseFloat(e.target.value))}
-                style={{ 
-                    width: '100%', cursor: 'pointer', accentColor: 'var(--accent)',
-                    background: 'rgba(255,255,255,0.1)', height: '4px', borderRadius: '2px',
-                    appearance: 'none'
-                }}
-            />
-          </div>
-
-          <div className="setting-group" style={{ marginTop: '20px' }}>
-            <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginBottom: '8px' }}>Ngũ Hành Bộ Lọc</p>
-            <div className="titan-filter-grid">
-              <div 
-                className={`titan-filter-box f-none ${filter === 'none' ? 'active' : ''}`} 
+            <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', padding: '4px', borderRadius: '12px' }}>
+              <button 
+                style={{ flex: 1, border: 'none', padding: '10px', borderRadius: '8px', fontSize: '0.75rem', cursor: 'pointer', background: filter === 'none' ? 'var(--accent)' : 'transparent', color: filter === 'none' ? 'white' : 'rgba(255,255,255,0.6)', fontWeight: 800 }} 
                 onClick={() => handleFilterChange('none')}
-                title="Gốc"
-              />
-              <div 
-                className={`titan-filter-box f-sepia ${filter === 'sepia' ? 'active' : ''}`} 
-                onClick={() => handleFilterChange('sepia')}
-                title="Giấy cũ"
-              />
-              <div 
-                className={`titan-filter-box f-blue ${filter === 'blue-light' ? 'active' : ''}`} 
-                onClick={() => handleFilterChange('blue-light')}
-                title="Chống mỏi mắt"
-              />
-              <div 
-                className={`titan-filter-box f-dark ${filter === 'dark' ? 'active' : ''}`} 
+              >
+                Sáng
+              </button>
+              <button 
+                style={{ flex: 1, border: 'none', padding: '10px', borderRadius: '8px', fontSize: '0.75rem', cursor: 'pointer', background: filter === 'dark' ? 'var(--accent)' : 'transparent', color: filter === 'dark' ? 'white' : 'rgba(255,255,255,0.6)', fontWeight: 800 }} 
                 onClick={() => handleFilterChange('dark')}
-                title="Đầm toi"
-              />
+              >
+                Tối
+              </button>
             </div>
           </div>
 
           <div className="setting-group" style={{ marginTop: '20px' }}>
-            <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginBottom: '8px' }}>Chất Lượng &apos;Truyền Thần&apos;</p>
+            <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginBottom: '8px' }}>Chất Lượng Hình Ảnh</p>
             <div 
               style={{ 
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between', 

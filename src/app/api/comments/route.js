@@ -86,7 +86,7 @@ export async function POST(request) {
         }
 
         const userUuid = session.uuid;
-        const userName = session.username || session.name || 'Đạo hữu ẩn danh';
+        const userName = session.username || session.name || 'Khách ẩn danh';
 
         // --- RATE LIMITING (HARDENED) ---
         // Check if user recently commented (within 10 seconds) by UUID to prevent name-change bypass

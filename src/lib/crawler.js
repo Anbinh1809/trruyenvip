@@ -142,7 +142,7 @@ async function runInParallel(items, mapper, concurrency = 2) {
 
 const MIN_IMAGE_COUNT = 1; // Leanest possible for JIT success
 
-function normalizeTitle(title) {
+export function normalizeTitle(title) {
     if (!title) return '';
     return title.toLowerCase()
         .normalize("NFD")
@@ -172,9 +172,22 @@ function cleanTitleForSearch(title) {
 
 function parseChapterNumber(title) {
     if (!title) return null;
-    // Handle "Chapter 123", "Ch. 123", "Chương 123.5"
-    const match = title.match(/(?:chương|chapter|chap|ch|c|[\s])\s*(\d+(?:\.\d+)?)/i);
-    if (match) return parseFloat(match[1]);
+    
+    // Industrial Precision Regex: Look for common chapter patterns first
+    // Handles "Chap 123", "Chapter 123.5", "Chương 123 - Phần 2"
+    const standardMatch = title.match(/(?:chương|chapter|chap|ch|c|[\s])\s*(\d+(?:\.\d+)?)/i);
+    if (standardMatch) {
+        let num = parseFloat(standardMatch[1]);
+        
+        // Sub-part detection: If "Phan 2" or "Part 2", add a small decimal if not already present
+        if (title.match(/(?:phần|phan|part|p)\s*(\d+)/i)) {
+            const partNum = parseInt(title.match(/(?:phần|phan|part|p)\s*(\d+)/i)[1]);
+            if (partNum > 1 && !standardMatch[1].includes('.')) {
+                num += partNum * 0.1; // e.g. Chap 10 Part 2 -> 10.2
+            }
+        }
+        return num;
+    }
     
     // Fallback: extract the first number found
     const fallbackMatch = title.match(/(\d+(?:\.\d+)?)/);
@@ -195,8 +208,9 @@ const SEARCH_REFERERS = [
     'https://www.google.com/',
     'https://www.bing.com/',
     'https://duckduckgo.com/',
-    'https://yandex.com/',
-    'https://github.com/'
+    'https://www.facebook.com/',
+    'https://t.co/', // Twitter
+    'https://www.pinterest.com/'
 ];
 
 // --- MIRROR ISOLATION & QUARANTINE ---
@@ -242,24 +256,15 @@ async function fetchWithRetry(url, options = {}, retries = 2) {
             const adaptiveBase = 200 + (global.globalFailureRate * 2500); 
             if (attempt > 0) await new Promise(r => setTimeout(r, adaptiveBase));
 
-            const host = new URL(finalUrl).host;
-            const response = await axiosAgent.get(finalUrl, { 
-                ...options, 
+            const isTruyenQQ = url.includes('truyenqq');
+            const response = await axios.get(finalUrl, { 
                 timeout: options.timeout || defaultTimeout,
                 headers: { 
-                    'User-Agent': ua,
+                    'User-Agent': options.headers?.['User-Agent'] || ua,
                     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
                     'Accept-Language': 'vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7',
-                    'Accept-Encoding': 'gzip, deflate, br',
-                    'Host': host,
-                    'Referer': options.headers?.Referer || (url.includes('truyenqq') ? 'https://truyenqqno.com/' : searchReferer),
-                    'Sec-Ch-Ua': '"Google Chrome";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
-                    'Sec-Ch-Ua-Mobile': '?0',
-                    'Sec-Ch-Ua-Platform': '"Windows"',
-                    'Sec-Fetch-Dest': 'document',
-                    'Sec-Fetch-Mode': 'navigate',
-                    'Sec-Fetch-Site': (url.includes('truyenqq') ? 'same-origin' : 'cross-site'),
-                    'Sec-Fetch-User': '?1',
+                    'Accept-Encoding': 'gzip, deflate',
+                    'Referer': options.headers?.Referer || (isTruyenQQ ? 'https://truyenqqno.com/' : searchReferer),
                     'Upgrade-Insecure-Requests': '1',
                     'Cache-Control': 'max-age=0',
                     ...options.headers 
@@ -268,13 +273,19 @@ async function fetchWithRetry(url, options = {}, retries = 2) {
 
             // Cloudflare Sentinel: Detect challenge pages disguised as 200 OK
             if (response.data && typeof response.data === 'string') {
-                const isChallenge = response.data.includes('cf-browser-verification') || 
-                                   response.data.includes('Checking your browser') ||
-                                   response.data.includes('captcha') ||
-                                   response.data.includes('Dung mạo đạo hữu');
+                const lowerData = response.data.toLowerCase();
+                const $ = cheerio.load(response.data);
+                const pageTitle = $('title').text().toLowerCase();
+                
+                // Specific Cloudflare signatures
+                const isChallenge = lowerData.includes('checking your browser') || 
+                                   lowerData.includes('ray id:') ||
+                                   pageTitle.includes('captcha') ||
+                                   pageTitle.includes('attention required') ||
+                                   lowerData.includes('dung mạo đạo hữu');
                 
                 if (isChallenge) {
-                    console.warn(`[Crawler] Challenge detected on ${currentMirror}. Rotating.`);
+                    console.warn(`[Crawler] REAL Challenge detected on ${currentMirror}. Rotating.`);
                     throw { code: 'CHALLENGE_DETECTED', response: { status: 403 } };
                 }
             }
@@ -290,8 +301,18 @@ async function fetchWithRetry(url, options = {}, retries = 2) {
             const isBlock = err.code === 'ECONNRESET' || err.response?.status === 403 || err.response?.status === 401 || err.code === 'ETIMEDOUT' || err.message?.includes('timeout');
             
             if (isBlock) {
-                console.warn(`[Crawler] Mirror ${currentMirror} blocked request or timed out. Quarantining.`);
-                global.mirrorQuarantine[currentMirror] = Date.now() + 7200000; // 2 hours
+                const isSingleMirror = !url.includes('nettruyen');
+                console.warn(`[Crawler] Mirror ${currentMirror} blocked or timed out. ${isSingleMirror ? 'Throttling (Single Mirror)' : 'Quarantining (Multi Mirror)'}`);
+                
+                // --- TITAN SOFT QUARANTINE ---
+                // For sources like TruyenQQ (one mirror), we just penalize score and wait a bit
+                // For Nettruyen (many mirrors), we hard quarantine for 2 hours.
+                if (isSingleMirror) {
+                    global.mirrorQuarantine[currentMirror] = Date.now() + 60000; // Just 1 minute cooldown
+                } else {
+                    global.mirrorQuarantine[currentMirror] = Date.now() + 7200000; // 2 hours
+                }
+                
                 global.mirrorScores[currentMirror] = Math.max(0, (global.mirrorScores[currentMirror] || 100) - 30);
                 attempt++;
                 continue;
@@ -316,6 +337,16 @@ const MAX_DEEP_CRAWLS = 3;
 const inProgressManga = new Set();
 const inProgressChapters = new Set();
 
+// --- ARCHITECTURE UTILITY: DETERMINISTIC JSON ---
+function stringifySorted(obj) {
+    if (!obj || typeof obj !== 'object') return JSON.stringify(obj);
+    const sorted = Object.keys(obj).sort().reduce((acc, key) => {
+        acc[key] = obj[key];
+        return acc;
+    }, {});
+    return JSON.stringify(sorted);
+}
+
 // --- RESOURCE HARNESS: CONCURRENCY CONTROL ---
 let activeChapterScrapes = 0;
 const MAX_CONCURRENT_CHAPTERS = 5; // Upgraded for faster recovery on modern servers
@@ -324,7 +355,7 @@ const pendingChapterIds = new Set(); // Track tasks waiting in the queue
 
 async function processQueue() {
     const mem = process.memoryUsage().heapUsed / 1024 / 1024;
-    const currentLimit = mem > 800 ? 1 : MAX_CONCURRENT_CHAPTERS;
+    const currentLimit = mem > 1100 ? 1 : MAX_CONCURRENT_CHAPTERS;
 
     if (activeChapterScrapes >= currentLimit) return;
     
@@ -355,11 +386,25 @@ async function processQueue() {
         if (taskRow.type === 'chapter_scrape') {
             const { chapId, url, source, force } = JSON.parse(taskRow.target);
             inProgressChapters.add(chapId);
-            await crawlChapterImages(chapId, url, source, force);
+            const imagesIngested = await crawlChapterImages(chapId, url, source, force);
+            if (imagesIngested === 0) {
+                throw new Error('ZERO_IMAGES_FOUND');
+            }
             inProgressChapters.delete(chapId);
         } else if (taskRow.type === 'manga_sync') {
             const { mangaId, url, source, earlyExit } = JSON.parse(taskRow.target);
             await crawlFullMangaChapters(mangaId, url, source, earlyExit);
+        } else if (taskRow.type === 'system_discovery') {
+            const { source, pageCount } = JSON.parse(taskRow.target);
+            if (source === 'nettruyen') {
+                for (let i = 1; i <= (pageCount || 2); i++) {
+                    await crawlNetTruyen(i, false, false);
+                }
+            } else if (source === 'truyenqq') {
+                for (let i = 1; i <= (pageCount || 2); i++) {
+                    await crawlTruyenQQ(i, false, false);
+                }
+            }
         }
         
         // Mark as completed
@@ -371,7 +416,7 @@ async function processQueue() {
             SET status = CASE WHEN attempts >= 3 THEN 'failed' ELSE 'pending' END, 
                 attempts = attempts + 1,
                 last_error = @err,
-                updated_at = GETDATE() 
+                updated_at = NOW() 
             WHERE id = @id
         `, { id: taskRow.id, err: e.message });
     } finally {
@@ -398,10 +443,23 @@ async function processQueue() {
 }
 
 export function queueChapterScrape(chapId, url, source, force = false, priority = 1) {
-    const taskPayload = JSON.stringify({ chapId, url, source, force });
+    const taskPayload = stringifySorted({ chapId, url, source, force });
     query(`
         INSERT INTO CrawlerTasks (type, target, priority) 
-        VALUES ('chapter_scrape', @target, @priority)
+        SELECT 'chapter_scrape', @target, @priority
+        WHERE EXISTS (SELECT 1 FROM Chapters WHERE id = @chapId)
+        ON CONFLICT (target) DO UPDATE 
+        SET priority = CASE WHEN CrawlerTasks.priority < @priority THEN @priority ELSE CrawlerTasks.priority END 
+        WHERE CrawlerTasks.status = 'pending'
+    `, { target: taskPayload, priority, chapId }).then(() => { processQueue(); }).catch(() => {});
+    return Promise.resolve(null);
+}
+
+export function queueMangaSync(mangaId, url, source, earlyExit = false, priority = 5) {
+    const taskPayload = stringifySorted({ mangaId, url, source, earlyExit });
+    query(`
+        INSERT INTO CrawlerTasks (type, target, priority) 
+        VALUES ('manga_sync', @target, @priority)
         ON CONFLICT (target) DO UPDATE 
         SET priority = CASE WHEN CrawlerTasks.priority < @priority THEN @priority ELSE CrawlerTasks.priority END 
         WHERE CrawlerTasks.status = 'pending'
@@ -409,11 +467,11 @@ export function queueChapterScrape(chapId, url, source, force = false, priority 
     return Promise.resolve(null);
 }
 
-export function queueMangaSync(mangaId, url, source, earlyExit = false, priority = 5) {
-    const taskPayload = JSON.stringify({ mangaId, url, source, earlyExit });
+export function queueDiscovery(source = 'nettruyen', pageCount = 2, priority = 10) {
+    const taskPayload = stringifySorted({ source, pageCount });
     query(`
         INSERT INTO CrawlerTasks (type, target, priority) 
-        VALUES ('manga_sync', @target, @priority)
+        VALUES ('system_discovery', @target, @priority)
         ON CONFLICT (target) DO UPDATE 
         SET priority = CASE WHEN CrawlerTasks.priority < @priority THEN @priority ELSE CrawlerTasks.priority END 
         WHERE CrawlerTasks.status = 'pending'
@@ -426,9 +484,19 @@ export function queueMangaSync(mangaId, url, source, earlyExit = false, priority
  * in case of a crash during execution.
  */
 export async function bootstrapCrawler() {
-    console.log('Initializing Crawler Persistence System...');
+    console.log('Initializing Crawler Persistence System (Industrial Guard)...');
     try {
-        await query("UPDATE CrawlerTasks SET status = 'pending' WHERE status = 'processing'");
+        // Recover orphan tasks: Any task stuck in 'processing' for > 2 hours is likely dead
+        const recovery = await query(`
+            UPDATE CrawlerTasks 
+            SET status = 'pending', updated_at = NOW() 
+            WHERE status = 'processing' 
+            AND updated_at < NOW() - INTERVAL '2 hours'
+        `);
+        if (recovery.rowsAffected[0] > 0) {
+            console.log(`[Guardian] Recovered ${recovery.rowsAffected[0]} orphaned tasks from the abyss.`);
+        }
+        
         processQueue(); // Start the motor
     } catch (e) {
         console.error('[Crawler] Bootstrap failed:', e.message);
@@ -476,7 +544,7 @@ export async function healChapterGaps(limit = 5) {
             console.log(`[Guardian][Priority] Healing ${targets.recordset.length} hot manga first...`);
             for (const target of targets.recordset) {
                 logCrawl(`[GAP-HEAL] Dang va chuong cho truyen HOT: ${target.title}`);
-                await logGuardianEvent(target.id, 'Nhieu chuong', 'FIX_GAP', `Linh Thu phat hien truyen chien luoc ${target.title} bi thieu chuong va da tu dong va loi.`);
+                await logGuardianEvent(target.id, 'Nhieu chuong', 'FIX_GAP', `He thong phat hien truyen chien luoc ${target.title} bi thieu chuong va da tu dong xu ly.`);
                 await crawlFullMangaChapters(target.id, target.source_url);
             }
         }
@@ -515,7 +583,7 @@ export async function rescueBrokenImages(limit = 10) {
                 const success_count = await crawlChapterImages(target.id, target.source_url);
                 
                 if (success_count >= 3) {
-                    await logGuardianEvent(target.manga_id, target.title, 'FIX_IMAGE', `Linh Thu da phuc hoi thanh cong ${success_count} anh cho truyen chien luoc ${target.manga_title}.`);
+                    await logGuardianEvent(target.manga_id, target.title, 'FIX_IMAGE', `He thong da phuc hoi thanh cong ${success_count} anh cho truyen chien luoc ${target.manga_title}.`);
                     await query('UPDATE chapters SET retry_count = 0, last_error = NULL WHERE id = @id', { id: target.id });
                 }
             }
@@ -679,13 +747,7 @@ export async function crawlNetTruyen(page = 1, full = false, limitless = false) 
         const isNewManga = existingManga.recordset.length === 0;
         const targetId = existingManga.recordset[0]?.id || id;
 
-        await query(`
-          INSERT INTO Manga (id, title, cover, source_url, normalized_title, last_crawled) 
-          VALUES (@targetId, @title, @cover, @url, @normTitle, NOW())
-          ON CONFLICT (id) DO UPDATE 
-          SET cover = EXCLUDED.cover, last_crawled = NOW(), normalized_title = EXCLUDED.normalized_title
-        `, { targetId, title, cover, url: sourceUrl, normTitle: titleSlug });
-
+        // Note: Manga insertion is now deferred to the atomic transaction below to ensure consistency.
         if (isNewManga) {
             if (activeDeepCrawls < MAX_DEEP_CRAWLS) {
                 activeDeepCrawls++;
@@ -715,14 +777,24 @@ export async function crawlNetTruyen(page = 1, full = false, limitless = false) 
           const maxNumRes = await query("SELECT MAX(chapter_number) as m FROM chapters WHERE manga_id = @mangaId", { mangaId: targetId });
           const currentMax = maxNumRes.recordset[0]?.m || 0;
           
-          await query(`
-            INSERT INTO Chapters (id, manga_id, title, source_url, chapter_number) 
-            VALUES (@chapId, @mangaId, @title, @url, @chapNum)
-          `, { chapId, mangaId: targetId, title: chapTitle, url: chapUrl, chapNum });
-          
-          await query(`
-            UPDATE Manga SET last_chap_num = @chapNum, last_crawled = NOW() WHERE id = @mangaId
-          `, { mangaId: targetId, chapNum });
+          // --- ATOMIC DISCOVERY: Manga & Chapter bound in one transaction ---
+          await withTransaction(async (tx) => {
+              await query(`
+                INSERT INTO Manga (id, title, cover, source_url, normalized_title, last_crawled) 
+                VALUES (@targetId, @title, @cover, @url, @normTitle, NOW())
+                ON CONFLICT (id) DO UPDATE 
+                SET cover = EXCLUDED.cover, last_crawled = NOW(), normalized_title = EXCLUDED.normalized_title
+              `, { targetId, title, cover, url: sourceUrl, normTitle: titleSlug }, tx);
+
+              await query(`
+                INSERT INTO Chapters (id, manga_id, title, source_url, chapter_number) 
+                VALUES (@chapId, @mangaId, @title, @url, @chapNum)
+              `, { chapId, mangaId: targetId, title: chapTitle, url: chapUrl, chapNum }, tx);
+              
+              await query(`
+                UPDATE Manga SET last_chap_num = @chapNum, last_crawled = NOW() WHERE id = @mangaId
+              `, { mangaId: targetId, chapNum }, tx);
+          });
           
           await queueChapterScrape(chapId, chapUrl, 'nettruyen');
           
@@ -1084,25 +1156,30 @@ export async function crawlFullMangaChapters(mangaId, detailUrl, source = 'nettr
         }
         console.log(`[Titan][${mangaId}] Batch recovery: Queued ${queuedCount} missing chapters for image scraping.`);
 
-        // --- CHAPTER PRUNING (PHANTOM CLEANUP) ---
-        if (uniqueChapterRows.length > 5 && !earlyExit) {
-            const dbChapters = await query("SELECT source_url FROM chapters WHERE manga_id = @mangaId", { mangaId });
-            const sourceBase = source === 'nettruyen' ? 'nettruyen' : 'truyenqq';
-            
-            const toDelete = dbChapters.recordset.filter(row => {
-                if (!row.source_url) return false;
-                // Only prune if the URL belongs to the current source being crawled
-                if (!row.source_url.includes(sourceBase)) return false;
-                return !processedUrls.has(row.source_url);
-            });
+            // --- CHAPTER PRUNING (PHANTOM CLEANUP) ---
+            // TITAN GUARD: Only prune if we found a significant number of chapters (>10)
+            // and the number of phantom chapters is not suspiciously high (< 50% of total)
+            if (uniqueChapterRows.length > 10 && !earlyExit) {
+                const dbChapters = await query("SELECT source_url FROM chapters WHERE manga_id = @mangaId", { mangaId });
+                const sourceBase = source === 'nettruyen' ? 'nettruyen' : 'truyenqq';
+                
+                const toDelete = dbChapters.recordset.filter(row => {
+                    if (!row.source_url) return false;
+                    if (!row.source_url.includes(sourceBase)) return false;
+                    return !processedUrls.has(row.source_url);
+                });
 
-            if (toDelete.length > 0 && toDelete.length < uniqueChapterRows.length * 0.5) { // Safety: don't wipe more than 50%
-                console.log(`[Prune][${mangaId}] Removing ${toDelete.length} phantom chapters.`);
-                for (const ghost of toDelete) {
-                    await query("DELETE FROM chapters WHERE manga_id = @mangaId AND source_url = @url", { mangaId, url: ghost.source_url });
+                const safetyThreshold = Math.ceil(uniqueChapterRows.length * 0.5);
+                if (toDelete.length > 0 && toDelete.length < safetyThreshold) {
+                    console.log(`[Prune][${mangaId}] Removing ${toDelete.length} phantom chapters.`);
+                    for (const ghost of toDelete) {
+                        await query("DELETE FROM chapters WHERE manga_id = @mangaId AND source_url = @url", { mangaId, url: ghost.source_url });
+                    }
+                } else if (toDelete.length >= safetyThreshold) {
+                    console.warn(`[Guardian][Safety] Phantom cleanup BLOCKED for ${mangaId}. Suspiciously high deletion count (${toDelete.length}). Possible source site DOM change.`);
+                    await logGuardianEvent(mangaId, 'Prune Safety', 'CLEANUP_BLOCKED', `He thong da ngan chan viec xoa ${toDelete.length} chuong vi con so nay vuot qua nguong an toan (50%). Co the trang nguon da thay doi cau truc.`);
                 }
             }
-        }
     } catch (err) {
         console.error(`Error in crawlFullMangaChapters for ${mangaId}:`, err.message);
     } finally {
@@ -1199,13 +1276,7 @@ export async function crawlTruyenQQ(page = 1, full = false, limitless = false) {
         const isNewManga = existingManga.recordset.length === 0;
         const actualMangaId = existingManga.recordset[0]?.id || id;
 
-        await query(`
-            INSERT INTO manga (id, title, cover, source_url, normalized_title, last_crawled) 
-            VALUES (@actualMangaId, @title, @cover, @url, @normTitle, NOW())
-            ON CONFLICT (id) DO UPDATE 
-            SET cover = EXCLUDED.cover, last_crawled = NOW(), normalized_title = EXCLUDED.normalized_title
-        `, { actualMangaId, title, cover, url: sourceUrl, normTitle: titleSlug });
-
+        // Note: Manga insertion deferred to atomic transaction below
         if (isNewManga) {
             if (activeDeepCrawls < MAX_DEEP_CRAWLS) {
                 activeDeepCrawls++;
@@ -1235,12 +1306,22 @@ export async function crawlTruyenQQ(page = 1, full = false, limitless = false) {
             const maxNumRes = await query("SELECT MAX(chapter_number) as m FROM Chapters WHERE manga_id = @mangaId", { mangaId: actualMangaId });
             const currentMax = maxNumRes.recordset[0]?.m || 0;
 
-            await query(`
-                INSERT INTO Chapters (id, manga_id, title, source_url, chapter_number) 
-                VALUES (@chapId, @mangaId, @title, @url, @chapNum);
-                
-                UPDATE Manga SET last_chap_num = @chapNum, last_crawled = NOW() WHERE id = @mangaId;
-            `, { chapId, mangaId: actualMangaId, title: chapTitle, url: chapUrl, chapNum });
+            // --- ATOMIC DISCOVERY: Manga & Chapter bound in one transaction ---
+            await withTransaction(async (tx) => {
+                await query(`
+                    INSERT INTO manga (id, title, cover, source_url, normalized_title, last_crawled) 
+                    VALUES (@actualMangaId, @title, @cover, @url, @normTitle, NOW())
+                    ON CONFLICT (id) DO UPDATE 
+                    SET cover = EXCLUDED.cover, last_crawled = NOW(), normalized_title = EXCLUDED.normalized_title
+                `, { actualMangaId, title, cover, url: sourceUrl, normTitle: titleSlug }, tx);
+
+                await query(`
+                    INSERT INTO Chapters (id, manga_id, title, source_url, chapter_number) 
+                    VALUES (@chapId, @mangaId, @title, @url, @chapNum);
+                    
+                    UPDATE Manga SET last_chap_num = @chapNum, last_crawled = NOW() WHERE id = @mangaId;
+                `, { chapId, mangaId: actualMangaId, title: chapTitle, url: chapUrl, chapNum }, tx);
+            });
             
             await queueChapterScrape(chapId, chapUrl, 'truyenqq');
 
@@ -1297,12 +1378,16 @@ export async function crawlChapterImages(chapId, url, source = 'nettruyen', forc
     const mangaInfo = await query("SELECT m.title, m.id as manga_id FROM manga m JOIN chapters c ON m.id = c.manga_id WHERE c.id = @chapId", { chapId });
     const mangaTitle = mangaInfo.recordset[0]?.title || 'Unknown Manga';
 
-    const strategies = [
-        { ref: 'https://www.nettruyenme.com/', source: 'nettruyen' },
-        { ref: 'https://truyenqqno.com/', source: 'truyenqq' },
+    const isTruyenQQ = source === 'truyenqq' || url.includes('truyenqq');
+    const strategies = isTruyenQQ ? [
+        { ref: url ? new URL(url).origin : 'https://truyenqqno.com/', name: 'Dynamic-Origin' },
+        { ref: 'https://www.google.com/', name: 'Search-Engine' },
+        { ref: '', name: 'Clean-Request' }
+    ] : [
+        { ref: url ? new URL(url).origin : 'https://www.nettruyenme.com/', source: 'dynamic-mirror' },
+        { ref: 'https://www.nettruyenking.com/', source: 'king-mirror' },
         { ref: 'https://nettruyenon.com/', name: 'On-Domain' },
-        { ref: 'https://www.nettruyenco.vn/', name: 'Co-Domain' },
-        { ref: '', name: 'Clean-Request' } // No referer fallback
+        { ref: '', name: 'Clean-Request' }
     ];
 
     let success = false;
@@ -1366,14 +1451,16 @@ export async function crawlChapterImages(chapId, url, source = 'nettruyen', forc
                 }
 
                 if (batchImages.length >= MIN_IMAGE_COUNT) {
+                    // TITAN ATOMIC INGESTION: Perform delete and insert in a single transaction
                     await withTransaction(async (tx) => {
                         await query("DELETE FROM chapterimages WHERE chapter_id = @chapId", { chapId }, tx);
+                        await bulkInsert('chapterimages', ['chapter_id', 'image_url', 'order'], batchImages.map(img => ({
+                            chapter_id: img.chapId,
+                            image_url: img.url,
+                            order: img.order
+                        })), tx);
                     });
-                    await bulkInsert('chapterimages', ['chapter_id', 'image_url', 'order'], batchImages.map(img => ({
-                        chapter_id: img.chapId,
-                        image_url: img.url,
-                        order: img.order
-                    })));
+                    
                     success = true;
                     imagesFound = batchImages.length;
                     break; 
@@ -1407,7 +1494,8 @@ export async function crawlChapterImages(chapId, url, source = 'nettruyen', forc
         return imagesFound;
     } else {
         updateTelemetry({ failCount: 1 });
-        await logCrawl(`[FAIL] Khong du anh (${imagesFound}/${MIN_IMAGE_COUNT}) cho: ${mangaTitle}`, 'error');
+        const diagInfo = imagesFound === 0 ? ` (Length: ${response?.data?.length || 0}, Snippet: ${String(response?.data || '').substring(0, 100).replace(/\s+/g, ' ')})` : '';
+        await logCrawl(`[FAIL] Khong du anh (${imagesFound}/${MIN_IMAGE_COUNT}) cho: ${mangaTitle}${diagInfo}`, 'error');
         
         // --- AEGIS AUTO-MIGRATION TRIGGER ---
         // If we failed to find images, and this is a TruyenQQ source, attempt auto-migration

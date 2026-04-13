@@ -135,11 +135,11 @@ export default function ChapterContent({ chapterId, initialImages = [] }) {
                     <LinkIcon size={24} color="var(--accent)" /> Đang cào dữ liệu...
                 </h3>
                 <p style={{ color: 'var(--text-muted)', maxWidth: '400px', margin: '0 auto' }}>
-                    Chương này chưa được lưu sẵn. Hệ thống đang đồng bộ dữ liệu trực tiếp từ nguồn cho ông, vui lòng đợi vài giây!
+                    Chương này chưa được lưu sẵn. Hệ thống đang đồng bộ dữ liệu trực tiếp từ nguồn cho bạn, vui lòng đợi vài giây!
                 </p>
                 <div className="shimmer-group" style={{ marginTop: '50px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                    <div className="shimmer" style={{ width: '100%', height: '400px', borderRadius: '20px', background: 'rgba(255,255,255,0.05)' }}></div>
-                    <div className="shimmer" style={{ width: '100%', height: '400px', borderRadius: '20px', background: 'rgba(255,255,255,0.05)' }}></div>
+                    <div className="shimmer" style={{ width: '100%', height: '400px', borderRadius: '4px', background: 'rgba(255,255,255,0.05)' }}></div>
+                    <div className="shimmer" style={{ width: '100%', height: '400px', borderRadius: '4px', background: 'rgba(255,255,255,0.05)' }}></div>
                 </div>
             </div>
         );
@@ -152,7 +152,7 @@ export default function ChapterContent({ chapterId, initialImages = [] }) {
             ))}
             {images.length === 0 && !isSyncing && (
                 <div style={{ padding: '80px 0', textAlign: 'center' }}>
-                    <p style={{ color: 'var(--text-muted)' }}>Mục tiêu tổng thể quán hiện không tìm thấy. Có thể pháp bảo bị trục trặc hoặc nguồn đã bị xóa.</p>
+                    <p style={{ color: 'var(--text-muted)' }}>Chương này hiện không tìm thấy dữ liệu. Có thể hệ thống gặp lỗi hoặc truyện ở nguồn đã bị xóa.</p>
                     <RecrawlButton chapterId={chapterId} />
                 </div>
             )}

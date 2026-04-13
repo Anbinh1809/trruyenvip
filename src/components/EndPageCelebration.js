@@ -13,25 +13,25 @@ export default function EndPageCelebration({ mangaId, mangaTitle }) {
                 <div className="celebration-icon-large">
                     <Scroll size={80} strokeWidth={1} />
                 </div>
-                <h2 className="celebration-headline">CỐNG HỈ ĐẠO HỮU!</h2>
+                <h2 className="celebration-headline">CHÚC MỪNG BẠN!</h2>
                 <div className="rank-badge-finish">{rankTitle}</div>
                 <p className="celebration-message">
-                    Đạo hữu đã tu luyện đến chương cuối cùng của bộ <strong>{mangaTitle}</strong>. 
-                    Tâm đắc thật đáng khâm phục!
+                    Bạn đã đọc đến chương cuối cùng của bộ <strong>{mangaTitle}</strong>. 
+                    Tốc độ thật đáng khâm phục!
                 </p>
                 
                 <div className="celebration-divider" />
                 
                 <div className="next-steps-titan">
-                    <p style={{ fontSize: '0.8rem', opacity: 0.6, marginBottom: '20px', textTransform: 'uppercase', letterSpacing: '1px' }}>Duyên nợ chưa dứt, mời đạo hữu tiếp tục tu luyện:</p>
+                    <p style={{ fontSize: '0.8rem', opacity: 0.6, marginBottom: '20px', textTransform: 'uppercase', letterSpacing: '1px' }}>Mời bạn tham khảo thêm các tác phẩm khác:</p>
                     <div className="action-grid-finish">
                         <Link href="/" className="btn btn-accent btn-large" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
                             <Search size={18} />
-                            Tìm Kiếm Cơ Duyên Mới
+                            Tìm Tác Phẩm Mới
                         </Link>
                         <Link href="/bookmarks" className="btn btn-glass btn-large" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
                             <Library size={18} />
-                            Lướt Xem Tàng Kinh Các
+                            Xem Tủ Truyện
                         </Link>
                     </div>
                 </div>

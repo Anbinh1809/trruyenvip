@@ -35,7 +35,7 @@ export async function register() {
                    try {
                        const { query } = await import('./lib/db');
                        const { normalizeTitle } = await import('./lib/crawler');
-                       const missing = await query("SELECT id, title FROM Manga WHERE normalized_title IS NULL");
+                       const missing = await query("SELECT id, title FROM Manga WHERE normalized_title IS NULL LIMIT 50");
                        
                        if (missing.recordset.length > 0) {
                            console.log(`[Guardian] Data Apotheosis: Healing ${missing.recordset.length} titles...`);

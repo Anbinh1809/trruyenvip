@@ -27,7 +27,8 @@ export async function GET(request) {
     'manga-tx.com', 'manhuavn.com', 'nhattruyenfree.com', 'nhattruyencovn.com',
     'st.nhattruyennew.com', 'st.nhattruyencovn.com', 'nettruyenme.com',
     'nettruyenpro.com', 'nettruyenking.com', 'nettruyenvi.com', 'ttquu.com',
-    'tintruyen.net', 'nettruyenone.com', 'nt-cdn1.xyz', 'nt-cdn2.xyz'
+    'tintruyen.net', 'nettruyenone.com', 'nt-cdn1.xyz', 'nt-cdn2.xyz',
+    'nettruyeninfo.com', 'nettruyenus.com', 'nettruyen.asia', 'nettruyen.tv'
   ];
   
   try {
@@ -98,7 +99,7 @@ export async function GET(request) {
             if (strategy.referer) headers['Referer'] = strategy.referer;
 
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout per strategy
+            const timeoutId = setTimeout(() => controller.abort(), 3000); // 3s fast-fail per strategy
 
             const response = await fetch(imageUrl, { 
                 headers, 
@@ -111,6 +112,18 @@ export async function GET(request) {
             if (response.ok) {
                 const buffer = await response.arrayBuffer();
                 const contentType = response.headers.get('content-type') || 'image/jpeg';
+                
+                // --- OOM PROTECTION: 10MB Limit ---
+                if (buffer.byteLength > 10 * 1024 * 1024) {
+                    return new Response(buffer, {
+                        headers: {
+                            'Content-Type': contentType,
+                            'Cache-Control': 'public, max-age=31536000, stale-while-revalidate=86400, immutable',
+                            'Access-Control-Allow-Origin': '*',
+                            'X-Optimization': 'skipped-too-large'
+                        },
+                    });
+                }
                 
                 // --- Smart Image Optimization ---
                 // Skip Sharp for GIFs (to preserve animation) or if Sharp fails

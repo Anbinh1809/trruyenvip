@@ -123,11 +123,12 @@ function translateSql(sql, params) {
     return { sql: translatedSql, values };
 }
 
-export async function query(sqlString, params = {}) {
+export async function query(sqlString, params = {}, client = null) {
     const { sql: psql, values } = translateSql(sqlString, params);
     
     try {
-        const result = await pool.query(psql, values);
+        const executor = client || pool;
+        const result = await executor.query(psql, values);
         
         // Emulate mssql .recordset and .recordsets for backward compatibility
         return {
@@ -161,20 +162,20 @@ export async function withTransaction(callback) {
     }
 }
 
-/**
+ /**
  * Titan bulkInsert optimized for PostgreSQL
+ * Added support for transaction client passed from withTransaction
  */
-export async function bulkInsert(tableName, columns, rows) {
+export async function bulkInsert(tableName, columns, rows, client = null) {
     if (!rows || rows.length === 0) return;
     
-    const client = await pool.connect();
+    const dbClient = client || await pool.connect();
     try {
         // Force lowercase and unquote table/column names to avoid case-sensitivity issues in PG
         const cleanTable = tableName.replace(/[\[\]"]/g, '').toLowerCase();
         const colNames = columns.map(c => `"${c.toLowerCase()}"`).join(', ');
-        const valuePlaceholders = [];
-        const flatValues = [];
         
+        const flatValues = [];
         const placeholders = rows.map((_, i) => 
             `(${columns.map((_, j) => {
                 flatValues.push(rows[i][columns[j]]);
@@ -183,9 +184,14 @@ export async function bulkInsert(tableName, columns, rows) {
         ).join(', ');
 
         const sql = `INSERT INTO ${cleanTable} (${colNames}) VALUES ${placeholders} ON CONFLICT DO NOTHING`;
-        await client.query(sql, flatValues);
+        
+        if (client) {
+            await client.query(sql, flatValues);
+        } else {
+            await dbClient.query(sql, flatValues);
+        }
     } finally {
-        client.release();
+        if (!client) dbClient.release();
     }
 }
 

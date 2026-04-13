@@ -201,7 +201,7 @@ export default function CrawlerDashboard() {
                         <div style={{ fontSize: '1.8rem', fontWeight: 900, color: '#10b981' }}>{Math.round((telemetry?.successCount / (telemetry?.successCount + telemetry?.failCount || 1)) * 100)}%</div>
                     </div>
                     <div className="glass-card" style={{ padding: '25px', background: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                        <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.4, marginBottom: '5px' }}>Tổng kho bộ tịch</div>
+                        <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.4, marginBottom: '5px' }}>Tổng số truyện</div>
                         <div style={{ fontSize: '1.8rem', fontWeight: 900 }}>{stats.total.toLocaleString()}</div>
                     </div>
                     <div className="glass-card" style={{ padding: '25px', background: 'rgba(255, 62, 62, 0.05)', borderRadius: '24px', border: '1px solid rgba(255, 62, 62, 0.2)' }}>

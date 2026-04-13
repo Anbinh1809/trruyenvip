@@ -12,8 +12,6 @@ import { Search, Coins, Trophy, Gem, X, Menu, Settings, LogOut, User, Sun, Moon 
 
 export default function Header() {
   const { theme, toggleTheme } = useTheme();
-  const engagement = useEngagement() || {};
-  const { vipCoins = 0, level = 1, rankTitle = 'Phàm Nhân', xpProgress = 0 } = engagement;
   const { user, isAuthenticated, logout, loading } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -54,7 +52,7 @@ export default function Header() {
   }, [isMenuOpen]);
 
   return (
-    <header className={`titan-header glass-nav ${isScrolled ? 'scrolled' : ''}`}>
+    <header className="titan-header minimalist-nav">
       <div className="container">
         <div className="header-wrapper">
           <Link href="/" className="logo">
@@ -69,20 +67,10 @@ export default function Header() {
             </div>
             
             {mounted && isAuthenticated && isMenuOpen && (
-                <div style={{ width: '100%', padding: '15px', borderRadius: '16px', marginBottom: '20px', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                <div style={{ width: '100%', padding: '15px', borderRadius: '4px', marginBottom: '20px', background: 'rgba(255, 255, 255, 0.05)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <span style={{ fontWeight: 800, fontSize: '1.1rem' }}>{user?.username}</span>
                         <span style={{ fontSize: '0.6rem', background: 'var(--accent)', color: 'white', padding: '2px 6px', borderRadius: '4px' }}>{user?.role === 'admin' ? 'ADMIN' : 'USER'}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px', fontSize: '0.85rem', fontWeight: 700 }}>
-                        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '4px 10px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                            <Coins size={14} color="var(--nebula-orange)" /> 
-                            {new Intl.NumberFormat().format(vipCoins)}
-                        </div>
-                        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '4px 10px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                            <Trophy size={14} color="var(--nebula-blue)" /> 
-                            Lv.{level} - {rankTitle}
-                        </div>
                     </div>
                 </div>
             )}

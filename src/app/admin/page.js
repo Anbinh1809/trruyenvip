@@ -28,7 +28,7 @@ export default function AdminDashboard() {
   }, [isAuthenticated, user, addToast]);
 
   const triggerCrawl = async () => {
-    if (window.confirm('Đạo hữu có chắc muốn kích hoạt chu kỳ cào ngay bây giờ?')) {
+    if (window.confirm('Bạn có chắc chắn muốn kích hoạt chu kỳ cào ngay bây giờ?')) {
         let secret = localStorage.getItem('TRUYENVIP_CRON_SECRET') || '';
         
         if (!secret) {

@@ -75,7 +75,7 @@ export default function MissionPanel() {
                         <Trophy size={20} color="white" />
                     </div>
                     <div>
-                        <h3 style={{ margin: 0, fontWeight: 950, fontSize: '1.2rem', letterSpacing: '-0.5px' }}>Tu Luyện</h3>
+                        <h3 style={{ margin: 0, fontWeight: 950, fontSize: '1.2rem', letterSpacing: '-0.5px' }}>Tiến Độ</h3>
                         <p style={{ margin: 0, fontSize: '0.7rem', opacity: 0.5, textTransform: 'uppercase', letterSpacing: '1px' }}>Thử thách hàng ngày</p>
                     </div>
                 </div>
@@ -149,15 +149,15 @@ export default function MissionPanel() {
                             </div>
                             <h2 style={{ fontSize: '3.5rem', fontWeight: 950, color: 'white', marginBottom: '10px', letterSpacing: '-2px' }}>+{claimedPrize.amount}</h2>
                             <p style={{ color: 'var(--accent)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', fontSize: '0.9rem' }}>{claimedPrize.type.toUpperCase()} THƯỞNG</p>
-                            <p style={{ color: 'rgba(255,255,255,0.4)', marginTop: '20px', maxWidth: '300px' }}>Chúc mừng đạo hữu đã phá giải {openingChest.prize.chestName}</p>
-                            <button className="btn btn-primary" onClick={closeCelebration} style={{ marginTop: '40px', padding: '18px 60px', borderRadius: '15px' }}>TU TIẾP</button>
+                            <p style={{ color: 'rgba(255,255,255,0.4)', marginTop: '20px', maxWidth: '300px' }}>Chúc mừng bạn đã mở khóa {openingChest.prize.chestName}</p>
+                            <button className="btn btn-primary" onClick={closeCelebration} style={{ marginTop: '40px', padding: '18px 60px', borderRadius: '15px' }}>ĐÓNG</button>
                         </div>
                     ) : (
                         <div className="titan-chest-shake">
                             <div style={{ color: 'var(--accent)', animation: 'pulse 1s infinite' }}>
                                 <Package size={120} strokeWidth={1} />
                             </div>
-                            <h3 style={{ marginTop: '30px', color: 'white', fontWeight: 900, fontSize: '1.4rem' }}>ĐANG PHÁ GIẢI CẤM CHẾ...</h3>
+                            <h3 style={{ marginTop: '30px', color: 'white', fontWeight: 900, fontSize: '1.4rem' }}>ĐANG CHI TRẢ THƯỞNG...</h3>
                             <div style={{ width: '100px', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', marginTop: '20px', overflow: 'hidden' }}>
                                 <div className="skeleton-shimmer" style={{ width: '100%', height: '100%' }}></div>
                             </div>

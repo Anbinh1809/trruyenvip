@@ -11,7 +11,9 @@ export async function GET(request) {
   try {
     // TITAN ARCHITECTURE: Instead of running the heavy crawl in the HTTP request (timeout risk),
     // we queue it in our background task system.
-    await queueMangaSync('priority_discovery', SOURCES.NETTRUYEN, 'nettruyen', false, 10);
+    import { queueDiscovery } from '@/lib/crawler';
+    await queueDiscovery('nettruyen', 3, 10);
+    await queueDiscovery('truyenqq', 3, 10);
     
     return Response.json({ 
         success: true, 

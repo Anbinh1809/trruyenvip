@@ -61,7 +61,7 @@ export default function HistoryPage() {
                 ) : (
                     <EmptyState 
                         title="Hành trình chưa bắt đầu"
-                        subtitle="Lịch sử đọc của đạo hữu hiện đang trống. Hãy khai phá những bộ tịch tuyệt phẩm ngay bây giờ!"
+                        subtitle="Lịch sử đọc của bạn hiện đang trống. Hãy khám phá những tác phẩm tuyệt vời ngay bây giờ!"
                         actionText="Khám phá ngay"
                         actionUrl="/"
                     />

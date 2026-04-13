@@ -62,7 +62,7 @@ export async function POST(request) {
         const val = parseInt(cardValue);
         const cost = val * 1000;
 
-        const userName = userIdent.username || 'Đạo hữu ẩn danh';
+        const userName = userIdent.username || 'Khách ẩn danh';
 
         // ATOMIC TRANSACTION WITH TRACEABILITY
         const traceId = `RED-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;

@@ -39,7 +39,7 @@ export default async function proxy(request) {
       
       if (userLog.count > MAX_REQUESTS) {
           return new NextResponse(
-              JSON.stringify({ error: 'Đạo hữu thao tác quá nhanh! Vui lòng tịnh tâm trong giây lát.' }),
+              JSON.stringify({ error: 'Bạn thao tác quá nhanh! Vui lòng đợi trong giây lát.' }),
               { status: 429, headers: { 'Content-Type': 'application/json' } }
           );
       }

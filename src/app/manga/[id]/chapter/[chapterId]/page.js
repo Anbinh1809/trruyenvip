@@ -3,19 +3,12 @@ import { query } from '@/lib/db';
 import Link from 'next/link';
 import HistoryRecorder from '@/components/HistoryRecorder';
 import ReaderSettings from '@/components/ReaderSettings';
-import XPRewarder from '@/components/XPRewarder';
-import RewardTimer from '@/components/RewardTimer';
-import NextChapterPrefetcher from '@/components/NextChapterPrefetcher';
-import MissionTrigger from '@/components/MissionTrigger';
 import ReaderManager from '@/components/ReaderManager';
-import ZenModeButton from '@/components/ZenModeButton';
 import BackToTop from '@/components/BackToTop';
 import ReadingProgressBar from '@/components/ReadingProgressBar';
-import RecommendedForYou from '@/components/RecommendedForYou';
 import Footer from '@/components/Footer';
 import dynamic from 'next/dynamic';
 import ChapterContent from '@/components/ChapterContent';
-import EndPageCelebration from '@/components/EndPageCelebration';
 
 const CommentSection = dynamic(() => import('@/components/CommentSection'), { 
   loading: () => <div className="loading-dots" style={{ padding: '40px', textAlign: 'center' }}>Đang tải bình luận...</div>
@@ -95,10 +88,6 @@ export default async function ChapterReader({ params }) {
     <main className="reader-page titan-bg" style={{ minHeight: '100vh', color: 'white' }}>
       <ReadingProgressBar />
       <HistoryRecorder manga={data.manga} chapter={data.chapter} />
-      <XPRewarder chapterId={chapterId} />
-      <RewardTimer chapterId={chapterId} />
-      <MissionTrigger type="READ_CHAPTER" />
-      <MissionTrigger type="GENRE_DIVERSITY" />
       <ReaderSettings />
       
       <ReaderManager 
@@ -115,7 +104,6 @@ export default async function ChapterReader({ params }) {
           </Link>
           <div className="reader-chap-title">{data.chapter.title}</div>
           <div className="reader-nav-actions" style={{ display: 'flex', gap: '10px', alignItems: 'center', flexShrink: 0 }}>
-            <ZenModeButton />
             <div className="nav-group" style={{ display: 'flex', gap: '8px' }}>
                 {prevChapter && (
                     <Link href={`/manga/${id}/chapter/${prevChapter.id}`} className="btn-reader-nav" title="Chương trước">
@@ -136,10 +124,6 @@ export default async function ChapterReader({ params }) {
         <ChapterContent chapterId={chapterId} initialImages={data.images} />
       </div>
 
-      {!nextChapter && (
-          <EndPageCelebration mangaId={id} mangaTitle={data.manga.title} />
-      )}
-
       {data.nextChapter.id && (
           <NextChapterPrefetcher 
             nextChapterId={data.nextChapter.id} 
@@ -153,9 +137,6 @@ export default async function ChapterReader({ params }) {
 
       <div className="reader-footer" style={{ padding: '80px 0', borderTop: '1px solid var(--glass-border)' }}>
         <div className="container">
-          <div style={{ marginBottom: '60px' }}>
-            <RecommendedForYou />
-          </div>
           <div style={{ textAlign: 'center' }}>
             <h2 style={{ marginBottom: '30px', fontWeight: 800 }}>Bạn đã đọc xong {data.chapter.title}</h2>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '20px' }}>
@@ -178,11 +159,11 @@ export default async function ChapterReader({ params }) {
     </div>
 
       <BackToTop />
-      <div style={{ marginBottom: '100px' }} />
-      <Footer />
       <div className="container">
           <CommentSection chapterId={chapterId} />
       </div>
+      <div style={{ marginBottom: '100px' }} />
+      <Footer />
     </main>
   );
 }

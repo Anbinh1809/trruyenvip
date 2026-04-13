@@ -1,10 +1,6 @@
 import Header from '@/components/Header';
-import FeaturedSlider from '@/components/FeaturedSlider';
-import DailyCheckIn from '@/components/DailyCheckIn';
-import MangaCard from '@/components/MangaCard';
 import RecentlyRead from '@/components/RecentlyRead';
-import TrendingTicker from '@/components/TrendingTicker';
-import RecommendedForYou from '@/components/RecommendedForYou';
+import MangaCard from '@/components/MangaCard';
 import Footer from '@/components/Footer';
 import { query, MANGA_CARD_FIELDS } from '@/lib/db';
 import Link from 'next/link';
@@ -51,24 +47,13 @@ export default async function Home() {
           TruyenVip - Nền tảng Đọc Truyện Tranh Online Cao Cấp từ NetTruyen và TruyenQQ
       </h1>
 
-      <div className="hero-section-titan">
-          <FeaturedSlider mangaList={mangaList} />
-      </div>
-      
-      <div className="container" style={{ position: 'relative', marginTop: '-120px', zIndex: 100 }}>
-        <TrendingTicker />
-        <div className="top-grid-titan fade-up">
-            <DailyCheckIn />
+      <div className="container" style={{ position: 'relative', marginTop: '40px', zIndex: 100 }}>
+        
+        <div style={{ marginBottom: '40px' }}>
             <Suspense fallback={<div className="skeleton-loader" />}>
                 <RecentlyRead />
             </Suspense>
         </div>
-        
-        <Suspense fallback={<div className="skeleton-loader" style={{ height: '300px', margin: '40px 0' }} />}>
-            <div className="recommended-wrapper-titan">
-                <RecommendedForYou />
-            </div>
-        </Suspense>
 
         <section className="section-titan fade-in">
           <div className="section-header-nebula" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
