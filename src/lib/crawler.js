@@ -22,13 +22,17 @@ function safeJoinUrl(base, path) {
 export const SOURCES = {
     NETTRUYEN: 'https://www.nettruyenme.com/',
     NETTRUYEN_MIRRORS: [
+        'https://www.nettruyenme.com/', 
         'https://www.nettruyenpro.com/', 
         'https://www.nettruyennew.com/', 
         'https://www.nettruyenking.com/', 
         'https://www.nettruyenon.com/',
         'https://www.nettruyenco.vn/',
         'https://www.nettruyenmax.com/',
-        'https://www.nettruyenvi.com/'
+        'https://www.nettruyenvi.com/',
+        'https://www.nettruyencc.com/',
+        'https://www.nettruyeninfo.com/',
+        'https://www.nettruyenus.com/'
     ],
     TRUYENQQ: 'https://truyenqqno.com/'
 };

@@ -47,6 +47,8 @@ export default function MissionPanel() {
             justifyContent: 'center',
             fontSize: '1.4rem',
             zIndex: 2000,
+            background: 'rgba(255, 62, 62, 0.4)',
+            backdropFilter: 'blur(20px)',
             border: completedCount > dailyMissions.missions.filter(m => m.claimed).length ? '2px solid var(--accent)' : '1px solid var(--glass-border)',
             boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
             cursor: 'pointer'
