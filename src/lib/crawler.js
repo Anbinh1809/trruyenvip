@@ -128,7 +128,7 @@ async function runInParallel(items, mapper, concurrency = 2) {
     return Promise.allSettled(results);
 }
 
-const MIN_IMAGE_COUNT = 10; // Increased to 10 for better data integrity (ignore ad-only chapters)
+const MIN_IMAGE_COUNT = 2; // More lenient to support chapters with fewer images or partial crawls
 
 function normalizeTitle(title) {
     if (!title) return '';

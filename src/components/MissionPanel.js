@@ -38,7 +38,7 @@ export default function MissionPanel() {
         style={{
             position: 'fixed',
             right: '20px',
-            bottom: '90px',
+            bottom: '100px',
             width: '55px',
             height: '55px',
             borderRadius: '50%',
@@ -46,7 +46,7 @@ export default function MissionPanel() {
             alignItems: 'center',
             justifyContent: 'center',
             fontSize: '1.4rem',
-            zIndex: 1000,
+            zIndex: 2000,
             border: completedCount > dailyMissions.missions.filter(m => m.claimed).length ? '2px solid var(--accent)' : '1px solid var(--glass-border)',
             boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
             cursor: 'pointer'
