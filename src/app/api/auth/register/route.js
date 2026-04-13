@@ -45,8 +45,9 @@ export async function POST(request) {
                 password_hash
             });
         } catch (dbErr) {
-            // Error 2627: Unique Constraint Violation
-            if (dbErr.number === 2627 || dbErr.message.includes('unique constraint')) {
+            // Error 2627: Unique Constraint Violation (MSSQL)
+            // Error 23505: Unique Violation (PostgreSQL)
+            if (dbErr.number === 2627 || dbErr.code === '23505' || dbErr.message.includes('unique constraint')) {
                 return NextResponse.json({ error: 'Tên đăng nhập, Email hoặc Thiết bị này đã được sử dụng.' }, { status: 400 });
             }
             throw dbErr; // Rethrow other DB errors to the main catch block

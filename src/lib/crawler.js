@@ -1311,7 +1311,9 @@ export async function crawlChapterImages(chapId, url, source = 'nettruyen', forc
                 .reading-detail .page-chapter img, 
                 .chapter_content img, 
                 #chapter_content img,
-                .chapter-content img
+                .chapter-content img,
+                .container-detail img,
+                .chapter-images img
             `);
             
             if (imgElements.length >= MIN_IMAGE_COUNT) {
@@ -1385,12 +1387,12 @@ export async function crawlChapterImages(chapId, url, source = 'nettruyen', forc
         }
     }
 
-    if (success) {
-        updateTelemetry({ successCount: global.crawlerState.successCount + 1, imagesFound });
+    if (imagesFound >= MIN_IMAGE_COUNT) {
+        updateTelemetry({ successCount: 1 });
         await logCrawl(`[OK] Da cao thanh cong ${imagesFound} anh cho: ${mangaTitle}`, 'success');
         return imagesFound;
     } else {
-        updateTelemetry({ failCount: global.crawlerState.failCount + 1 });
+        updateTelemetry({ failCount: 1 });
         await logCrawl(`[FAIL] Khong du anh (${imagesFound}/${MIN_IMAGE_COUNT}) cho: ${mangaTitle}`, 'error');
         
         // --- AEGIS AUTO-MIGRATION TRIGGER ---
