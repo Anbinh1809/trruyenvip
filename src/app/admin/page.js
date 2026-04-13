@@ -93,32 +93,32 @@ export default function AdminDashboard() {
                     <div className="stat-item-titan">
                         <div className="stat-label-titan">📊 TỔNG NGƯỜI DÙNG</div>
                         <div className="stat-value-titan">
-                            {stats ? stats.totalUsers : <div className="skeleton-shimmer" style={{ height: '3rem', width: '80px', borderRadius: '10px' }} />}
+                            {stats ? stats.totalUsers : <div className="skeleton-shimmer" style={{ height: '3rem', width: '80px', borderRadius: 'var(--border-radius)' }} />}
                         </div>
                     </div>
                     <div className="stat-item-titan">
                         <div className="stat-label-titan">📚 TỔNG TRUYỆN</div>
                         <div className="stat-value-titan">
-                            {stats ? stats.totalManga : <div className="skeleton-shimmer" style={{ height: '3rem', width: '80px', borderRadius: '10px' }} />}
+                            {stats ? stats.totalManga : <div className="skeleton-shimmer" style={{ height: '3rem', width: '80px', borderRadius: 'var(--border-radius)' }} />}
                         </div>
                     </div>
                     <div className="stat-item-titan">
                         <div className="stat-label-titan">📜 TỔNG CHƯƠNG</div>
                         <div className="stat-value-titan">
-                            {stats ? stats.totalChapters : <div className="skeleton-shimmer" style={{ height: '3rem', width: '80px', borderRadius: '10px' }} />}
+                            {stats ? stats.totalChapters : <div className="skeleton-shimmer" style={{ height: '3rem', width: '80px', borderRadius: 'var(--border-radius)' }} />}
                         </div>
                     </div>
                     <div className="stat-item-titan highlight-titan">
                         <div className="stat-label-titan" style={{ color: 'var(--accent)' }}>🎁 ĐỢI ĐỔI QUÀ</div>
                         <div className="stat-value-titan" style={{ color: 'var(--accent)' }}>
-                            {stats ? stats.pendingRewards : <div className="skeleton-shimmer" style={{ height: '3rem', width: '40px', borderRadius: '10px' }} />}
+                            {stats ? stats.pendingRewards : <div className="skeleton-shimmer" style={{ height: '3rem', width: '40px', borderRadius: 'var(--border-radius)' }} />}
                         </div>
                         <Link href="/admin/rewards" className="action-link" style={{ marginTop: '15px', display: 'block', fontWeight: 800, color: 'var(--accent)', textDecoration: 'none' }}>Quản lý ngay →</Link>
                     </div>
                 </div>
 
                 <section className="admin-actions-section">
-                    <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '30px' }}>⚡ Quyền Năng Hệ Thống</h2>
+                    <h2 style={{ fontSize: '1.4rem', fontWeight: 800, marginBottom: '25px' }}>Quản lý hệ thống</h2>
                     <div className="actions-list-titan">
                         
                         {/* Crawler Control */}
@@ -128,7 +128,7 @@ export default function AdminDashboard() {
                             <p className="action-desc-titan">Hệ thống cào truyện thông minh, tự động đồng bộ chương mới và xử lý ảnh cao cấp.</p>
                             
                             {/* TASK MONITOR MINI */}
-                            <div className="task-monitor-mini glass" style={{ padding: '15px', borderRadius: '16px', marginBottom: '20px', background: 'rgba(255,255,255,0.03)' }}>
+                            <div className="task-monitor-mini glass" style={{ padding: '12px', borderRadius: 'var(--border-radius)', marginBottom: '15px', background: 'rgba(255,255,255,0.03)' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 800 }}>
                                     <span>HÀNG CHỜ:</span>
                                     <span style={{ color: 'var(--accent)' }}>{stats?.taskPending || 0}</span>
@@ -174,7 +174,7 @@ export default function AdminDashboard() {
                             <h3 className="action-title-titan">Chẩn Đoán Hệ Thống</h3>
                             <p className="action-desc-titan">Phân tích lỗi hàng chờ và tìm ra những bộ truyện đang gặp sự cố.</p>
                             
-                            <div className="failure-list-mini glass" style={{ fontSize: '0.65rem', padding: '10px', borderRadius: '12px', background: 'rgba(255,255,255,0.02)', maxHeight: '100px', overflowY: 'auto' }}>
+                            <div className="failure-list-mini glass" style={{ fontSize: '0.65rem', padding: '10px', borderRadius: 'var(--border-radius)', background: 'rgba(255,255,255,0.02)', maxHeight: '100px', overflowY: 'auto' }}>
                                 <div style={{ fontWeight: 900, color: 'var(--text-muted)', marginBottom: '5px' }}>LỖI CẬP NHẬT GẦN NHẤT:</div>
                                 {stats?.recentFailures?.length > 0 ? stats.recentFailures.map(f => (
                                     <div key={f.id} style={{ marginBottom: '4px', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '2px' }}>
@@ -184,7 +184,7 @@ export default function AdminDashboard() {
                             </div>
 
                             {stats?.heatmap?.length > 0 && (
-                                <div className="heatmap-titan glass" style={{ marginTop: '10px', padding: '10px', borderRadius: '12px', background: 'rgba(255,62,62,0.02)', border: '1px solid rgba(255,62,62,0.1)' }}>
+                                <div className="heatmap-titan glass" style={{ marginTop: '10px', padding: '10px', borderRadius: 'var(--border-radius)', background: 'rgba(255,62,62,0.02)', border: '1px solid rgba(255,62,62,0.1)' }}>
                                     <div style={{ fontSize: '0.6rem', fontWeight: 900, marginBottom: '5px', color: 'var(--accent)' }}>PHÂN TÍCH LỖI HỆ THỐNG:</div>
                                     {stats.heatmap.map((h, i) => (
                                         <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.6rem', marginBottom: '2px' }}>
@@ -203,7 +203,7 @@ export default function AdminDashboard() {
                         {/* Other Tools */}
                         <div className="action-node-titan dimmed" style={{ opacity: 0.6, pointerEvents: 'none' }}>
                             <div className="action-icon-titan">🛠️</div>
-                            <h3 className="action-title-titan">Bảo Trì Thần Khí</h3>
+                            <h3 className="action-title-titan">Bảo Trì Hệ Thống</h3>
                             <p className="action-desc-titan">Tính năng đang được phát triển. Sẽ sớm ra mắt trong các phiên bản kế tiếp.</p>
                             <button className="btn btn-outline" disabled style={{ marginTop: 'auto', opacity: 0.5 }}>Sắp ra mắt</button>
                         </div>

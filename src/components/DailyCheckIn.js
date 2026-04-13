@@ -20,7 +20,7 @@ export default function DailyCheckIn() {
     }
   }, [mounted]);
 
-  if (!mounted) return <div className="skeleton-loader" style={{ height: '220px', borderRadius: '30px' }} />;
+  if (!mounted) return <div className="skeleton-loader" style={{ height: '200px', borderRadius: 'var(--border-radius)' }} />;
 
   const alreadyChecked = lastCheckIn === serverDate;
 
@@ -39,7 +39,7 @@ export default function DailyCheckIn() {
                 <h3 className="checkin-title">Điểm danh hằng ngày</h3>
                 <p className="checkin-subtitle" style={{ fontSize: '0.85rem', marginBottom: '20px' }}>Nhận VipCoins và XP mỗi lần báo danh.</p>
                 
-                <div className="streak-container-nebula" style={{ position: 'relative', marginTop: '30px' }}>
+                <div className="streak-container" style={{ position: 'relative', marginTop: '25px' }}>
                     <div className="streak-bar-titan">
                         {[1, 2, 3, 4, 5, 6, 7].map((d) => (
                             <div key={d} className={`streak-step ${d <= currentStreak ? 'active' : ''}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>

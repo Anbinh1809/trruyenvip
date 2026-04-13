@@ -49,13 +49,9 @@ export default function EndPageCelebration({ mangaId, mangaTitle }) {
                     width: 100%;
                     background: rgba(255, 255, 255, 0.02);
                     border: 1px solid rgba(255, 255, 255, 0.08);
-                    backdrop-filter: blur(20px);
-                    border-radius: 40px;
-                    padding: 60px 40px;
+                    border-radius: 4px;
+                    padding: 50px 35px;
                     text-align: center;
-                    box-shadow: 0 40px 100px rgba(0,0,0,0.5);
-                    position: relative;
-                    overflow: hidden;
                 }
                 .celebration-glass-box::before {
                     content: '';
@@ -72,7 +68,7 @@ export default function EndPageCelebration({ mangaId, mangaTitle }) {
                     margin-bottom: 25px;
                     display: flex;
                     justify-content: center;
-                    filter: drop-shadow(0 0 20px rgba(255, 62, 62, 0.4));
+                    opacity: 0.8;
                 }
                 .celebration-headline {
                     font-size: 2.2rem;
@@ -83,14 +79,13 @@ export default function EndPageCelebration({ mangaId, mangaTitle }) {
                 }
                 .rank-badge-finish {
                     display: inline-block;
-                    padding: 6px 24px;
-                    background: var(--accent-gradient);
+                    padding: 4px 16px;
+                    background: var(--accent);
                     color: white;
-                    border-radius: 30px;
-                    font-weight: 900;
+                    border-radius: 4px;
+                    font-weight: 800;
                     font-size: 0.8rem;
-                    margin-bottom: 30px;
-                    box-shadow: 0 10px 20px rgba(255, 62, 62, 0.3);
+                    margin-bottom: 25px;
                 }
                 .celebration-message {
                     font-size: 1.1rem;
@@ -109,8 +104,8 @@ export default function EndPageCelebration({ mangaId, mangaTitle }) {
                     gap: 15px;
                 }
                 .btn-large {
-                    padding: 18px 25px;
-                    border-radius: 15px;
+                    padding: 14px 20px;
+                    border-radius: 4px;
                     font-weight: 800;
                     font-size: 0.9rem;
                     transition: var(--transition);

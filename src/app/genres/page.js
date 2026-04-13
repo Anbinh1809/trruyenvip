@@ -107,8 +107,8 @@ export default async function GenresPage({ searchParams }) {
       
       <div className="container" style={{ paddingTop: '120px' }}>
         <header className="fade-up" style={{ marginBottom: '50px' }}>
-            <div style={{ display: 'inline-block', padding: '5px 15px', background: 'rgba(255, 62, 62, 0.1)', border: '1px solid rgba(255, 62, 62, 0.3)', color: 'var(--accent)', fontSize: '0.7rem', fontWeight: 900, letterSpacing: '2px', borderRadius: '50px', marginBottom: '20px' }}>THƯ VIỆN TRUYỆN</div>
-            <h1 style={{ fontSize: '3.5rem', fontWeight: 950, letterSpacing: '-2px', marginBottom: '10px', color: 'var(--text-primary)' }}>
+            <div style={{ display: 'inline-block', padding: '4px 12px', background: 'rgba(255, 62, 62, 0.1)', border: '1px solid rgba(255, 62, 62, 0.3)', color: 'var(--accent)', fontSize: '0.7rem', fontWeight: 800, letterSpacing: '1px', borderRadius: 'var(--border-radius)', marginBottom: '15px' }}>THƯ VIỆN TRUYỆN</div>
+            <h1 style={{ fontSize: '2.5rem', fontWeight: 900, letterSpacing: '-1.5px', marginBottom: '10px', color: 'var(--text-primary)' }}>
                 {activeGenre ? activeGenre.name : 'Khám Phá Tất Cả'}
             </h1>
             <p style={{ color: 'var(--text-muted)', fontWeight: 600, fontSize: '1.1rem' }}>

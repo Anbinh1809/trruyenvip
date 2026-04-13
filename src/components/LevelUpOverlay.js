@@ -42,14 +42,13 @@ export default function LevelUpOverlay({ level, rank, onComplete }) {
 
   return (
     <div className="titan-level-toast" onClick={() => setVisible(false)} style={{ cursor: 'pointer', zIndex: 10000 }}>
-      {/* GLOW AURA BASED ON RANK */}
-      <div className={`titan-celebration-box rank-aura-${rank.replace(/\s+/g, '-').toLowerCase()}`}>
-        <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+      <div className="titan-celebration-box">
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
             <div className="celebration-icon-titan">
-                <Sparkles size={32} color="var(--accent)" />
+                <Sparkles size={28} color="var(--accent)" />
             </div>
             <div>
-                <h3 className="celebration-title-titan">THĂNG CẤP ĐỘ!</h3>
+                <h3 className="celebration-title-titan">LÊN CẤP!</h3>
                 <div className="rank-tag-premium">{rank}</div>
                 <p className="celebration-subtitle-titan">Cấp {level}</p>
             </div>

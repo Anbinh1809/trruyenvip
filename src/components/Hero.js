@@ -20,7 +20,7 @@ export default function Hero({ manga }) {
       
       <div className="container hero-container" style={{ position: 'relative', zIndex: 10, display: 'grid', gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 0.8fr)', alignItems: 'center', gap: '50px' }}>
         <div className="hero-content fade-in" style={{ position: 'relative', zIndex: 20 }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 16px', background: 'rgba(255, 62, 62, 0.15)', color: '#ff3e3e', borderRadius: '50px', fontWeight: 800, fontSize: '0.75rem', marginBottom: '20px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '4px 12px', background: 'rgba(255, 62, 62, 0.15)', color: '#ff3e3e', borderRadius: 'var(--border-radius)', fontWeight: 700, fontSize: '0.75rem', marginBottom: '15px', textTransform: 'uppercase', letterSpacing: '1px' }}>
             <Flame size={14} /> Đang Thịnh Hành
           </div>
           <h1 className="titan-hero-title">{manga.title}</h1>

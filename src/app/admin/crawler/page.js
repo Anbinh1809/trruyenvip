@@ -106,7 +106,7 @@ export default function CrawlerDashboard() {
                             <span className="dot-pulse" style={{ background: ramUsage > 500 ? '#f59e0b' : '#10b981' }}></span> 
                             {ramUsage ? `${ramUsage}MB RAM` : 'Đang đo...'}
                         </div>
-                        <button className="btn btn-outline" style={{ padding: '8px 20px', borderRadius: '12px' }} onClick={() => fetchData()}>
+                        <button className="btn btn-outline" style={{ padding: '8px 18px' }} onClick={() => fetchData()}>
                             Làm mới dữ liệu
                         </button>
                     </div>
@@ -114,11 +114,11 @@ export default function CrawlerDashboard() {
 
                 {/* Mirror Health Intelligence */}
                 {data?.mirrorHealth && Object.keys(data.mirrorHealth).length > 0 && (
-                    <div className="glass-card" style={{ marginBottom: '40px', padding: '25px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '28px' }}>
+                    <div className="glass-card" style={{ marginBottom: '40px', padding: '25px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 'var(--border-radius)' }}>
                         <h3 style={{ fontSize: '0.75rem', fontWeight: 900, letterSpacing: '2px', color: 'rgba(255,255,255,0.4)', marginBottom: '20px' }}>ĐỘ ỔN ĐỊNH HỆ THỐNG MIRROR</h3>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px' }}>
                             {Object.entries(data.mirrorHealth).map(([mirror, score]) => (
-                                <div key={mirror} style={{ padding: '15px', background: 'rgba(255,255,255,0.03)', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                <div key={mirror} style={{ padding: '15px', background: 'rgba(255,255,255,0.03)', borderRadius: 'var(--border-radius)', border: '1px solid rgba(255,255,255,0.05)' }}>
                                     <div style={{ fontSize: '0.75rem', color: 'var(--text-primary)', fontWeight: 800, marginBottom: '8px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={mirror}>
                                         {mirror.replace('https://', '').replace('www.', '')}
                                     </div>
@@ -145,7 +145,7 @@ export default function CrawlerDashboard() {
                 )}
 
                 {/* Live Telemetry monitor */}
-                <div className="glass-card" style={{ position: 'relative', overflow: 'hidden', padding: '30px', borderRadius: '32px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '40px' }}>
+                <div className="glass-card" style={{ position: 'relative', overflow: 'hidden', padding: '25px', borderRadius: 'var(--border-radius)', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '40px' }}>
 
                     <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div style={{ width: '60%' }}>
@@ -155,7 +155,7 @@ export default function CrawlerDashboard() {
                             </div>
                             <div style={{ marginBottom: '25px' }}>
                                 <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)', marginBottom: '5px' }}>TRUYỆN ĐANG XỬ LÝ</div>
-                                <div style={{ fontSize: '1.4rem', fontWeight: 950 }}>{telemetry?.currentManga || 'Đang chờ chu kỳ...'}</div>
+                                <div style={{ fontSize: '1.2rem', fontWeight: 900 }}>{telemetry?.currentManga || 'Đang chờ chu kỳ...'}</div>
                             </div>
                             <div style={{ display: 'flex', gap: '40px' }}>
                                 <div>
@@ -192,26 +192,26 @@ export default function CrawlerDashboard() {
                 </div>
 
                 <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '40px' }}>
-                    <div className="glass-card" style={{ padding: '25px', background: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                    <div className="glass-card" style={{ padding: '25px', background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--border-radius)', border: '1px solid rgba(255,255,255,0.05)' }}>
                         <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.4, marginBottom: '5px' }}>Hành động hôm nay</div>
                         <div style={{ fontSize: '1.8rem', fontWeight: 900 }}>{stats.today + (telemetry?.imagesScrapedToday || 0)} <span style={{ fontSize: '1rem', opacity: 0.5 }}>sự kiện</span></div>
                     </div>
-                    <div className="glass-card" style={{ padding: '25px', background: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                    <div className="glass-card" style={{ padding: '25px', background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--border-radius)', border: '1px solid rgba(255,255,255,0.05)' }}>
                         <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.4, marginBottom: '5px' }}>Tỷ lệ thành công</div>
                         <div style={{ fontSize: '1.8rem', fontWeight: 900, color: '#10b981' }}>{Math.round((telemetry?.successCount / (telemetry?.successCount + telemetry?.failCount || 1)) * 100)}%</div>
                     </div>
-                    <div className="glass-card" style={{ padding: '25px', background: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                    <div className="glass-card" style={{ padding: '25px', background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--border-radius)', border: '1px solid rgba(255,255,255,0.05)' }}>
                         <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.4, marginBottom: '5px' }}>Tổng số truyện</div>
                         <div style={{ fontSize: '1.8rem', fontWeight: 900 }}>{stats.total.toLocaleString()}</div>
                     </div>
-                    <div className="glass-card" style={{ padding: '25px', background: 'rgba(255, 62, 62, 0.05)', borderRadius: '24px', border: '1px solid rgba(255, 62, 62, 0.2)' }}>
+                    <div className="glass-card" style={{ padding: '25px', background: 'rgba(255, 62, 62, 0.05)', borderRadius: 'var(--border-radius)', border: '1px solid rgba(255, 62, 62, 0.2)' }}>
                         <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.6, marginBottom: '5px', color: 'var(--accent)' }}>Chương bị gắn cờ</div>
                         <div style={{ fontSize: '1.8rem', fontWeight: 900, color: 'var(--accent)' }}>{stats.flagged || 0} <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>báo cáo</span></div>
                     </div>
                 </div>
                 
                 {/* Log Feed */}
-                <div className="glass-card" style={{ borderRadius: '24px', padding: '0', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.01)' }}>
+                <div className="glass-card" style={{ borderRadius: 'var(--border-radius)', padding: '0', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.01)' }}>
                     <div style={{ padding: '25px 30px', borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.02)', display: 'flex', justifyContent: 'space-between' }}>
                         <h3 style={{ fontWeight: 800 }}>📂 Nhật ký hệ thống</h3>
                         <span style={{ fontSize: '0.8rem', opacity: 0.5 }}>100 sự kiện gần nhất</span>

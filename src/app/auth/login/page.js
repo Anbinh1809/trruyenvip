@@ -34,7 +34,7 @@ export default function LoginPage() {
             
             <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', position: 'relative', zIndex: 1 }}>
                 <div className="auth-container-titan fade-up" style={{ textAlign: 'center' }}>
-                    <div style={{ display: 'inline-block', padding: '6px 16px', background: 'rgba(255, 62, 62, 0.1)', border: '1px solid rgba(255, 62, 62, 0.3)', color: 'var(--accent)', borderRadius: '50px', fontSize: '0.7rem', fontWeight: 900, letterSpacing: '3px', marginBottom: '25px' }}>
+                    <div style={{ display: 'inline-block', padding: '4px 14px', background: 'rgba(255, 62, 62, 0.1)', border: '1px solid rgba(255, 62, 62, 0.3)', color: 'var(--accent)', borderRadius: 'var(--border-radius)', fontSize: '0.7rem', fontWeight: 800, letterSpacing: '2px', marginBottom: '20px' }}>
                         TRUYEN VIP
                     </div>
                     <div className="auth-header">
@@ -43,7 +43,7 @@ export default function LoginPage() {
                     </div>
 
                     <form className="auth-form-titan" onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '25px', textAlign: 'left' }}>
-                        {error && <div style={{ padding: '15px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#ef4444', borderRadius: '15px', fontSize: '0.85rem', fontWeight: 700, textAlign: 'center' }}>{error}</div>}
+                        {error && <div style={{ padding: '12px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#ef4444', borderRadius: 'var(--border-radius)', fontSize: '0.85rem', fontWeight: 700, textAlign: 'center' }}>{error}</div>}
                         
                         <div className="input-field-titan">
                             <label className="input-label-titan">Tên đăng nhập</label>
@@ -71,7 +71,7 @@ export default function LoginPage() {
                             />
                         </div>
 
-                        <button type="submit" className="btn btn-primary" style={{ height: '65px', borderRadius: '20px', fontSize: '1.1rem', fontWeight: 900, marginTop: '15px' }} disabled={loading}>
+                        <button type="submit" className="btn btn-primary" style={{ height: '55px', fontSize: '1rem', fontWeight: 800, marginTop: '15px' }} disabled={loading}>
                             {loading ? 'Đang xác thực...' : 'Đăng nhập'}
                         </button>
                     </form>

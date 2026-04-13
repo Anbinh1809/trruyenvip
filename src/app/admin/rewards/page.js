@@ -57,7 +57,7 @@ export default function AdminRewardsPage() {
           <main className="main-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', flexDirection: 'column', gap: '20px' }}>
               <h1 style={{ fontSize: '5rem' }}>🚫</h1>
               <h2>Truy cập bị từ chối</h2>
-              <p>Chỉ có bậc tiền bối (Admin) mới có quyền vào đây.</p>
+              <p>Chỉ có quản trị viên (Admin) mới có quyền vào đây.</p>
               <Link href="/" className="btn-primary">Quay lại trang chủ</Link>
           </main>
       );
@@ -70,7 +70,7 @@ export default function AdminRewardsPage() {
       <div className="container fade-in" style={{ marginTop: '120px' }}>
         <h1 style={{ marginBottom: '40px' }}>💵 Quản lý Đổi Thẻ</h1>
         
-        <div className="glass" style={{ padding: '30px', borderRadius: '25px', overflowX: 'auto' }}>
+        <div className="glass" style={{ padding: '25px', borderRadius: 'var(--border-radius)', overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                 <thead>
                     <tr style={{ borderBottom: '1px solid var(--glass-border)' }}>
@@ -93,11 +93,12 @@ export default function AdminRewardsPage() {
                             <td style={{ padding: '15px', color: 'var(--accent)', fontWeight: 800 }}>{req.card_value}k</td>
                             <td style={{ padding: '15px' }}>
                                 <span style={{ 
-                                    padding: '5px 12px', 
-                                    borderRadius: '20px', 
+                                    padding: '4px 10px', 
+                                    borderRadius: 'var(--border-radius)', 
                                     fontSize: '0.75rem', 
-                                    fontWeight: 800,
-                                    background: req.status === 'Pending' ? 'orange' : 'green' 
+                                    fontWeight: 700,
+                                    background: req.status === 'Pending' ? 'rgba(255,165,0,0.15)' : 'rgba(16,185,129,0.15)',
+                                    color: req.status === 'Pending' ? '#ffa500' : '#10b981'
                                 }}>
                                     {req.status}
                                 </span>
@@ -106,7 +107,7 @@ export default function AdminRewardsPage() {
                                 {req.status === 'Pending' && (
                                     <button 
                                         onClick={() => updateStatus(req.id, 'Done')}
-                                        style={{ padding: '8px 15px', borderRadius: '10px', background: 'var(--accent)', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 700 }}
+                                        style={{ padding: '7px 14px', borderRadius: 'var(--border-radius)', background: 'var(--accent)', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 700 }}
                                     >
                                         ✅ Gửi mã
                                     </button>

@@ -99,23 +99,23 @@ export default function RewardsPage() {
       
       <div className="container fade-in" style={{ marginTop: '140px', paddingBottom: '100px' }}>
         <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-               <span style={{ background: 'rgba(255, 165, 0, 0.1)', color: '#ffa500', padding: '6px 14px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 900, letterSpacing: '2px', marginBottom: '20px', display: 'inline-block' }}>QUY ĐỔI THƯỞNG</span>
-               <h1 style={{ fontSize: '3.5rem', fontWeight: 950, letterSpacing: '-3px', marginBottom: '15px' }}>Đổi Thưởng & Ưu Đãi</h1>
+               <span style={{ background: 'rgba(255, 165, 0, 0.1)', color: '#ffa500', padding: '4px 12px', borderRadius: 'var(--border-radius)', fontSize: '0.75rem', fontWeight: 800, letterSpacing: '1px', marginBottom: '15px', display: 'inline-block' }}>QUY ĐỔI THƯỞNG</span>
+               <h1 style={{ fontSize: '2.5rem', fontWeight: 900, letterSpacing: '-1.5px', marginBottom: '15px' }}>Đổi Thưởng & Ưu Đãi</h1>
                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '1.1rem', maxWidth: '600px', margin: '0 auto 40px', fontWeight: 600 }}>Sử dụng VipCoins tích lũy từ việc đọc truyện để đổi lấy các phần quà giá trị.</p>
                
-               <div className="glass" style={{ display: 'inline-flex', alignItems: 'center', gap: '20px', padding: '15px 35px', borderRadius: '50px', border: '1px solid gold' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'gold', filter: 'drop-shadow(0 0 10px gold)' }}>
-                      <Coins size={32} />
+               <div className="glass" style={{ display: 'inline-flex', alignItems: 'center', gap: '15px', padding: '12px 25px', borderRadius: 'var(--border-radius)', border: '1px solid rgba(255, 165, 0, 0.4)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fbbf24' }}>
+                      <Coins size={28} />
                   </div>
                   <div style={{ textAlign: 'left' }}>
                       <span style={{ fontSize: '0.75rem', fontWeight: 700, opacity: 0.5, textTransform: 'uppercase', letterSpacing: '1px' }}>VipCoins hiện có</span>
-                      <div style={{ fontSize: '1.5rem', fontWeight: 950, color: 'gold' }}>{vipCoins.toLocaleString()}</div>
+                      <div style={{ fontSize: '1.4rem', fontWeight: 900 }}>{vipCoins.toLocaleString()}</div>
                   </div>
                </div>
         </div>
 
-        <div className="grid" style={{ gridTemplateColumns: '1fr 2fr', gap: '30px', alignItems: 'start' }}>
-          <div className="glass" style={{ padding: '40px', borderRadius: '30px' }}>
+        <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px', alignItems: 'start' }}>
+          <div className="glass" style={{ padding: '30px', borderRadius: 'var(--border-radius)' }}>
                   <h3 style={{ fontSize: '1.4rem', fontWeight: 900, marginBottom: '30px', letterSpacing: '-0.5px' }}>1. Thông tin nhận thưởng</h3>
                   <div className="input-group-titan" style={{ marginBottom: '20px' }}>
                           <label className="input-label-titan">Nhà mạng</label>
@@ -132,7 +132,7 @@ export default function RewardsPage() {
 
                   {msg && (
                       <div style={{ 
-                          marginTop: '30px', padding: '20px', borderRadius: '14px', textAlign: 'center', fontWeight: 700, 
+                          marginTop: '25px', padding: '15px', borderRadius: 'var(--border-radius)', textAlign: 'center', fontWeight: 700, 
                           background: msgType === 'success' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255, 62, 62, 0.1)', 
                           color: msgType === 'success' ? '#10b981' : 'var(--accent)', 
                           border: `1px solid ${msgType === 'success' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 62, 62, 0.2)'}`,
@@ -155,10 +155,10 @@ export default function RewardsPage() {
                       <h4 style={{ fontSize: '1.4rem', fontWeight: 900, marginBottom: '5px' }}>{item.label}</h4>
                       <p style={{ opacity: 0.5, fontSize: '0.85rem', marginBottom: '20px' }}>Tốn {item.cost.toLocaleString()} VipCoins</p>
                       <button 
-                          className="btn-primary" 
+                          className="btn btn-primary" 
                           disabled={loading || vipCoins < item.cost}
                           onClick={() => handleRedeem(item)}
-                          style={{ background: item.color, width: '100%' }}
+                          style={{ background: vipCoins < item.cost ? 'rgba(255,255,255,0.1)' : item.color, width: '100%', opacity: vipCoins < item.cost ? 0.5 : 1 }}
                       >
                           {loading ? '...' : (vipCoins < item.cost ? 'Chưa đủ Coins' : 'Đổi ngay')}
                       </button>
@@ -170,7 +170,7 @@ export default function RewardsPage() {
                   <h3 style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '25px', fontWeight: 900, fontSize: '1.6rem', letterSpacing: '-0.5px' }}>
                       <Clock size={24} /> Lịch sử đổi thưởng
                   </h3>
-                  <div className="glass" style={{ borderRadius: '25px', padding: '10px' }}>
+                  <div className="glass" style={{ borderRadius: 'var(--border-radius)', padding: '8px' }}>
                       {history.map(req => (
                           <div key={req.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                               <div>

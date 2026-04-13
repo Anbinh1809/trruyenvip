@@ -87,8 +87,8 @@ export default function Header() {
           {isSearchOpen && (
               <div className="mobile-search-hud fade-in" style={{ position: 'fixed', inset: 0, background: 'rgba(2, 6, 23, 0.98)', backdropFilter: 'blur(30px)', zIndex: 30005, padding: '20px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '30px' }}>
-                      <button onClick={() => setIsSearchOpen(false)} style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: 'white', padding: '10px', borderRadius: '50%' }}><X size={24} /></button>
-                      <h3 style={{ margin: 0, fontWeight: 950, letterSpacing: '-1px' }}>Tìm Kiếm Truyện</h3>
+                      <button onClick={() => setIsSearchOpen(false)} style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: 'white', padding: '10px', borderRadius: 'var(--border-radius)' }}><X size={24} /></button>
+                      <h3 style={{ margin: 0, fontWeight: 800, letterSpacing: '-0.5px' }}>Tìm kiếm</h3>
                   </div>
                   <LiveSearch onSelect={() => setIsSearchOpen(false)} />
               </div>
@@ -97,10 +97,10 @@ export default function Header() {
           <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button 
               className="search-toggle-mobile mobile-only" 
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', cursor: 'pointer', flexShrink: 0 }} 
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', width: '38px', height: '38px', borderRadius: 'var(--border-radius)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', cursor: 'pointer', flexShrink: 0 }} 
               onClick={() => setIsSearchOpen(true)}
             >
-              <Search size={20} />
+              <Search size={18} />
             </button>
 
             {!loading && !isAuthenticated && mounted ? (
@@ -130,20 +130,17 @@ export default function Header() {
 
             <button 
               className="theme-toggle desktop-only" 
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', width: '45px', height: '45px', borderRadius: '50%', fontSize: '1.2rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }} 
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', width: '38px', height: '38px', borderRadius: 'var(--border-radius)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }} 
               onClick={toggleTheme}
             >
-              {mounted ? (theme === 'light' ? <Moon size={20} /> : <Sun size={20} />) : <div style={{ width: 20 }} />}
+              {mounted ? (theme === 'light' ? <Moon size={18} /> : <Sun size={18} />) : <div style={{ width: 18 }} />}
             </button>
             <button 
               className="mobile-menu-btn desktop-hide" 
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', width: '45px', height: '45px', borderRadius: '12px', cursor: 'pointer', flexShrink: 0 }} 
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', width: '38px', height: '38px', borderRadius: 'var(--border-radius)', cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} 
               onClick={() => setIsMenuOpen(true)}
             >
-              <div style={{ width: '20px', height: '2px', background: 'white', margin: '0 auto', position: 'relative' }}>
-                  <div style={{ position: 'absolute', width: '100%', height: '2px', background: 'white', top: '-6px' }} />
-                  <div style={{ position: 'absolute', width: '100%', height: '2px', background: 'white', bottom: '-6px' }} />
-              </div>
+              <Menu size={20} color="white" />
             </button>
           </div>
         </div>
@@ -158,9 +155,9 @@ export default function Header() {
             align-items: center;
             gap: 5px;
             margin-bottom: 2px;
-            color: var(--nebula-orange);
+            color: #fbbf24;
             font-size: 0.85rem;
-            font-weight: 800;
+            font-weight: 700;
             text-decoration: none;
         }
         .coin-label {

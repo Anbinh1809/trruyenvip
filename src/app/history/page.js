@@ -16,7 +16,7 @@ export default function HistoryPage() {
             <div className="container" style={{ paddingTop: '120px' }}>
                 <header style={{ marginBottom: '50px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '20px' }}>
                     <div>
-                        <h1 style={{ fontSize: '3.5rem', fontWeight: 950, marginBottom: '10px', letterSpacing: '-2px' }}>Lịch sử đọc truyện</h1>
+                        <h1 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '10px', letterSpacing: '-1.5px' }}>Lịch sử đọc truyện</h1>
                         <p style={{ color: 'rgba(255,255,255,0.4)', fontWeight: 600, fontSize: '1.1rem' }}>Danh sách các bộ truyện bạn đã đọc gần đây</p>
                     </div>
                     {history.length > 0 && (
@@ -39,18 +39,18 @@ export default function HistoryPage() {
                                         style={{ objectFit: 'cover' }}
                                     />
                                     <div style={{ position: 'absolute', bottom: '15px', left: '15px' }}>
-                                        <div style={{ background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', padding: '6px 14px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 900, color: 'white', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                        <div style={{ background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', padding: '4px 10px', borderRadius: 'var(--border-radius)', fontSize: '0.75rem', fontWeight: 800, color: 'white', border: '1px solid rgba(255,255,255,0.1)' }}>
                                             {new Date(item.timestamp).toLocaleDateString('vi-VN')}
                                         </div>
                                     </div>
                                 </Link>
                                 <div style={{ padding: '25px' }}>
-                                    <h3 style={{ fontSize: '1.1rem', fontWeight: 850, color: 'white', marginBottom: '10px', lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{item.mangaTitle}</h3>
+                                    <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'white', marginBottom: '10px', lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{item.mangaTitle}</h3>
                                     <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--accent)', marginBottom: '20px', opacity: 0.9 }}>Dừng lại ở: {item.chapterTitle}</div>
                                     <Link 
                                         href={`/manga/${item.mangaId}/chapter/${item.chapterId}`} 
                                         className="btn btn-primary"
-                                        style={{ display: 'block', textAlign: 'center', fontSize: '0.85rem', fontWeight: 850, padding: '15px', borderRadius: '15px' }}
+                                        style={{ display: 'block', textAlign: 'center', fontSize: '0.85rem', fontWeight: 800, padding: '12px' }}
                                     >
                                         Đọc tiếp
                                     </Link>

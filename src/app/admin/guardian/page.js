@@ -48,26 +48,26 @@ export default function GuardianHub() {
             <div className="container" style={{ paddingTop: '120px' }}>
                 <div className="section-header" style={{ marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                     <div>
-                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 15px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '50px', marginBottom: '15px' }}>
-                            <span style={{ width: '8px', height: '8px', background: '#10b981', borderRadius: '50%', boxShadow: '0 0 10px #10b981' }}></span>
-                            <span style={{ fontSize: '0.65rem', fontWeight: 900, color: '#10b981', letterSpacing: '1px' }}>HỆ THỐNG ĐANG BẢO VỆ (AUTOPILOT)</span>
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '4px 12px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: 'var(--border-radius)', marginBottom: '15px' }}>
+                            <span style={{ width: '7px', height: '7px', background: '#10b981', borderRadius: '50%' }}></span>
+                            <span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#10b981', letterSpacing: '1px' }}>TỰ ĐỘNG ĐANG CHẠY</span>
                         </div>
-                        <h1 style={{ fontSize: '2.5rem', fontWeight: 950, marginBottom: '10px' }}>⚙️ Titan Control Center</h1>
+                        <h1 style={{ fontSize: '2.2rem', fontWeight: 900, marginBottom: '10px' }}>Trung Tâm Điều Khiển</h1>
                         <p style={{ color: 'rgba(255,255,255,0.5)', fontWeight: 600 }}>Chi tiết lịch sử vá lỗi và phục hồi dữ liệu tự động</p>
                     </div>
-                    <button className="btn btn-outline" style={{ padding: '10px 25px', borderRadius: '14px' }} onClick={fetchHistory}>
-                        🔄 Làm mới danh sách
+                    <button className="btn btn-outline" style={{ padding: '8px 20px' }} onClick={fetchHistory}>
+                        Làm mới danh sách
                     </button>
                 </div>
 
                 {/* Dashboard Metrics */}
                 <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', marginBottom: '40px' }}>
-                    <div className="glass-card" style={{ padding: '30px', background: 'rgba(255,255,255,0.02)', borderRadius: '28px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                    <div className="glass-card" style={{ padding: '25px', background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--border-radius)', border: '1px solid rgba(255,255,255,0.05)' }}>
                         <div style={{ fontSize: '0.75rem', opacity: 0.5, marginBottom: '5px', fontWeight: 700 }}>TỔNG LẦN PHỤC HỒI (24H)</div>
-                        <div style={{ fontSize: '2.5rem', fontWeight: 950, color: 'var(--accent)' }}>{data?.metrics?.total_fixes || 0}</div>
+                        <div style={{ fontSize: '2.2rem', fontWeight: 900, color: 'var(--accent)' }}>{data?.metrics?.total_fixes || 0}</div>
                         <div style={{ fontSize: '0.8rem', marginTop: '10px', color: 'rgba(255,255,255,0.4)' }}>Hệ thống đã tự động phục hồi dữ liệu thành công.</div>
                     </div>
-                    <div className="glass-card" style={{ padding: '30px', background: 'rgba(255,255,255,0.02)', borderRadius: '28px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                    <div className="glass-card" style={{ padding: '25px', background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--border-radius)', border: '1px solid rgba(255,255,255,0.05)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
                             <div>
                                 <div style={{ fontSize: '0.7rem', opacity: 0.5, fontWeight: 700 }}>VÁ CHƯƠNG THIẾU</div>
@@ -85,7 +85,7 @@ export default function GuardianHub() {
                 </div>
 
                 {/* Detailed History List */}
-                <div className="glass-card" style={{ borderRadius: '32px', overflow: 'hidden', background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div className="glass-card" style={{ borderRadius: 'var(--border-radius)', overflow: 'hidden', background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.08)' }}>
                     <div style={{ padding: '25px 30px', borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)' }}>
                         <h3 style={{ fontWeight: 900, fontSize: '1.2rem' }}>📜 Nhật Ký Hệ Thống Chi Tiết</h3>
                     </div>

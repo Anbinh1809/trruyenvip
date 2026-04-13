@@ -44,7 +44,7 @@ export default function FavoritesPage() {
           {!mounted ? (
             <div className="manga-grid-titan">
               {[...Array(10)].map((_, i) => (
-                <div key={i} className="skeleton-shimmer" style={{ height: '350px', borderRadius: '30px' }}></div>
+                <div key={i} className="skeleton-shimmer" style={{ height: '350px', borderRadius: 'var(--border-radius)' }}></div>
               ))}
             </div>
           ) : favorites.length > 0 ? (

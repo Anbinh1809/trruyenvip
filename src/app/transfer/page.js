@@ -74,7 +74,7 @@ export default function TransferPage() {
                     </p>
                 </header>
 
-                <div className="glass-card" style={{ padding: '40px', borderRadius: '32px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)' }}>
+                <div className="glass-card" style={{ padding: '30px', borderRadius: 'var(--border-radius)', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)' }}>
                     <div style={{ marginBottom: '25px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '10px' }}>
                         <h3 style={{ fontSize: '1.3rem', fontWeight: 900, letterSpacing: '-0.5px' }}>Nhập liên kết chương truyện</h3>
                         <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', opacity: 0.5 }}>Mỗi dòng một liên kết chương truyện</span>
@@ -86,18 +86,18 @@ export default function TransferPage() {
                             onChange={(e) => setUrls(e.target.value)}
                             placeholder="Dán link NetTruyen hoặc TruyenQQ vào đây..."
                             style={{ 
-                                width: '100%', minHeight: '250px', borderRadius: '20px',
+                                width: '100%', minHeight: '220px', borderRadius: 'var(--border-radius)',
                                 background: 'rgba(0,0,0,0.03)', border: '1px solid var(--glass-border)',
-                                padding: '25px', color: '#10b981', fontFamily: '"Fira Code", monospace',
-                                fontSize: '0.95rem', lineHeight: 1.8, outline: 'none', transition: 'all 0.3s',
-                                marginBottom: '30px'
+                                padding: '20px', color: '#10b981', fontFamily: '"Fira Code", monospace',
+                                fontSize: '0.9rem', lineHeight: 1.8, outline: 'none', transition: 'all 0.3s',
+                                marginBottom: '20px'
                             }}
                         />
                         <button 
                             type="submit" 
                             disabled={isProcessing || !urls.trim()}
                             className={`btn btn-primary ${isProcessing ? 'processing' : ''}`}
-                            style={{ width: '100%', height: '70px', borderRadius: '18px', fontWeight: 950, fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}
+                            style={{ width: '100%', height: '55px', fontWeight: 800, fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
                         >
                             {isProcessing ? <><RefreshCw className="spin" size={24} /> Đang xử lý...</> : <><Zap size={24} /> Kích hoạt dịch chuyển</>}
                         </button>
@@ -109,9 +109,9 @@ export default function TransferPage() {
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                                 {results.map((res, i) => (
                                     <div key={i} style={{ 
-                                        padding: '15px 20px', borderRadius: '12px', background: 'var(--bg-primary)', 
-                                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                                        border: `1px solid ${res.status === 'success' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255, 62, 62, 0.1)'}`
+                                    padding: '12px 18px', borderRadius: 'var(--border-radius)', background: 'var(--bg-primary)', 
+                                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                    border: `1px solid ${res.status === 'success' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255, 62, 62, 0.1)'}`
                                     }}>
                                         <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '65%' }}>{res.url}</div>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
