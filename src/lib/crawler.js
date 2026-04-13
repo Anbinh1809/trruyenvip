@@ -128,7 +128,7 @@ async function runInParallel(items, mapper, concurrency = 2) {
     return Promise.allSettled(results);
 }
 
-const MIN_IMAGE_COUNT = 2; // More lenient to support chapters with fewer images or partial crawls
+const MIN_IMAGE_COUNT = 1; // Leanest possible for JIT success
 
 function normalizeTitle(title) {
     if (!title) return '';
@@ -1318,7 +1318,13 @@ export async function crawlChapterImages(chapId, url, source = 'nettruyen', forc
                 #chapter_content img,
                 .chapter-content img,
                 .container-detail img,
-                .chapter-images img
+                .chapter-images img,
+                .read-content img,
+                .box-chap img,
+                img.lazy,
+                img[data-src],
+                img[data-original],
+                img[data-cdn]
             `);
             
             if (imgElements.length >= MIN_IMAGE_COUNT) {
@@ -1335,8 +1341,9 @@ export async function crawlChapterImages(chapId, url, source = 'nettruyen', forc
                     // Smart Attribute Selection: Prioritize data-src for TruyenQQ
                     const imgUrl = $(el).attr('data-src') || 
                                    $(el).attr('data-original') || 
-                                   $(el).attr('src') ||
-                                   $(el).attr('data-cdn');
+                                   $(el).attr('data-index') ||
+                                   $(el).attr('data-cdn') ||
+                                   $(el).attr('src');
                     
                     if (!imgUrl || imgUrl.length < 10) continue;
 
