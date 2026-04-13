@@ -3,6 +3,7 @@ import { query } from '@/lib/db';
 import Link from 'next/link';
 import HistoryRecorder from '@/components/HistoryRecorder';
 import ReaderSettings from '@/components/ReaderSettings';
+import NextChapterPrefetcher from '@/components/NextChapterPrefetcher';
 import ReaderManager from '@/components/ReaderManager';
 import BackToTop from '@/components/BackToTop';
 import ReadingProgressBar from '@/components/ReadingProgressBar';

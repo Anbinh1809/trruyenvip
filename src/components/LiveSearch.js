@@ -128,7 +128,7 @@ export default function LiveSearch() {
         <form 
             style={{ 
                 position: 'relative', background: 'rgba(255, 255, 255, 0.05)', 
-                border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '100px', 
+                border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: 'var(--border-radius)', 
                 display: 'flex', alignItems: 'center', padding: '2px 5px', transition: 'all 0.3s ease' 
             }} 
             onSubmit={handleSearch}
@@ -165,7 +165,7 @@ export default function LiveSearch() {
             <div id="live-search-results" className="titan-results-panel fade-slide-up">
                 {isUrl && (
                     <div style={{ padding: '15px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                        <button onClick={handleMigration} className="btn-migrate-pulse" style={{ width: '100%', background: 'var(--accent)', color: 'white', border: 'none', padding: '12px', borderRadius: '12px', fontWeight: 900, fontSize: '0.75rem', cursor: 'pointer', letterSpacing: '1px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                        <button onClick={handleMigration} className="btn-primary" style={{ width: '100%', background: 'var(--accent)', color: 'white', border: 'none', padding: '12px', borderRadius: 'var(--border-radius)', fontWeight: 900, fontSize: '0.75rem', cursor: 'pointer', letterSpacing: '1px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
                             <Zap size={16} /> {loading ? 'ĐANG XỬ LÝ...' : 'DỒN DỮ LIỆU TỪ NGUỒN NGOÀI'}
                         </button>
                         <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textAlign: 'center', marginTop: '8px', fontWeight: 700, textTransform: 'uppercase' }}>Hệ thống phát hiện liên kết ngoài</div>
@@ -196,19 +196,12 @@ export default function LiveSearch() {
                             </div>
                             <div style={{ flex: 1 }}>
                                 <div style={{ fontWeight: 800, color: 'var(--text-primary)', fontSize: '0.9rem', marginBottom: '2px' }}>{m.title}</div>
-                                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>{m.author || 'TruyenVip Thần Sát'}</div>
+                                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>{m.author || 'Đang cập nhật'}</div>
                             </div>
                             {idx < 3 && <div style={{ fontSize: '0.6rem', background: 'rgba(255, 62, 62, 0.1)', color: 'var(--accent)', padding: '2px 6px', borderRadius: '4px', fontWeight: 900 }}>HOT</div>}
                         </Link>
                     )) : !loading && q.length >= 2 && (
                         <div style={{ padding: '40px 20px', textAlign: 'center' }}>
-                            <div className="guardian-beast-mini" style={{ marginBottom: '20px' }}>
-                                <img 
-                                    src="/guardian_beast_empty_state_1776007472770.png" 
-                                    alt="Empty" 
-                                    style={{ width: '120px', height: '120px', objectFit: 'contain', filter: 'drop-shadow(0 0 20px rgba(255,62,62,0.2))' }} 
-                                />
-                            </div>
                             <div style={{ fontWeight: 900, fontSize: '1.1rem', color: 'white', marginBottom: '8px' }}>KHÔNG TÌM THẤY</div>
                             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600, maxWidth: '200px', marginInline: 'auto' }}>
                                 Kết quả tìm kiếm hiện chưa có trong cơ sở dữ liệu.

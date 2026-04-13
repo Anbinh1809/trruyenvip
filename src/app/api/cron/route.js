@@ -1,4 +1,4 @@
-import { queueMangaSync, SOURCES } from '@/lib/crawler';
+import { queueMangaSync, queueDiscovery, SOURCES } from '@/lib/crawler';
  
 export async function GET(request) {
   const authHeader = request.headers.get('authorization');
@@ -11,7 +11,6 @@ export async function GET(request) {
   try {
     // TITAN ARCHITECTURE: Instead of running the heavy crawl in the HTTP request (timeout risk),
     // we queue it in our background task system.
-    import { queueDiscovery } from '@/lib/crawler';
     await queueDiscovery('nettruyen', 3, 10);
     await queueDiscovery('truyenqq', 3, 10);
     

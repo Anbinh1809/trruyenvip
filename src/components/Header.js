@@ -88,7 +88,7 @@ export default function Header() {
               <div className="mobile-search-hud fade-in" style={{ position: 'fixed', inset: 0, background: 'rgba(2, 6, 23, 0.98)', backdropFilter: 'blur(30px)', zIndex: 30005, padding: '20px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '30px' }}>
                       <button onClick={() => setIsSearchOpen(false)} style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: 'white', padding: '10px', borderRadius: '50%' }}><X size={24} /></button>
-                      <h3 style={{ margin: 0, fontWeight: 950, letterSpacing: '-1px' }}>Tìm Kiếm Tuyệt Đỉnh</h3>
+                      <h3 style={{ margin: 0, fontWeight: 950, letterSpacing: '-1px' }}>Tìm Kiếm Truyện</h3>
                   </div>
                   <LiveSearch onSelect={() => setIsSearchOpen(false)} />
               </div>
@@ -110,37 +110,19 @@ export default function Header() {
             ) : (
                 mounted && isAuthenticated ? (
                     <div className="user-profile-titan desktop-only">
-                        <div className="profile-trigger" onClick={() => {}}>
-                            <Link href="/rewards" className="coin-display">
-                                <Coins size={14} /> {new Intl.NumberFormat().format(vipCoins)} <span className="coin-label">VipCoins</span>
-                            </Link>
-                            <div className="level-display">
-                                <span className="level-accent">Cấp {level}</span> {' // '} {rankTitle}
-                            </div>
+                        <div className="profile-trigger" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 16px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px', cursor: 'pointer' }}>
+                            <User size={16} />
+                            <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{user?.username || 'Tài khoản'}</span>
                         </div>
                         
-                        <div className="profile-dropdown-titan glass">
-                            <div className="profile-header">
-                                <div className="avatar-wrapper">
-                                    <img 
-                                        src={`https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(user?.username || 'Guest')}&backgroundColor=transparent`} 
-                                        alt="Avatar" 
-                                        className="avatar-img"
-                                    />
-                                </div>
-                                <div className="profile-meta">
-                                    <p className="username">{user?.username || 'Người dùng'}</p>
-                                    <p className="role">{user?.role === 'admin' ? 'Quản trị viên' : 'Độc giả VIP'}</p>
-                                </div>
-                            </div>
-                            <div className="dropdown-divider" />
-                            <Link href="/profile" className="dropdown-item">Hồ sơ cá nhân</Link>
-                            <Link href="/favorites" className="dropdown-item">Truyện yêu thích</Link>
+                        <div className="profile-dropdown-titan glass" style={{ padding: '10px', minWidth: '200px' }}>
+                            <Link href="/profile" className="dropdown-item" style={{ padding: '10px', display: 'block', borderRadius: '4px' }}>Hồ sơ cá nhân</Link>
+                            <Link href="/favorites" className="dropdown-item" style={{ padding: '10px', display: 'block', borderRadius: '4px' }}>Truyện yêu thích</Link>
                             {user?.role === 'admin' && (
-                                <Link href="/admin" className="dropdown-item admin-link">Bảng điều khiển Admin</Link>
+                                <Link href="/admin" className="dropdown-item admin-link" style={{ padding: '10px', display: 'block', borderRadius: '4px' }}>Bảng điều khiển Admin</Link>
                             )}
-                            <div className="dropdown-divider" />
-                            <button onClick={logout} className="dropdown-item logout-btn">Đăng xuất</button>
+                            <div className="dropdown-divider" style={{ margin: '5px 0', borderTop: '1px solid rgba(255,255,255,0.1)' }} />
+                            <button onClick={logout} className="dropdown-item logout-btn" style={{ padding: '10px', display: 'block', width: '100%', textAlign: 'left', background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', borderRadius: '4px' }}>Đăng xuất</button>
                         </div>
                     </div>
                 ) : <div style={{ width: 100, opacity: 0 }} />

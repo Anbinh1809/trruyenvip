@@ -20,8 +20,7 @@ export default function ContinueReadingButton({ mangaId, chapters }) {
             href={`/manga/${mangaId}/chapter/${lastRead.chapterId}`} 
             className="btn btn-primary btn-large"
             style={{ 
-                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                boxShadow: '0 10px 30px rgba(16, 185, 129, 0.3)',
+                background: 'var(--accent)',
                 border: 'none',
                 display: 'flex',
                 alignItems: 'center',
@@ -35,10 +34,10 @@ export default function ContinueReadingButton({ mangaId, chapters }) {
 
   return (
       <div style={{ display: 'flex', gap: '15px', width: '100%' }}>
-          <Link href={`/manga/${mangaId}/chapter/${chapters[chapters.length - 1].id}`} className="btn btn-glass btn-large" style={{ flex: 1 }}>
+          <Link href={`/manga/${mangaId}/chapter/${chapters[chapters.length - 1].id}`} className="btn btn-outline" style={{ flex: 1 }}>
               Đọc chương đầu
           </Link>
-          <Link href={`/manga/${mangaId}/chapter/${chapters[0].id}`} className="btn btn-glass btn-large" style={{ flex: 1 }}>
+          <Link href={`/manga/${mangaId}/chapter/${chapters[0].id}`} className="btn btn-primary" style={{ flex: 1 }}>
               Chương mới nhất
           </Link>
       </div>

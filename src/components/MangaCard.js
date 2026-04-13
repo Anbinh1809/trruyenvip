@@ -51,7 +51,7 @@ function MangaCard({ manga, isNew = false }) {
         className={`card-media-titan ${!isLoaded ? 'skeleton-shimmer' : ''}`} 
         style={{ 
             aspectRatio: '4/5.2', 
-            borderRadius: '16px', 
+            borderRadius: 'var(--border-radius)', 
             overflow: 'hidden', 
             position: 'relative',
             background: '#0a0a0a' // Solid anchor to prevent transparency flicker
@@ -71,11 +71,11 @@ function MangaCard({ manga, isNew = false }) {
         
         {/* Badges on Top-Left */}
         <div className="manga-badge-container">
-            <span className="nebula-badge badge-time">
+            <span className="manga-tag badge-time">
                 {formatTimeAgo(manga.last_crawled)}
             </span>
             {(isNew || manga.trending) && (
-                <span className={`nebula-badge ${manga.trending ? 'badge-hot' : 'badge-status'}`}>
+                <span className={`manga-tag ${manga.trending ? 'badge-hot' : 'badge-status'}`}>
                     {manga.trending ? 'Hot' : 'New'}
                 </span>
             )}
@@ -83,7 +83,7 @@ function MangaCard({ manga, isNew = false }) {
 
         {/* Bookmark Button on Top-Right */}
         <button 
-            className={`bookmark-btn-nebula ${favorited ? 'active' : ''}`}
+            className={`bookmark-btn ${favorited ? 'active' : ''}`}
             aria-label={favorited ? "Xóa khỏi yêu thích" : "Thêm vào yêu thích"}
             onClick={(e) => {
                 e.preventDefault();

@@ -35,7 +35,6 @@ export default function Footer() {
                 <li><Link href="/leaderboard">Bảng Xếp Hạng</Link></li>
                 <li><Link href="/bookmarks">Truyện Yêu Thích</Link></li>
                 <li><Link href="/history">Lịch Sử Đọc</Link></li>
-                <li><Link href="/missions">Nhiệm Vụ Hàng Ngày</Link></li>
             </ul>
           </div>
 
@@ -52,11 +51,7 @@ export default function Footer() {
         </div>
 
         <div className="footer-bottom-titan">
-          <p>© {new Date().getFullYear()} TruyenVip Golden Sovereign. Nền tảng được tối ưu hóa cho trải nghiệm đọc truyện cao cấp.</p>
-          <div className="tech-stack-badges">
-                <span>Next.js 15+</span>
-                <span>Titan Engine v2.0</span>
-          </div>
+          <p>© {new Date().getFullYear()} TruyenVip. Đọc truyện tranh online miễn phí chất lượng cao.</p>
         </div>
       </div>
 

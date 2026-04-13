@@ -27,7 +27,7 @@
 
 .glass-scrollbar::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
+  border-radius: var(--border-radius);
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -94,9 +94,8 @@ body {
 .toast-titan {
     min-width: 320px;
     background: var(--toast-bg);
-    backdrop-filter: blur(25px);
     border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 20px;
+    border-radius: var(--border-radius);
     padding: 16px 24px;
     display: flex;
     align-items: center;
@@ -162,7 +161,7 @@ body {
     padding: 100px 20px;
     background: rgba(255,255,255,0.02);
     border: 1px dashed rgba(255,255,255,0.08);
-    border-radius: 40px;
+    border-radius: var(--border-radius);
 }
 
 .empty-illustration {
@@ -396,10 +395,8 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
   transform: translateY(10px);
   transition: var(--transition);
   border: 1px solid var(--glass-border);
-  border-radius: 20px;
+  border-radius: var(--border-radius);
   background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
   z-index: 1001;
 }
 
@@ -440,25 +437,23 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
     position: absolute; top: 10px; left: 10px; 
     display: flex; gap: 6px; z-index: 15; 
 }
-.nebula-badge { 
+.manga-tag { 
     font-size: 0.65rem; font-weight: 800; padding: 4px 10px; 
-    border-radius: 8px 0 8px 0; color: white;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    border-radius: var(--border-radius); color: white;
 }
-.badge-time { background: var(--nebula-blue); }
-.badge-status { background: var(--nebula-orange); }
-.badge-hot { background: var(--nebula-red); }
+.badge-time { background: #1e3a5f; color: #93c5fd; }
+.badge-status { background: #78350f; color: #fcd34d; }
+.badge-hot { background: rgba(255, 62, 62, 0.2); color: var(--accent); }
 
-.bookmark-btn-nebula {
+.bookmark-btn {
     position: absolute; top: 10px; right: 10px; 
-    width: 32px; height: 32px; border-radius: 50%;
-    background: white; border: none; cursor: pointer;
-    display: flex; alignItems: center; justifyContent: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    z-index: 15; color: #64748b; transition: var(--transition);
+    width: 32px; height: 32px; border-radius: var(--border-radius);
+    background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 15; color: rgba(255,255,255,0.7); transition: var(--transition);
 }
-.bookmark-btn-nebula.active { color: var(--nebula-red); }
-.bookmark-btn-nebula:hover { transform: scale(1.1); }
+.bookmark-btn.active { color: #ef4444; }
+.bookmark-btn:hover { background: rgba(0,0,0,0.8); color: white; }
 
 .card-title-centered {
     text-align: center;
@@ -495,7 +490,7 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
 .titan-genres-sidebar { position: sticky; top: 110px; }
 .titan-nav-card {
     background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 20px; padding: 25px; overflow: hidden;
+    border-radius: var(--border-radius); padding: 25px; overflow: hidden;
 }
 .titan-genre-scroll { display: flex; flex-direction: column; gap: 5px; max-height: 70vh; overflow-y: auto; padding-right: 5px; }
 .titan-genre-scroll::-webkit-scrollbar { width: 3px; }
@@ -590,7 +585,7 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
     align-items: center;
     justify-content: center;
     padding: 12px 24px;
-    border-radius: 12px;
+    border-radius: var(--border-radius);
     font-weight: 800;
     font-size: 0.95rem;
     transition: var(--transition);
@@ -636,14 +631,11 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
    ========================================================================== */
 .auth-container-titan {
     background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
     border: 1px solid var(--glass-border);
-    border-radius: 30px;
-    padding: 50px;
+    border-radius: var(--border-radius);
+    padding: 40px;
     width: 100%;
     max-width: 480px;
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
 }
 
 .auth-header { margin-bottom: 35px; }
@@ -680,8 +672,8 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
     background: rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: white;
-    padding: 16px 20px;
-    border-radius: 16px;
+    padding: 12px 16px;
+    border-radius: var(--border-radius);
     font-size: 1rem;
     font-family: var(--font-body);
     transition: var(--transition);
@@ -803,9 +795,9 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
 /* Slider Components */
 .titan-btn-glass {
     display: inline-flex; align-items: center; justify-content: center; padding: 16px 36px;
-    border-radius: 12px; font-weight: 800; font-size: 0.95rem; color: white;
+    border-radius: var(--border-radius); font-weight: 800; font-size: 0.95rem; color: white;
     background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px); transition: var(--transition); text-decoration: none;
+    transition: var(--transition); text-decoration: none;
 }
 .titan-btn-glass:hover { background: rgba(255, 255, 255, 0.2); transform: translateY(-2px); }
 
@@ -818,17 +810,17 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
 /* LiveSearch Components */
 .titan-results-panel {
     position: absolute; top: 120%; left: 0; right: 0; background: var(--bg-secondary);
-    border: 1px solid var(--glass-border); border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.5);
-    z-index: 2000; overflow: hidden; backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border); border-radius: var(--border-radius);
+    z-index: 2000; overflow: hidden;
 }
-.btn-migrate-pulse { animation: pulseAccent 2s infinite; }
+.btn-migrate-pulse { }
 
 /* Daily CheckIn Components */
 .checkin-section-titan { margin-bottom: 50px; position: relative; z-index: 10; }
 .glass-titan-checkin {
-    background: linear-gradient(135deg, rgba(20,20,20,0.8) 0%, rgba(10,10,10,0.95) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.05); padding: 40px; border-radius: 30px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; gap: 40px;
+    background: var(--bg-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.05); padding: 30px; border-radius: var(--border-radius);
+    display: flex; justify-content: space-between; align-items: center; gap: 40px;
 }
 .checkin-title { font-size: 1.8rem; font-weight: 900; margin-bottom: 10px; color: white; }
 .checkin-subtitle { font-size: 0.95rem; color: var(--text-muted); font-weight: 500; margin-bottom: 25px; }
@@ -882,9 +874,8 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
    TITAN PROFILE PAGE
    ========================================================================== */
 .profile-card-titan {
-    background: linear-gradient(180deg, rgba(20,20,20,0.8) 0%, rgba(5,5,5,0.9) 100%);
-    border: 1px solid rgba(255,255,255,0.05); padding: 50px 30px; border-radius: 40px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    background: var(--bg-secondary);
+    border: 1px solid rgba(255,255,255,0.05); padding: 40px 30px; border-radius: var(--border-radius);
 }
 
 .stat-grid-titan {
@@ -906,9 +897,8 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
 }
 
 .stat-item-titan {
-    background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--glass-border); padding: 30px; border-radius: 24px; transition: var(--transition);
-    position: relative; overflow: hidden;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border); padding: 25px; border-radius: var(--border-radius); transition: var(--transition);
 }
 .stat-item-titan:hover { transform: translateY(-8px); box-shadow: 0 20px 50px rgba(0,0,0,0.4); border-color: rgba(255,255,255,0.2); }
 .stat-item-titan.highlight-titan { border-color: rgba(255, 62, 62, 0.4); background: rgba(255, 62, 62, 0.08); }
@@ -921,8 +911,8 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
 }
 
 .action-node-titan {
-    background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--glass-border); padding: 35px; border-radius: 30px; display: flex; flex-direction: column;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border); padding: 30px; border-radius: var(--border-radius); display: flex; flex-direction: column;
     transition: var(--transition);
 }
 .action-node-titan:hover:not(.dimmed) { border-color: var(--accent); box-shadow: 0 10px 40px rgba(255, 62, 62, 0.15); transform: translateY(-3px); }
@@ -938,7 +928,7 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
 }
 
 .titan-admin-status {
-    padding: 8px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 800;
+    padding: 6px 12px; border-radius: var(--border-radius); font-size: 0.8rem; font-weight: 800;
     display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgba(255,255,255,0.1);
     background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.6); text-transform: uppercase;
 }
@@ -952,7 +942,7 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
 .titan-scanner-line { box-shadow: 0 0 15px 2px var(--accent); position: absolute; }
 
 .titan-image-log {
-    background: #000; border: 1px solid rgba(255, 62, 62, 0.3); padding: 15px; border-radius: 12px;
+    background: #000; border: 1px solid rgba(255, 62, 62, 0.3); padding: 15px; border-radius: var(--border-radius);
     font-family: monospace; position: relative; overflow: hidden;
 }
 
@@ -968,8 +958,8 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
    TITAN LEADERBOARD
    ========================================================================== */
 .rank-node-titan {
-    background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--glass-border); border-radius: 25px; display: flex; align-items: center; gap: 20px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border); border-radius: var(--border-radius); display: flex; align-items: center; gap: 20px;
     transition: var(--transition);
 }
 .rank-node-titan:hover { transform: translateX(10px); background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.15); box-shadow: -10px 10px 30px rgba(0,0,0,0.5); }
@@ -992,35 +982,33 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
 .detail-header { display: flex; gap: 40px; margin-bottom: 60px; }
 .detail-info { flex: 1; }
 .detail-title { 
-    font-size: clamp(1.8rem, 8vw, 3.5rem); 
-    font-weight: 950; 
-    letter-spacing: -1.5px; 
+    font-size: clamp(1.8rem, 8vw, 2.8rem); 
+    font-weight: 900; 
+    letter-spacing: -1px; 
     line-height: 1.1; 
     margin-bottom: 10px; 
     color: var(--text-primary); 
-    text-shadow: 0 5px 20px rgba(0,0,0,0.2); 
 }
 .detail-subtitle { font-size: 1.1rem; color: var(--text-secondary); font-weight: 600; margin-bottom: 25px; }
 
-.pill-group { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; }
-.pill { padding: 8px 16px; border-radius: 12px; font-size: 0.85rem; font-weight: 800; }
+.pill-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 30px; }
+.pill { padding: 6px 14px; border-radius: var(--border-radius); font-size: 0.8rem; font-weight: 700; }
 .author-pill { background: rgba(255,255,255,0.1); color: white; }
 .status-pill.accent { background: rgba(255, 62, 62, 0.15); color: var(--accent); border: 1px solid rgba(255, 62, 62, 0.3); text-transform: uppercase; letter-spacing: 1px; }
 .genre-pill { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.1); text-decoration: none; transition: var(--transition); }
 .genre-pill:hover { background: rgba(255,255,255,0.15); color: white; transform: translateY(-2px); }
 
 .description-container {
-    padding: 25px; border-radius: 20px; margin-bottom: 30px; line-height: 1.8;
+    padding: 20px; border-radius: var(--border-radius); margin-bottom: 30px; line-height: 1.8;
     color: var(--text-primary); font-size: 0.95rem; 
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(10px);
 }
 
 .detail-actions { display: flex; gap: 15px; margin-bottom: 40px; flex-wrap: wrap; }
-.btn-glass { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(10px); color: white; }
-.btn-glass:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
-.btn-large { padding: 18px 40px; font-size: 1.1rem; font-weight: 900; border-radius: 16px; text-decoration: none; }
+.btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; }
+.btn-outline:hover { background: rgba(255,255,255,0.08); }
+.btn-large { padding: 16px 36px; font-size: 1rem; font-weight: 800; text-decoration: none; }
 
 /* ==========================================================================
    TITAN RECENTLY READ COMPONENTS
@@ -1037,7 +1025,7 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
 .titan-recent-card:hover { transform: translateY(-5px); }
 
 .titan-recent-image {
-    position: relative; aspect-ratio: 2/3; border-radius: 16px; overflow: hidden;
+    position: relative; aspect-ratio: 2/3; border-radius: var(--border-radius); overflow: hidden;
     border: 1px solid var(--glass-border);
 }
 .titan-recent-img { object-fit: cover; transition: 0.3s; }
@@ -1096,7 +1084,7 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
     padding: 8px 16px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
+    border-radius: var(--border-radius);
     color: var(--text-primary);
     font-size: 0.8rem;
     font-weight: 700;
@@ -1129,7 +1117,7 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
     overflow-y: auto;
     padding-right: 8px;
     background: rgba(255, 255, 255, 0.02);
-    border-radius: 16px;
+    border-radius: var(--border-radius);
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -1178,31 +1166,31 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
     display: flex; justify-content: center; gap: 10px; margin: 50px 0;
 }
 .pagination-node-titan {
-    width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;
-    border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+    border-radius: var(--border-radius); background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
     color: white; text-decoration: none; font-weight: 800; transition: 0.3s; cursor: pointer;
 }
 .pagination-node-titan:hover, .pagination-node-titan.active { background: var(--accent); border-color: var(--accent); transform: translateY(-3px); }
 
 /* 4. Auxiliary Page Components */
 .auth-form-titan {
-    background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-    padding: 50px; border-radius: 30px; border: 1px solid var(--glass-border);
-    box-shadow: 0 30px 60px rgba(0,0,0,0.5); width: 100%; max-width: 450px;
+    background: var(--glass-bg);
+    padding: 40px; border-radius: var(--border-radius); border: 1px solid var(--glass-border);
+    width: 100%; max-width: 450px;
 }
 
-.login-btn { width: 100%; padding: 15px; font-size: 1.1rem; border-radius: 12px; font-weight: 900; margin-top: 20px; }
+.login-btn { width: 100%; padding: 14px; font-size: 1rem; border-radius: var(--border-radius); font-weight: 800; margin-top: 20px; }
 
 .titan-chaos-card {
     background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 20px; padding: 30px; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    text-align: center; cursor: pointer; position: relative; overflow: hidden;
+    border-radius: var(--border-radius); padding: 25px; transition: 0.3s;
+    text-align: center; cursor: pointer;
 }
 .titan-chaos-card:hover { transform: translateY(-10px); background: rgba(255,255,255,0.08); border-color: var(--accent); box-shadow: 0 20px 40px rgba(255,62,62,0.2); }
 
 .empty-state-titan {
     text-align: center; padding: 80px 20px; background: rgba(255,255,255,0.02);
-    border-radius: 30px; border: 1px dashed rgba(255,255,255,0.1);
+    border-radius: var(--border-radius); border: 1px dashed rgba(255,255,255,0.1);
 }
 
 .history-grid-titan {
@@ -1211,14 +1199,14 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
 
 .favorite-btn-titan {
     background: rgba(255, 62, 62, 0.1); border: 1px solid rgba(255, 62, 62, 0.3);
-    color: var(--accent); border-radius: 12px; padding: 15px 30px; font-weight: 800;
+    color: var(--accent); border-radius: var(--border-radius); padding: 12px 24px; font-weight: 700;
     cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 10px;
 }
 .favorite-btn-titan:hover { background: rgba(255, 62, 62, 0.2); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255, 62, 62, 0.3); }
 
 .titan-share-btn {
     background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3);
-    color: #3b82f6; border-radius: 12px; padding: 15px 30px; font-weight: 800;
+    color: #3b82f6; border-radius: var(--border-radius); padding: 12px 24px; font-weight: 700;
     cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 10px;
 }
 .titan-share-btn:hover { background: rgba(59, 130, 246, 0.2); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3); }
@@ -1250,14 +1238,13 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
 .titan-reader-panel {
     position: fixed; bottom: 250px; right: 30px; width: 280px;
     background: rgba(15,15,15,0.98); border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 20px; padding: 25px; z-index: 2000; box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-    backdrop-filter: blur(20px);
+    border-radius: var(--border-radius); padding: 20px; z-index: 2000;
 }
 .setting-group + .setting-group { margin-top: 20px; }
 
 .titan-filter-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 .titan-filter-box {
-    height: 35px; border-radius: 10px; cursor: pointer; border: 2px solid transparent;
+    height: 35px; border-radius: var(--border-radius); cursor: pointer; border: 2px solid transparent;
     transition: 0.3s;
 }
 .titan-filter-box.active { border-color: var(--accent); transform: scale(1.1); }
@@ -1282,8 +1269,8 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
 .titan-genre-scroller::-webkit-scrollbar { display: none; }
 
 .titan-genre-tag-mobile {
-    white-space: nowrap; padding: 8px 16px; background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1); border-radius: 50px; font-size: 0.85rem;
+    white-space: nowrap; padding: 6px 14px; background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1); border-radius: var(--border-radius); font-size: 0.8rem;
     font-weight: 700; color: rgba(255,255,255,0.6); text-decoration: none; transition: 0.2s;
 }
 .titan-genre-tag-mobile.active { background: var(--accent); border-color: var(--accent); color: white; }
@@ -1327,7 +1314,7 @@ nextjs-portal, #nextjs-portal { display: none !important; }
 
 .recently-read-titan {
     background: rgba(255,255,255,0.02);
-    border-radius: 24px;
+    border-radius: var(--border-radius);
     padding: 20px;
     border: 1px solid rgba(255,255,255,0.05);
 }
@@ -1341,7 +1328,7 @@ nextjs-portal, #nextjs-portal { display: none !important; }
     align-items: center;
     gap: 12px;
     padding: 10px;
-    border-radius: 16px;
+    border-radius: var(--border-radius);
     background: rgba(255,255,255,0.03);
     border: 1px solid rgba(255,255,255,0.05);
     transition: 0.3s;
@@ -1357,7 +1344,7 @@ nextjs-portal, #nextjs-portal { display: none !important; }
     width: 60px;
     height: 80px;
     position: relative;
-    border-radius: 8px;
+    border-radius: var(--border-radius);
     overflow: hidden;
     flex-shrink: 0;
 }
@@ -1476,7 +1463,7 @@ nextjs-portal, #nextjs-portal { display: none !important; }
 .recent-skeleton-img {
     width: 45px;
     height: 60px;
-    border-radius: 10px;
+    border-radius: var(--border-radius);
     background: rgba(255,255,255,0.05);
 }
 
@@ -1512,8 +1499,7 @@ nextjs-portal, #nextjs-portal { display: none !important; }
 
 .reading-progress-bar {
     height: 100%;
-    background: var(--accent-gradient);
-    box-shadow: 0 0 10px rgba(255, 62, 62, 0.5);
+    background: var(--accent);
     transition: width 0.1s ease-out;
 }
 
@@ -1536,7 +1522,7 @@ nextjs-portal, #nextjs-portal { display: none !important; }
 /* TRENDING TICKER MARQUEE */
 .trending-ticker-titan {
     background: rgba(255, 255, 255, 0.03);
-    border-radius: 12px;
+    border-radius: var(--border-radius);
     padding: 12px 0;
     overflow: hidden;
     white-space: nowrap;
@@ -1565,11 +1551,11 @@ nextjs-portal, #nextjs-portal { display: none !important; }
 
 .trending-ticker-item .hot-indicator {
     color: var(--accent);
-    font-weight: 950;
+    font-weight: 800;
     font-size: 0.65rem;
     background: rgba(255, 62, 62, 0.12);
     padding: 3px 8px;
-    border-radius: 6px;
+    border-radius: var(--border-radius);
     border: 1px solid rgba(255, 62, 62, 0.2);
 }
 
@@ -1597,7 +1583,7 @@ nextjs-portal, #nextjs-portal { display: none !important; }
 
 .skeleton-premium-card {
     height: 350px;
-    border-radius: 20px;
+    border-radius: var(--border-radius);
     background: rgba(255,255,255,0.03);
     position: relative;
     overflow: hidden;
@@ -1734,13 +1720,12 @@ nextjs-portal, #nextjs-portal { display: none !important; }
 .rank-tag-premium {
     display: inline-block;
     font-size: 0.75rem;
-    font-weight: 900;
-    padding: 3px 15px;
+    font-weight: 800;
+    padding: 3px 12px;
     background: var(--accent);
     color: white;
-    border-radius: 20px;
+    border-radius: var(--border-radius);
     margin: 8px 0;
-    box-shadow: 0 4px 15px rgba(255, 62, 62, 0.4);
 }
 
 .celebration-subtitle-titan {
@@ -1749,15 +1734,15 @@ nextjs-portal, #nextjs-portal { display: none !important; }
     margin: 0;
 }
 
-/* RANK AURAS */
-.rank-aura-phàm-nhân { box-shadow: 0 0 40px rgba(139, 69, 19, 0.2); }
-.rank-aura-luyện-khí { box-shadow: 0 0 50px rgba(128, 128, 128, 0.2); }
-.rank-aura-trúc-cơ { box-shadow: 0 0 60px rgba(205, 127, 50, 0.3); }
-.rank-aura-kim-đan { box-shadow: 0 0 70px rgba(192, 192, 192, 0.4); border: 1px solid rgba(192, 192, 192, 0.2); }
-.rank-aura-nguyên-anh { box-shadow: 0 0 80px rgba(255, 215, 0, 0.5); border: 1px solid rgba(255, 215, 0, 0.3); }
-.rank-aura-hóa-thần { box-shadow: 0 0 100px rgba(229, 228, 226, 0.6); border: 2px solid rgba(229, 228, 226, 0.4); }
-.rank-aura-đại-thánh { box-shadow: 0 0 120px rgba(185, 242, 255, 0.7); animation: titanGlow 3s infinite alternate; }
-.rank-aura-tiên-đế { box-shadow: 0 0 150px rgba(255, 62, 62, 0.8); animation: titanGlowRed 2s infinite alternate; }
+/* RANK AURAS - removed glow effects for minimalist UI */
+.rank-aura-phàm-nhân { }
+.rank-aura-luyện-khí { }
+.rank-aura-trúc-cơ { }
+.rank-aura-kim-đan { }
+.rank-aura-nguyên-anh { }
+.rank-aura-hóa-thần { }
+.rank-aura-đại-thánh { }
+.rank-aura-tiên-đế { }
 
 /* ERGONOMIC BRIGHTNESS ENGINE */
 :root {

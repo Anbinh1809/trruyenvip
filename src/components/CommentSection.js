@@ -68,12 +68,10 @@ const CommentItem = ({ comment, isReply = false, chapterId, userName, fetchComme
             <div className={`comment-item ${isReply ? 'reply' : ''}`} style={{ 
                 padding: '20px', 
                 background: isAdmin ? 'rgba(255,215,0,0.03)' : (isReply ? 'rgba(255,255,255,0.02)' : 'var(--bg-primary)'), 
-                borderRadius: '15px', 
+                borderRadius: 'var(--border-radius)', 
                 border: isAdmin ? '1px solid rgba(255,215,0,0.3)' : '1px solid var(--glass-border)',
                 marginLeft: isReply ? '40px' : '0',
-                boxShadow: isAdmin ? '0 0 25px rgba(255, 215, 0, 0.15)' : 'none',
                 opacity: comment.isOptimistic ? 0.7 : 1
-
             }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -86,7 +84,7 @@ const CommentItem = ({ comment, isReply = false, chapterId, userName, fetchComme
                                 background: isAdmin ? '#ffd700' : 'var(--bg-tertiary)', 
                                 color: isAdmin ? '#000' : 'var(--text-primary)',
                                 padding: '2px 8px',
-                                borderRadius: '6px',
+                                borderRadius: '4px',
                                 fontWeight: 800,
                                 textTransform: 'uppercase'
                             }}>
@@ -133,7 +131,7 @@ const CommentItem = ({ comment, isReply = false, chapterId, userName, fetchComme
                             value={replyText}
                             onChange={(e) => setReplyText(e.target.value)}
                             placeholder="Viết câu trả lời..."
-                            style={{ width: '100%', minHeight: '60px', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)', padding: '12px', borderRadius: '10px', color: 'white', marginBottom: '10px', outline: 'none' }}
+                            style={{ width: '100%', minHeight: '60px', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)', padding: '12px', borderRadius: 'var(--border-radius)', color: 'white', marginBottom: '10px', outline: 'none' }}
                         />
                         <div style={{ display: 'flex', gap: '10px' }}>
                             <button type="submit" className="btn btn-primary" style={{ padding: '6px 20px', fontSize: '0.8rem' }}>Gửi</button>
@@ -265,7 +263,7 @@ export default function CommentSection({ chapterId }) {
   const rootComments = (comments || []).filter(c => !c.parent_id);
 
   return (
-    <section className="comment-section container" style={{ marginTop: '60px', padding: '40px', background: 'var(--bg-secondary)', borderRadius: '30px', border: '1px solid var(--glass-border)' }}>
+    <section className="comment-section container" style={{ marginTop: '60px', padding: '40px', background: 'var(--bg-secondary)', borderRadius: 'var(--border-radius)', border: '1px solid var(--glass-border)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
         <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', fontWeight: 800 }}>
             <MessageSquare size={20} color="var(--accent)" /> Bình luận ({comments?.length || 0})
@@ -278,7 +276,7 @@ export default function CommentSection({ chapterId }) {
       </div>
       
       {!isAuthenticated ? (
-         <div className="glass-card" style={{ padding: '30px', textAlign: 'center', marginBottom: '40px', borderRadius: '20px' }}>
+         <div className="glass-card" style={{ padding: '30px', textAlign: 'center', marginBottom: '40px', borderRadius: 'var(--border-radius)' }}>
             <p style={{ marginBottom: '20px', fontWeight: 600 }}>Vui lòng đăng nhập để tham gia thảo luận cùng cộng đồng.</p>
             <Link href="/auth/login" className="btn btn-primary" style={{ display: 'inline-block', textDecoration: 'none' }}>Đăng nhập ngay</Link>
          </div>
@@ -288,18 +286,18 @@ export default function CommentSection({ chapterId }) {
                 placeholder="Nhập nội dung bình luận..." 
                 value={newComment} 
                 onChange={(e) => setNewComment(e.target.value)}
-                style={{ width: '100%', minHeight: '100px', background: 'rgba(0,0,0,0.1)', border: '1px solid var(--glass-border)', padding: '15px 20px', borderRadius: '15px', color: 'white', marginBottom: '15px', resize: 'vertical', outline: 'none' }}
+                style={{ width: '100%', minHeight: '100px', background: 'rgba(0,0,0,0.1)', border: '1px solid var(--glass-border)', padding: '15px 20px', borderRadius: 'var(--border-radius)', color: 'white', marginBottom: '15px', resize: 'vertical', outline: 'none' }}
                 required
             ></textarea>
-            <button type="submit" className="btn btn-primary" style={{ padding: '12px 40px' }}>Gửi bình luận (+10 XP)</button>
+            <button type="submit" className="btn btn-primary" style={{ padding: '12px 40px' }}>Gửi bình luận</button>
         </form>
       )}
 
       <div className="comment-list">
         {loading ? (
           <div className="shimmer-group" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <div className="shimmer" style={{ width: '100%', height: '80px', borderRadius: '15px', background: 'rgba(255,255,255,0.05)' }}></div>
-            <div className="shimmer" style={{ width: '100%', height: '80px', borderRadius: '15px', background: 'rgba(255,255,255,0.05)' }}></div>
+            <div className="shimmer" style={{ width: '100%', height: '80px', borderRadius: 'var(--border-radius)', background: 'rgba(255,255,255,0.05)' }}></div>
+            <div className="shimmer" style={{ width: '100%', height: '80px', borderRadius: 'var(--border-radius)', background: 'rgba(255,255,255,0.05)' }}></div>
           </div>
         ) : rootComments.length > 0 ? (
           rootComments.map((comment) => (

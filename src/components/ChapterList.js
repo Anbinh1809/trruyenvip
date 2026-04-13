@@ -51,7 +51,7 @@ export default function ChapterList({ mangaId, chapters }) {
                 className="btn-sort-titan"
                 style={{
                     padding: '10px 18px',
-                    borderRadius: '12px',
+                    borderRadius: 'var(--border-radius)',
                     background: 'rgba(255,255,255,0.05)',
                     border: '1px solid rgba(255,255,255,0.1)',
                     color: 'var(--text-primary)',
@@ -79,7 +79,7 @@ export default function ChapterList({ mangaId, chapters }) {
                     width: '100%',
                     padding: '12px 20px',
                     paddingLeft: '40px',
-                    borderRadius: '15px',
+                    borderRadius: 'var(--border-radius)',
                     background: 'var(--bg-tertiary)',
                     border: '1px solid var(--glass-border)',
                     color: 'var(--text-primary)',
