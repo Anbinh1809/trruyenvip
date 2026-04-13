@@ -52,7 +52,7 @@ export default function ChapterContent({ chapterId, initialImages = [] }) {
             } catch (e) {
                 // Continue polling
             }
-        }, 3000); 
+        }, 1500); 
     }, [chapterId, stopPolling]);
 
     const startSync = useCallback(async () => {
@@ -65,18 +65,39 @@ export default function ChapterContent({ chapterId, initialImages = [] }) {
                 body: JSON.stringify({ chapterId })
             });
 
+            const data = await res.json().catch(() => ({}));
+
             if (res.ok) {
+                // Sync completed synchronously on Vercel — fetch images immediately
+                if (data.imageCount > 0) {
+                    const imgRes = await fetch(`/api/reader/chapter-images?id=${encodeURIComponent(chapterId)}`);
+                    if (imgRes.ok) {
+                        const imgData = await imgRes.json();
+                        if (imgData.images?.length > 0) {
+                            const optimizedWidth = window.innerWidth < 768 ? 800 : 1200;
+                            setImages(imgData.images.map(img =>
+                                `/api/proxy?url=${encodeURIComponent(img.image_url)}&w=${optimizedWidth}`
+                            ));
+                            setIsSyncing(false);
+                            return;
+                        }
+                    }
+                }
+                // Fallback: start polling in case sync is still writing
                 startPolling();
-            } else if (res.status === 401) {
-                setError('Vui lòng đăng nhập để kích hoạt bộ cào dữ liệu cho chương này.');
             } else if (res.status === 429) {
-                const data = await res.json().catch(() => ({}));
                 setError(data.error || 'Thao tác quá nhanh, vui lòng đợi một chút.');
+                setIsSyncing(false);
+            } else if (res.status === 404) {
+                setError('Chương này không tồn tại trong hệ thống. Vui lòng quay lại mục lục.');
+                setIsSyncing(false);
             } else {
-                setError('Hệ thống đang bảo trì hoặc nguồn không phản hồi. Vui lòng quay lại sau.');
+                setError(data.error || 'Hệ thống đang bảo trì hoặc nguồn không phản hồi. Vui lòng quay lại sau.');
+                setIsSyncing(false);
             }
         } catch (e) {
-            setError('Lỗi kết nối máy chủ.');
+            setError('Lỗi kết nối máy chủ. Vui lòng kiểm tra mạng và thử lại.');
+            setIsSyncing(false);
         }
     }, [chapterId, startPolling]);
 
