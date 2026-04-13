@@ -41,8 +41,6 @@ function translateSql(sql, params) {
     // 2. String Concatenation Fix (MSSQL + to Postgres ||)
     // Converts $1 + '%' OR '%' + $1 OR 'A' + 'B'
     translatedSql = translatedSql.replace(/(\$\d+|'[^']*')\s*\+\s*(\$\d+|'[^']*')/gi, '$1 || $2');
-    // Handle double concatenation like $1 + ' ' + $2
-    translatedSql = translatedSql.replace(/(\$\d+|'[^']*')\s*\+\s*(\$\d+|'[^']*')/gi, '$1 || $2');
 
     // 3. Robust TOP to LIMIT translation
     // Handles SELECT TOP 10 ..., SELECT DISTINCT TOP 10 ..., and subqueries

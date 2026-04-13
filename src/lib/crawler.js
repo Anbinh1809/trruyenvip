@@ -79,7 +79,7 @@ async function logGuardianEvent(mangaId, chapterTitle, eventType, message) {
         let mangaName = 'System';
         
         if (mangaId) {
-            const res = await query("SELECT TOP 1 title, cover FROM Manga WHERE id = @mangaId", { mangaId });
+            const res = await query("SELECT title, cover FROM Manga WHERE id = @mangaId LIMIT 1", { mangaId });
             if (res.recordset.length > 0) {
                 mangaName = res.recordset[0].title;
                 cover = res.recordset[0].cover;
@@ -253,8 +253,17 @@ async function fetchWithRetry(url, options = {}, retries = 3) {
 
             // Cloudflare Sentinel: Detect challenge pages disguised as 200 OK
             if (response.data && typeof response.data === 'string') {
-                if (response.data.includes('cf-browser-verification') || response.data.includes('Checking your browser')) {
+                const isChallenge = response.data.includes('cf-browser-verification') || 
+                                   response.data.includes('Checking your browser') ||
+                                   response.data.includes('captcha');
+                
+                if (isChallenge) {
                     throw { response: { status: 403, data: 'Cloudflare Challenge Detected' } };
+                }
+
+                // Empty page detection for mirrors (detecting mirrors that serve skeletons or blanks)
+                if (options.isDiscovery && response.data.length < 500) {
+                    throw new Error('Empypage or skeletal response detected on mirror');
                 }
             }
             
@@ -433,7 +442,7 @@ export async function healChapterGaps(limit = 5) {
         
         // Find manga with inconsistent chapter counts, prioritize by Favorites & Views
         const targets = await query(`
-            SELECT TOP (@limit) m.id, m.source_url, m.title, (SELECT COUNT(*) FROM Favorites f WHERE f.manga_id = m.id) as fav_count
+            SELECT m.id, m.source_url, m.title, (SELECT COUNT(*) FROM Favorites f WHERE f.manga_id = m.id) as fav_count
             FROM Manga m
             JOIN (
                 SELECT manga_id, MAX(chapter_number) as max_n, COUNT(*) as count_n
@@ -466,7 +475,7 @@ export async function rescueBrokenImages(limit = 10) {
         
         // Find chapters with fewer than 3 images, prioritizing Popular Manga & Newer chapters
         const targets = await query(`
-            SELECT TOP (@limit) c.id, c.title, c.source_url, m.title as manga_title, m.id as manga_id, 
+            SELECT c.id, c.title, c.source_url, m.title as manga_title, m.id as manga_id, 
                    (SELECT COUNT(*) FROM Favorites f WHERE f.manga_id = m.id) as fav_count
             FROM Chapters c
             JOIN Manga m ON c.manga_id = m.id
@@ -557,11 +566,12 @@ export async function crawlLatest(full = false, limitless = false) {
 export async function refreshActiveManga(limit = 20) {
     try {
         const targets = await query(`
-            SELECT TOP (@limit) m.id, m.source_url, m.title, m.status, m.last_crawled, COUNT(f.id) as fav_count
+            SELECT m.id, m.source_url, m.title, m.status, m.last_crawled, COUNT(f.id) as fav_count
             FROM Manga m
             LEFT JOIN Favorites f ON m.id = f.manga_id
             GROUP BY m.id, m.source_url, m.title, m.status, m.last_crawled
             ORDER BY fav_count DESC, m.last_crawled ASC
+            LIMIT @limit
         `, { limit });
 
         await runInParallel(targets.recordset, async (manga) => {
@@ -591,7 +601,7 @@ export async function refreshActiveManga(limit = 20) {
 export async function autoDeepCrawl(limit = 5) {
     try {
         const targets = await query(`
-            SELECT TOP (@limit) m.id, m.source_url, m.title 
+            SELECT m.id, m.source_url, m.title 
             FROM Manga m
             LEFT JOIN (SELECT manga_id, COUNT(*) as c FROM Chapters GROUP BY manga_id) ch ON m.id = ch.manga_id
             ORDER BY 
@@ -848,7 +858,9 @@ export async function crawlFullMangaChapters(mangaId, detailUrl, source = 'nettr
                            $('.star').attr('data-id') || 
                            $('input[name="comicId"]').val() ||
                            $('.subscribe').attr('data-id') ||
-                           $('#hdMangaId').val();
+                           $('#hdMangaId').val() ||
+                           $('[data-site-id]').attr('data-id') ||
+                           $('.follow-link').attr('data-id');
 
             // Fallback: Extract from script or URL if standard selectors fail
             if (!comicId) {
