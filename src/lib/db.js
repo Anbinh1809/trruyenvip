@@ -8,13 +8,24 @@ if (!process.env.DATABASE_URL) {
 
 // TITAN-GRADE POSTGRESQL POOL
 // Native support for Neon.tech and Vercel Edge performance requirements.
+const originalUrl = process.env.DATABASE_URL;
+let connectionString = originalUrl;
+
+// TITAN AUTO-SILENCE: Append uselibpqcompat=true to suppress SSL warnings in logs
+if (connectionString?.includes('sslmode=') && !connectionString.includes('uselibpqcompat=true')) {
+    const separator = connectionString.includes('?') ? '&' : '?';
+    connectionString += `${separator}uselibpqcompat=true`;
+}
+
+const isCloudDB = connectionString?.includes('supabase') || 
+                  connectionString?.includes('neon') || 
+                  connectionString?.includes('.aivencloud.com');
+
 const pool = new Pool({ 
-    connectionString: process.env.DATABASE_URL,
-    connectionTimeoutMillis: 10000, // 10s timeout
-    max: 20, // Increased for peak performance
-    ssl: process.env.DATABASE_URL?.includes('supabase') || process.env.DATABASE_URL?.includes('neon') 
-        ? { rejectUnauthorized: false } 
-        : false
+    connectionString: connectionString,
+    connectionTimeoutMillis: 10000, 
+    max: 10, 
+    ssl: isCloudDB ? { rejectUnauthorized: false } : false
 });
 
 // Cache for translated SQL to avoid regex overhead on every query
