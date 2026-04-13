@@ -45,20 +45,17 @@ function translateSql(sql, params) {
     translatedSql = translatedSql.replace(/(\$\d+|'[^']*')\s*\+\s*(\$\d+|'[^']*')/gi, '$1 || $2');
 
     // 3. Robust TOP to LIMIT translation
-    // Handles SELECT TOP 10 ... and SELECT TOP @limit ...
-    const topMatch = translatedSql.match(/SELECT\s+TOP\s+\(?(\d+|\$\d+)\)?/i);
-    if (topMatch) {
-        const limitValue = topMatch[1];
-        translatedSql = translatedSql.replace(/SELECT\s+TOP\s+\(?(\d+|\$\d+)\)?/i, 'SELECT');
-        // Simple append if no LIMIT exists
-        if (!translatedSql.toUpperCase().includes('LIMIT ')) {
-            translatedSql = translatedSql.trim();
-            if (translatedSql.endsWith(';')) translatedSql = translatedSql.slice(0, -1);
-            translatedSql += ` LIMIT ${limitValue}`;
-        }
-    }
+    // Handles SELECT TOP 10 ..., SELECT DISTINCT TOP 10 ..., and subqueries
+    // Postgres LIMIT must be at the end of the clause.
+    translatedSql = translatedSql.replace(/(SELECT\s+(?:DISTINCT\s+)?TOP\s+\(?(\d+|\$\d+)\)?)(.*?)(?=\bSELECT\b|$|;|\))/gis, (match, prefix, limit, rest) => {
+        const selectStmt = prefix.toUpperCase().includes('DISTINCT') ? 'SELECT DISTINCT' : 'SELECT';
+        // If the 'rest' already contains a LIMIT, don't append another one (prevents recursive issues)
+        if (rest.toUpperCase().includes('LIMIT ')) return match;
+        return `${selectStmt}${rest} LIMIT ${limit}`;
+    });
 
     // 4. Common Function Mapping
+    translatedSql = translatedSql.replace(/LIKE\s+N'/gi, "LIKE '");
     translatedSql = translatedSql.replace(/GETDATE\(\)/gi, 'NOW()');
     translatedSql = translatedSql.replace(/ISNULL/gi, 'COALESCE');
     translatedSql = translatedSql.replace(/LEN\s*\(/gi, 'LENGTH(');

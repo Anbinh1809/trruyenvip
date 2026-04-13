@@ -69,22 +69,24 @@ export async function POST(request) {
         console.log(`[Redeem][${traceId}] Attempt started for ${userIdent.uuid} (${userName})`);
 
         try {
-            await query(`
-                BEGIN TRANSACTION;
-                UPDATE Users SET vipCoins = vipCoins - @cost 
-                WHERE uuid = @uuid AND vipCoins >= @cost;
-                
-                IF @@ROWCOUNT = 0
-                BEGIN
-                    ROLLBACK;
-                    THROW 50000, 'Số dư VipCoins không đủ để thực hiện giao dịch này.', 1;
-                END
+            const { withTransaction } = await import('@/lib/db');
+            
+            await withTransaction(async (client) => {
+                // In Postgres, we use standard SQL and check rowCount on the client
+                const updateRes = await client.query(
+                    'UPDATE Users SET "vipCoins" = "vipCoins" - $1 WHERE uuid = $2 AND "vipCoins" >= $1',
+                    [cost, session.uuid]
+                );
 
-                INSERT INTO RedemptionRequests (user_uuid, user_name, card_type, card_value, phone_number, status)
-                VALUES (@uuid, @userName, @cardType, @cardValue, @phoneNumber, 'Pending');
-                
-                COMMIT;
-            `, { uuid: session.uuid, cost, userName, cardType, cardValue: val, phoneNumber });
+                if (updateRes.rowCount === 0) {
+                    throw new Error('Số dư VipCoins không đủ để thực hiện giao dịch này.');
+                }
+
+                await client.query(
+                    'INSERT INTO "RedemptionRequests" (user_uuid, user_name, card_type, card_value, phone_number, status) VALUES ($1, $2, $3, $4, $5, $6)',
+                    [session.uuid, userName, cardType, val, phoneNumber, 'Pending']
+                );
+            });
 
             console.log(`[Redeem][${traceId}] Success. Cost: ${cost} coins.`);
             return new Response('Yêu cầu đổi quà đã được ghi nhận!', { 
@@ -115,9 +117,9 @@ export async function PATCH(request) {
         const body = await request.json();
         const { id, status } = body;
 
-        const res = await query("UPDATE RedemptionRequests SET status = @status WHERE id = @id; SELECT @@ROWCOUNT as affected", { id, status });
+        const res = await query("UPDATE RedemptionRequests SET status = @status WHERE id = @id", { id, status });
         
-        if (res.recordset[0]?.affected === 0) {
+        if (res.rowCount === 0) {
             return new Response('Không tìm thấy yêu cầu đổi quà', { status: 404 });
         }
 
