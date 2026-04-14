@@ -84,7 +84,9 @@ export {
     rescueBrokenImages,
     bootstrapCrawler,
     queueChapterScrape,
-    queueDiscovery
+    queueDiscovery,
+    processQueue,
+    runTitanWorker
 } from './engine.js';
 
 export { 

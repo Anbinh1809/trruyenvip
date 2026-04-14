@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const CRON_URL = process.env.CRON_URL || 'http://localhost:3000/api/cron';
-const INTERVAL = 5 * 60 * 1000; // 5 minutes
+const INTERVAL = 1 * 60 * 1000; // 1 minute (Titan Heartbeat)
 
 console.log(`[Worker] Automation started. Targeting: ${CRON_URL}`);
 console.log(`[Worker] Interval: ${INTERVAL / 1000 / 60} minutes`);

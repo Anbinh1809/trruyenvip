@@ -8,6 +8,8 @@ global.crawlerState = global.crawlerState || {
     currentManga: null,
     currentChapter: null,
     currentImage: null,
+    discoveryPage: 1,
+    isArchivalPulse: false,
     successCount: 0,
     failCount: 0,
     imagesScrapedToday: 0,

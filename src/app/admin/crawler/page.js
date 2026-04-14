@@ -22,7 +22,7 @@ export default function CrawlerDashboard() {
                 const json = await res.json();
                 setData(json);
                 setStats({
-                    today: json.summary?.total_logs || 0,
+                    today: (json.summary?.total_logs || 0) + (json.summary?.total_images_today || 0),
                     success: json.summary?.success_logs || 0,
                     total: json.counts?.total_chapters || 0,
                     flagged: json.counts?.total_reports || 0
@@ -47,6 +47,22 @@ export default function CrawlerDashboard() {
             if (e.name !== 'AbortError') console.error('Telemetry fetch failed:', e.message);
         }
     }, []);
+
+    const triggerDeepScan = async (pages) => {
+        try {
+            const res = await fetch('/api/admin/crawler/deep-scan', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pages, startPage: telemetry?.discoveryPage || 1 })
+            });
+            if (res.ok) {
+                alert(`Kích hoạt cào ${pages} trang thành công!`);
+                fetchTelemetry();
+            }
+        } catch (e) {
+            alert('Lỗi kích hoạt Deep Scan');
+        }
+    };
 
     useEffect(() => {
         const controller = new AbortController();
@@ -76,11 +92,10 @@ export default function CrawlerDashboard() {
 
     if (!isAuthenticated || user?.role !== 'admin') return null;
 
-
-    const calculateEPS = () => {
-        if (!telemetry?.startTime) return '0.0';
-        const elapsed = (Date.now() - telemetry.startTime) / 1000;
-        return (telemetry.successCount / (elapsed || 1)).toFixed(2);
+    const calculateEPM = () => {
+        if (!telemetry?.startTime || telemetry.successCount === 0) return '0.0';
+        const elapsedMinutes = (Date.now() - telemetry.startTime) / 1000 / 60;
+        return (telemetry.successCount / (elapsedMinutes || 0.01)).toFixed(1);
     };
 
     return (
@@ -107,8 +122,52 @@ export default function CrawlerDashboard() {
                             {ramUsage ? `${ramUsage}MB RAM` : 'Đang đo...'}
                         </div>
                         <button className="btn btn-outline" style={{ padding: '8px 18px' }} onClick={() => fetchData()}>
-                            Làm mới dữ liệu
+                            Làm mới
                         </button>
+                    </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', marginBottom: '40px' }}>
+                    {/* Discovery Status Card */}
+                    <div className="glass-card" style={{ padding: '25px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 'var(--border-radius)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                            <h3 style={{ fontSize: '0.75rem', fontWeight: 900, letterSpacing: '2px', color: 'rgba(255,255,255,0.4)' }}>ROBUST DISCOVERY ENGINE</h3>
+                            <div style={{ background: telemetry?.isArchivalPulse ? 'rgba(139, 92, 246, 0.1)' : 'rgba(16, 185, 129, 0.1)', color: telemetry?.isArchivalPulse ? '#a78bfa' : '#10b981', padding: '4px 10px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 900 }}>
+                                {telemetry?.isArchivalPulse ? 'ĐANG ĐÀO SÂU' : 'KIỂM TRA TRUYỆN MỚI'}
+                            </div>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                            <div style={{ flex: 1 }}>
+                                <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginBottom: '5px' }}>TRANG HIỆN TẠI (ARCHIVE)</div>
+                                <div style={{ fontSize: '1.8rem', fontWeight: 950, color: 'var(--text-primary)' }}>
+                                    PAGE <span style={{ color: 'var(--accent)' }}>{telemetry?.discoveryPage || 1}</span>
+                                    <span style={{ fontSize: '0.9rem', opacity: 0.3, marginLeft: '10px' }}>/ 500</span>
+                                </div>
+                            </div>
+                            <div style={{ width: '80px', height: '80px', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                                <div className="scanning-ring" style={{ position: 'absolute', width: '100%', height: '100%', borderRadius: '50%', border: '2px solid var(--accent)', borderTopColor: 'transparent', animation: 'spin 2s linear infinite' }}></div>
+                                <div style={{ fontSize: '1.2rem' }}>🔎</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Quick Actions / Deep Scan Card */}
+                    <div className="glass-card" style={{ padding: '25px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 'var(--border-radius)' }}>
+                        <h3 style={{ fontSize: '0.75rem', fontWeight: 900, letterSpacing: '2px', color: 'rgba(255,255,255,0.4)', marginBottom: '20px' }}>HÀNH ĐỘNG NHANH</h3>
+                        <div style={{ display: 'flex', gap: '10px', height: 'calc(100% - 40px)' }}>
+                            <button onClick={() => triggerDeepScan(20)} className="btn btn-primary" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px', fontSize: '0.8rem' }}>
+                                <span style={{ fontSize: '1.5rem' }}>🚀</span>
+                                <div><b>QUÉT 20 TRANG</b><br/><small style={{ opacity: 0.7 }}>Discovery sâu</small></div>
+                            </button>
+                            <button onClick={() => triggerDeepScan(50)} className="btn btn-outline" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px', fontSize: '0.8rem' }}>
+                                <span style={{ fontSize: '1.5rem' }}>🔥</span>
+                                <div><b>QUÉT 50 TRANG</b><br/><small style={{ opacity: 0.7 }}>Phủ sóng</small></div>
+                            </button>
+                            <button onClick={() => router.push('/admin/guardian')} className="btn btn-outline" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px', fontSize: '0.8rem' }}>
+                                <span style={{ fontSize: '1.5rem' }}>🛡️</span>
+                                <div><b>TUẦN TRA</b><br/><small style={{ opacity: 0.7 }}>Guardian</small></div>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -146,7 +205,6 @@ export default function CrawlerDashboard() {
 
                 {/* Live Telemetry monitor */}
                 <div className="glass-card" style={{ position: 'relative', overflow: 'hidden', padding: '25px', borderRadius: 'var(--border-radius)', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '40px' }}>
-
                     <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div style={{ width: '60%' }}>
                             <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '15px' }}>
@@ -164,7 +222,7 @@ export default function CrawlerDashboard() {
                                 </div>
                                 <div>
                                     <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', marginBottom: '5px' }}>TỐC ĐỘ XỬ LÝ</div>
-                                    <div style={{ fontWeight: 800, color: '#10b981' }}>{calculateEPS()} mục/giây</div>
+                                    <div style={{ fontWeight: 800, color: '#10b981' }}>{calculateEPM()} mục/phút</div>
                                 </div>
                                 <div>
                                     <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', marginBottom: '5px' }}>CHẾ ĐỘ</div>
@@ -194,7 +252,7 @@ export default function CrawlerDashboard() {
                 <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '40px' }}>
                     <div className="glass-card" style={{ padding: '25px', background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--border-radius)', border: '1px solid rgba(255,255,255,0.05)' }}>
                         <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.4, marginBottom: '5px' }}>Hành động hôm nay</div>
-                        <div style={{ fontSize: '1.8rem', fontWeight: 900 }}>{stats.today + (telemetry?.imagesScrapedToday || 0)} <span style={{ fontSize: '1rem', opacity: 0.5 }}>sự kiện</span></div>
+                        <div style={{ fontSize: '1.8rem', fontWeight: 900 }}>{stats.today.toLocaleString()} <span style={{ fontSize: '1rem', opacity: 0.5 }}>sự kiện</span></div>
                     </div>
                     <div className="glass-card" style={{ padding: '25px', background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--border-radius)', border: '1px solid rgba(255,255,255,0.05)' }}>
                         <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.4, marginBottom: '5px' }}>Tỷ lệ thành công</div>
@@ -219,7 +277,7 @@ export default function CrawlerDashboard() {
                     <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <tbody className="log-tbody">
-                                {data?.logs.map(log => (
+                                {data?.logs.slice(0, 100).map(log => (
                                     <tr key={log.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                                         <td style={{ padding: '20px', fontSize: '0.8rem', width: '180px', opacity: 0.4 }}>
                                             {new Date(log.created_at).toLocaleTimeString('vi-VN')}

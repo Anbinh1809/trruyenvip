@@ -14,7 +14,7 @@ export const GET = withTitan({
                 (SELECT COUNT(*) FROM users) as "totalUsers",
                 (SELECT COUNT(*) FROM manga) as "totalManga",
                 (SELECT COUNT(*) FROM chapters) as "totalChapters",
-                (SELECT COUNT(*) FROM redemptionrequests WHERE status = 'Pending') as "pendingRewards",
+                (SELECT COUNT(*) FROM redemptionrequests WHERE status = 'pending') as "pendingRewards",
                 (SELECT COUNT(*) FROM crawlertasks WHERE status = 'pending') as "taskPending",
                 (SELECT COUNT(*) FROM crawlertasks WHERE status = 'failed') as "taskFailed",
                 (SELECT COUNT(*) FROM chapters WHERE created_at > NOW() - INTERVAL '1 hour') as "syncsLastHour",
@@ -22,7 +22,7 @@ export const GET = withTitan({
         `);
  
         const recentFailures = await query(`
-            SELECT id, type, last_error 
+            SELECT id, type, LEFT(last_error, 100) as last_error 
             FROM crawlertasks 
             WHERE status = 'failed' 
             ORDER BY updated_at DESC 
@@ -30,7 +30,7 @@ export const GET = withTitan({
         `);
  
         const heatmap = await query(`
-            SELECT SUBSTRING(last_error, 1, 50) as signature, COUNT(*) as count
+            SELECT LEFT(last_error, 50) as signature, COUNT(*) as count
             FROM crawlertasks
             WHERE status = 'failed' AND updated_at > NOW() - INTERVAL '24 hours'
             GROUP BY signature
@@ -48,6 +48,7 @@ export const GET = withTitan({
             heatmap: heatmap.recordset || []
         };
         
+        // Force refresh if requested or on internal trigger
         global.adminStatsCache = { data, time: Date.now() };
 
         return data; // withTitan handles the NextResponse.json() wrapper

@@ -55,6 +55,7 @@ async function init() {
                 title VARCHAR(1000) NOT NULL,
                 chapter_number DOUBLE PRECISION,
                 updated_at TIMESTAMPTZ DEFAULT NOW(),
+                created_at TIMESTAMPTZ DEFAULT NOW(),
                 source_url TEXT,
                 UNIQUE(manga_id, chapter_number)
             );
@@ -151,6 +152,22 @@ async function init() {
                 issue_type VARCHAR(50),
                 details TEXT,
                 fixed BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMPTZ DEFAULT NOW()
+            );
+        `);
+
+        await query(`
+            CREATE TABLE IF NOT EXISTS redemptionrequests (
+                id SERIAL PRIMARY KEY,
+                user_uuid VARCHAR(255) REFERENCES users(uuid) ON DELETE CASCADE,
+                user_name VARCHAR(100),
+                card_type VARCHAR(100),
+                bank_name VARCHAR(255),
+                account_no VARCHAR(100),
+                account_holder VARCHAR(255),
+                card_value INT,
+                phone_number VARCHAR(100),
+                status VARCHAR(50) DEFAULT 'pending',
                 created_at TIMESTAMPTZ DEFAULT NOW()
             );
         `);

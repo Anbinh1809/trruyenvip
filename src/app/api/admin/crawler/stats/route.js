@@ -25,7 +25,8 @@ export async function GET(req) {
             SELECT 
                 COUNT(*) as total_logs,
                 SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as success_logs,
-                SUM(CASE WHEN status = 'error' THEN 1 ELSE 0 END) as error_logs
+                SUM(CASE WHEN status = 'error' THEN 1 ELSE 0 END) as error_logs,
+                (SELECT COUNT(*) FROM "ChapterImages" WHERE CAST(created_at AS DATE) = CURRENT_DATE) as total_images_today
             FROM "CrawlLogs"
             WHERE CAST(created_at AS DATE) = CURRENT_DATE
         `);

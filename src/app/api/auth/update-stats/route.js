@@ -9,41 +9,56 @@ export async function POST(request) {
             return NextResponse.json({ error: 'Chưa đăng nhập' }, { status: 401 });
         }
 
-        const { xpDelta } = await request.json();
-        const deltaXp = parseInt(xpDelta || 0);
+        // 1. Robust Parsing for Beacon/Keepalive (handles missing Content-Type)
+        let body;
+        try {
+            body = await request.json();
+        } catch (e) {
+            // Fallback for beacon payloads which might be sent as text/plain strings
+            const text = await request.text();
+            try {
+                body = JSON.parse(text);
+            } catch (inner) {
+                return NextResponse.json({ error: 'Invalid payload format' }, { status: 400 });
+            }
+        }
 
-        // 1. Return early if no changes
-        if (deltaXp === 0) {
+        const { xpDelta, coinDelta } = body;
+        const deltaXp = parseInt(xpDelta || 0);
+        const deltaCoins = parseInt(coinDelta || 0);
+
+        // 2. Return early if no changes
+        if (deltaXp === 0 && deltaCoins === 0) {
             return NextResponse.json({ success: true });
         }
 
-        // 2. Sanity Check: Prevent massive injections
-        if (Math.abs(deltaXp) > 1000) {
-            return NextResponse.json({ error: 'Dữ liệu bất thường' }, { status: 400 });
+        // 3. Sanity Check: Prevent massive injections (Hardened for Production)
+        if (Math.abs(deltaXp) > 2000 || Math.abs(deltaCoins) > 10000) {
+            return NextResponse.json({ error: 'Dữ liệu bất thường (Deltas excessive)' }, { status: 400 });
         }
 
-        // 2. High-Frequency Check (Rate Limiting)
+        // 4. High-Frequency Check (Rate Limiting)
         const userRes = await query(`SELECT last_stats_update FROM users WHERE uuid = @uuid`, { uuid: session.uuid });
         const lastUpdate = userRes.recordset[0]?.last_stats_update;
         const now = new Date();
 
-        if (lastUpdate && (now - new Date(lastUpdate)) < 5000) { // Strict 5s cooldown
-            const waitTime = Math.ceil((5000 - (now - new Date(lastUpdate))) / 1000);
+        if (lastUpdate && (now - new Date(lastUpdate)) < 3000) { // Slight reduction to 3s for better UX
             return NextResponse.json({ 
-              error: `Hệ thống đang bận, vui lòng đợi thêm ${waitTime} giây để cập nhật lại.`,
-              nextAvailable: 5000 - (now - new Date(lastUpdate))
+              error: 'Hệ thống đang bận',
+              nextAvailable: 3000 - (now - new Date(lastUpdate))
             }, { status: 429 });
         }
 
-
-        // 3. Apply Update (Hardened: No more coinDelta from client)
+        // 5. Apply Update (ATOMIC RECONCILIATION)
         await query(`
             UPDATE users 
             SET xp = xp + @xp, 
+                vipcoins = vipcoins + @coins,
                 last_stats_update = NOW()
             WHERE uuid = @uuid
         `, {
-            xp: parseInt(deltaXp || 0),
+            xp: deltaXp,
+            coins: deltaCoins,
             uuid: session.uuid
         });
 

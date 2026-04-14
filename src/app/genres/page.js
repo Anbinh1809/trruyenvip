@@ -35,7 +35,7 @@ async function getData(currentSlug) {
     if (currentSlug) {
         // Optimized for Scale: TOP 36 instead of all
         const mangaRes = await query(`
-            SELECT DISTINCT m.${MANGA_CARD_FIELDS.replace(/, /g, ', m.')}
+            SELECT DISTINCT m.id, ${MANGA_CARD_FIELDS.split(', ').filter(f => f !== 'id').map(f => `m.${f}`).join(', ')}
             FROM "Manga" m
             JOIN "MangaGenres" mg ON m.id = mg.manga_id
             JOIN "Genres" g ON mg.genre_id = g.id

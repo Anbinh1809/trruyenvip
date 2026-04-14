@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { runTitanWorker } from '../src/lib/crawler.js';
+import { runTitanWorker } from '../src/lib/crawler/index.js';
 
 const WORKER_TIMEOUT_MS = 14 * 60 * 1000; // 14 minutes (GitHub Actions has 6hr limit but Vercel free has 10s)
 
@@ -20,20 +20,14 @@ async function main() {
         process.exit(1);
     }
 
-    while (Date.now() - start < WORKER_TIMEOUT_MS) {
-        cycles++;
-        console.log(`\n[Titan Worker] === Cycle ${cycles} | Elapsed: ${Math.floor((Date.now() - start) / 1000)}s ===`);
-        try {
-            await runTitanWorker();
-        } catch (err) {
-            console.error(`[Titan Worker] Cycle ${cycles} error:`, err.message);
-        }
-        // Small pause between cycles to avoid DB hammering
-        await new Promise(r => setTimeout(r, 5000));
+    try {
+        // Start the Unified Autonomous Engine
+        // This will initialize the queue and start the Guardian Autopilot loop
+        await runTitanWorker();
+    } catch (err) {
+        console.error('[Titan Worker] Fatal execution error:', err.message);
+        process.exit(1);
     }
-
-    console.log(`\n[Titan Worker] Session complete after ${cycles} cycles.`);
-    process.exit(0);
 }
 
 main().catch(err => {

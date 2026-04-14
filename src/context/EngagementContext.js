@@ -174,9 +174,17 @@ export function EngagementProvider({ children }) {
         // FINAL SYNC BEFORE DEPARTURE
         const handleBeforeUnload = () => {
             if (pendingDeltasRef.current.xp > 0 || pendingDeltasRef.current.coins > 0) {
-               // We use fetch with keepalive: true to ensure the request finishes even after close
-               const body = JSON.stringify({ xpDelta: pendingDeltasRef.current.xp, coinDelta: pendingDeltasRef.current.coins });
-               navigator.sendBeacon('/api/auth/update-stats', body);
+               // TITAN RELIABILITY: Use fetch with keepalive:true to ensure completion
+               // sendBeacon doesn't allow custom headers like application/json easily
+               fetch('/api/auth/update-stats', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ 
+                    xpDelta: pendingDeltasRef.current.xp, 
+                    coinDelta: pendingDeltasRef.current.coins 
+                  }),
+                  keepalive: true
+               });
             }
         };
 

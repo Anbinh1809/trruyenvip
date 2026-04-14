@@ -10,9 +10,13 @@ import { SOURCES } from './mirrors.js';
 
 // Concurrency State
 let activeChapterScrapes = 0;
-const MAX_CONCURRENT_CHAPTERS = 10;
+const MAX_CONCURRENT_CHAPTERS = 15;
 const inProgressManga = new Set();
 const inProgressChapters = new Set();
+
+// Autonomous Discovery State
+global.discoveryPage = global.discoveryPage || 1;
+global.isArchivalPulse = global.isArchivalPulse || false;
 
 /**
  * Task Execution Logic
@@ -62,9 +66,14 @@ async function executeTask(taskRow) {
 export async function processQueue() {
     const mem = process.memoryUsage().heapUsed / 1024 / 1024;
     const currentLimit = mem > 1100 ? 1 : MAX_CONCURRENT_CHAPTERS;
-
     const needed = currentLimit - activeChapterScrapes;
+    
     if (needed <= 0) return;
+    
+    // Performance Pulse Logging
+    if (activeChapterScrapes > 0) {
+        console.log(`[Titan Queue] Active: ${activeChapterScrapes} | Available Slots: ${needed} | Heap: ${Math.round(mem)}MB`);
+    }
     
     const pickRes = await query(`
         UPDATE crawlertasks
@@ -105,8 +114,8 @@ export async function queueMangaSync(mangaId, url, source, earlyExit = false, pr
     processQueue();
 }
 
-export async function queueDiscovery(source, pageCount = 3, priority = 3) {
-    const target = stringifySorted({ source, pageCount });
+export async function queueDiscovery(source, pageCount = 3, startPage = 1, priority = 3) {
+    const target = stringifySorted({ source, pageCount, startPage });
     await query(`
         INSERT INTO crawlertasks (type, target, priority) VALUES ('system_discovery', @target, @priority)
         ON CONFLICT (target) DO UPDATE SET priority = GREATEST(crawlertasks.priority, @priority)
@@ -203,15 +212,15 @@ export async function crawlFullMangaChapters(mangaId, url, source, earlyExit = f
 /**
  * Discovery Engine: Finding new manga content
  */
-export async function crawlLatest(source = 'nettruyen', pageCount = 1) {
-    console.log(`[Crawler] Global Discovery Initiated: ${source} (${pageCount} pages)`);
+export async function crawlLatest(source = 'nettruyen', pageCount = 1, startPage = 1) {
+    console.log(`[Crawler] Global Discovery Initiated: ${source} (Pages ${startPage} to ${startPage + pageCount - 1})`);
     const base = source === 'nettruyen' ? SOURCES.NETTRUYEN : SOURCES.TRUYENQQ;
     
-    for (let p = 1; p <= pageCount; p++) {
+    for (let p = startPage; p < startPage + pageCount; p++) {
         try {
             const url = source === 'nettruyen' 
                 ? `${base}?page=${p}` 
-                : `${base}/latest-updates?page=${p}`; // Hypothetical latest page
+                : `${base}/latest-updates?page=${p}`; 
                 
             const response = await fetchWithRetry(url, { isDiscovery: true });
             const $ = require('cheerio').load(response.data);
@@ -313,18 +322,35 @@ export async function runGuardianAutopilot() {
     if (global.guardianActive) return;
     global.guardianActive = true;
     
-    console.log('[Titan] Autonomous Guardian Activated...');
+    console.log('[Titan] Autonomous Guardian Activated (Rolling Discovery Mode)...');
     while (true) {
         try {
-            updateTelemetry({ status: 'guardian_discovery' });
-            await crawlLatest('nettruyen', 1);
-            await rescueBrokenImages(10);
-            await healChapterGaps(5);
+            updateTelemetry({ 
+                status: 'guardian_discovery',
+                discoveryPage: global.discoveryPage % 500 + 1,
+                isArchivalPulse: global.isArchivalPulse
+            });
             
-            await new Promise(r => setTimeout(r, 300000)); // Cycle every 5 minutes
+            // ROLLING DISCOVERY PULSE: Alternate between Latest and Archive
+            if (!global.isArchivalPulse) {
+                console.log(`[Guardian] Latest Pulse: checking Page 1`);
+                await crawlLatest('nettruyen', 1);
+                global.isArchivalPulse = true;
+            } else {
+                const archivePage = global.discoveryPage % 500 + 1; // Cycle through 500 pages
+                console.log(`[Guardian] Archive Pulse: diving into Page ${archivePage}`);
+                await crawlLatest('nettruyen', 1, archivePage);
+                global.discoveryPage++;
+                global.isArchivalPulse = false;
+            }
+
+            await rescueBrokenImages(15);
+            await healChapterGaps(10);
+            
+            await new Promise(r => setTimeout(r, 60000)); // Cycle every 1 minute
         } catch (e) {
             console.error('[Guardian] Engine Stalled:', e.message);
-            await new Promise(r => setTimeout(r, 60000));
+            await new Promise(r => setTimeout(r, 30000));
         }
     }
 }
@@ -366,5 +392,14 @@ export async function bootstrapCrawler() {
         WHERE status = 'processing' AND updated_at < NOW() - INTERVAL '2 hours'
     `);
     processQueue();
+}
+
+export async function runTitanWorker() {
+    console.log('[Titan] Initializing Background Worker...');
+    await bootstrapCrawler();
+    
+    // Start the persistent autopilot loop
+    // This is treated as a background process that never returns
+    await runGuardianAutopilot();
 }
 
