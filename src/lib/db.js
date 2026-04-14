@@ -127,7 +127,7 @@ function translateSql(sql, params) {
     // 7. Schema & Identifier Cleanup
     translatedSql = translatedSql.replace(/(?:\[dbo\]|"dbo"|dbo)\./gi, ''); 
     translatedSql = translatedSql.replace(/\[([^\]]+)\]/g, (match, p1) => `"${p1.toLowerCase()}"`);
-    translatedSql = translatedSql.replace(/"([^"]+)"/g, (match, p1) => `"${p1.toLowerCase()}"`);
+    // NOTE: Removed forceful lowercase of quoted identifiers to support CamelCase aliases needed for stats
 
     if (translationCache.size < MAX_CACHE_SIZE) {
         translationCache.set(sql, { translatedSql, paramOrder });
