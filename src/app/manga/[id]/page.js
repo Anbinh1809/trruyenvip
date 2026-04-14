@@ -11,7 +11,7 @@ import { BookOpen, User, Star, Calendar, Share2, Heart, AlertOctagon } from 'luc
 
 export async function generateMetadata({ params }) {
   const { id } = await params;
-  const res = await query('SELECT title, description, cover FROM manga WHERE id = @id', { id });
+  const res = await query('SELECT title, description, cover FROM manga WHERE id = @id OR normalized_title = @id', { id });
   const manga = res.recordset?.[0];
 
   if (!manga) return { title: 'Manga Not Found | TruyenVip' };
@@ -80,7 +80,7 @@ async function getManga(id) {
         SELECT g.name, g.slug 
         FROM genres g
         JOIN mangagenres mg ON g.id = mg.genre_id
-        WHERE mg.manga_id = @id
+        WHERE mg.manga_id = @internalId
     `, { id });
     
     return {
