@@ -85,7 +85,6 @@ export {
     queueMangaSync, 
     crawlFullMangaChapters, 
     crawlChapterImages,
-    runGuardianAutopilot, 
     healChapterGaps,
     rescueBrokenImages,
     bootstrapCrawler,

@@ -531,6 +531,6 @@ export async function bootstrapCrawler() {
 export async function runTitanWorker() {
     console.log('[Titan] Initializing Background Worker...');
     await bootstrapCrawler();
-    await runGuardianAutopilot();
+    // runGuardianAutopilot is disabled — queue-based processing is active via processQueue.
 }
 

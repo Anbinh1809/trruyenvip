@@ -59,15 +59,9 @@ export async function register() {
                 setInterval(rotateLogs, 86400000); 
                 setInterval(healData, 3600000); // Check for broken titles every hour
 
-                // 4. Launch Autonomous Guardian
-                if (m && m.runGuardianAutopilot) {
-                    console.log('[Guardian] Requesting Autopilot Launch Sequence...');
-                    setTimeout(() => {
-                        m.runGuardianAutopilot().catch(err => {
-                            console.error('[Instrumentation] Critical Guardian stall:', err.message);
-                        });
-                    }, 5000);
-                }
+                // 4. Autonomous Guardian disabled — runGuardianAutopilot is not active.
+                // The queue processor (processQueue) will continue handling tasks via bootstrapCrawler.
+                console.log('[Guardian] Autopilot disabled. Queue-based processing is active.');
             })
             .catch((err) => {
                 console.error('[Instrumentation] Critical Initialization Failure:', err.message);
