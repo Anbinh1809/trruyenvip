@@ -263,13 +263,24 @@ export async function cleanLegacyEncoding() {
         await query("UPDATE manga SET description = REPLACE(description, '??', '') WHERE description LIKE '%??%'");
         await query("UPDATE manga SET title = REPLACE(title, '??', '') WHERE title LIKE '%??%'");
 
-        // TITAN-SLUG CLEANUP: Standardize IDs and Slugs (Accent Stripping)
-        // This handles older SQL Server data that migrated with accented titles
-        await query(`
-            UPDATE manga 
-            SET normalized_title = LOWER(id)
-            WHERE normalized_title IS NULL OR normalized_title = ''
-        `);
+        // TITAN-SLUG RECONSTRUCTION: Move to JS for robust transliteration
+        const rawManga = await query("SELECT id, title FROM manga WHERE normalized_title IS NULL OR normalized_title = '' LIMIT 500");
+        const list = rawManga.recordset || [];
+        
+        if (list.length > 0) {
+            console.log(`[DB_MAINTENANCE] Migrating ${list.length} slugs...`);
+            for (const m of list) {
+                // Simple robust slugifier
+                const slug = m.title.toLowerCase()
+                    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                    .replace(/[đĐ]/g, 'd')
+                    .replace(/[^a-z0-9]/g, '-')
+                    .replace(/-+/g, '-')
+                    .replace(/^-|-$/g, '');
+                
+                await query("UPDATE manga SET normalized_title = @slug WHERE id = @id", { slug, id: m.id });
+            }
+        }
         
         // 2. CHAPTERS TABLE SANITIZATION
         // Note: content might be large, we use a targeted update to avoid locking
@@ -278,7 +289,12 @@ export async function cleanLegacyEncoding() {
         // 3. AUTOMATED LOG & RESOURCE PRUNING (Maintain high performance)
         await query("DELETE FROM crawllogs WHERE created_at < NOW() - INTERVAL '3 days'");
         await query("DELETE FROM guardianreports WHERE created_at < NOW() - INTERVAL '7 days'");
-        await query("DELETE FROM notifications WHERE is_read = TRUE AND created_at < NOW() - INTERVAL '30 days'");
+        
+        // Use more resilient DELETE with existence checks for optional tables
+        try {
+            await query("DELETE FROM notifications WHERE is_read = TRUE AND created_at < NOW() - INTERVAL '30 days'");
+        } catch (e) { /* ignore if table missing */ }
+        
         await query("DELETE FROM readhistory WHERE updated_at < NOW() - INTERVAL '30 days'");
         await query("DELETE FROM ratelimits WHERE reset_at < NOW()");
 

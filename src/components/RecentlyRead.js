@@ -4,6 +4,7 @@ import { useHistory } from '@/context/HistoryContext';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Play, History } from 'lucide-react';
+import { getSignedProxyUrl } from '@/lib/crypto';
 import './RecentlyRead.css';
 
 export default function RecentlyRead() {
@@ -25,7 +26,7 @@ export default function RecentlyRead() {
         <div className="quick-resume-banner-titan industrial-shadow-nebula">
           <div 
             className="banner-bg-titan" 
-            style={{ '--cover-url': `url(${mostRecent.mangaCover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(mostRecent.mangaCover)}` : (mostRecent.mangaCover || '/placeholder-manga.svg')})` }} 
+            style={{ '--cover-url': `url(${mostRecent.mangaCover?.includes('/api/proxy') ? mostRecent.mangaCover : mostRecent.mangaCover?.startsWith('http') ? getSignedProxyUrl(mostRecent.mangaCover, 800, 75) : (mostRecent.mangaCover || '/placeholder-manga.svg')})` }} 
           />
           <div className="banner-content-titan">
             <div className="banner-label-titan">
@@ -34,7 +35,7 @@ export default function RecentlyRead() {
             <h3 className="banner-title-titan truncate-1">{mostRecent.mangaTitle}</h3>
             <p className="banner-sub-titan">Chương {mostRecent.chapterNumber} • {mostRecent.mangaAuthor || 'Đang cập nhật'}</p>
             <Link 
-              href={`/manga/${mostRecent.mangaId}/chapter/${mostRecent.chapterId}`} 
+              href={`/manga/${mostRecent.mangaNormalizedTitle || mostRecent.mangaId}/chapter/${mostRecent.chapterId}`} 
               className="btn btn-primary banner-btn-titan-industrial"
             >
               TIẾP TỤC ĐỌC
@@ -56,12 +57,12 @@ export default function RecentlyRead() {
                 {otherHistory.map((item, idx) => (
                     <Link 
                         key={`${item.mangaId}-${idx}`} 
-                        href={`/manga/${item.mangaId}/chapter/${item.chapterId}`}
+                        href={`/manga/${item.mangaNormalizedTitle || item.mangaId}/chapter/${item.chapterId}`}
                         className="titan-recent-card-industrial"
                     >
                         <div className="titan-recent-image-industrial">
                             <Image 
-                                src={item.mangaCover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(item.mangaCover)}&w=50` : (item.mangaCover || '/placeholder-manga.svg')} 
+                                src={item.mangaCover?.includes('/api/proxy') ? item.mangaCover : item.mangaCover?.startsWith('http') ? getSignedProxyUrl(item.mangaCover, 100, 70) : (item.mangaCover || '/placeholder-manga.svg')} 
                                 alt={item.mangaTitle} 
                                 fill 
                                 sizes="50px"

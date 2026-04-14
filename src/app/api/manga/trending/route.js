@@ -7,9 +7,9 @@ export async function GET() {
         const trending = await query(`
             SELECT m.id, m.title, m.cover, m.normalized_title
             FROM manga m
-            JOIN chapters c ON m.id = c.manga_id
+            LEFT JOIN chapters c ON m.id = c.manga_id
             GROUP BY m.id, m.title, m.cover, m.normalized_title
-            ORDER BY COUNT(c.id) DESC
+            ORDER BY m.views DESC, COUNT(c.id) DESC
             LIMIT 5
         `);
 
