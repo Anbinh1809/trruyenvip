@@ -23,12 +23,12 @@ export async function POST(request) {
             }
         }
 
-        const { xpDelta, coinDelta } = body;
+        const { xpDelta, coinDelta, missionData } = body;
         const deltaXp = parseInt(xpDelta || 0);
         const deltaCoins = parseInt(coinDelta || 0);
 
         // 2. Return early if no changes
-        if (deltaXp === 0 && deltaCoins === 0) {
+        if (deltaXp === 0 && deltaCoins === 0 && !missionData) {
             return NextResponse.json({ success: true });
         }
 
@@ -58,11 +58,13 @@ export async function POST(request) {
             UPDATE users 
             SET xp = xp + @xp, 
                 vipcoins = vipcoins + @coins,
+                mission_data = COALESCE(@missionData, mission_data),
                 last_stats_update = NOW()
             WHERE uuid = @uuid
         `, {
             xp: deltaXp,
             coins: deltaCoins,
+            missionData: missionData ? JSON.stringify(missionData) : null,
             uuid: session.uuid
         });
 

@@ -16,9 +16,27 @@
     },
     {
       "src": "/apple-icon.png",
-      "sizes": "180x180",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-icon.png",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Truyện Thịnh Hành",
+      "url": "/?tab=trending",
+      "description": "Xem các bộ truyện hot nhất hiện nay"
+    },
+    {
+      "name": "Thể Loại",
+      "url": "/genres",
+      "description": "Khám phá các thể loại truyện"
     }
   ]
 }

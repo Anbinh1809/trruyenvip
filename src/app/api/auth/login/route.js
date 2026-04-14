@@ -1,11 +1,22 @@
-import { query } from '@/lib/db';
+import { query, checkRateLimit } from '@/lib/db';
 import bcrypt from 'bcryptjs';
 import { signToken, setSessionCookie } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 
 export async function POST(request) {
+    const startTime = Date.now();
     try {
         const { username, password } = await request.json();
+        const ip = request.headers.get('x-forwarded-for') || '127.0.0.1';
+
+        // 1. Rate Limit: 10 attempts / 1 minute
+        const limiter = await checkRateLimit(`login_${ip}`, 10, 60);
+        if (!limiter.success) {
+            return NextResponse.json({ 
+                error: 'Quá nhiều lần thử. Vui lòng quay lại sau ít phút.',
+                reset: limiter.reset
+            }, { status: 429 });
+        }
 
         if (!username || !password) {
             return NextResponse.json({ error: 'Thiếu thông tin đăng nhập' }, { status: 400 });
@@ -46,6 +57,10 @@ export async function POST(request) {
         });
         await setSessionCookie(token);
 
+        // TITAN SECURITY: Constant Response Time
+        const elapsed = Date.now() - startTime;
+        if (elapsed < 1500) await new Promise(r => setTimeout(r, 1500 - elapsed));
+
         return NextResponse.json({
             message: 'Đăng nhập thành công',
             user: { 
@@ -59,6 +74,8 @@ export async function POST(request) {
 
     } catch (e) {
         console.error('Login error', e);
+        const elapsed = Date.now() - startTime;
+        if (elapsed < 1500) await new Promise(r => setTimeout(r, 1500 - elapsed));
         return NextResponse.json({ error: 'Lỗi hệ thống khi đăng nhập' }, { status: 500 });
     }
 }

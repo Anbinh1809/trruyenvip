@@ -20,12 +20,18 @@ async function init() {
                 password_hash TEXT NOT NULL,
                 xp INT DEFAULT 0,
                 vipcoins INT DEFAULT 0,
+                mission_data JSONB DEFAULT '{}',
+                last_mission_reset TIMESTAMPTZ DEFAULT NOW(),
                 role VARCHAR(20) DEFAULT 'user',
                 avatar TEXT,
                 last_stats_update TIMESTAMPTZ DEFAULT NOW(),
                 created_at TIMESTAMPTZ DEFAULT NOW()
             );
         `);
+
+        // TITAN-GRADE MIGRATION: Ensure columns exist if table was created in a previous version
+        await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS mission_data JSONB DEFAULT '{}';`);
+        await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS last_mission_reset TIMESTAMPTZ DEFAULT NOW();`);
 
         await query(`
             CREATE TABLE IF NOT EXISTS manga (
@@ -60,6 +66,10 @@ async function init() {
                 UNIQUE(manga_id, chapter_number)
             );
         `);
+
+        // TITAN-GRADE MIGRATION: Health Tracking
+        await query(`ALTER TABLE chapters ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'pending';`);
+        await query(`ALTER TABLE chapters ADD COLUMN IF NOT EXISTS fail_count INT DEFAULT 0;`);
 
         await query(`
             CREATE TABLE IF NOT EXISTS chapterimages (
@@ -148,12 +158,21 @@ async function init() {
         `);
 
         await query(`
+            CREATE TABLE IF NOT EXISTS system_config (
+                key VARCHAR(100) PRIMARY KEY,
+                value JSONB,
+                updated_at TIMESTAMPTZ DEFAULT NOW()
+            );
+        `);
+
+        await query(`
             CREATE TABLE IF NOT EXISTS guardianreports (
                 id SERIAL PRIMARY KEY,
-                manga_id VARCHAR(255) REFERENCES manga(id) ON DELETE CASCADE,
-                issue_type VARCHAR(50),
-                details TEXT,
-                fixed BOOLEAN DEFAULT FALSE,
+                manga_name VARCHAR(255),
+                chapter_title VARCHAR(255),
+                event_type VARCHAR(50),
+                message TEXT,
+                cover TEXT,
                 created_at TIMESTAMPTZ DEFAULT NOW()
             );
         `);
@@ -170,6 +189,46 @@ async function init() {
                 card_value INT,
                 phone_number VARCHAR(100),
                 status VARCHAR(50) DEFAULT 'pending',
+                created_at TIMESTAMPTZ DEFAULT NOW()
+            );
+        `);
+
+        await query(`
+            CREATE TABLE IF NOT EXISTS ratelimits (
+                key VARCHAR(255) PRIMARY KEY,
+                count INT DEFAULT 1,
+                reset_at TIMESTAMPTZ NOT NULL
+            );
+        `);
+
+        await query(`
+            CREATE TABLE IF NOT EXISTS notifications (
+                id SERIAL PRIMARY KEY,
+                user_uuid VARCHAR(255) REFERENCES users(uuid) ON DELETE CASCADE,
+                type VARCHAR(50) DEFAULT 'info',
+                title TEXT NOT NULL,
+                message TEXT,
+                link TEXT,
+                manga_id VARCHAR(255) REFERENCES manga(id) ON DELETE SET NULL,
+                is_read BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMPTZ DEFAULT NOW()
+            );
+        `);
+
+        await query(`
+            CREATE TABLE IF NOT EXISTS comment_likes (
+                user_uuid VARCHAR(255) REFERENCES users(uuid) ON DELETE CASCADE,
+                comment_id INT REFERENCES comments(id) ON DELETE CASCADE,
+                PRIMARY KEY (user_uuid, comment_id)
+            );
+        `);
+
+        await query(`
+            CREATE TABLE IF NOT EXISTS comment_reports (
+                id SERIAL PRIMARY KEY,
+                user_uuid VARCHAR(255) REFERENCES users(uuid) ON DELETE SET NULL,
+                comment_id INT REFERENCES comments(id) ON DELETE CASCADE,
+                reason TEXT NOT NULL,
                 created_at TIMESTAMPTZ DEFAULT NOW()
             );
         `);

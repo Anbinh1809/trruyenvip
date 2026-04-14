@@ -7,14 +7,18 @@ export async function register() {
         }
         globalRef.guardianInitialized = true;
 
-        console.log('--- [Guardian] Initializing Autonomous Engine (V8 Clean) ---');
+        console.log('--- [Guardian] Initializing Autonomous Engine (Industrial Path) ---');
 
-        // relative import without alias to avoid Turbopack resolution bugs
         import('./lib/crawler/index.js')
-            .then((m) => {
-                if (m && m.bootstrapCrawler) m.bootstrapCrawler().catch(() => {});
+            .then(async (m) => {
+                const { query } = await import('./lib/db.js');
+
+                // 1. Initial System Bootstrap
+                if (m && m.bootstrapCrawler) {
+                    await m.bootstrapCrawler().catch(e => console.error('[Guardian] Bootstrap failed:', e.message));
+                }
                 
-                // AUTOMATED MAINTENANCE: Purge logs older than 7 days
+                // 2. Automated Maintenance (Log Rotation)
                 const rotateLogs = async () => {
                    try {
                        const result = await query("DELETE FROM crawllogs WHERE created_at < NOW() - INTERVAL '7 days'");
@@ -26,17 +30,13 @@ export async function register() {
                    }
                 };
                 
-                rotateLogs(); // Initial purge
-                setInterval(rotateLogs, 86400000); // Daily purge
-                
-                // DATA APOTHEOSIS: Self-Healing Search Index
+                // 3. Data Apotheosis (Search Index Healing)
                 const healData = async () => {
                    try {
-                       const { query } = await import('./lib/db');
-                       const { normalizeTitle } = await import('./lib/crawler/index.js');
+                       const { normalizeTitle } = m;
                        const missing = await query("SELECT id, title FROM manga WHERE normalized_title IS NULL LIMIT 50");
                        
-                       if (missing.recordset.length > 0) {
+                       if (missing.recordset && missing.recordset.length > 0) {
                            console.log(`[Guardian] Data Apotheosis: Healing ${missing.recordset.length} titles...`);
                            for (const manga of missing.recordset) {
                                const normalized = normalizeTitle(manga.title);
@@ -45,26 +45,32 @@ export async function register() {
                                    id: manga.id 
                                });
                            }
-                           console.log(`[Guardian] Data Apotheosis: Complete.`);
                        }
                    } catch (e) {
                        console.error('[Guardian] Data Apotheosis failed:', e.message);
                    }
                 };
 
-                healData(); // Initial heal
-                setInterval(healData, 86400000); // Daily heal
+                // Trigger Initial Services
+                rotateLogs().catch(() => {});
+                healData().catch(() => {});
+                
+                // Set Maintenance Intervals
+                setInterval(rotateLogs, 86400000); 
+                setInterval(healData, 3600000); // Check for broken titles every hour
 
+                // 4. Launch Autonomous Guardian
                 if (m && m.runGuardianAutopilot) {
+                    console.log('[Guardian] Requesting Autopilot Launch Sequence...');
                     setTimeout(() => {
                         m.runGuardianAutopilot().catch(err => {
-                            console.error('[Instrumentation] Guardian Autopilot failed:', err.message);
+                            console.error('[Instrumentation] Critical Guardian stall:', err.message);
                         });
                     }, 5000);
                 }
             })
             .catch((err) => {
-                console.error('[Instrumentation] Critical Crawler Import Failure:', err.message);
+                console.error('[Instrumentation] Critical Initialization Failure:', err.message);
             });
     }
 }

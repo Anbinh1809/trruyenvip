@@ -50,16 +50,22 @@ export default function ReaderSettings() {
 
   return (
     <>
-      <div className="titan-reader-hud" onClick={() => setIsOpen(!isOpen)} title="Cài đặt trình đọc">
+      <button 
+        className="titan-reader-hud titan-icon-btn" 
+        onClick={() => setIsOpen(!isOpen)} 
+        title="Cài đặt trình đọc"
+        aria-label="Cài đặt trình đọc"
+        aria-expanded={isOpen}
+      >
         <div className={`settings-icon-wrapper ${isOpen ? 'is-active' : ''}`}>
           <Settings size={22} />
         </div>
-      </div>
+      </button>
 
       {isOpen && (
-        <div className="titan-reader-panel fade-in">
+        <div className="titan-reader-panel fade-in" role="dialog" aria-label="Bảng cài đặt trình đọc">
           <div className="setting-header-industrial">
-              <span className="setting-icon-box">
+              <span className="setting-icon-box" aria-hidden="true">
                 {incognito ? <EyeOff size={18} /> : <Eye size={18} />}
               </span>
               <div className="setting-header-text">
@@ -69,23 +75,28 @@ export default function ReaderSettings() {
               <button 
                 onClick={toggleIncognito} 
                 className={`titan-switch ${incognito ? 'active' : ''}`} 
+                role="switch"
+                aria-checked={incognito}
+                aria-label="Chế độ ẩn danh"
               />
           </div>
 
           <div className="setting-group">
             <label className="setting-label">
-                <Layout size={14} /> Chế độ hiển thị
+                <Layout size={14} aria-hidden="true" /> Chế độ hiển thị
             </label>
             <div className="setting-control-row">
                 <button 
                   onClick={() => toggleWebtoon(true)}
                   className={`btn-setting-toggle ${isWebtoon ? 'active' : ''}`}
+                  aria-pressed={isWebtoon}
                 >
                     Cuộn dọc
                 </button>
                 <button 
                   onClick={() => toggleWebtoon(false)}
                   className={`btn-setting-toggle ${!isWebtoon ? 'active' : ''}`}
+                  aria-pressed={!isWebtoon}
                 >
                     Từng trang
                 </button>
@@ -94,18 +105,20 @@ export default function ReaderSettings() {
 
           <div className="setting-group">
             <label className="setting-label">
-                <Palette size={14} /> Nền màn hình
+                <Palette size={14} aria-hidden="true" /> Nền màn hình
             </label>
             <div className="setting-control-row">
                 <button 
                   onClick={() => updateFilter('none')}
                   className={`btn-setting-toggle ${filter === 'none' ? 'active' : ''}`}
+                  aria-pressed={filter === 'none'}
                 >
                     Mặc định
                 </button>
                 <button 
                   onClick={() => updateFilter('dark')}
                   className={`btn-setting-toggle ${filter === 'dark' ? 'active' : ''}`}
+                  aria-pressed={filter === 'dark'}
                 >
                     Tối (OLED)
                 </button>
@@ -114,18 +127,21 @@ export default function ReaderSettings() {
 
           <div className="setting-group no-margin">
             <label className="setting-label">
-                <Monitor size={14} /> Chất Lượng Hình Ảnh
+                <Monitor size={14} aria-hidden="true" /> Chất Lượng Hình Ảnh
             </label>
-            <div 
+            <button 
               className={`hifi-toggle-card ${isHiFi ? 'active' : ''}`} 
               onClick={toggleHiFi}
+              role="switch"
+              aria-checked={isHiFi}
+              aria-label="Chế độ hình ảnh siêu nét 4K"
             >
                 <div className="hifi-info">
                     <div className="hifi-title">Chế độ Siêu nét 4K</div>
                     <div className="hifi-sub">Yêu cầu mạng ổn định</div>
                 </div>
                 <div className={`titan-checkbox ${isHiFi ? 'checked' : ''}`} />
-            </div>
+            </button>
             <p className="setting-footer-hint">Tự động tối ưu hóa cho đường truyền nội bộ.</p>
           </div>
         </div>

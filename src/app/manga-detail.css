@@ -27,6 +27,43 @@
     padding-top: 120px;
 }
 
+.breadcrumb-titan-industrial {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 30px;
+}
+
+.breadcrumb-node {
+    font-size: 0.7rem;
+    font-weight: 950;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.breadcrumb-node:hover {
+    color: var(--accent);
+}
+
+.sep-titan {
+    color: rgba(255,255,255,0.1);
+    font-size: 0.7rem;
+    font-weight: 950;
+}
+
+.current-node-titan {
+    font-size: 0.7rem;
+    font-weight: 950;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    opacity: 0.95;
+    text-shadow: 0 0 20px rgba(255,255,255,0.1);
+}
+
 .detail-grid-titan {
     display: grid;
     grid-template-columns: 320px 1fr;

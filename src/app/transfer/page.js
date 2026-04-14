@@ -20,14 +20,22 @@ export default function TransferPage() {
             .map(u => u.startsWith('http') ? u : `https://${u}`);
         if (urlList.length === 0) return;
 
+        // CLIENT-SIDE VALIDATION: Prevent junk requests
+        const allowedTargets = ['nettruyen', 'nhattruyen', 'truyenqq'];
+        const invalidUrls = urlList.filter(u => !allowedTargets.some(t => u.includes(t)));
+        if (invalidUrls.length > 0) {
+            alert(`Một số liên kết không được hỗ trợ: ${invalidUrls[0]}...`);
+            return;
+        }
+
         setIsProcessing(true);
         setResults([]);
         
-        const processResults = [];
+        let batchResults = [];
         
         for (let i = 0; i < urlList.length; i += 3) {
             const chunk = urlList.slice(i, i + 3);
-            await Promise.all(chunk.map(async (url) => {
+            const chunkResults = await Promise.all(chunk.map(async (url) => {
                 try {
                     const res = await fetch('/api/migration', {
                         method: 'POST',
@@ -37,21 +45,26 @@ export default function TransferPage() {
                     const data = await res.json();
                     
                     if (data.success) {
-                        processResults.push({ 
+                        return { 
                             url, 
                             status: 'success', 
                             title: data.mangaId,
                             link: data.redirectUrl 
-                        });
-                        fetchMangaAndAddToHistory(data.mangaId, data.chapterId);
+                        };
                     } else {
-                        processResults.push({ url, status: 'error', msg: data.error });
+                        return { url, status: 'error', msg: data.error };
                     }
                 } catch (err) {
-                    processResults.push({ url, status: 'error', msg: 'Lỗi kết nối' });
+                    return { url, status: 'error', msg: 'Lỗi kết nối' };
                 }
             }));
-            setResults([...processResults]);
+            
+            // TITAN OPTIMIZATION: Batch update to reduce re-renders
+            batchResults = [...batchResults, ...chunkResults];
+            setResults([...batchResults]);
+            
+            // Adaptive delay to prevent OS-level TCP congestion
+            await new Promise(r => setTimeout(r, 500));
         }
         setIsProcessing(false);
     };

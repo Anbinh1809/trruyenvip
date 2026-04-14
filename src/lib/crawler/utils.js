@@ -49,12 +49,14 @@ export function cleanTitleForSearch(title) {
 export function parseChapterNumber(title) {
     if (!title) return null;
     
-    const standardMatch = title.match(/(?:chương|chapter|chap|ch|c|[\s])\s*(\d+(?:\.\d+)?)/i);
+    // Support for: Chương, Chapter, Chap, Ch, C, Hồi
+    const standardMatch = title.match(/(?:chương|chapter|chap|ch|c|hồi|hoi|[\s])\s*(\d+(?:\.\d+)?)/i);
     if (standardMatch) {
         let num = parseFloat(standardMatch[1]);
         
-        if (title.match(/(?:phần|phan|part|p)\s*(\d+)/i)) {
-            const partMatch = title.match(/(?:phần|phan|part|p)\s*(\d+)/i);
+        // Handle "Phần" or "Part" suffixes
+        const partMatch = title.match(/(?:phần|phan|part|p)\s*(\d+)/i);
+        if (partMatch) {
             const partNum = parseInt(partMatch[1]);
             if (partNum > 1 && !standardMatch[1].includes('.')) {
                 num += partNum * 0.1;

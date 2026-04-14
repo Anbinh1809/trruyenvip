@@ -15,14 +15,21 @@ export const SOURCES = {
         'https://www.nettruyenvi.com/',
         'https://www.nettruyencc.com/',
         'https://www.nettruyeninfo.com/',
-        'https://www.nettruyenus.com/'
+        'https://www.nettruyenus.com/',
+        'https://www.nettruyentv.com/'
     ],
-    TRUYENQQ: 'https://truyenqqno.com/'
+    TRUYENQQ: 'https://truyenqqno.com/',
+    TRUYENQQ_MIRRORS: [
+        'https://truyenqqno.com/',
+        'https://truyenqqvi.com/',
+        'https://truyenqqvn.com/',
+        'https://truyenqqtop.com/'
+    ]
 };
 
 // Global state tracking
 global.mirrorScores = global.mirrorScores || {};
-SOURCES.NETTRUYEN_MIRRORS.forEach(m => {
+[...SOURCES.NETTRUYEN_MIRRORS, ...SOURCES.TRUYENQQ_MIRRORS].forEach(m => {
     if (global.mirrorScores[m] === undefined) global.mirrorScores[m] = 100;
 });
 
@@ -47,12 +54,19 @@ export const SEARCH_REFERERS = [
  * Returns sorted mirrors by score
  */
 export function getOptimizedMirrors(sourceUrl) {
-    if (!sourceUrl.includes('nettruyen')) return [sourceUrl];
+    let sourceMirrors = [];
+    if (sourceUrl.includes('nettruyen')) {
+        sourceMirrors = SOURCES.NETTRUYEN_MIRRORS;
+    } else if (sourceUrl.includes('truyenqq')) {
+        sourceMirrors = SOURCES.TRUYENQQ_MIRRORS;
+    } else {
+        return [sourceUrl];
+    }
     
     const now = Date.now();
-    let mirrors = [...SOURCES.NETTRUYEN_MIRRORS].filter(m => !global.mirrorQuarantine[m] || global.mirrorQuarantine[m] < now);
+    let mirrors = [...sourceMirrors].filter(m => !global.mirrorQuarantine[m] || global.mirrorQuarantine[m] < now);
     
-    if (mirrors.length === 0) mirrors = [...SOURCES.NETTRUYEN_MIRRORS];
+    if (mirrors.length === 0) mirrors = [...sourceMirrors];
     
     return mirrors.sort((a, b) => (global.mirrorScores[b] || 0) - (global.mirrorScores[a] || 0));
 }

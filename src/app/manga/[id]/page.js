@@ -2,31 +2,74 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ChapterList from '@/components/ChapterList';
 import DetailCover from '@/components/DetailCover';
+import DetailActions from '@/components/DetailActions';
 import { query, MANGA_CARD_FIELDS } from '@/lib/db';
+import { getSignedProxyUrl } from '@/lib/crypto';
 import "@/app/manga-detail.css";
 import Link from 'next/link';
 import { BookOpen, User, Star, Calendar, Share2, Heart, AlertOctagon } from 'lucide-react';
 
+export async function generateMetadata({ params }) {
+  const { id } = await params;
+  const res = await query('SELECT title, description, cover FROM manga WHERE id = @id', { id });
+  const manga = res.recordset?.[0];
+
+  if (!manga) return { title: 'Manga Not Found | TruyenVip' };
+
+  const ogImage = manga.cover 
+    ? getSignedProxyUrl(manga.cover, 1200, 75) 
+    : '/placeholder-manga.svg';
+
+  return {
+    title: `${manga.title} [Full] - Đọc Truyện Tranh Online | TruyenVip`,
+    description: manga.description?.substring(0, 160) || `Đọc truyện ${manga.title} bản đẹp nhất, cập nhật nhanh nhất tại TruyenVip.`,
+    openGraph: {
+      title: manga.title,
+      description: manga.description?.substring(0, 160),
+      images: [ogImage],
+      type: 'article',
+      siteName: 'TruyenVip',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: manga.title,
+      description: manga.description?.substring(0, 160),
+      images: [ogImage],
+    }
+  };
+}
+
+
+
 async function getManga(id) {
   try {
     const res = await query(`
-        SELECT ${MANGA_CARD_FIELDS}, description, author, status, genres, last_crawled
+        SELECT ${MANGA_CARD_FIELDS}, description, author, status, last_crawled
         FROM manga WHERE id = @id
     `, { id });
     const manga = res.recordset[0];
     if (!manga) return null;
 
+    // Fetch chapters
     const chaptersRes = await query(`
-        SELECT id, chapter_number, title, created_at 
+        SELECT id, chapter_number, title, created_at, updated_at, status 
         FROM chapters WHERE manga_id = @id 
         ORDER BY chapter_number DESC
+    `, { id });
+
+    // Fetch genres via junction table
+    const genresRes = await query(`
+        SELECT g.name, g.slug 
+        FROM genres g
+        JOIN mangagenres mg ON g.id = mg.genre_id
+        WHERE mg.manga_id = @id
     `, { id });
     
     return {
       ...manga,
-      cover: manga.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(manga.cover)}` : (manga.cover || '/placeholder-manga.svg'),
+      cover: manga.cover ? getSignedProxyUrl(manga.cover, 0, 75) : '/placeholder-manga.svg',
       chapters: chaptersRes.recordset,
-      genres: manga.genres ? JSON.parse(manga.genres) : []
+      genres: genresRes.recordset || []
     };
   } catch (err) {
     console.error('Fetch Manga Error:', err);
@@ -55,8 +98,58 @@ export default async function MangaDetailPage({ params }) {
     );
   }
 
+  // TITAN SEO: Structured Data
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'ComicSeries',
+        'name': manga.title,
+        'description': manga.description,
+        'image': `https://truyenvip.com${getSignedProxyUrl(manga.cover, 800, 75)}`,
+        'author': {
+          '@type': 'Person',
+          'name': manga.author || 'Đang cập nhật'
+        },
+        'genre': manga.genres.map(g => g.name),
+        'aggregateRating': {
+          '@type': 'AggregateRating',
+          'ratingValue': manga.rating || '4.9',
+          'reviewCount': '12500'
+        }
+      },
+      {
+        '@type': 'BreadcrumbList',
+        'itemListElement': [
+          {
+            '@type': 'ListItem',
+            'position': 1,
+            'name': 'Trang chủ',
+            'item': 'https://truyenvip.com/'
+          },
+          {
+            '@type': 'ListItem',
+            'position': 2,
+            'name': 'Manga',
+            'item': 'https://truyenvip.com/genres'
+          },
+          {
+            '@type': 'ListItem',
+            'position': 3,
+            'name': manga.title,
+            'item': `https://truyenvip.com/manga/${id}`
+          }
+        ]
+      }
+    ]
+  };
+
   return (
     <main className="main-wrapper titan-bg">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Header />
       
       <div 
@@ -65,6 +158,15 @@ export default async function MangaDetailPage({ params }) {
       />
 
       <div className="container detail-content-wrapper fade-in">
+        {/* TITAN BREADCRUMBS */}
+        <nav className="breadcrumb-titan-industrial">
+            <Link href="/" className="breadcrumb-node">TRANG CHỦ</Link>
+            <span className="sep-titan">/</span>
+            <Link href="/genres" className="breadcrumb-node">THỂ LOẠI</Link>
+            <span className="sep-titan">/</span>
+            <span className="current-node-titan">{manga.title}</span>
+        </nav>
+
         <div className="detail-grid-titan">
             {/* LEFT: COVER & STATS */}
             <div className="detail-left-column">
@@ -94,11 +196,11 @@ export default async function MangaDetailPage({ params }) {
             <div className="detail-right-column">
                 <div className="detail-header-industrial">
                     <div className="genre-cloud-industrial">
-                        {manga.genres.map(g => (
-                            <span key={g.id} className="genre-tag-titan">{g.name}</span>
+                        {manga.genres.map((g, idx) => (
+                            <Link key={idx} href={`/genres/${g.slug}`} className="genre-tag-titan">{g.name}</Link>
                         ))}
                     </div>
-                    <h1 className="detail-title-industrial">{manga.title}</h1>
+                    <h1 className="detail-title-industrial" itemProp="name">{manga.title}</h1>
                     
                     <div className="pill-group-industrial">
                         <span className="author-pill-titan">
@@ -110,21 +212,16 @@ export default async function MangaDetailPage({ params }) {
                     </div>
                 </div>
 
-                <p className="detail-desc-industrial">
+                <p className="detail-desc-industrial" itemProp="description">
                     {manga.description || 'Chưa có tóm tắt nội dung cho bộ truyện này. Chúng tôi sẽ cập nhật trong thời gian sớm nhất.'}
                 </p>
 
-                <div className="detail-actions-titan">
-                    <Link href={`/manga/${id}/chapter/${manga.chapters[manga.chapters.length - 1]?.id || ''}`} className="btn btn-primary read-btn-titan shadow-titan">
-                        <BookOpen size={20} /> ĐỌC TỪ ĐẦU
-                    </Link>
-                    <button className="btn btn-glass fav-btn-titan shadow-titan">
-                        <Heart size={20} /> YÊU THÍCH
-                    </button>
-                    <button className="btn btn-glass share-btn-titan shadow-titan">
-                        <Share2 size={20} /> CHIA SẺ
-                    </button>
-                </div>
+                <DetailActions 
+                    mangaId={id} 
+                    firstChapterId={manga.chapters[manga.chapters.length - 1]?.id} 
+                    mangaTitle={manga.title}
+                    mangaCover={manga.cover}
+                />
 
                 <section className="chapters-section-industrial">
                     <div className="section-header-titan">

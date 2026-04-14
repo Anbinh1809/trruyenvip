@@ -253,18 +253,35 @@
 }
 
 /* MOBILE HUD SEARCH CAPTURE */
-.mobile-search-hud {
+.mobile-search-hud-industrial {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    background: rgba(2, 6, 23, 0.98);
-    backdrop-filter: blur(30px);
-    z-index: 10000;
-    padding: 40px 20px;
+    inset: 0;
+    background: var(--bg-primary);
+    z-index: 6000;
+    padding: 20px;
     display: flex;
     flex-direction: column;
+    animation: fadeIn 0.3s ease;
+}
+
+.search-hud-header-industrial {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.search-hud-title-industrial {
+    margin: 0;
+    font-weight: 950;
+    letter-spacing: -1px;
+    font-size: 1.5rem;
+    color: white;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 /* USER PROFILE REFINEMENT */

@@ -47,7 +47,13 @@ export async function fetchWithRetry(url, options = {}, retries = 2) {
             // Challenge detection
             if (response.data && typeof response.data === 'string') {
                 const lowerData = response.data.toLowerCase();
-                const isChallenge = lowerData.includes('just a moment') || lowerData.includes('please wait');
+                const isChallenge = lowerData.includes('just a moment') || 
+                                  lowerData.includes('please wait') || 
+                                  lowerData.includes('checking your browser') ||
+                                  lowerData.includes('verify you are human') ||
+                                  lowerData.includes('cloudflare-static') ||
+                                  lowerData.includes('ddos-guard');
+                
                 if (isChallenge) throw { code: 'CHALLENGE_DETECTED', mirror: mirrorUrl };
             }
             

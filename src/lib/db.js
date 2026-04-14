@@ -61,18 +61,34 @@ function translateSql(sql, params) {
     let paramCount = 1;
 
     // 1. Robust Named Param Mapping (@param -> $n)
+    // Refined to avoid replacing inside string literals
     if (params && Object.keys(params).length > 0) {
         const keys = Object.keys(params).sort((a, b) => b.length - a.length);
         
-        for (const key of keys) {
-            const regex = new RegExp(`@${key}\\b`, 'gi');
-            if (translatedSql.match(regex)) {
-                translatedSql = translatedSql.replace(regex, `$${paramCount}`);
-                values.push(params[key]);
-                paramOrder.push(key);
-                paramCount++;
+        // Match string literals OR named parameters
+        // Group 1: string literal, Group 2: parameter name
+        const masterRegex = /('[^']*')|@(\w+)\b/g;
+        
+        translatedSql = translatedSql.replace(masterRegex, (match, literal, pName) => {
+            if (literal) return literal; // Return string literal unchanged
+            
+            const key = pName;
+            if (params.hasOwnProperty(key)) {
+                // If this is a new parameter we haven't mapped yet in this pass
+                // We need to keep track of the index for $n
+                // Note: The loop below is slightly inefficient but safe for the "Titan" scale
+                const existingIndex = paramOrder.indexOf(key);
+                if (existingIndex !== -1) {
+                    return `$${existingIndex + 1}`;
+                } else {
+                    values.push(params[key]);
+                    paramOrder.push(key);
+                    const idx = paramCount++;
+                    return `$${idx}`;
+                }
             }
-        }
+            return match; // Not a known param, return as is (e.g. email address handle)
+        });
     }
 
     // 2. String Concatenation Fix
@@ -246,18 +262,103 @@ export async function cleanLegacyEncoding() {
         // Note: content might be large, we use a targeted update to avoid locking
         await query("UPDATE chapters SET title = REPLACE(title, '??', '') WHERE title LIKE '%??%'");
         
-        // 3. AUTOMATED LOG PRUNING
-        await query("DELETE FROM crawllogs WHERE created_at < NOW() - INTERVAL '30 days'");
+        // 3. AUTOMATED LOG & RESOURCE PRUNING (Maintain high performance)
+        await query("DELETE FROM crawllogs WHERE created_at < NOW() - INTERVAL '15 days'");
         await query("DELETE FROM guardianreports WHERE created_at < NOW() - INTERVAL '30 days'");
-        
-        // 4. INDEX HARDENING
+        await query("DELETE FROM notifications WHERE is_read = TRUE AND created_at < NOW() - INTERVAL '30 days'");
+        await query("DELETE FROM comment_reports WHERE created_at < NOW() - INTERVAL '60 days'");
+        await query("DELETE FROM readhistory WHERE updated_at < NOW() - INTERVAL '120 days'");
+        await query("DELETE FROM ratelimits WHERE reset_at < NOW()");
+
+        // 4. ORPHANED IMAGE PURGE: Remove images for chapters that no longer exist
+        await query(`
+            DELETE FROM chapterimages 
+            WHERE chapter_id NOT IN (SELECT id FROM chapters)
+        `);
+
+        await query(`
+            DELETE FROM mangagenres 
+            WHERE manga_id NOT IN (SELECT id FROM manga)
+        `);
+
+        // 5. INDEX HARDENING
         await query("CREATE INDEX IF NOT EXISTS idx_manga_normalized_title_gin ON manga USING gin(normalized_title gin_trgm_ops)");
         await query("CREATE INDEX IF NOT EXISTS idx_manga_alternative_titles_gin ON manga USING gin(alternative_titles gin_trgm_ops)");
         
-        console.log('[TITAN INFO] Project SANITIZED: Log pruning and encoding fixes completed.');
+        console.log('[TITAN INFO] Project SANITIZED: Log pruning and orphaned record cleanup completed.');
     } catch (e) {
         console.error('[TITAN ERROR] Project Sanitation failed:', e.message);
     }
+}
+
+/**
+ * TITAN RATE LIMITER
+ * Persistently tracks requests per key (IP, User ID, etc.)
+ */
+export async function checkRateLimit(key, limit, windowSeconds) {
+    try {
+        const resetAt = new Date(Date.now() + windowSeconds * 1000);
+        const res = await query(`
+            INSERT INTO ratelimits (key, count, reset_at)
+            VALUES (@key, 1, @resetAt)
+            ON CONFLICT (key) DO UPDATE 
+            SET count = CASE WHEN ratelimits.reset_at < NOW() THEN 1 ELSE ratelimits.count + 1 END,
+                reset_at = CASE WHEN ratelimits.reset_at < NOW() THEN @resetAt ELSE ratelimits.reset_at END
+            RETURNING count, reset_at
+        `, { key, resetAt });
+
+        const { count, reset_at } = res.recordset[0];
+        const isAllowed = count <= limit;
+
+        return {
+            success: isAllowed,
+            count,
+            limit,
+            remaining: Math.max(0, limit - count),
+            reset: new Date(reset_at).getTime()
+        };
+    } catch (e) {
+        console.error('[TITAN SECURITY] Rate limit check failed:', e.message);
+        return { success: true, count: 0, limit, remaining: limit, reset: Date.now() };
+    }
+}
+
+// --- SYSTEM CONFIGURATION HELPERS ---
+
+/**
+ * Persists a system configuration key-value pair to the database.
+ * Useful for crawler state, global toggles, and maintenance timestamps.
+ */
+export async function saveSystemState(key, value) {
+    try {
+        await query(`
+            INSERT INTO system_config (key, value, updated_at)
+            VALUES (@key, @value, NOW())
+            ON CONFLICT (key) DO UPDATE SET value = @value, updated_at = NOW()
+        `, { key, value: JSON.stringify(value) });
+    } catch (e) {
+        console.error(`[DB] Failed to save system state [${key}]:`, e.message);
+    }
+}
+
+/**
+ * Loads a system configuration value from the database.
+ */
+export async function loadSystemState(key) {
+    try {
+        const res = await query('SELECT value FROM system_config WHERE key = @key', { key });
+        return res.recordset?.[0]?.value || null;
+    } catch (e) {
+        console.error(`[DB] Failed to load system state [${key}]:`, e.message);
+        return null;
+    }
+}
+
+/**
+ * Periodically run the automated maintenance service.
+ */
+if (typeof setInterval !== 'undefined') {
+    setInterval(cleanLegacyEncoding, 1000 * 60 * 60 * 6); // Every 6 hours
 }
 
 

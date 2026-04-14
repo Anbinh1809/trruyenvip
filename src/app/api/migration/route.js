@@ -1,18 +1,29 @@
-import { query } from '@/lib/db';
+import { query, checkRateLimit } from '@/lib/db';
 import { queueMangaSync, queueChapterScrape } from '@/lib/crawler/engine';
 import { parseChapterNumber } from '@/lib/crawler/utils';
+import { getSession } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 
 export async function POST(req) {
     try {
+        const session = await getSession();
+        if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
         const { url } = await req.json();
         if (!url) return NextResponse.json({ error: 'Missing URL' }, { status: 400 });
+
+        // TITAN RATE LIMIT: Prevent migration abuse
+        const limiter = await checkRateLimit(`migration_${session.uuid}`, 5, 60);
+        if (!limiter.success) {
+            return NextResponse.json({ 
+                error: 'Bạn đang thực hiện quá nhiều yêu cầu dịch chuyển. Vui lòng đợi trong giây lát.' 
+            }, { status: 429 });
+        }
 
         const source = url.includes('nettruyen') ? 'nettruyen' : (url.includes('truyenqq') ? 'truyenqq' : null);
         if (!source) return NextResponse.json({ error: 'Nguồn không hỗ trợ' }, { status: 400 });
 
         // Robust Parsing Logic
-        // Example: https://www.nettruyennew.com/truyen-tranh/manga-slug/chap-123/789
         const parts = url.split('/');
         let mangaSlug = '';
         let chapterSlug = '';
@@ -39,10 +50,10 @@ export async function POST(req) {
         if (!mangaSlug) return NextResponse.json({ error: 'Không thể nhận diện mã truyện' }, { status: 400 });
 
         // 1. Ensure Manga exists
-        const mangaCheck = await query('SELECT id FROM manga WHERE id = $1', [mangaSlug]);
-        if (mangaCheck.rowCount === 0) {
-            await query('INSERT INTO manga (id, title, source_url) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING', 
-                [mangaSlug, mangaSlug.replace(/-/g, ' '), url.split('/chap-')[0]]);
+        const mangaCheck = await query('SELECT id FROM manga WHERE id = @id', { id: mangaSlug });
+        if (mangaCheck.recordset.length === 0) {
+            await query('INSERT INTO manga (id, title, source_url) VALUES (@id, @title, @url) ON CONFLICT DO NOTHING', 
+                { id: mangaSlug, title: mangaSlug.replace(/-/g, ' '), url: url.split('/chap-')[0] });
         }
 
         // 2. Identify and Queue Sync
@@ -51,10 +62,10 @@ export async function POST(req) {
         let chapterId = null;
         if (chapterSlug) {
             chapterId = `${mangaSlug}_${chapterSlug}`;
-            const chapCheck = await query('SELECT id FROM chapters WHERE id = $1', [chapterId]);
-            if (chapCheck.rowCount === 0) {
-                await query('INSERT INTO chapters (id, manga_id, title, source_url, chapter_number) VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING',
-                    [chapterId, mangaSlug, chapterSlug.replace(/-/g, ' '), url, parseChapterNumber(chapterSlug)]);
+            const chapCheck = await query('SELECT id FROM chapters WHERE id = @id', { id: chapterId });
+            if (chapCheck.recordset.length === 0) {
+                await query('INSERT INTO chapters (id, manga_id, title, source_url, chapter_number) VALUES (@id, @mId, @title, @url, @num) ON CONFLICT DO NOTHING',
+                    { id: chapterId, mId: mangaSlug, title: chapterSlug.replace(/-/g, ' '), url, num: parseChapterNumber(chapterSlug) });
             }
             queueChapterScrape(chapterId, url, source, true, 10); // High priority
         }

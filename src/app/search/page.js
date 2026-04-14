@@ -14,23 +14,33 @@ async function searchManga(q, page = 1) {
   
   let sanitizedQ = q.toString().trim().substring(0, 100);
   if (sanitizedQ.length < 2) return { manga: [], total: 0 };
+  
+  // Use slug-style normalization to match the normalized_title column
+  const searchSlug = sanitizedQ.toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, '-')
+    .trim();
 
   try {
     const countRes = await query(`
       SELECT COUNT(*) as total 
       FROM manga 
-      WHERE title ILIKE @q OR author ILIKE @q
-    `, { q: `%${sanitizedQ}%` });
+      WHERE normalized_title LIKE @slug OR title ILIKE @q OR author ILIKE @q
+    `, { slug: `%${searchSlug}%`, q: `%${sanitizedQ}%` });
     
     const total = countRes.recordset[0]?.total || 0;
 
     const result = await query(`
       SELECT ${MANGA_CARD_FIELDS}
       FROM manga 
-      WHERE title ILIKE @q OR author ILIKE @q 
-      ORDER BY last_crawled DESC
+      WHERE normalized_title LIKE @slug OR title ILIKE @q OR author ILIKE @q 
+      ORDER BY 
+        CASE WHEN normalized_title LIKE @slug THEN 0 ELSE 1 END,
+        last_crawled DESC
       LIMIT @pageSize OFFSET @offset
-    `, { q: `%${sanitizedQ}%`, offset, pageSize });
+    `, { slug: `%${searchSlug}%`, q: `%${sanitizedQ}%`, offset, pageSize });
 
     const manga = result.recordset.map(m => ({
       ...m,

@@ -27,9 +27,9 @@ export async function GET(request) {
 
         const rssItems = chapters.map(chap => {
             const chapUrl = `${origin}/manga/${chap.manga_id}/chapter/${chap.chapter_id}`;
-            const coverUrl = chap.manga_cover.startsWith('http') 
+            const coverUrl = (chap.manga_cover && chap.manga_cover.startsWith('http')) 
                 ? `${origin}/api/proxy?url=${encodeURIComponent(chap.manga_cover)}` 
-                : `${origin}${chap.manga_cover}`;
+                : `${origin}${chap.manga_cover || '/placeholder-manga.svg'}`;
             
             return `
                 <item>

@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { Search, ArrowUpDown } from 'lucide-react';
+import { Search, ArrowUpDown, Ghost, Loader2, AlertCircle } from 'lucide-react';
 
 export default function ChapterList({ mangaId, chapters }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -42,6 +42,7 @@ export default function ChapterList({ mangaId, chapters }) {
             <button 
                 onClick={() => setSortOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
                 className="btn-sort-titan-industrial"
+                aria-label={sortOrder === 'desc' ? 'Sắp xếp cũ nhất' : 'Sắp xếp mới nhất'}
             >
                 <ArrowUpDown size={14} /> {sortOrder === 'desc' ? 'Mới nhất' : 'Cũ nhất'}
             </button>
@@ -53,6 +54,7 @@ export default function ChapterList({ mangaId, chapters }) {
                 value={searchTerm}
                 autoComplete="off"
                 className="chapter-search-input-industrial"
+                aria-label="Tìm nhanh chương"
                 onChange={(e) => {
                     setSearchTerm(e.target.value);
                     setDisplayCount(50);
@@ -75,17 +77,33 @@ export default function ChapterList({ mangaId, chapters }) {
                 {displayedChapters.map(chapter => (
                     <Link 
                         key={chapter.id} 
-                        href={`/manga/${mangaId}/chapter/${chapter.id}`} 
-                        className="chapter-item-titan-industrial"
+                        href={chapter.status === 'ghost' ? '#' : `/manga/${mangaId}/chapter/${chapter.id}`} 
+                        className={`chapter-item-titan-industrial status-${chapter.status || 'pending'}`}
+                        onClick={(e) => chapter.status === 'ghost' && e.preventDefault()}
                     >
                         <div className="chapter-main-info">
                             <span className="chapter-num-pill">Chương {chapter.chapter_number}</span>
                             {chapter.title && chapter.title !== `Chương ${chapter.chapter_number}` && (
                                 <span className="chapter-title-industrial truncate-1">{chapter.title}</span>
                             )}
+                            
+                            {/* STATUS BADGES */}
+                            {chapter.status === 'ghost' && (
+                                <span className="badge-ghost-titan" title="Nguồn lỗi hoặc không có ảnh">
+                                    <Ghost size={12} /> LỖI NGUỒN
+                                </span>
+                            )}
+                            {chapter.status === 'pending' && (
+                                <span className="badge-pending-titan" title="Đang xử lý dữ liệu">
+                                    <Loader2 size={12} className="animate-spin" /> ĐANG TẢI
+                                </span>
+                            )}
+                            {((new Date() - new Date(chapter.updated_at)) < (48 * 60 * 60 * 1000)) && (
+                                <span className="badge-new-titan">MỚI</span>
+                            )}
                         </div>
                         <span className="chapter-date-industrial">
-                            {new Date(chapter.updated_at).toLocaleDateString('vi-VN')}
+                            {new Date(chapter.updated_at || chapter.created_at).toLocaleDateString('vi-VN')}
                         </span>
                     </Link>
                 ))}
@@ -105,6 +123,37 @@ export default function ChapterList({ mangaId, chapters }) {
       )}
 
       <style jsx>{`
+        .badge-ghost-titan {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .badge-pending-titan {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .chapter-item-titan-industrial.status-ghost {
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-style: dashed;
+        }
+        .chapter-item-titan-industrial.status-ghost:hover {
+            transform: none;
+            border-color: var(--glass-border);
+        }
         .chapter-list-header-industrial {
             display: flex;
             justify-content: space-between;

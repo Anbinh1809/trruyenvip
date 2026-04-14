@@ -17,7 +17,7 @@ export async function GET() {
     const { payload } = await jwtVerify(token, JWT_SECRET);
     
     // FETCH FULL RECORD TO BE ABSOLUTELY SURE
-    const res = await query('SELECT uuid, username, email, role, avatar, xp, vipcoins FROM users WHERE uuid = @uuid', { uuid: payload.uuid });
+    const res = await query('SELECT uuid, username, email, role, avatar, xp, vipcoins, mission_data FROM users WHERE uuid = @uuid', { uuid: payload.uuid });
     const user = res.recordset?.[0];
 
     if (!user) {
@@ -33,7 +33,8 @@ export async function GET() {
         role: user.role,
         avatar: user.avatar,
         xp: user.xp,
-        vipCoins: user.vipCoins
+        vipCoins: user.vipCoins,
+        missionData: user.mission_data
       }
     }, { status: 200 });
   } catch (err) {

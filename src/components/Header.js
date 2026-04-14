@@ -10,6 +10,7 @@ import { Search, X, Menu } from 'lucide-react';
 // Sub-components
 import HeaderLogo from './layout/Header/HeaderLogo';
 import UserActions from './layout/Header/UserActions';
+import NotificationBell from '@/components/NotificationBell';
 import './layout/Header/Header.css';
 
 export default function Header() {
@@ -26,9 +27,17 @@ export default function Header() {
     // Titan Heartbeat: Extend session
     let heartbeatInterval;
     if (isAuthenticated) {
-        heartbeatInterval = setInterval(() => {
-            fetch('/api/auth/heartbeat', { method: 'POST' }).catch(() => {});
-        }, 300000);
+        heartbeatInterval = setInterval(async () => {
+            try {
+                const res = await fetch('/api/auth/heartbeat', { method: 'POST' });
+                if (res.status === 401) {
+                    console.warn('[Titan] Session expired. Force logging out...');
+                    // Note: In an ideal world, we'd call a logout function from useAuth
+                    // But for now, we'll let the next restricted action handle it
+                    // or force a refresh if necessary.
+                }
+            } catch (e) {}
+        }, 300000); // 5 minutes
     }
 
     return () => {
@@ -57,7 +66,13 @@ export default function Header() {
           <nav className={`nav-titan ${isMenuOpen ? 'nav-open' : ''}`}>
             <div className="mobile-only-header">
                 <HeaderLogo />
-                <button className="titan-icon-btn" onClick={() => setIsMenuOpen(false)}>
+            <div className="mobile-only-header">
+                <HeaderLogo />
+                <button 
+                  className="titan-icon-btn" 
+                  onClick={() => setIsMenuOpen(false)}
+                  aria-label="Đóng menu điều hướng"
+                >
                     <X size={20} />
                 </button>
             </div>
@@ -75,9 +90,13 @@ export default function Header() {
 
           {/* MOBILE SEARCH OVERLAY (HUD) */}
           {isSearchOpen && (
-              <div className="mobile-search-hud-industrial fade-in">
+              <div className="mobile-search-hud-industrial fade-in" role="dialog" aria-modal="true" aria-label="Tìm kiếm truyện">
                   <div className="search-hud-header-industrial">
-                      <button onClick={() => setIsSearchOpen(false)} className="titan-icon-btn">
+                      <button 
+                        onClick={() => setIsSearchOpen(false)} 
+                        className="titan-icon-btn"
+                        aria-label="Đóng tìm kiếm"
+                      >
                           <X size={20} />
                       </button>
                       <h3 className="search-hud-title-industrial">Tìm truyện</h3>
@@ -87,42 +106,27 @@ export default function Header() {
           )}
 
           <div className="header-actions">
-            <button className="mobile-only titan-icon-btn" onClick={() => setIsSearchOpen(true)}>
+            <button 
+              className="mobile-only titan-icon-btn" 
+              onClick={() => setIsSearchOpen(true)}
+              aria-label="Mở tìm kiếm"
+            >
               <Search size={18} />
             </button>
 
+            {isAuthenticated && <NotificationBell />}
             <UserActions loading={loading} />
 
-            <button className="mobile-only titan-icon-btn" onClick={() => setIsMenuOpen(true)}>
+            <button 
+              className="mobile-only titan-icon-btn" 
+              onClick={() => setIsMenuOpen(true)}
+              aria-label="Mở menu điều hướng"
+            >
               <Menu size={20} />
             </button>
           </div>
         </div>
       </div>
-      <style jsx>{`
-        .mobile-search-hud-industrial {
-            position: fixed;
-            inset: 0;
-            background: var(--bg-primary);
-            z-index: 6000;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-        }
-        .search-hud-header-industrial {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        .search-hud-title-industrial {
-            margin: 0;
-            font-weight: 950;
-            letter-spacing: -1px;
-            font-size: 1.5rem;
-            color: white;
-        }
-      `}</style>
     </header>
   );
 }

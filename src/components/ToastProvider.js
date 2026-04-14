@@ -22,11 +22,14 @@ export function ToastProvider({ children }) {
   return (
     <ToastContext.Provider value={value}>
       {children}
-      <div className="toast-container-titan">
+      <div className="toast-container-titan" aria-label="Thông báo hệ thống">
         {toasts.map(toast => (
           <div 
             key={toast.id} 
             className={`toast-titan toast-industrial ${toast.type} fade-up`}
+            role={toast.type === 'error' ? 'alert' : 'status'}
+            aria-live={toast.type === 'error' ? 'assertive' : 'polite'}
+            aria-atomic="true"
           >
             <div className="toast-icon">
               {toast.type === 'success' ? <CheckCircle size={18} /> : (toast.type === 'error' ? <AlertCircle size={18} /> : <InfoIcon size={18} />)}

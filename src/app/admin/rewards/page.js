@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/components/ToastProvider';
 import { CheckCircle, XCircle, Clock, User, Landmark, CreditCard, ChevronRight, Shield } from 'lucide-react';
+import '../admin.css';
 
 export default function AdminRewardsPage() {
   const { user, isAuthenticated, loading } = useAuth();
@@ -174,15 +175,6 @@ export default function AdminRewardsPage() {
         </div>
       </div>
       <Footer />
-      <style jsx>{`
-        .empty-table-cell { text-align: center; padding: 60px; color: rgba(255,255,255,0.2); font-weight: 800; font-style: italic; }
-        .avatar-mini-titan { width: 24px; height: 24px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .bank-name-titan { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-bottom: 4px; }
-        .account-no-titan { display: flex; align-items: center; gap: 8px; font-size: 1rem; color: #60a5fa; margin-bottom: 2px; }
-        .holder-name-titan { font-size: 0.75rem; color: rgba(255,255,255,0.3); text-transform: uppercase; }
-        .cost-coins-titan { font-size: 0.75rem; color: rgba(255,255,255,0.3); font-weight: 800; }
-        .action-done-titan { font-size: 0.8rem; font-weight: 950; color: rgba(255,255,255,0.1); letter-spacing: 1px; }
-      `}</style>
     </main>
   );
 }

@@ -4,14 +4,23 @@ import { query } from '@/lib/db';
 // RAM OPTIMIZATION: Enable Sharp cache with a 50MB limit to balance speed vs memory
 sharp.cache({ memory: 50, items: 100, files: 20 });
 
+import { generateProxySignature } from '@/lib/crypto';
+
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const imageUrl = searchParams.get('url');
-  const quality = parseInt(searchParams.get('q') || '75');
-  const width = parseInt(searchParams.get('w') || '0');
+  const quality = searchParams.get('q') || '75';
+  const width = searchParams.get('w') || '0';
+  const sig = searchParams.get('sig');
 
   if (!imageUrl) {
     return new Response('Missing URL', { status: 400 });
+  }
+
+  // TITAN SECURITY: Signature Enforcement
+  const expectedSig = generateProxySignature(imageUrl, width, quality);
+  if (!sig || sig !== expectedSig) {
+    return new Response('Forbidden: Invalid Signature', { status: 403 });
   }
 
 
@@ -20,7 +29,7 @@ export async function GET(request) {
     'nettruyen.com', 'nettryuen.com', 'nettruyenmax.com', 'nettruyenon.com',
     'image.nettruyen.com', 'st.nettruyennew.com', 'st.nettruyen.com',
     'nettruyen.cc', 'nettruyenhay.com', 'truyen-qq.com', 'truyenqq.com',
-    'hinhhinh.com', 'truyenvua.com', 'cmanga.com', 'cmanga.nu',
+    'hinhhinh.com', 'truyenvua.com', 'cmanga.com', 'cmanga.nu', 'cmanga.io',
     'nt-cdn.xyz', 'nt-cdn.com', 'imagetruyen.com', 'blogtruyen.vn',
     'nettruyenco.vn', 'nettruyenco.com', 'nhattruyento.com', 'nhattruyen.com', 
     'nhattruyenmax.com', 'nhattruyenmin.com', 'st.nhattruyen.com', 'animez.com', 
@@ -28,7 +37,8 @@ export async function GET(request) {
     'st.nhattruyennew.com', 'st.nhattruyencovn.com', 'nettruyenme.com',
     'nettruyenpro.com', 'nettruyenking.com', 'nettruyenvi.com', 'ttquu.com',
     'tintruyen.net', 'nettruyenone.com', 'nt-cdn1.xyz', 'nt-cdn2.xyz',
-    'nettruyeninfo.com', 'nettruyenus.com', 'nettruyen.asia', 'nettruyen.tv'
+    'nettruyeninfo.com', 'nettruyenus.com', 'nettruyen.asia', 'nettruyen.tv',
+    'hentaivn.one', 'hentaivn.tv', 'cuutruyen.net', 'saytruyen.io', 'saytruyen.net'
   ];
   
   try {
@@ -75,10 +85,11 @@ export async function GET(request) {
 
     // Multi-Stage Referer Strategies (The "Gauntlet")
     const strategies = [
+        { name: 'Target-Path', referer: imageUrl.split('/').slice(0, -1).join('/') + '/' }, // New Dynamic Path Strategy
+        { name: 'Target-Host', referer: parsedUrl.origin + '/' }, 
         { name: 'Self-Domain', referer: `https://${domain}/` },
         { name: 'On-Domain', referer: 'https://nettruyenon.com/' },
         { name: 'QQ-Domain', referer: 'https://truyenqqno.com/' },
-        { name: 'Co-Domain', referer: 'https://www.nettruyenco.vn/' },
         { name: 'Stealth', referer: '' }
     ];
 
@@ -99,7 +110,7 @@ export async function GET(request) {
         if (strategy.referer) headers['Referer'] = strategy.referer;
 
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 4000); // Tight 4s per strategy
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s for slower CDNs
 
         try {
             const response = await fetch(imageUrl, { headers, signal: controller.signal, next: { revalidate: 86400 } });

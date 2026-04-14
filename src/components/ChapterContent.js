@@ -3,13 +3,19 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import RecrawlButton from './RecrawlButton';
 import { Link as LinkIcon, AlertCircle, RefreshCw } from 'lucide-react';
+import { useReaderKeys } from '@/hooks/useReaderKeys';
+import { getSignedProxyUrl } from '@/lib/crypto';
 
-export default function ChapterContent({ chapterId, initialImages = [] }) {
+export default function ChapterContent({ mangaId, chapter, nextChapterId, prevChapterId, initialImages = [] }) {
+    const chapterId = chapter?.id;
     const [images, setImages] = useState(initialImages);
     const [isSyncing, setIsSyncing] = useState(initialImages.length === 0);
     const [error, setError] = useState(null);
     const pollInterval = useRef(null);
-    const prevChapterId = useRef(chapterId);
+    const prevChapterIdRef = useRef(chapterId);
+
+    // TITAN MASTER HOTKEYS
+    useReaderKeys(mangaId, prevChapterId, nextChapterId);
 
     const stopPolling = useCallback(() => {
         if (pollInterval.current) {
@@ -24,7 +30,7 @@ export default function ChapterContent({ chapterId, initialImages = [] }) {
         const MAX_RETRIES = 40;
 
         pollInterval.current = setInterval(async () => {
-            if (chapterId !== prevChapterId.current) {
+            if (chapterId !== prevChapterIdRef.current) {
                 stopPolling();
                 return;
             }
@@ -47,7 +53,7 @@ export default function ChapterContent({ chapterId, initialImages = [] }) {
                         const q = isHiFi ? 95 : 78;
 
                         setImages(data.images.map(img => 
-                            `/api/proxy?url=${encodeURIComponent(img.image_url)}&w=${w}&q=${q}`
+                            getSignedProxyUrl(img.image_url, w, q)
                         ));
                         setIsSyncing(false);
                         stopPolling();
@@ -82,7 +88,7 @@ export default function ChapterContent({ chapterId, initialImages = [] }) {
                             const q = isHiFi ? 95 : 78;
 
                             setImages(imgData.images.map(img =>
-                                `/api/proxy?url=${encodeURIComponent(img.image_url)}&w=${w}&q=${q}`
+                                getSignedProxyUrl(img.image_url, w, q)
                             ));
                             setIsSyncing(false);
                             return;
@@ -101,11 +107,11 @@ export default function ChapterContent({ chapterId, initialImages = [] }) {
     }, [chapterId, startPolling]);
 
     useEffect(() => {
-        if (prevChapterId.current !== chapterId) {
+        if (prevChapterIdRef.current !== chapterId) {
             setImages(initialImages);
             setIsSyncing(initialImages.length === 0);
             setError(null);
-            prevChapterId.current = chapterId;
+            prevChapterIdRef.current = chapterId;
         }
 
         if (images.length === 0 && initialImages.length === 0) {
@@ -190,7 +196,7 @@ function ReaderImage({ src, idx }) {
                 setShouldLoad(true);
                 observer.disconnect();
             }
-        }, { rootMargin: '1200px' });
+        }, { rootMargin: '2500px' }); // TITAN-GRADE LOOKAHEAD
 
         if (containerRef.current) observer.observe(containerRef.current);
         return () => observer.disconnect();
@@ -215,7 +221,7 @@ function ReaderImage({ src, idx }) {
     return (
         <div className="reader-img-wrapper" ref={containerRef}>
             {(!loaded || !shouldLoad) && (
-                <div className="reader-image-placeholder skeleton-industrial">
+                <div className={`reader-image-placeholder skeleton-industrial ${loaded ? 'is-fading' : ''}`}>
                     <span className="reader-page-num">TRANG {idx + 1}</span>
                 </div>
             )}
@@ -228,6 +234,19 @@ function ReaderImage({ src, idx }) {
                     onError={() => setError(true)}
                 />
             )}
+            <style jsx>{`
+                .reader-img-titan {
+                    opacity: 0;
+                    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+                }
+                .reader-img-titan.reader-img-loaded {
+                    opacity: 1;
+                }
+                .reader-image-placeholder.is-fading {
+                    opacity: 0;
+                    pointer-events: none;
+                }
+            `}</style>
         </div>
     );
 }

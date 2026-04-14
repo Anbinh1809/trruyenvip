@@ -6,10 +6,12 @@ import { useState, memo } from 'react';
 import { useFavorites } from '@/context/FavoritesContext';
 import { Bookmark, Star, Eye } from 'lucide-react';
 
-function MangaCard({ manga, isNew = false }) {
-  const coverUrl = manga.cover?.startsWith('http') 
-    ? `/api/proxy?url=${encodeURIComponent(manga.cover)}` 
-    : (manga.cover || '/placeholder-manga.svg');
+import { getSignedProxyUrl } from '@/lib/crypto';
+
+function MangaCard({ manga, isNew = false, priority = false }) {
+  const coverUrl = manga.cover 
+    ? getSignedProxyUrl(manga.cover, 0, 75) 
+    : '/placeholder-manga.svg';
     
   const [imgSrc, setImgSrc] = useState(coverUrl);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -45,17 +47,25 @@ function MangaCard({ manga, isNew = false }) {
   };
 
   return (
-    <Link href={`/manga/${manga.id}`} className="manga-card-titan fade-up">
+    <Link 
+      href={`/manga/${manga.id}`} 
+      className="manga-card-titan fade-up"
+      itemScope 
+      itemType="http://schema.org/CreativeWork"
+    >
+      <meta itemprop="url" content={`/manga/${manga.id}`} />
       <div className={`card-media-titan ${!isLoaded ? 'skeleton-shimmer' : ''}`}>
         <Image 
           src={imgSrc} 
-          alt={manga.title} 
+          alt={`Ảnh bìa truyện ${manga.title}`} 
           fill
           sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 20vw"
           className={`card-img-titan ${isLoaded ? 'is-loaded' : ''}`} 
           onLoad={() => setIsLoaded(true)}
           onError={handleImgError}
-          priority={isNew}
+          priority={priority || isNew}
+          fetchPriority={priority ? "high" : "auto"}
+          itemProp="image"
         />
         
         <div className="manga-badge-container">
@@ -71,7 +81,7 @@ function MangaCard({ manga, isNew = false }) {
 
         <button 
             className={`bookmark-btn ${favorited ? 'active' : ''}`}
-            aria-label={favorited ? "Xóa khỏi yêu thích" : "Thêm vào yêu thích"}
+            aria-label={favorited ? `Xóa ${manga.title} khỏi yêu thích` : `Thêm ${manga.title} vào yêu thích`}
             onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -94,11 +104,13 @@ function MangaCard({ manga, isNew = false }) {
         </div>
       </div>
 
-      <h3 className="card-title-centered truncate-1">{manga.title}</h3>
+      <h3 className="card-title-centered truncate-1" itemProp="name">{manga.title}</h3>
       <p className="card-chapter-centered">
-        {manga.last_chap_num && isNaN(manga.last_chap_num) ? 
+        {manga.latest_chapter_number ? (
+            `Chương ${manga.latest_chapter_number}`
+        ) : (manga.last_chap_num && isNaN(manga.last_chap_num) ? 
             manga.last_chap_num : 
-            (manga.last_chap_num && manga.last_chap_num !== '0' ? `Chương ${manga.last_chap_num}` : 'Đang cập nhật')
+            (manga.last_chap_num && manga.last_chap_num !== '0' ? `Chương ${manga.last_chap_num}` : 'Đang cập nhật'))
         }
       </p>
 

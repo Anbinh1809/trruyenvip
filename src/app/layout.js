@@ -11,6 +11,7 @@ import { ToastProvider } from "@/components/ToastProvider";
 import { AuthProvider } from "@/context/AuthContext";
 import MobileNav from "@/components/MobileNav";
 import BackToTop from "@/components/BackToTop";
+import SWRegistration from "@/components/SWRegistration";
 
 const inter = Inter({
   subsets: ['latin', 'vietnamese'],
@@ -61,14 +62,32 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="vi" className={`${inter.variable}`} suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.addEventListener('unhandledrejection', function(event) {
+                console.error('TITAN_PROMISE_REJECTION:', event.reason);
+              });
+              window.onerror = function(message, source, lineno, colno, error) {
+                console.error('TITAN_RUNTIME_ERROR:', message, error);
+              };
+            `,
+          }}
+        />
+      </head>
       <body suppressHydrationWarning>
+        <a href="#main-content" className="skip-to-content-titan">Bỏ qua đến nội dung chính</a>
         <AuthProvider>
           <ThemeProvider>
             <ToastProvider> 
               <EngagementProvider>
                 <HistoryProvider>
                   <FavoritesProvider>
-                    {children}
+                    <main id="main-content">
+                      {children}
+                    </main>
+                    <SWRegistration />
                     <MobileNav />
                     <BackToTop />
                   </FavoritesProvider>

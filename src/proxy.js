@@ -6,20 +6,21 @@ import { jwtVerify } from 'jose';
  * Orchestrates Edge-level security, Rate Limiting, RBAC, and Security Headers.
  */
 
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
+const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'truyenvip_default_secret_key_change_me');
 const CRON_SECRET = process.env.CRON_SECRET;
 
 // --- RATE LIMITING STATE (Memory-Safe Guard) ---
 const RATE_LIMIT_MAP = new Map();
 const LIMIT_WINDOW = 60 * 1000; // 1 minute
-const MAX_REQUESTS = 60; // Standard 1 req/sec average
+const MAX_REQUESTS = 120; // Increased for high-traffic scalability
 
 export default async function proxy(request) {
   const { pathname } = request.nextUrl;
-  const ip = request.ip || '127.0.0.1';
+  const ip = request.headers.get('x-forwarded-for') || '127.0.0.1';
 
-  // --- TITAN-0: RATE LIMITING ---
-  if (pathname.startsWith('/api/auth') || pathname.startsWith('/api/admin')) {
+  // --- TITAN-0: RATE LIMITING (Excluding static assets & heavy proxy) ---
+  const isSlightlyProtected = pathname.startsWith('/api/auth') || pathname.startsWith('/api/admin') || pathname.startsWith('/api/user');
+  if (isSlightlyProtected && !pathname.startsWith('/api/proxy')) {
       if (RATE_LIMIT_MAP.size > 5000) {
           const oldestKey = RATE_LIMIT_MAP.keys().next().value;
           RATE_LIMIT_MAP.delete(oldestKey);
@@ -106,13 +107,27 @@ export default async function proxy(request) {
 }
 
 function applyTitanHeaders(response) {
+  // --- TITAN INDUSTRIAL SECURITY SUITE ---
+  const csp = [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.vercel-scripts.com", // unsafe-inline for Next.js hydration
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "img-src 'self' data: blob: https: *", // flexible for proxied images
+    "font-src 'self' https://fonts.gstatic.com",
+    "connect-src 'self' https: *",
+    "frame-ancestors 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "object-src 'none'"
+  ].join('; ');
+
+  response.headers.set('Content-Security-Policy', csp);
   response.headers.set('X-Frame-Options', 'DENY');
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-  response.headers.set('X-XSS-Protection', '1; mode=block');
-  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   response.headers.set('X-Titan-Security', 'Ironclad-Enforced');
+  response.headers.set('X-Powered-By', 'Titan-Engine');
 }
 
 export const config = {

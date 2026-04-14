@@ -5,6 +5,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import '../admin.css';
 import { 
     Zap, 
     ShieldCheck, 
@@ -178,18 +179,6 @@ export default function AdminCrawlerPage() {
       </div>
 
       <Footer />
-      <style jsx>{`
-        .status-badges-group { display: flex; gap: 15px; align-items: center; }
-        .telemetry-flex { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-        .limit-tag { font-size: 0.9rem; opacity: 0.2; margin-left: 10px; }
-        .pulse-banner-titan { font-size: 0.65rem; font-weight: 950; background: rgba(139, 92, 246, 0.1); color: #a78bfa; padding: 6px 12px; border-radius: 4px; display: inline-block; letter-spacing: 1px; }
-        .config-grid-titan { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; }
-        .config-label-titan { font-size: 0.7rem; font-weight: 950; color: rgba(255,255,255,0.2); letter-spacing: 2px; margin-bottom: 8px; }
-        .config-value-titan { font-size: 1rem; font-weight: 850; color: white; }
-        .rotate-hover-titan { width: 45px; height: 45px; display: flex; alignItems: center; justifyContent: center; padding: 0; }
-        .rotate-hover-titan:hover :global(svg) { transform: rotate(180deg); }
-        .rotate-hover-titan :global(svg) { transition: transform 0.5s; }
-      `}</style>
     </main>
   );
 }

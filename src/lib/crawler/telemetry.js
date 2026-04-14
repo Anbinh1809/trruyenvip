@@ -1,7 +1,7 @@
 /**
  * Titan Telemetry & State Management
  */
-import { query } from '../db.js';
+import { query, saveSystemState } from '../db.js';
 
 global.crawlerState = global.crawlerState || {
     status: 'idle',
@@ -16,10 +16,29 @@ global.crawlerState = global.crawlerState || {
     failCount: 0,
     imagesScrapedToday: 0,
     startTime: Date.now(),
-    lastAction: Date.now()
+    lastAction: Date.now(),
+    mirrorHealth: {} // { 'nettruyen.com': { failCount: 0, lastFail: Date.now(), status: 'ok' } }
 };
 
 export const getTelemetry = () => global.crawlerState;
+
+export function updateMirrorHealth(domain, isSuccess, error = '') {
+    if (!domain) return;
+    const health = global.crawlerState.mirrorHealth[domain] || { failCount: 0, lastFail: null, status: 'ok' };
+    
+    if (isSuccess) {
+        health.failCount = 0;
+        health.status = 'ok';
+    } else {
+        health.failCount++;
+        health.lastFail = Date.now();
+        health.lastError = error;
+        if (health.failCount >= 5) health.status = 'degraded';
+        if (health.failCount >= 20) health.status = 'offline';
+    }
+    
+    global.crawlerState.mirrorHealth[domain] = health;
+}
 
 export function updateTelemetry(data) {
     if (!data) return;
@@ -42,6 +61,22 @@ export function updateTelemetry(data) {
     
     if (data.imagesFound) {
         global.crawlerState.imagesScrapedToday = (global.crawlerState.imagesScrapedToday || 0) + data.imagesFound;
+    }
+
+    // SYNC TO DB: Debounced crawler state persistence
+    if (data.discoveryPage || data.isArchivalPulse || data.syncHealth) {
+        if (data.discoveryPage) global.crawlerState.discoveryPage = data.discoveryPage;
+        if (data.isArchivalPulse !== undefined) global.crawlerState.isArchivalPulse = data.isArchivalPulse;
+        
+        const now = Date.now();
+        if (now - (global.lastStateSync || 0) > 60000 || data.syncHealth) { // Sync every 60s or on force health sync
+            global.lastStateSync = now;
+            saveSystemState('crawler_state', {
+                discoveryPage: global.crawlerState.discoveryPage,
+                isArchivalPulse: global.crawlerState.isArchivalPulse,
+                mirrorHealth: global.crawlerState.mirrorHealth
+            });
+        }
     }
     
     global.crawlerState.lastAction = Date.now();

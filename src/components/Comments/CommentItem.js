@@ -61,8 +61,29 @@ const CommentItem = ({ comment, isReply = false, chapterId, userName, fetchComme
         }
     };
 
+    const handleReport = async (id) => {
+        const reason = prompt('Lý do báo cáo nội dung này (ví dụ: Nội dung độc hại, Spam...):');
+        if (!reason || reason.length < 5) return;
+
+        try {
+            const res = await fetch('/api/comments/report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ commentId: id, reason })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                if (addToast) addToast(data.message, 'success');
+            } else {
+                if (addToast) addToast(data.error || 'Lỗi gửi báo cáo', 'error');
+            }
+        } catch (e) {
+            console.error('Report error', e);
+        }
+    };
+
     const canDelete = isAuthenticated && (user?.uuid === comment.user_uuid || user?.role === 'admin');
-    const isLiked = typeof window !== 'undefined' && JSON.parse(localStorage.getItem('truyenvip_liked_comments') || '[]').includes(comment.id);
+    const isLiked = comment.has_liked;
 
     return (
         <div className={`comment-group-wrapper ${isReply ? 'is-reply' : ''}`}>
@@ -87,6 +108,15 @@ const CommentItem = ({ comment, isReply = false, chapterId, userName, fetchComme
                                 title="Xóa bình luận"
                             >
                                 <Trash2 size={14} />
+                            </button>
+                        )}
+                        {isAuthenticated && user?.uuid !== comment.user_uuid && (
+                            <button 
+                                onClick={() => handleReport(comment.id)} 
+                                className="action-btn-industrial report-btn"
+                                title="Báo cáo vi phạm"
+                            >
+                                <MessageSquare size={14} /> 
                             </button>
                         )}
                     </div>

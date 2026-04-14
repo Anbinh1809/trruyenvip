@@ -8,6 +8,8 @@ import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { ChevronLeft, ChevronRight, Home, BookOpen, AlertTriangle } from 'lucide-react';
 
+import ChapterSelector from '@/components/ChapterSelector';
+
 // Lazy load comments to prevent hydration mismatches
 const Comments = dynamic(() => import('@/components/CommentSection'), { 
   loading: () => <div className="loading-dots-industrial">Đang tải bình luận...</div>
@@ -26,7 +28,7 @@ async function getChapterData(mangaId, chapterId) {
     const chaptersRes = await query('SELECT id, chapter_number, title FROM chapters WHERE manga_id = @mangaId ORDER BY chapter_number ASC', { mangaId });
     const chapters = chaptersRes.recordset;
 
-    const currentIndex = chapters.findIndex(c => c.id == chapterId);
+    const currentIndex = chapters.findIndex(c => c.id === chapterId);
     const prevChapter = currentIndex > 0 ? chapters[currentIndex - 1] : null;
     const nextChapter = currentIndex < chapters.length - 1 ? chapters[currentIndex + 1] : null;
 
@@ -52,7 +54,7 @@ export default async function ChapterPage({ params }) {
     );
   }
 
-  const { manga, chapter, nextChapter, prevChapter } = data;
+  const { manga, chapter, chapters, nextChapter, prevChapter } = data;
 
   return (
     <main className="main-wrapper titan-bg reader-industrial-layout">
@@ -65,7 +67,7 @@ export default async function ChapterPage({ params }) {
           </Link>
 
           <div className="reader-nav-center">
-            <span className="current-chapter-pill">CHAPTER {chapter.chapter_number}</span>
+            <ChapterSelector mangaId={id} chapters={chapters} currentId={chapterId} />
           </div>
 
           <div className="reader-nav-actions-industrial">
@@ -92,6 +94,7 @@ export default async function ChapterPage({ params }) {
             mangaId={id} 
             chapter={chapter} 
             nextChapterId={nextChapter?.id} 
+            prevChapterId={prevChapter?.id}
             mangaTitle={manga.title}
         />
       </div>

@@ -1,0 +1,228 @@
+/* ==========================================================================
+   TITAN INDUSTRIAL - ADMIN DASHBOARD
+   Centrally managed styles for all administrative control panels.
+   ========================================================================== */
+
+.admin-container {
+    padding-top: 40px;
+    padding-bottom: 100px;
+}
+
+.admin-header-industrial {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 50px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.admin-title-industrial {
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    font-weight: 950;
+    letter-spacing: -1px;
+    color: white;
+    margin-bottom: 8px;
+}
+
+.admin-subtitle {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 700;
+}
+
+/* STATS GRID */
+.admin-stats-grid-industrial {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+    margin-bottom: 50px;
+}
+
+.admin-stat-node-industrial {
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 30px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.admin-stat-node-industrial:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.admin-stat-node-industrial.accent-node {
+    background: linear-gradient(135deg, rgba(235, 60, 60, 0.1) 0%, rgba(15, 23, 42, 0.4) 100%);
+    border-color: rgba(235, 60, 60, 0.2);
+}
+
+.admin-stat-label-industrial {
+    font-size: 0.7rem;
+    font-weight: 950;
+    color: rgba(255, 255, 255, 0.3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.admin-stat-value-industrial {
+    font-size: 2.5rem;
+    font-weight: 950;
+    color: white;
+    letter-spacing: -2px;
+}
+
+/* ACTION GRID */
+.admin-action-grid-industrial {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 30px;
+}
+
+.admin-card-industrial {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 40px;
+    backdrop-filter: blur(20px);
+}
+
+.admin-card-title-industrial {
+    font-size: 1.1rem;
+    font-weight: 950;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+    letter-spacing: 1px;
+}
+
+/* TASK MONITORING */
+.monitored-task-box-industrial {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    padding: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.task-stat-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.task-stat-line:last-child {
+    border-bottom: none;
+}
+
+.task-stat-label-industrial {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 700;
+}
+
+.task-stat-value-titan {
+    font-weight: 950;
+    font-size: 1.1rem;
+}
+
+/* FAILURE LOGS */
+.failure-log-mini-industrial {
+    min-height: 200px;
+}
+
+.failure-log-title {
+    font-size: 0.7rem;
+    font-weight: 950;
+    color: #f87171;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+}
+
+.failure-entry-industrial {
+    background: rgba(248, 113, 113, 0.03);
+    border-left: 2px solid #f87171;
+    padding: 12px 18px;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 10px;
+    border-radius: 0 8px 8px 0;
+}
+
+/* HEATMAP / DB LOAD */
+.heatmap-engine-industrial {
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* TABLE STYLES */
+.admin-table-wrapper {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    overflow: hidden;
+    backdrop-filter: blur(20px);
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table th {
+    background: rgba(255, 255, 255, 0.02);
+    padding: 20px;
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 950;
+    color: rgba(255, 255, 255, 0.3);
+    letter-spacing: 2px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.admin-table td {
+    padding: 24px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    vertical-align: middle;
+}
+
+/* ANIMATIONS */
+@keyframes spin-titan {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.spin-titan {
+    animation: spin-titan 1.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+/* CRAWLER SPECIFIC */
+.status-badges-group { display: flex; gap: 15px; align-items: center; }
+.telemetry-flex { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.limit-tag { font-size: 0.9rem; opacity: 0.2; margin-left: 10px; }
+.pulse-banner-titan { font-size: 0.65rem; font-weight: 950; background: rgba(139, 92, 246, 0.1); color: #a78bfa; padding: 6px 12px; border-radius: 4px; display: inline-block; letter-spacing: 1px; }
+.config-grid-titan { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; }
+.config-label-titan { font-size: 0.7rem; font-weight: 950; color: rgba(255,255,255,0.2); letter-spacing: 2px; margin-bottom: 8px; }
+.config-value-titan { font-size: 1rem; font-weight: 850; color: white; }
+.rotate-hover-titan { width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; padding: 0; }
+.rotate-hover-titan:hover svg { transform: rotate(180deg); }
+.rotate-hover-titan svg { transition: transform 0.5s; }
+
+/* REWARDS SPECIFIC */
+.empty-table-cell { text-align: center; padding: 60px; color: rgba(255,255,255,0.2); font-weight: 800; font-style: italic; }
+.avatar-mini-titan { width: 24px; height: 24px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.bank-name-titan { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-bottom: 4px; }
+.account-no-titan { display: flex; align-items: center; gap: 8px; font-size: 1rem; color: #60a5fa; margin-bottom: 2px; }
+.holder-name-titan { font-size: 0.75rem; color: rgba(255,255,255,0.3); text-transform: uppercase; }
+.cost-coins-titan { font-size: 0.75rem; color: rgba(255,255,255,0.3); font-weight: 800; }
+.action-done-titan { font-size: 0.8rem; font-weight: 950; color: rgba(255,255,255,0.1); letter-spacing: 1px; }

@@ -1,14 +1,23 @@
-import { query } from '@/lib/db';
+import { query, checkRateLimit } from '@/lib/db';
 import bcrypt from 'bcryptjs';
 import { signToken, setSessionCookie } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 
 export async function POST(request) {
     try {
-        const { username, password, email, uuid, xp = 0, vipCoins = 0 } = await request.json();
+        const { username, password, email, uuid } = await request.json();
+        const ip = request.headers.get('x-forwarded-for') || '127.0.0.1';
 
-        if (!username || !password || !uuid) {
-            return NextResponse.json({ error: 'Thiếu thông tin đăng ký' }, { status: 400 });
+        // 1. Rate Limit: 5 registrations / 1 hour
+        const limiter = await checkRateLimit(`register_${ip}`, 5, 3600);
+        if (!limiter.success) {
+            return NextResponse.json({ 
+                error: 'Bạn đã đăng ký quá nhiều tài khoản. Vui lòng quay lại sau 1 giờ.' 
+            }, { status: 429 });
+        }
+
+        if (!username || !password || !uuid || typeof uuid !== 'string' || uuid.length < 8) {
+            return NextResponse.json({ error: 'Thông tin đăng ký không hợp lệ hoặc thiếu dữ liệu thiết bị' }, { status: 400 });
         }
 
         // --- GATEKEEPER VALIDATION: Infiltration Shield ---

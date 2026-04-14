@@ -34,8 +34,8 @@ const initialState = {
 function engagementReducer(state, action) {
   switch (action.type) {
     case 'SYNC_USER': {
-        const { xp, vipCoins, uuid, isServerSync } = action.payload;
-        if (state.xp === xp && state.vipCoins === vipCoins && state.userUuid === uuid) return state;
+        const { xp, vipCoins, uuid, missionData, isServerSync } = action.payload;
+        if (state.xp === xp && state.vipCoins === vipCoins && state.userUuid === uuid && !missionData) return state;
 
         const level = Math.floor(xp / 100) + 1;
         const rank = [...RANKS].reverse().find(r => level >= r.lv);
@@ -44,6 +44,7 @@ function engagementReducer(state, action) {
             localStorage.setItem('truyenvip_xp', xp.toString());
             localStorage.setItem('truyenvip_coins', vipCoins.toString());
             localStorage.setItem('truyenvip_user_uuid', uuid);
+            if (missionData) localStorage.setItem('truyenvip_daily_missions', JSON.stringify(missionData));
         }
 
         return {
@@ -52,7 +53,8 @@ function engagementReducer(state, action) {
          vipCoins,
          userUuid: uuid,
          level,
-         rankTitle: rank ? rank.title : 'Thành viên mới'
+         rankTitle: rank ? rank.title : 'Thành viên mới',
+         dailyMissions: missionData || state.dailyMissions
         };
     }
     case 'ADD_XP': {
@@ -144,7 +146,11 @@ export function EngagementProvider({ children }) {
         const res = await fetch('/api/auth/update-stats', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ xpDelta: snapshot.xp, coinDelta: snapshot.coins })
+            body: JSON.stringify({ 
+                xpDelta: snapshot.xp, 
+                coinDelta: snapshot.coins,
+                missionData: state.dailyMissions 
+            })
         });
         
         if (res.ok) {
@@ -250,9 +256,6 @@ export function EngagementProvider({ children }) {
         if (adjustedXp !== lastSyncRef.current.xp || adjustedCoins !== lastSyncRef.current.coins) {
             const nextLevel = Math.floor(adjustedXp / 100) + 1;
             
-            // TITAN LOGIN FIX: If this is the first server sync, align the celebration ref
-            // to the current level to prevent back-filling a queue of fireworks for levels 
-            // the user already earned in previous sessions.
             if (isFirstSyncRef.current) {
                 hasCelebratedLevelRef.current = nextLevel;
                 isFirstSyncRef.current = false;
@@ -262,6 +265,7 @@ export function EngagementProvider({ children }) {
                 xp: adjustedXp, 
                 vipCoins: adjustedCoins, 
                 uuid: uUuid, 
+                missionData: user?.missionData,
                 isServerSync: true 
             }});
             lastSyncRef.current = { xp: adjustedXp, coins: adjustedCoins };

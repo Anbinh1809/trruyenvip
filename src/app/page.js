@@ -3,6 +3,7 @@ import RecentlyRead from '@/components/RecentlyRead';
 import MangaCard from '@/components/MangaCard';
 import Footer from '@/components/Footer';
 import { query, MANGA_CARD_FIELDS } from '@/lib/db';
+import { getSignedProxyUrl } from '@/lib/crypto';
 import "./home.css";
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -27,7 +28,7 @@ async function getManga() {
 
     return (result.recordset || []).map(m => ({
       ...m,
-      cover: m.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}&w=400&q=75` : (m.cover || '/placeholder-manga.svg'),
+      cover: m.cover ? getSignedProxyUrl(m.cover, 400, 75) : '/placeholder-manga.svg',
     }));
   } catch (err) {
     console.error('DB Fetch Error:', err.message);
@@ -73,8 +74,8 @@ export default async function Home() {
             </div>
           </div>
           <div className="manga-grid-titan">
-            {trendingManga.map(manga => (
-              <MangaCard key={manga.id} manga={manga} />
+            {trendingManga.map((manga, idx) => (
+              <MangaCard key={manga.id} manga={manga} priority={idx < 4} />
             ))}
           </div>
         </section>
@@ -91,7 +92,7 @@ export default async function Home() {
           </div>
           <div className="manga-grid-titan">
             {recentManga.map(manga => (
-              <MangaCard key={manga.id} manga={manga} />
+              <MangaCard key={manga.id} manga={manga} priority={false} />
             ))}
           </div>
         </section>

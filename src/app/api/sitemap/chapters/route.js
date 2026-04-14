@@ -8,12 +8,11 @@ export async function GET(request) {
   const origin = `${protocol}://${host}`;
 
   try {
-    // Fetch the 2000 most recent chapters for rapid indexing
     const chapRes = await query(`
       SELECT id, manga_id, updated_at 
       FROM chapters 
       ORDER BY updated_at DESC
-      LIMIT 2000
+      LIMIT 10000
     `);
 
     const chapters = chapRes.recordset || [];
@@ -21,7 +20,7 @@ export async function GET(request) {
   <url>
     <loc>${origin}/manga/${c.manga_id}/chapter/${c.id}</loc>
     <lastmod>${new Date(c.updated_at || Date.now()).toISOString()}</lastmod>
-    <changefreq>never</changefreq>
+    <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>`).join('');
 
