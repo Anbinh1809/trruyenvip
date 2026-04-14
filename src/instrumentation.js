@@ -10,7 +10,7 @@ export async function register() {
         console.log('--- [Guardian] Initializing Autonomous Engine (V8 Clean) ---');
 
         // relative import without alias to avoid Turbopack resolution bugs
-        import('./lib/crawler.js')
+        import('./lib/crawler/index.js')
             .then((m) => {
                 if (m && m.bootstrapCrawler) m.bootstrapCrawler().catch(() => {});
                 
@@ -34,7 +34,7 @@ export async function register() {
                 const healData = async () => {
                    try {
                        const { query } = await import('./lib/db');
-                       const { normalizeTitle } = await import('./lib/crawler');
+                       const { normalizeTitle } = await import('./lib/crawler/index.js');
                        const missing = await query("SELECT id, title FROM Manga WHERE normalized_title IS NULL LIMIT 50");
                        
                        if (missing.recordset.length > 0) {

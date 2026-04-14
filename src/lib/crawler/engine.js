@@ -35,7 +35,7 @@ async function executeTask(taskRow) {
             }
             case 'system_discovery': {
                 const { source, pageCount } = payload;
-                // These will be imported or defined below
+                await crawlLatest(source, pageCount);
                 break;
             }
         }
@@ -105,6 +105,16 @@ export async function queueMangaSync(mangaId, url, source, earlyExit = false, pr
     processQueue();
 }
 
+export async function queueDiscovery(source, pageCount = 3, priority = 3) {
+    const target = stringifySorted({ source, pageCount });
+    await query(`
+        INSERT INTO crawlertasks (type, target, priority) VALUES ('system_discovery', @target, @priority)
+        ON CONFLICT (target) DO UPDATE SET priority = GREATEST(crawlertasks.priority, @priority)
+        WHERE crawlertasks.status = 'pending'
+    `, { target, priority });
+    processQueue();
+}
+
 /**
  * Core Ingestion Logic: Full Manga Sync
  */
@@ -132,6 +142,9 @@ export async function crawlFullMangaChapters(mangaId, url, source, earlyExit = f
             status: metadata.status || 'Đang cập nhật', 
             description: metadata.description || 'Nội dung đang được cập nhật.'
         });
+
+        const $ = require('cheerio').load(html);
+        const chapterRows = source === 'nettruyen' ? $('.list-chapter li').toArray() : $('.list01 li').toArray();
 
         const processedUrls = new Set();
         const existingIds = new Set();
@@ -184,6 +197,54 @@ export async function crawlFullMangaChapters(mangaId, url, source, earlyExit = f
         console.error(`Error in crawlFullMangaChapters for ${mangaId}:`, err.message);
     } finally {
         inProgressManga.delete(mangaId);
+    }
+}
+
+/**
+ * Discovery Engine: Finding new manga content
+ */
+export async function crawlLatest(source = 'nettruyen', pageCount = 1) {
+    console.log(`[Crawler] Global Discovery Initiated: ${source} (${pageCount} pages)`);
+    const base = source === 'nettruyen' ? SOURCES.NETTRUYEN : SOURCES.TRUYENQQ;
+    
+    for (let p = 1; p <= pageCount; p++) {
+        try {
+            const url = source === 'nettruyen' 
+                ? `${base}?page=${p}` 
+                : `${base}/latest-updates?page=${p}`; // Hypothetical latest page
+                
+            const response = await fetchWithRetry(url, { isDiscovery: true });
+            const $ = require('cheerio').load(response.data);
+            
+            const mangaLinks = source === 'nettruyen' 
+                ? $('.items .item .image a').toArray() 
+                : $('.book_item .book_avatar a').toArray();
+                
+            for (const link of mangaLinks) {
+                let mangaUrl = $(link).attr('href');
+                if (!mangaUrl) continue;
+                if (mangaUrl.startsWith('/')) mangaUrl = safeJoinUrl(base, mangaUrl);
+                
+                const slug = mangaUrl.split('/').pop()?.split('?')[0];
+                const title = $(link).attr('title') || $(link).find('img').attr('alt') || slug;
+                
+                // Ensure manga exists in DB
+                const check = await query("SELECT id FROM manga WHERE id = @slug OR source_url = @mangaUrl", { slug, mangaUrl });
+                if (check.recordset.length === 0) {
+                    await query(`
+                        INSERT INTO manga (id, title, source_url) 
+                        VALUES (@slug, @title, @mangaUrl)
+                        ON CONFLICT (id) DO NOTHING
+                    `, { slug, title, mangaUrl });
+                }
+                
+                // Queue Sync for existing or new manga
+                await queueMangaSync(slug, mangaUrl, source, true, 4);
+                await new Promise(r => setTimeout(r, 100));
+            }
+        } catch (e) {
+            console.error(`[Crawler] Page ${p} Discovery failed:`, e.message);
+        }
     }
 }
 
@@ -256,15 +317,29 @@ export async function runGuardianAutopilot() {
     while (true) {
         try {
             updateTelemetry({ status: 'guardian_discovery' });
-            // Step 1: Discovery (Placeholder for crawlLatest logic)
-            // Step 2: Healing & Rescue
-            await rescueBrokenImages(5);
+            await crawlLatest('nettruyen', 1);
+            await rescueBrokenImages(10);
+            await healChapterGaps(5);
             
-            await new Promise(r => setTimeout(r, 60000)); // Cycle every minute
+            await new Promise(r => setTimeout(r, 300000)); // Cycle every 5 minutes
         } catch (e) {
             console.error('[Guardian] Engine Stalled:', e.message);
-            await new Promise(r => setTimeout(r, 30000));
+            await new Promise(r => setTimeout(r, 60000));
         }
+    }
+}
+
+export async function healChapterGaps(batchSize = 20) {
+    const candidates = await query(`
+        SELECT id, source_url FROM manga 
+        WHERE last_crawled < NOW() - INTERVAL '6 hours'
+        ORDER BY last_crawled ASC 
+        LIMIT @batchSize
+    `, { batchSize });
+
+    for (const m of candidates.recordset) {
+        const source = m.source_url.includes('truyenqq') ? 'truyenqq' : 'nettruyen';
+        queueMangaSync(m.id, m.source_url, source, true, 2);
     }
 }
 

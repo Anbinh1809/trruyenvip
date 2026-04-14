@@ -83,7 +83,8 @@ export {
     healChapterGaps,
     rescueBrokenImages,
     bootstrapCrawler,
-    queueChapterScrape
+    queueChapterScrape,
+    queueDiscovery
 } from './engine.js';
 
 export { 
