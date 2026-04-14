@@ -7,9 +7,9 @@ import LiveSearch from '@/components/LiveSearch';
 import { Search, X, Menu } from 'lucide-react';
 
 // Sub-components
-import HeaderLogo from './HeaderLogo';
-import UserActions from './UserActions';
-import './Header.css';
+import HeaderLogo from './layout/Header/HeaderLogo';
+import UserActions from './layout/Header/UserActions';
+import './layout/Header/Header.css';
 
 export default function Header() {
   const { isAuthenticated, loading } = useAuth();
