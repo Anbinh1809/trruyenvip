@@ -38,6 +38,7 @@ setInterval(async () => {
 
     // TITAN RESCUE: Auto-reset failed tasks during off-peak windows
     try {
+        // 1. Salvage failed tasks
         const failedCountRes = await query("SELECT COUNT(*) as count FROM crawlertasks WHERE status = 'failed'");
         const failedCount = failedCountRes.recordset?.[0]?.count || 0;
         
@@ -49,6 +50,9 @@ setInterval(async () => {
                 WHERE status = 'failed' AND updated_at < NOW() - INTERVAL '3 hours'
             `);
         }
+
+        // 2. INDUSTRIAL CLEANUP: Prune logs older than 24h
+        await query("DELETE FROM crawllogs WHERE created_at < NOW() - INTERVAL '24 hours'");
     } catch (e) {
         console.error('[Rescue:Error]', e.message);
     }
@@ -151,15 +155,9 @@ export async function processQueue() {
         selected_tasks AS (
             SELECT t.id 
             FROM crawlertasks t
-            LEFT JOIN favorite_counts f ON (
-                CASE 
-                    WHEN t.type = 'chapter_scrape' THEN REPLACE(REPLACE(t.target, '{"chapId":"', ''), '"', '') 
-                    WHEN t.type = 'manga_sync' THEN REPLACE(REPLACE(t.target, '{"mangaId":"', ''), '"', '')
-                    ELSE 'system'
-                END LIKE f.manga_id || '%'
-            )
+            LEFT JOIN favorite_counts f ON t.manga_id = f.manga_id
             WHERE t.status = 'pending'
-            ORDER BY (t.priority + COALESCE(f.fav_count, 0) * 2) DESC, t.created_at ASC
+            ORDER BY (t.priority + COALESCE(f.fav_count, 0) * 3) DESC, t.created_at ASC
             LIMIT @needed
             FOR UPDATE SKIP LOCKED
         )
@@ -196,20 +194,23 @@ function stringifySorted(obj) {
 export async function queueMangaSync(mangaId, url, source, earlyExit = false, priority = 5) {
     const target = stringifySorted({ mangaId, url, source, earlyExit });
     await query(`
-        INSERT INTO crawlertasks (type, target, priority) VALUES ('manga_sync', @target, @priority)
+        INSERT INTO crawlertasks (type, target, priority, manga_id) 
+        VALUES ('manga_sync', @target, @priority, @mangaId)
         ON CONFLICT (target) DO UPDATE SET priority = GREATEST(crawlertasks.priority, @priority)
         WHERE crawlertasks.status = 'pending'
-    `, { target, priority });
+    `, { target, priority, mangaId });
     processQueue();
 }
 
 export async function queueDiscovery(source, pageCount = 3, startPage = 1, priority = 3) {
     const target = stringifySorted({ source, pageCount, startPage });
+    const mangaId = `system_discovery_${source}`;
     await query(`
-        INSERT INTO crawlertasks (type, target, priority) VALUES ('system_discovery', @target, @priority)
+        INSERT INTO crawlertasks (type, target, priority, manga_id) 
+        VALUES ('system_discovery', @target, @priority, @mangaId)
         ON CONFLICT (target) DO UPDATE SET priority = GREATEST(crawlertasks.priority, @priority)
         WHERE crawlertasks.status = 'pending'
-    `, { target, priority });
+    `, { target, priority, mangaId });
     processQueue();
 }
 

@@ -70,13 +70,19 @@ export async function fetchWithRetry(url, options = {}, retries = 2) {
         }
     };
 
-    // TITAN V3 SUPER RACING: Fast, simultaneous mirror racing
-    // We race the top 3 mirrors with slight staggering to optimize resources
-    const racers = [
-        tryMirror(mirrors[0], 0),
-        mirrors[1] ? tryMirror(mirrors[1], 400) : null,
-        mirrors[2] ? tryMirror(mirrors[2], 1200) : null
-    ].filter(Boolean);
+    // TITAN V3 ADAPTIVE RACING: Smart resource management
+    // We only race multiple mirrors if the primary is showing signs of instability
+    const domain = mirrors[0] ? new URL(mirrors[0]).hostname : null;
+    const health = global.crawlerState?.mirrorHealth?.[domain] || { status: 'ok', failCount: 0 };
+    
+    let racers = [tryMirror(mirrors[0], 0)];
+    
+    if (health.status !== 'ok' || health.failCount > 1 || options.isDiscovery) {
+        if (mirrors[1]) racers.push(tryMirror(mirrors[1], 400));
+        if (mirrors[2] && (health.status === 'offline' || options.isDiscovery)) racers.push(tryMirror(mirrors[2], 1200));
+    }
+
+    racers = racers.filter(Boolean);
 
     try {
         return await Promise.any(racers);
