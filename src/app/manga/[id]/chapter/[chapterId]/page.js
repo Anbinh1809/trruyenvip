@@ -18,8 +18,9 @@ const Comments = dynamic(() => import('@/components/CommentSection'), {
 
 async function getChapterData(mangaId, chapterId) {
   try {
-    // TITAN SMART LOOKUP 2.0: Check both id and normalized_title simultaneously
-    let mangaRes = await query('SELECT id, title, cover FROM manga WHERE id = @mangaId OR normalized_title = @mangaId LIMIT 1', { mangaId });
+    // TITAN SMART LOOKUP 2.0: Check both id and normalized_title simultaneously (Case-Insensitive)
+    const cleanMangaId = mangaId?.toString().trim();
+    let mangaRes = await query('SELECT id, title, cover FROM manga WHERE id = @mangaId OR LOWER(normalized_title) = LOWER(@mangaId) LIMIT 1', { mangaId: cleanMangaId });
     
     let manga = mangaRes.recordset[0];
 
@@ -34,12 +35,18 @@ async function getChapterData(mangaId, chapterId) {
         manga = mangaRes.recordset[0];
     }
     
-    if (!manga) return null;
+    if (!manga) {
+        console.error(`[Reader Error] Parent manga not found for ID: ${mangaId}`);
+        return null;
+    }
 
     const internalMangaId = manga.id;
     const chapterRes = await query('SELECT id, title, chapter_number, content FROM chapters WHERE id = @chapterId', { chapterId });
     const chapter = chapterRes.recordset[0];
-    if (!chapter) return null;
+    if (!chapter) {
+        console.error(`[Reader Error] Chapter not found for ID: ${chapterId} in Manga: ${internalMangaId}`);
+        return null;
+    }
 
     const chaptersRes = await query(`
         SELECT id, chapter_number, title 
@@ -47,7 +54,7 @@ async function getChapterData(mangaId, chapterId) {
         WHERE manga_id = @internalMangaId 
         ORDER BY NULLIF(regexp_replace(chapter_number, '[^0-9.]', '', 'g'), '')::numeric ASC
     `, { internalMangaId });
-    const chapters = chaptersRes.recordset;
+    const chapters = chaptersRes.recordset || [];
 
     const currentIndex = chapters.findIndex(c => c.id === chapterId);
     const prevChapter = currentIndex > 0 ? chapters[currentIndex - 1] : null;

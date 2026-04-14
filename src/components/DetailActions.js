@@ -63,12 +63,13 @@ export default function DetailActions({ mangaId, firstChapterId, mangaTitle, man
     return (
         <div className="detail-actions-titan">
             <Link 
-                href={`/manga/${mangaId}/chapter/${firstChapterId || ''}`} 
-                className="btn btn-primary read-btn-titan shadow-titan"
+                href={firstChapterId ? `/manga/${mangaId}/chapter/${firstChapterId}` : '#'} 
+                className={`btn btn-primary read-btn-titan shadow-titan ${!firstChapterId ? 'disabled-industrial op-50' : ''}`}
                 onMouseEnter={handleHover}
                 onMouseLeave={handleHoverExit}
+                onClick={(e) => !firstChapterId && e.preventDefault()}
             >
-                <BookOpen size={20} /> ĐỌC TỪ ĐẦU
+                <BookOpen size={20} /> {firstChapterId ? 'ĐỌC TỪ ĐẦU' : 'CHƯA CÓ CHƯƠNG'}
             </Link>
             
             <FavoriteButton manga={{ id: mangaId, title: mangaTitle, cover: mangaCover }} />

@@ -11,7 +11,8 @@ import { BookOpen, User, Star, Calendar, Share2, Heart, AlertOctagon } from 'luc
 
 export async function generateMetadata({ params }) {
   const { id } = await params;
-  const res = await query('SELECT title, description, cover FROM manga WHERE id = @id OR normalized_title = @id', { id });
+  const cleanId = id?.toString().trim();
+  const res = await query('SELECT title, description, cover FROM manga WHERE id = @id OR LOWER(normalized_title) = LOWER(@id) LIMIT 1', { id: cleanId });
   const manga = res.recordset?.[0];
 
   if (!manga) return { title: 'Manga Not Found | TruyenVip' };
@@ -43,13 +44,14 @@ export async function generateMetadata({ params }) {
 
 async function getManga(id) {
   try {
-    // TITAN SMART LOOKUP 2.0: Check both id and normalized_title simultaneously
+    // TITAN SMART LOOKUP 2.0: Check both id and normalized_title simultaneously (Case-Insensitive)
+    const cleanId = id?.toString().trim();
     let res = await query(`
         SELECT ${MANGA_CARD_FIELDS}, description, author, status, last_crawled, normalized_title
         FROM manga 
-        WHERE id = @id OR normalized_title = @id
+        WHERE id = @id OR LOWER(normalized_title) = LOWER(@id)
         LIMIT 1
-    `, { id });
+    `, { id: cleanId });
 
     let manga = res.recordset[0];
 
@@ -85,8 +87,9 @@ async function getManga(id) {
     
     return {
       ...manga,
+      rawCover: manga.cover,
       cover: manga.cover ? getSignedProxyUrl(manga.cover, 0, 75) : '/placeholder-manga.svg',
-      chapters: chaptersRes.recordset,
+      chapters: chaptersRes.recordset || [],
       genres: genresRes.recordset || []
     };
   } catch (err) {
@@ -124,7 +127,7 @@ export default async function MangaDetailPage({ params }) {
         '@type': 'ComicSeries',
         'name': manga.title,
         'description': manga.description,
-        'image': `https://truyenvip.com${getSignedProxyUrl(manga.cover, 800, 75)}`,
+        'image': `https://truyenvip.com${getSignedProxyUrl(manga.rawCover || manga.cover, 800, 75)}`,
         'author': {
           '@type': 'Person',
           'name': manga.author || 'Đang cập nhật'
@@ -236,7 +239,7 @@ export default async function MangaDetailPage({ params }) {
 
                 <DetailActions 
                     mangaId={id} 
-                    firstChapterId={manga.chapters[manga.chapters.length - 1]?.id} 
+                    firstChapterId={manga.chapters?.length > 0 ? manga.chapters[manga.chapters.length - 1]?.id : null} 
                     mangaTitle={manga.title}
                     mangaCover={manga.cover}
                 />
