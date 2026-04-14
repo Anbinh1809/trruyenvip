@@ -21,14 +21,14 @@ export async function runMaintenance() {
             DELETE FROM crawllogs 
             WHERE created_at < NOW() - INTERVAL '1 day'
         `);
-        results.logsPurged = logRes.rowsAffected?.[0] || 0;
+        results.logsPurged = logRes.rowCount || 0;
 
         // 2. Prune guardianreports (Keep 3 days)
         const reportRes = await query(`
             DELETE FROM guardianreports 
             WHERE created_at < NOW() - INTERVAL '3 days'
         `);
-        results.reportsPurged = reportRes.rowsAffected?.[0] || 0;
+        results.reportsPurged = reportRes.rowCount || 0;
 
         // 3. Recover Orphaned Tasks (Stuck for > 1 hour)
         const taskRes = await query(`
@@ -37,14 +37,16 @@ export async function runMaintenance() {
             WHERE status = 'processing' 
             AND updated_at < NOW() - INTERVAL '1 hour'
         `);
-        results.tasksRecovered = taskRes.rowsAffected?.[0] || 0;
+        results.tasksRecovered = taskRes.rowCount || 0;
 
-        // 4. Clean Orphaned chapterimages (If chapter was deleted but images stayed)
+        // 4. Clean Orphaned chapterimages (Optimized for PostgreSQL Performance)
         const orphanRes = await query(`
-            DELETE FROM chapterimages 
-            WHERE chapter_id NOT IN (SELECT id FROM chapters)
+            DELETE FROM chapterimages ci
+            WHERE NOT EXISTS (
+                SELECT 1 FROM chapters c WHERE c.id = ci.chapter_id
+            )
         `);
-        results.orphanImagesRemoved = orphanRes.rowsAffected?.[0] || 0;
+        results.orphanImagesRemoved = orphanRes.rowCount || 0;
 
         // 5. Optimize Indexes (VACUUM-like triggers for Neon)
         // Neon handles vacuuming automatically, but we can hit some stats routes if needed.

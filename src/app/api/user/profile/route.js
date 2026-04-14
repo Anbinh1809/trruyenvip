@@ -14,7 +14,7 @@ export async function PATCH(request) {
             return new Response('URL too long', { status: 400 });
         }
 
-        await query('UPDATE "Users" SET avatar = @avatar WHERE uuid = @uuid', { 
+        await query('UPDATE users SET avatar = @avatar WHERE uuid = @uuid', { 
             avatar: avatar || null, 
             uuid: session.uuid 
         });

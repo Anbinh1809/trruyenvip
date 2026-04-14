@@ -90,16 +90,18 @@ export async function processQueue() {
     }
     
     const pickRes = await query(`
-        UPDATE crawlertasks
-        SET status = 'processing', updated_at = NOW()
-        WHERE id IN (
+        WITH selected_tasks AS (
             SELECT id FROM crawlertasks
             WHERE status = 'pending'
             ORDER BY priority DESC, created_at ASC
             LIMIT @needed
             FOR UPDATE SKIP LOCKED
         )
-        RETURNING id, type, target;
+        UPDATE crawlertasks
+        SET status = 'processing', updated_at = NOW()
+        FROM selected_tasks
+        WHERE crawlertasks.id = selected_tasks.id
+        RETURNING crawlertasks.id, crawlertasks.type, crawlertasks.target;
     `, { needed });
 
     const tasks = pickRes.recordset || [];
@@ -250,15 +252,13 @@ export async function crawlLatest(source = 'nettruyen', pageCount = 1, startPage
                 const slug = mangaUrl.split('/').pop()?.split('?')[0];
                 const title = $(link).attr('title') || $(link).find('img').attr('alt') || slug;
                 
-                // Ensure manga exists in DB
-                const check = await query("SELECT id FROM manga WHERE id = @slug OR source_url = @mangaUrl", { slug, mangaUrl });
-                if (check.recordset.length === 0) {
-                    await query(`
-                        INSERT INTO manga (id, title, source_url) 
-                        VALUES (@slug, @title, @mangaUrl)
-                        ON CONFLICT (id) DO NOTHING
-                    `, { slug, title, mangaUrl });
-                }
+                // Ensure manga exists in DB (Standardized logic)
+                await query(`
+                    INSERT INTO manga (id, title, source_url) 
+                    VALUES (@slug, @title, @mangaUrl)
+                    ON CONFLICT (source_url) DO NOTHING
+                    ON CONFLICT (id) DO NOTHING
+                `, { slug, title, mangaUrl });
                 
                 // Queue Sync for existing or new manga
                 await queueMangaSync(slug, mangaUrl, source, true, 4);

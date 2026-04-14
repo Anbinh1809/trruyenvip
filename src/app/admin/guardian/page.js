@@ -114,6 +114,7 @@ export default function GuardianHub() {
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                                     <div style={{ width: '32px', height: '42px', position: 'relative', borderRadius: '4px', overflow: 'hidden', background: 'rgba(255,255,255,0.05)' }}>
                                                         {report.cover && <Image src={report.cover.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(report.cover)}` : report.cover} alt="" fill style={{ objectFit: 'cover' }} />}
+                                                        {!report.cover && <div style={{ width: '100%', height: '100%', background: 'rgba(255,255,255,0.05)' }}></div>}
                                                     </div>
                                                     <span style={{ fontWeight: 800, fontSize: '0.9rem' }}>{report.manga_name}</span>
                                                 </div>

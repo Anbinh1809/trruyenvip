@@ -13,39 +13,41 @@ export default function Footer() {
                 TRUYEN<span style={{ color: 'var(--accent)' }}>VIP</span>
             </div>
             <p className="footer-brand-text">
-                Nền tảng đọc truyện tranh trực tuyến hàng đầu, nơi hội tụ tinh hoa của vạn bộ truyện. Đọc truyện tranh đỉnh cao, khám phá thế giới qua từng khung hình.
+                Nền tảng đọc truyện tranh trực tuyến hàng đầu, nơi hội tụ tinh hoa của vạn bộ truyện. Trải nghiệm cinematic trên mọi thiết bị.
             </p>
+            <div className="dmca-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 12px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 800, border: '1px solid rgba(255,255,255,0.1)' }}>
+                <span style={{ color: '#10b981' }}>✓</span> DMCA PROTECTED
+            </div>
           </div>
 
-          {/* COLUMN 2: DISCOVERY */}
+          {/* COLUMN 2: SEO CLUSTER */}
           <div className="footer-col">
-            <h4 className="footer-heading">Khám Phá</h4>
+            <h4 className="footer-heading">Thể loại HOT</h4>
             <ul className="footer-links">
-                <li><Link href="/">Trang Chủ</Link></li>
-                <li><Link href="/trending">Đang Hot</Link></li>
-                <li><Link href="/genres">Thể Loại</Link></li>
-                <li><Link href="/new">Mới Cập Nhật</Link></li>
+                <li><Link href="/genres?type=action">Action</Link></li>
+                <li><Link href="/genres?type=manga">Manga</Link></li>
+                <li><Link href="/genres?type=manhwa">Manhwa</Link></li>
+                <li><Link href="/genres?type=romance">Romance</Link></li>
             </ul>
           </div>
 
           {/* COLUMN 3: COMMUNITY */}
           <div className="footer-col">
-            <h4 className="footer-heading">Cá Nhân</h4>
+            <h4 className="footer-heading">Mạng Xã Hội</h4>
             <ul className="footer-links">
-                <li><Link href="/leaderboard">Bảng Xếp Hạng</Link></li>
-                <li><Link href="/bookmarks">Truyện Yêu Thích</Link></li>
-                <li><Link href="/history">Lịch Sử Đọc</Link></li>
+                <li><a href="#" target="_blank" rel="nofollow">Facebook Feed</a></li>
+                <li><a href="#" target="_blank" rel="nofollow">Discord Community</a></li>
+                <li><a href="#" target="_blank" rel="nofollow">Telegram Global</a></li>
             </ul>
           </div>
 
           {/* COLUMN 4: POLICY */}
           <div className="footer-col">
-            <h4 className="footer-heading">Pháp Lý</h4>
+            <h4 className="footer-heading">Chính Sách</h4>
             <ul className="footer-links">
+                <li><Link href="/copyright">Bản Quyền</Link></li>
                 <li><Link href="/terms">Điều Khoản</Link></li>
                 <li><Link href="/privacy">Bảo Mật</Link></li>
-                <li><Link href="/copyright">Bản Quyền</Link></li>
-                <li><Link href="/contact">Liên Kết</Link></li>
             </ul>
           </div>
         </div>

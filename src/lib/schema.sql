@@ -2,14 +2,14 @@
 -- Run this in the Neon.tech SQL Editor
 
 -- 1. Identity & Users
-CREATE TABLE IF NOT EXISTS Users (
+CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     uuid VARCHAR(255) UNIQUE NOT NULL,
     username VARCHAR(255) UNIQUE NOT NULL,
     email VARCHAR(255),
     password_hash VARCHAR(255),
     xp INTEGER DEFAULT 0,
-    vipCoins INTEGER DEFAULT 0,
+    vipcoins INTEGER DEFAULT 0,
     level INTEGER DEFAULT 1,
     avatar TEXT,
     contribution_points INTEGER DEFAULT 0,
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS Users (
 );
 
 -- 2. Manga Core
-CREATE TABLE IF NOT EXISTS Manga (
+CREATE TABLE IF NOT EXISTS manga (
     id VARCHAR(255) PRIMARY KEY,
     title VARCHAR(500) NOT NULL,
     cover TEXT,
@@ -38,9 +38,9 @@ CREATE TABLE IF NOT EXISTS Manga (
 );
 
 -- 3. Chapters
-CREATE TABLE IF NOT EXISTS Chapters (
+CREATE TABLE IF NOT EXISTS chapters (
     id VARCHAR(255) PRIMARY KEY,
-    manga_id VARCHAR(255) REFERENCES Manga(id) ON DELETE CASCADE,
+    manga_id VARCHAR(255) REFERENCES manga(id) ON DELETE CASCADE,
     title VARCHAR(500),
     source_url TEXT,
     chapter_number DOUBLE PRECISION,
@@ -50,29 +50,29 @@ CREATE TABLE IF NOT EXISTS Chapters (
 );
 
 -- 4. Images
-CREATE TABLE IF NOT EXISTS ChapterImages (
+CREATE TABLE IF NOT EXISTS chapterimages (
     id SERIAL PRIMARY KEY,
-    chapter_id VARCHAR(255) REFERENCES Chapters(id) ON DELETE CASCADE,
+    chapter_id VARCHAR(255) REFERENCES chapters(id) ON DELETE CASCADE,
     image_url TEXT NOT NULL,
     "order" INTEGER,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 5. Genres
-CREATE TABLE IF NOT EXISTS Genres (
+CREATE TABLE IF NOT EXISTS genres (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) UNIQUE NOT NULL,
     slug VARCHAR(255) UNIQUE NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS MangaGenres (
-    manga_id VARCHAR(255) REFERENCES Manga(id) ON DELETE CASCADE,
-    genre_id INTEGER REFERENCES Genres(id) ON DELETE CASCADE,
+CREATE TABLE IF NOT EXISTS mangagenres (
+    manga_id VARCHAR(255) REFERENCES manga(id) ON DELETE CASCADE,
+    genre_id INTEGER REFERENCES genres(id) ON DELETE CASCADE,
     PRIMARY KEY (manga_id, genre_id)
 );
 
 -- 6. Social & History
-CREATE TABLE IF NOT EXISTS Favorites (
+CREATE TABLE IF NOT EXISTS favorites (
     id SERIAL PRIMARY KEY,
     user_uuid VARCHAR(255) NOT NULL,
     manga_id VARCHAR(255) NOT NULL,
@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS Favorites (
     UNIQUE(user_uuid, manga_id)
 );
 
-CREATE TABLE IF NOT EXISTS ReadHistory (
+CREATE TABLE IF NOT EXISTS readhistory (
     id SERIAL PRIMARY KEY,
     user_uuid VARCHAR(255) NOT NULL,
     manga_id VARCHAR(255) NOT NULL,
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS ReadHistory (
     UNIQUE(user_uuid, manga_id)
 );
 
-CREATE TABLE IF NOT EXISTS Comments (
+CREATE TABLE IF NOT EXISTS comments (
     id SERIAL PRIMARY KEY,
     chapter_id VARCHAR(255) NOT NULL,
     user_uuid VARCHAR(255) NOT NULL,
@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS Comments (
 );
 
 -- 7. System & Crawler
-CREATE TABLE IF NOT EXISTS DailyCheckins (
+CREATE TABLE IF NOT EXISTS dailycheckins (
     id SERIAL PRIMARY KEY,
     user_uuid VARCHAR(255) NOT NULL,
     checkin_date DATE NOT NULL,
@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS DailyCheckins (
     UNIQUE(user_uuid, checkin_date)
 );
 
-CREATE TABLE IF NOT EXISTS CrawlerTasks (
+CREATE TABLE IF NOT EXISTS crawlertasks (
     id SERIAL PRIMARY KEY,
     type VARCHAR(50) NOT NULL,
     target TEXT UNIQUE NOT NULL,
@@ -120,25 +120,24 @@ CREATE TABLE IF NOT EXISTS CrawlerTasks (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS CrawlLogs (
+CREATE TABLE IF NOT EXISTS crawllogs (
     id SERIAL PRIMARY KEY,
     message TEXT,
     status VARCHAR(20),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS GuardianReports (
+CREATE TABLE IF NOT EXISTS guardianreports (
     id SERIAL PRIMARY KEY,
-    manga_name VARCHAR(255),
-    chapter_title VARCHAR(255),
-    event_type VARCHAR(50),
-    message TEXT,
-    cover TEXT,
+    manga_id VARCHAR(255) REFERENCES manga(id) ON DELETE CASCADE,
+    issue_type VARCHAR(50),
+    details TEXT,
+    fixed BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 8. Financial & Redemptions
-CREATE TABLE IF NOT EXISTS RedemptionRequests (
+CREATE TABLE IF NOT EXISTS redemptionrequests (
     id SERIAL PRIMARY KEY,
     user_uuid VARCHAR(255) NOT NULL,
     user_name VARCHAR(255),
@@ -154,9 +153,14 @@ CREATE TABLE IF NOT EXISTS RedemptionRequests (
 );
 
 -- Performance Indexes
-CREATE INDEX IF NOT EXISTS idx_manga_norm ON Manga(normalized_title);
-CREATE INDEX IF NOT EXISTS idx_chapters_manga ON Chapters(manga_id);
-CREATE INDEX IF NOT EXISTS idx_images_chap ON ChapterImages(chapter_id);
-CREATE INDEX IF NOT EXISTS idx_fav_user ON Favorites(user_uuid);
-CREATE INDEX IF NOT EXISTS idx_history_user ON ReadHistory(user_uuid);
-CREATE INDEX IF NOT EXISTS idx_tasks_status ON CrawlerTasks(status, priority);
+CREATE INDEX IF NOT EXISTS idx_manga_norm ON manga(normalized_title);
+CREATE INDEX IF NOT EXISTS idx_chapters_manga ON chapters(manga_id);
+CREATE INDEX IF NOT EXISTS idx_images_chap ON chapterimages(chapter_id);
+CREATE INDEX IF NOT EXISTS idx_fav_user ON favorites(user_uuid);
+CREATE INDEX IF NOT EXISTS idx_history_user ON readhistory(user_uuid);
+CREATE INDEX IF NOT EXISTS idx_tasks_status ON crawlertasks(status, priority);
+
+-- High-Performance Scaling Indexes
+CREATE INDEX IF NOT EXISTS idx_crawllogs_created_at ON crawllogs(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_guardianreports_created_at ON guardianreports(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_chapterimages_created_at ON chapterimages(created_at DESC);

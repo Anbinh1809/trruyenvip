@@ -39,7 +39,7 @@ async function init() {
                 trending BOOLEAN DEFAULT FALSE,
                 views BIGINT DEFAULT 0,
                 rating DOUBLE PRECISION DEFAULT 4.5,
-                source_url TEXT,
+                source_url TEXT UNIQUE,
                 alternative_titles TEXT,
                 views_at_source BIGINT DEFAULT 0,
                 migration_count INT DEFAULT 0,
@@ -66,7 +66,9 @@ async function init() {
                 id SERIAL PRIMARY KEY,
                 chapter_id VARCHAR(255) REFERENCES chapters(id) ON DELETE CASCADE,
                 image_url TEXT NOT NULL,
-                "order" INT NOT NULL
+                "order" INT NOT NULL,
+                created_at TIMESTAMPTZ DEFAULT NOW(),
+                UNIQUE(chapter_id, "order")
             );
         `);
 
@@ -187,6 +189,11 @@ async function init() {
         await query('CREATE INDEX IF NOT EXISTS idx_users_vipcoins ON users(vipcoins DESC);');
         await query('CREATE INDEX IF NOT EXISTS idx_manga_views_rating ON manga(views DESC, rating DESC);');
         await query('CREATE INDEX IF NOT EXISTS idx_crawlertasks_status ON crawlertasks(status, priority DESC);');
+        
+        // Time-based Indexes for Scaling
+        await query('CREATE INDEX IF NOT EXISTS idx_crawllogs_created_at ON crawllogs(created_at DESC);');
+        await query('CREATE INDEX IF NOT EXISTS idx_guardianreports_created_at ON guardianreports(created_at DESC);');
+        await query('CREATE INDEX IF NOT EXISTS idx_chapterimages_created_at ON chapterimages(created_at DESC);');
 
         console.log('--- PostgreSQL Initialization Complete ---');
     } catch (err) {

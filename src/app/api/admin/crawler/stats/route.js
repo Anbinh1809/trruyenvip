@@ -15,7 +15,7 @@ export async function GET(req) {
         // 1. Get Latest Logs
         const logs = await query(`
             SELECT id, message, status, created_at 
-            FROM "CrawlLogs" 
+            FROM crawllogs 
             ORDER BY created_at DESC
             LIMIT @limit
         `, { limit });
@@ -26,17 +26,17 @@ export async function GET(req) {
                 COUNT(*) as total_logs,
                 SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as success_logs,
                 SUM(CASE WHEN status = 'error' THEN 1 ELSE 0 END) as error_logs,
-                (SELECT COUNT(*) FROM "ChapterImages" WHERE CAST(created_at AS DATE) = CURRENT_DATE) as total_images_today
-            FROM "CrawlLogs"
-            WHERE CAST(created_at AS DATE) = CURRENT_DATE
+                (SELECT COUNT(*) FROM chapterimages WHERE created_at >= CURRENT_DATE) as total_images_today
+            FROM crawllogs
+            WHERE created_at >= CURRENT_DATE
         `);
 
         // 3. Get Manga Stats
         const countsArr = await query(`
             SELECT 
-                (SELECT COUNT(*) FROM "Manga") as total_manga,
-                (SELECT COUNT(*) FROM "Chapters") as total_chapters,
-                (SELECT COUNT(*) FROM "CrawlLogs" WHERE status = 'error') as total_reports
+                (SELECT COUNT(*) FROM manga) as total_manga,
+                (SELECT COUNT(*) FROM chapters) as total_chapters,
+                (SELECT COUNT(*) FROM crawllogs WHERE status = 'error') as total_reports
         `);
 
         // Only expose true NetTruyen mirrors, not polluted individual chapter URLs

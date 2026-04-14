@@ -13,7 +13,7 @@ export async function POST(req) {
         const { mangaId } = await req.json();
         if (!mangaId) return NextResponse.json({ error: 'Missing mangaId' }, { status: 400 });
 
-        const mangaData = await query('SELECT source_url FROM "Manga" WHERE id = @id', { id: mangaId });
+        const mangaData = await query('SELECT source_url FROM manga WHERE id = @id', { id: mangaId });
         if (!mangaData.recordset?.[0]) {
             return NextResponse.json({ error: 'Manga not found' }, { status: 404 });
         }

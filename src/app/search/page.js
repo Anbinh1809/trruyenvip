@@ -20,7 +20,7 @@ async function searchManga(q, page = 1) {
     // 1. Get total count for pagination UI
     const countRes = await query(`
       SELECT COUNT(*) as total 
-      FROM Manga 
+      FROM manga 
       WHERE title ILIKE '%' || @q || '%' OR author ILIKE '%' || @q || '%'
     `, { q: sanitizedQ });
     
@@ -29,7 +29,7 @@ async function searchManga(q, page = 1) {
     // 2. Paginated results fetch
     const result = await query(`
       SELECT ${MANGA_CARD_FIELDS}
-      FROM Manga 
+      FROM manga 
       WHERE title ILIKE '%' || @q || '%' OR author ILIKE '%' || @q || '%' 
       ORDER BY last_crawled DESC
       LIMIT @pageSize OFFSET @offset
@@ -40,7 +40,7 @@ async function searchManga(q, page = 1) {
 
     const manga = result.recordset.map(m => ({
       ...m,
-      cover: m.cover.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : m.cover,
+      cover: m.cover && m.cover.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : (m.cover || '/placeholder-manga.svg'),
     }));
 
     return { manga, total };

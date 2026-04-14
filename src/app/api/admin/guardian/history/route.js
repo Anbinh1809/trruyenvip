@@ -14,9 +14,9 @@ export async function GET(req) {
 
         const reports = await query(`
             SELECT gr.*, m.title as manga_name, m.cover, c.retry_count
-            FROM "GuardianReports" gr
-            JOIN "Manga" m ON gr.manga_id = m.id
-            LEFT JOIN "Chapters" c ON gr.chapter_title = c.title AND gr.manga_id = c.manga_id
+            FROM guardianreports gr
+            JOIN manga m ON gr.manga_id = m.id
+            LEFT JOIN chapters c ON gr.chapter_title = c.title AND gr.manga_id = c.manga_id
             ORDER BY gr.created_at DESC
             LIMIT @limit
         `, { limit });
@@ -27,7 +27,7 @@ export async function GET(req) {
                 COUNT(*) as total_fixes,
                 SUM(CASE WHEN event_type = 'FIX_GAP' THEN 1 ELSE 0 END) as gaps_filled,
                 SUM(CASE WHEN event_type = 'FIX_IMAGE' THEN 1 ELSE 0 END) as images_rescued
-            FROM "GuardianReports"
+            FROM guardianreports
             WHERE created_at > NOW() - INTERVAL '1 day'
         `);
 

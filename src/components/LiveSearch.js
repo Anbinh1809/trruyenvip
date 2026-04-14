@@ -195,8 +195,8 @@ export default function LiveSearch() {
                                 />
                             </div>
                             <div style={{ flex: 1 }}>
-                                <div style={{ fontWeight: 800, color: 'var(--text-primary)', fontSize: '0.9rem', marginBottom: '2px' }}>{m.title}</div>
-                                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>{m.author || 'Đang cập nhật'}</div>
+                                <div className="truncate-1" style={{ fontWeight: 800, color: 'var(--text-primary)', fontSize: '0.9rem', marginBottom: '2px' }}>{m.title}</div>
+                                <div className="truncate-1" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>{m.author || 'Đang cập nhật'}</div>
                             </div>
                             {idx < 3 && <div style={{ fontSize: '0.6rem', background: 'rgba(255, 62, 62, 0.1)', color: 'var(--accent)', padding: '2px 6px', borderRadius: '4px', fontWeight: 900 }}>HOT</div>}
                         </Link>

@@ -1,6 +1,7 @@
 import { getSession } from '@/lib/auth';
 import { query } from '@/lib/db';
 import { NextResponse } from 'next/server';
+import { SOURCES } from '@/lib/crawler/mirrors';
 
 /**
  * Maintenance tool to repair 404/Relative links in the database.
@@ -27,12 +28,12 @@ export async function GET() {
             let newUrl = '';
             // Majority of relative links are from TruyenQQ in this DB state
             if (chap.source_url.includes('chap')) {
-                newUrl = 'https://truyenqqno.com' + chap.source_url;
+                newUrl = SOURCES.TRUYENQQ + (chap.source_url.startsWith('/') ? '' : '/') + chap.source_url;
             } else {
-                newUrl = 'https://nettruyennew.com' + chap.source_url;
+                newUrl = SOURCES.NETTRUYEN + (chap.source_url.startsWith('/') ? '' : '/') + chap.source_url;
             }
             
-            await query('UPDATE "Chapters" SET source_url = @newUrl WHERE id = @id', { newUrl, id: chap.id });
+            await query('UPDATE chapters SET source_url = @newUrl WHERE id = @id', { newUrl, id: chap.id });
             repairedCount++;
         }
 

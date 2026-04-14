@@ -61,6 +61,23 @@
   --toast-bg: rgba(10, 10, 10, 0.9);
 }
 
+.truncate-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
 html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;

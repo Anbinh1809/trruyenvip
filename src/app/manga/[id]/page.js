@@ -13,6 +13,9 @@ import Footer from '@/components/Footer';
 import { AlertCircle, PenTool, Info, Library } from 'lucide-react';
 import StructuredData from '@/components/SEO/StructuredData';
 import ShareButton from '@/components/Social/ShareButton';
+ 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0; // Bypass cache for immediate fix confirmation
 
 const stripHtml = (html) => {
     if (!html) return '';
@@ -21,12 +24,13 @@ const stripHtml = (html) => {
 
 export async function generateMetadata({ params }) {
   const { id } = await params;
-  const mangaResult = await query('SELECT title, description, cover, author FROM "Manga" WHERE id = @id', { id });
+  const mangaResult = await query('SELECT title, description, cover, author FROM manga WHERE id = @id', { id });
   if (!mangaResult.recordset || mangaResult.recordset.length === 0) return { title: 'TruyenVip' };
   
   const manga = mangaResult.recordset[0];
-  const cleanDescription = stripHtml(manga.description).substring(0, 160);
-  const relativeCover = manga.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(manga.cover)}` : (manga.cover || '/placeholder-manga.svg');
+  const cleanDescription = manga.description ? stripHtml(manga.description).substring(0, 160) : 'Đọc truyện tranh online tại TruyenVip';
+  const coverUrl = manga.cover || '/placeholder-manga.svg';
+  const relativeCover = coverUrl.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(coverUrl)}` : coverUrl;
   
   const headersList = await headers();
   const host = headersList.get('host') || 'truyenvip.com';
@@ -58,28 +62,28 @@ export async function generateMetadata({ params }) {
 }
 
 async function getMangaDetail(id) {
-  const mangaResult = await query('SELECT id, title, author, status, description, cover, views, views_at_source, rating, alternative_titles, last_chap_num FROM "Manga" WHERE id = @id', { id });
+  const mangaResult = await query('SELECT id, title, author, status, description, cover, views, views_at_source, rating, alternative_titles, last_chap_num FROM manga WHERE id = @id', { id });
 
   if (!mangaResult.recordset || mangaResult.recordset.length === 0) return null;
   
   const manga = mangaResult.recordset[0];
 
   try {
-    await query('UPDATE "Manga" SET views = views + 1 WHERE id = @id', { id: manga.id });
+    await query('UPDATE manga SET views = views + 1 WHERE id = @id', { id: manga.id });
   } catch (e) {
     console.error('Failed to increment views', e);
   }
   
   const genresRes = await query(`
     SELECT g.id, g.name, g.slug 
-    FROM "Genres" g
-    JOIN "MangaGenres" mg ON g.id = mg.genre_id
+    FROM genres g
+    JOIN mangagenres mg ON g.id = mg.genre_id
     WHERE mg.manga_id = @id
   `, { id });
 
   const chaptersResult = await query(`
     SELECT id, title, chapter_number, updated_at 
-    FROM "Chapters" 
+    FROM chapters 
     WHERE manga_id = @id 
     ORDER BY 
         CASE WHEN chapter_number IS NULL THEN 0 ELSE 1 END DESC,
@@ -93,20 +97,20 @@ async function getMangaDetail(id) {
     const genreIds = genresRes.recordset.map(g => g.id);
     try {
         const relatedRes = await query(`
-            SELECT m.id, m.title, m.cover, m.last_chap_num, m.rating, m.views,
+            SELECT m.id, m.title, m.cover, m.last_chap_num, m.rating, m.views, m.last_crawled, m.trending,
                    COUNT(mg.genre_id) as overlap_count
-            FROM "Manga" m
-            JOIN "MangaGenres" mg ON m.id = mg.manga_id
+            FROM manga m
+            JOIN mangagenres mg ON m.id = mg.manga_id
             WHERE mg.genre_id IN (${genreIds.join(',')}) 
               AND m.id != @id
-            GROUP BY m.id, m.title, m.cover, m.last_chap_num, m.rating, m.views
+            GROUP BY m.id, m.title, m.cover, m.last_chap_num, m.rating, m.views, m.last_crawled, m.trending
             ORDER BY overlap_count DESC, m.views DESC, m.last_crawled DESC
             LIMIT 6
         `, { id });
 
         related = (relatedRes.recordset || []).map(m => ({
             ...m,
-            cover: m.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : (m.cover || '/placeholder-manga.svg'),
+            cover: m.cover && m.cover.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : (m.cover || '/placeholder-manga.svg'),
         }));
     } catch (e) {
         console.error('Failed to fetch related manga', e);
@@ -153,7 +157,7 @@ export default async function MangaDetail({ params }) {
       '@type': 'Person',
       'name': manga.author || 'Đang cập nhật'
     },
-    'genre': manga.genres.map(g => g.name),
+    'genre': (manga.genres || []).map(g => g.name || 'Truyện'),
     'aggregateRating': {
       '@type': 'AggregateRating',
       'ratingValue': manga.rating || 4.5,

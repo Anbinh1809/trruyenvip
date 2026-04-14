@@ -92,10 +92,14 @@ export default function CrawlerDashboard() {
 
     if (!isAuthenticated || user?.role !== 'admin') return null;
 
-    const calculateEPM = () => {
-        if (!telemetry?.startTime || telemetry.successCount === 0) return '0.0';
-        const elapsedMinutes = (Date.now() - telemetry.startTime) / 1000 / 60;
-        return (telemetry.successCount / (elapsedMinutes || 0.01)).toFixed(1);
+    const calculateSpeed = () => {
+        if (!telemetry?.startTime || telemetry.successCount === 0 || telemetry.status === 'idle') return '0.0';
+        const elapsedSeconds = (Date.now() - telemetry.startTime) / 1000;
+        if (elapsedSeconds < 1) return '...';
+        
+        const eps = telemetry.successCount / elapsedSeconds;
+        if (eps >= 1) return `${eps.toFixed(1)} mục/giây`;
+        return `${(eps * 60).toFixed(1)} mục/phút`;
     };
 
     return (
@@ -222,7 +226,7 @@ export default function CrawlerDashboard() {
                                 </div>
                                 <div>
                                     <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', marginBottom: '5px' }}>TỐC ĐỘ XỬ LÝ</div>
-                                    <div style={{ fontWeight: 800, color: '#10b981' }}>{calculateEPM()} mục/phút</div>
+                                    <div style={{ fontWeight: 800, color: '#10b981' }}>{calculateSpeed()}</div>
                                 </div>
                                 <div>
                                     <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', marginBottom: '5px' }}>CHẾ ĐỘ</div>
@@ -251,7 +255,7 @@ export default function CrawlerDashboard() {
 
                 <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '40px' }}>
                     <div className="glass-card" style={{ padding: '25px', background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--border-radius)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                        <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.4, marginBottom: '5px' }}>Hành động hôm nay</div>
+                        <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.4, marginBottom: '5px' }}>Ảnh & Nhật ký trong ngày</div>
                         <div style={{ fontSize: '1.8rem', fontWeight: 900 }}>{stats.today.toLocaleString()} <span style={{ fontSize: '1rem', opacity: 0.5 }}>sự kiện</span></div>
                     </div>
                     <div className="glass-card" style={{ padding: '25px', background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--border-radius)', border: '1px solid rgba(255,255,255,0.05)' }}>

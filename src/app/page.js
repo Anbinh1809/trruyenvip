@@ -18,7 +18,7 @@ async function getManga() {
   try {
         const result = await query(`
             SELECT ${MANGA_CARD_FIELDS}
-            FROM "Manga" 
+            FROM manga 
             ORDER BY last_crawled DESC
             LIMIT 60
         `);
@@ -42,14 +42,22 @@ export default async function Home() {
     <main className="home-page titan-bg" style={{ minHeight: '100vh', paddingBottom: '100px', color: 'white' }}>
       <Header />
       
-      {/* SEO Source of Truth */}
-      <h1 style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0,0,0,0)', border: 0 }}>
-          TruyenVip - Nền tảng Đọc Truyện Tranh Online Cao Cấp từ NetTruyen và TruyenQQ
-      </h1>
+      {/* Hero Section: Premium Branding & SEO */}
+      <div className="home-hero-glow" style={{ position: 'relative', overflow: 'hidden', paddingTop: '120px', paddingBottom: '60px', background: 'radial-gradient(circle at 50% -20%, rgba(255, 62, 62, 0.15) 0%, transparent 70%)' }}>
+          <div className="container" style={{ textAlign: 'center', position: 'relative', zIndex: 10 }}>
+              <div style={{ display: 'inline-block', padding: '5px 15px', background: 'rgba(255, 62, 62, 0.1)', border: '1px solid rgba(255, 62, 62, 0.2)', borderRadius: '20px', color: 'var(--accent)', fontSize: '0.75rem', fontWeight: 900, letterSpacing: '2px', marginBottom: '20px' }}>PREMIUM READING EXPERIENCE</div>
+              <h1 style={{ fontSize: '3.5rem', fontWeight: 950, letterSpacing: '-2px', marginBottom: '15px', lineHeight: 1.1 }}>
+                  Truyen<span style={{ color: 'var(--accent)' }}>Vip</span>: Thế Giới Truyện Tranh <br/> Đỉnh Cao
+              </h1>
+              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '1.2rem', fontWeight: 600, maxWidth: '700px', margin: '0 auto 40px' }}>
+                  Trải nghiệm đọc truyện cinematic, tốc độ siêu nhanh và kho truyện khổng lồ từ những nguồn tốt nhất Việt Nam.
+              </p>
+          </div>
+      </div>
 
-      <div className="container" style={{ position: 'relative', marginTop: '40px', zIndex: 100 }}>
+      <div className="container" style={{ position: 'relative', zIndex: 100 }}>
         
-        <div style={{ marginBottom: '40px' }}>
+        <div style={{ marginBottom: '60px', marginTop: '-20px' }}>
             <Suspense fallback={<div className="skeleton-loader" />}>
                 <RecentlyRead />
             </Suspense>

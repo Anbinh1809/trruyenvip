@@ -24,6 +24,13 @@ export const getTelemetry = () => global.crawlerState;
 export function updateTelemetry(data) {
     if (!data) return;
     
+    // reset stats on new session start
+    if (data.status && data.status !== 'idle' && global.crawlerState.status === 'idle') {
+        global.crawlerState.startTime = Date.now();
+        global.crawlerState.successCount = 0;
+        global.crawlerState.failCount = 0;
+    }
+
     if (data.status) global.crawlerState.status = data.status;
     if (data.currentManga !== undefined) global.crawlerState.currentManga = data.currentManga;
     if (data.currentMangaTitle !== undefined) global.crawlerState.currentMangaTitle = data.currentMangaTitle;

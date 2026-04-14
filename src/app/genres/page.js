@@ -15,7 +15,7 @@ export async function generateMetadata({ searchParams }) {
   let genreName = 'Thể loại';
   
   if (type) {
-    const genreRes = await query('SELECT name FROM "Genres" WHERE slug = @slug', { slug: type });
+    const genreRes = await query('SELECT name FROM genres WHERE slug = @slug', { slug: type });
     if (genreRes.recordset && genreRes.recordset.length > 0) genreName = genreRes.recordset[0].name;
   }
 
@@ -26,7 +26,7 @@ export async function generateMetadata({ searchParams }) {
 }
 
 async function getData(currentSlug) {
-    const genresRes = await query('SELECT name, slug FROM "Genres" ORDER BY name ASC');
+    const genresRes = await query('SELECT name, slug FROM genres ORDER BY name ASC');
     const allGenres = genresRes.recordset || [];
 
     let manga = [];
@@ -35,10 +35,10 @@ async function getData(currentSlug) {
     if (currentSlug) {
         // Optimized for Scale: TOP 36 instead of all
         const mangaRes = await query(`
-            SELECT DISTINCT m.id, ${MANGA_CARD_FIELDS.split(', ').filter(f => f !== 'id').map(f => `m.${f}`).join(', ')}
-            FROM "Manga" m
-            JOIN "MangaGenres" mg ON m.id = mg.manga_id
-            JOIN "Genres" g ON mg.genre_id = g.id
+            SELECT DISTINCT m.id, m.title, m.cover, m.last_chap_num, m.rating, m.views, m.author, m.status, m.last_crawled, m.views_at_source
+            FROM manga m
+            JOIN mangagenres mg ON m.id = mg.manga_id
+            JOIN genres g ON mg.genre_id = g.id
             WHERE g.slug = @slug
             ORDER BY m.views_at_source DESC, m.last_crawled DESC
             LIMIT 36
@@ -51,7 +51,7 @@ async function getData(currentSlug) {
 
         activeGenre = allGenres.find(g => g.slug === currentSlug);
     } else {
-        const mangaRes = await query(`SELECT ${MANGA_CARD_FIELDS} FROM "Manga" ORDER BY last_crawled DESC LIMIT 36`);
+        const mangaRes = await query(`SELECT ${MANGA_CARD_FIELDS} FROM manga ORDER BY last_crawled DESC LIMIT 36`);
         manga = (mangaRes.recordset || []).map(item => ({
             ...item,
             cover: item.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(item.cover)}&w=400&q=75` : (item.cover || '/placeholder-manga.svg')

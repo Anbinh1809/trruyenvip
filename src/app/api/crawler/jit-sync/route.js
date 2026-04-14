@@ -31,14 +31,14 @@ export async function POST(req) {
         }
 
         // Fast-path: Check if already exists
-        const existing = await query('SELECT COUNT(*) as count FROM ChapterImages WHERE chapter_id = @id', { id: chapterId });
+        const existing = await query('SELECT COUNT(*) as count FROM chapterimages WHERE chapter_id = @id', { id: chapterId });
         if (parseInt(existing.recordset[0].count) >= 1) {
             return NextResponse.json({ success: true, imageCount: existing.recordset[0].count });
         }
 
         jitTelemetry.set(rateLimitKey, Date.now());
 
-        const chapData = await query("SELECT source_url FROM Chapters WHERE id = @id", { id: chapterId });
+        const chapData = await query("SELECT source_url FROM chapters WHERE id = @id", { id: chapterId });
         if (chapData.recordset.length === 0) return NextResponse.json({ error: 'Chapter not found' }, { status: 404 });
 
         const chapter = chapData.recordset[0];
@@ -61,7 +61,7 @@ export async function POST(req) {
         }
 
         // Verification
-        const imgCheck = await query('SELECT COUNT(*) as count FROM ChapterImages WHERE chapter_id = @id', { id: chapterId });
+        const imgCheck = await query('SELECT COUNT(*) as count FROM chapterimages WHERE chapter_id = @id', { id: chapterId });
         const finalCount = parseInt(imgCheck.recordset[0].count);
 
         const duration = Date.now() - startTime;

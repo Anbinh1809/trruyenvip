@@ -105,7 +105,7 @@ function MangaCard({ manga, isNew = false }) {
       </div>
 
       {/* Centered Text Content */}
-      <h3 className="card-title-centered">{manga.title}</h3>
+      <h3 className="card-title-centered truncate-2">{manga.title}</h3>
       <p className="card-chapter-centered">
         {manga.last_chap_num && isNaN(manga.last_chap_num) ? 
             manga.last_chap_num : 
