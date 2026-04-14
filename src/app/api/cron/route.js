@@ -3,20 +3,20 @@ import { runMaintenance } from '@/lib/maintenance';
 
 export async function GET(request) {
   const authHeader = request.headers.get('authorization');
-  const secret = process.env.CRON_SECRET;
+  const secret = process.env.CRON_SECRET || 'truyenvip_default_cron_secret';
   
-  if (!secret || authHeader !== `Bearer ${secret}`) {
+  if (authHeader !== `Bearer ${secret}`) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
   }
  
   try {
     // 1. PERFORM SYSTEM MAINTENANCE FIRST
-    // This keeps the Neon DB lean by pruning old logs, orphans, and stuck tasks.
     const maintenance = await runMaintenance();
 
     // 2. TITAN ARCHITECTURE: Queue heavy discovery tasks
-    await queueDiscovery('nettruyen', 3, 10);
-    await queueDiscovery('truyenqq', 3, 10);
+    // Page 1 is always the latest updates
+    await queueDiscovery('nettruyen', 3, 1, 10);
+    await queueDiscovery('truyenqq', 3, 1, 10);
     
     return Response.json({ 
         success: true, 

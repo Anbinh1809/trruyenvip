@@ -15,6 +15,8 @@ global.crawlerState = global.crawlerState || {
     successCount: 0,
     failCount: 0,
     imagesScrapedToday: 0,
+    activeWorkers: 0,
+    concurrencyLimit: 15,
     startTime: Date.now(),
     lastAction: Date.now(),
     mirrorHealth: {} // { 'nettruyen.com': { failCount: 0, lastFail: Date.now(), status: 'ok' } }
@@ -62,6 +64,9 @@ export function updateTelemetry(data) {
     if (data.imagesFound) {
         global.crawlerState.imagesScrapedToday = (global.crawlerState.imagesScrapedToday || 0) + data.imagesFound;
     }
+
+    if (data.activeWorkers !== undefined) global.crawlerState.activeWorkers = data.activeWorkers;
+    if (data.concurrencyLimit !== undefined) global.crawlerState.concurrencyLimit = data.concurrencyLimit;
 
     // SYNC TO DB: Debounced crawler state persistence
     if (data.discoveryPage || data.isArchivalPulse || data.syncHealth) {

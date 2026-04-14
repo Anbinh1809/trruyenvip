@@ -17,9 +17,26 @@ export async function GET(request) {
     return new Response('Missing URL', { status: 400 });
   }
 
-  // TITAN SECURITY: Signature Enforcement
-  const expectedSig = generateProxySignature(imageUrl, width, quality);
-  if (!sig || sig !== expectedSig) {
+  // TITAN SECURITY: Dual-mode Signature Verification
+  // - 16-char HMAC: generated server-side via generateProxySignature()
+  // - 8-char simpleHash: generated client-side via getSignedProxyUrl() in MangaCard etc.
+  function simpleHash(str) {
+      let hash = 5381;
+      for (let i = 0; i < str.length; i++) {
+          hash = ((hash << 5) + hash) ^ str.charCodeAt(i);
+          hash = hash >>> 0;
+      }
+      const secret = 'titan-default-9381-secret-kjsd8';
+      for (let i = 0; i < secret.length; i++) {
+          hash = ((hash << 3) + hash) ^ secret.charCodeAt(i);
+          hash = hash >>> 0;
+      }
+      return hash.toString(16).padStart(8, '0');
+  }
+
+  const expectedHmac = generateProxySignature(imageUrl, width, quality);
+  const expectedSimple = simpleHash(`${imageUrl}|${width}|${quality}`);
+  if (!sig || (sig !== expectedHmac && sig !== expectedSimple)) {
     return new Response('Forbidden: Invalid Signature', { status: 403 });
   }
 

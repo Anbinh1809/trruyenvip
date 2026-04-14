@@ -102,12 +102,12 @@ export default function AdminCrawlerPage() {
                 <p className="admin-subtitle">Hệ thống quản lý và thu thập dữ liệu tự động thời gian thực.</p>
             </div>
             <div className="status-badges-group">
-                <div className="status-badge-titan active shadow-titan">
-                    <div className="status-dot-active"></div>
-                    AUTO-CRAWL: ACTIVE
+                <div className={`status-badge-titan shadow-titan ${telemetry?.status && telemetry.status !== 'idle' ? 'active' : ''}`}>
+                    <div className={telemetry?.status && telemetry.status !== 'idle' ? 'status-dot-active' : 'status-dot-idle'}></div>
+                    AUTOPILOT: {telemetry?.status?.toUpperCase() || 'IDLE'}
                 </div>
-                <div className={`status-badge-titan shadow-titan ${ramUsage > 500 ? 'warning' : 'active'}`}>
-                    <Cpu size={14} /> MEM_USAGE: {ramUsage}MB
+                <div className={`status-badge-titan shadow-titan ${ramUsage > 1000 ? 'warning' : 'active'}`}>
+                    <Cpu size={14} /> RAM: {ramUsage}MB
                 </div>
                 <button className="btn btn-outline rotate-hover-titan" onClick={fetchData}>
                     <RefreshCcw size={16} />
@@ -124,8 +124,8 @@ export default function AdminCrawlerPage() {
                         <span className="limit-tag">/ 500</span>
                     </div>
                     <div className="discovery-ring-box">
-                        <div className="scanning-pulse-ring"></div>
-                        <Zap size={24} color="var(--accent)" />
+                        <div className={telemetry?.status === 'guardian_discovery' ? 'scanning-pulse-ring' : ''}></div>
+                        <Zap size={24} color={telemetry?.status === 'guardian_discovery' ? 'var(--accent)' : 'rgba(255,255,255,0.1)'} />
                     </div>
                 </div>
                 <div className="pulse-banner-titan">
@@ -134,23 +134,18 @@ export default function AdminCrawlerPage() {
             </div>
 
             <div className="telemetry-card-titan shadow-titan">
-                <div className="telemetry-label-titan"><Rocket size={14} /> HÀNH ĐỘNG NHANH</div>
-                <div className="action-grid-mini-industrial">
-                    <div className="action-node-mini-titan" onClick={() => triggerDeepScan(20)}>
-                        <Rocket className="icon" color="var(--accent)" />
-                        <span>QUÉT 20 TRANG</span>
-                        <div className="sub-label">Discovery sâu</div>
+                <div className="telemetry-label-titan"><Zap size={14} /> WORKER STATUS</div>
+                <div className="telemetry-flex">
+                    <div className="telemetry-value-industrial">
+                        <span className="accent">{telemetry?.activeWorkers || 0}</span>
+                        <span className="limit-tag">/ {telemetry?.concurrencyLimit || 35}</span>
                     </div>
-                    <div className="action-node-mini-titan" onClick={() => triggerDeepScan(50)}>
-                        <Flame className="icon" color="#f59e0b" />
-                        <span>QUÉT 50 TRANG</span>
-                        <div className="sub-label">Phủ sóng rộng</div>
+                    <div className="worker-load-indicator">
+                        <div className="load-fill" style={{ width: `${Math.min(100, ((telemetry?.activeWorkers || 0) / (telemetry?.concurrencyLimit || 35)) * 100)}%` }}></div>
                     </div>
-                    <div className="action-node-mini-titan" onClick={() => router.push('/admin/guardian')}>
-                        <ShieldCheck className="icon" color="#10b981" />
-                        <span>GUARDIAN</span>
-                        <div className="sub-label">Phục hồi dữ liệu</div>
-                    </div>
+                </div>
+                <div className="pulse-banner-titan">
+                    {telemetry?.status === 'scraping_images' ? `SCRAPING: ${telemetry.currentManga?.substring(0, 20)}...` : 'WAITING_FOR_TASKS'}
                 </div>
             </div>
         </section>
@@ -163,16 +158,16 @@ export default function AdminCrawlerPage() {
                     <div className="config-value-titan">NetTruyen, TruyenQQ</div>
                 </div>
                 <div className="config-item-titan">
-                    <div className="config-label-titan">CONCURRENCY_LIMIT</div>
-                    <div className="config-value-titan">15 Workers</div>
+                    <div className="config-label-titan">ADAPTIVE_LIMIT</div>
+                    <div className="config-value-titan">{telemetry?.concurrencyLimit || 35} Weight Units</div>
                 </div>
                 <div className="config-item-titan">
-                    <div className="config-label-titan">SYNC_INTERVAL</div>
-                    <div className="config-value-titan">300 Seconds</div>
+                    <div className="config-label-titan">HEARTBEAT</div>
+                    <div className="config-value-titan">60-600s Industrial</div>
                 </div>
                 <div className="config-item-titan">
                     <div className="config-label-titan">PROTOCOL_VERSION</div>
-                    <div className="config-value-titan">TITAN_V2.1.0_PROD</div>
+                    <div className="config-value-titan">TITAN_V2.2.0_INDUSTRIAL</div>
                 </div>
             </div>
         </section>
