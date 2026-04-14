@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useEngagement } from '@/context/EngagementContext';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/components/ToastProvider';
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare, Send } from 'lucide-react';
 import CommentItem from './Comments/CommentItem';
 import './Comments/Comments.css';
 
@@ -20,7 +20,6 @@ export default function CommentSection({ chapterId }) {
 
   useEffect(() => {
     if (isAuthenticated && user) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setUserName(user.username);
     } else {
         const savedName = typeof window !== 'undefined' ? localStorage.getItem('truyenvip_username') : null;
@@ -43,7 +42,6 @@ export default function CommentSection({ chapterId }) {
   }, [chapterId]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (chapterId) fetchComments();
   }, [chapterId, fetchComments]);
 
@@ -120,41 +118,45 @@ export default function CommentSection({ chapterId }) {
 
   return (
     <section className="comment-section-container container">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-        <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', fontWeight: 800 }}>
-            <MessageSquare size={20} color="var(--accent)" /> Bình luận ({comments?.length || 0})
+      <div className="comment-header-industrial">
+        <h3 className="comment-count-title">
+            <MessageSquare size={24} color="var(--accent)" /> 
+            Bình luận <span className="text-secondary-titan">({comments?.length || 0})</span>
         </h3>
         {isAuthenticated && (
-           <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-             Đang bình luận bằng: <strong style={{ color: 'var(--accent)' }}>{user.username}</strong>
+           <div className="active-user-hint">
+             Đang bình luận bằng: <span className="active-user-name">{user.username}</span>
            </div>
         )}
       </div>
       
       {!isAuthenticated ? (
-         <div className="glass-card" style={{ padding: '30px', textAlign: 'center', marginBottom: '40px', borderRadius: 'var(--border-radius)' }}>
-            <p style={{ marginBottom: '20px', fontWeight: 600 }}>Vui lòng đăng nhập để tham gia thảo luận cùng cộng đồng.</p>
-            <Link href="/auth/login" className="btn btn-primary" style={{ display: 'inline-block', textDecoration: 'none' }}>Đăng nhập ngay</Link>
+         <div className="user-tag-industrial">
+            <p className="login-prompt-text">Vui lòng đăng nhập để tham gia thảo luận cùng cộng đồng.</p>
+            <Link href="/auth/login" className="btn btn-primary login-btn-wide">Đăng nhập ngay</Link>
          </div>
       ) : (
-        <form onSubmit={handleSubmit} style={{ marginBottom: '40px' }}>
+        <form onSubmit={handleSubmit} className="comment-form-industrial">
             <textarea 
-                placeholder="Nhập nội dung bình luận..." 
+                placeholder="Chia sẻ suy nghĩ của bạn về chương này..." 
                 value={newComment} 
                 onChange={(e) => setNewComment(e.target.value)}
-                className="comment-textarea"
-                style={{ minHeight: '100px' }}
+                className="comment-textarea-industrial"
                 required
             />
-            <button type="submit" className="btn btn-primary" style={{ padding: '12px 40px' }}>Gửi bình luận</button>
+            <div className="form-actions-industrial">
+               <button type="submit" className="btn btn-primary submit-btn-titan">
+                    <Send size={18} /> GỬI BÌNH LUẬN
+               </button>
+            </div>
         </form>
       )}
 
-      <div className="comment-list">
+      <div className="comment-list-industrial">
         {loading ? (
-          <div className="shimmer-group" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <div className="shimmer" style={{ width: '100%', height: '80px', borderRadius: 'var(--border-radius)', background: 'rgba(255,255,255,0.05)' }}></div>
-            <div className="shimmer" style={{ width: '100%', height: '80px', borderRadius: 'var(--border-radius)', background: 'rgba(255,255,255,0.05)' }}></div>
+          <div className="shimmer-list-industrial">
+            <div className="shimmer-item-titan" />
+            <div className="shimmer-item-titan" />
           </div>
         ) : rootComments.length > 0 ? (
           rootComments.map((comment) => (
@@ -169,9 +171,75 @@ export default function CommentSection({ chapterId }) {
             />
           ))
         ) : (
-          <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '40px', fontWeight: 600 }}>Chưa có bình luận nào. Hãy là người đầu tiên!</p>
+          <div className="empty-comments-industrial">
+              <p>Chưa có bình luận nào. Hãy là người đầu tiên!</p>
+          </div>
         )}
       </div>
+
+      <style jsx>{`
+        .text-secondary-titan {
+            opacity: 0.4;
+            font-weight: 800;
+        }
+        .active-user-hint {
+            font-size: 0.85rem; 
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 700;
+        }
+        .active-user-name {
+            color: var(--accent);
+            font-weight: 900;
+        }
+        .login-prompt-text {
+            margin-bottom: 25px; 
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        .login-btn-wide {
+            display: inline-flex; 
+            padding: 14px 40px;
+            font-weight: 950;
+        }
+        .form-actions-industrial {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 50px;
+        }
+        .submit-btn-titan {
+            padding: 14px 45px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 950;
+            letter-spacing: 0.5px;
+        }
+        .shimmer-list-industrial {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        .shimmer-item-titan {
+            width: 100%;
+            height: 120px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            animation: pulse-industrial 2s infinite;
+        }
+        .empty-comments-industrial {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.3);
+            padding: 60px;
+            font-weight: 800;
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 20px;
+            border: 1px dashed var(--glass-border);
+        }
+        @keyframes pulse-industrial {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.8; }
+        }
+      `}</style>
     </section>
   );
 }

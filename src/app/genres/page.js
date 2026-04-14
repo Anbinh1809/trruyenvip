@@ -9,7 +9,6 @@ import GuardianBeastEmptyState from '@/components/GuardianBeastEmptyState';
 
 export const revalidate = 600; // ISR: Revalidate every 10 minutes
 
-
 export async function generateMetadata({ searchParams }) {
   const { type } = await searchParams;
   let genreName = 'Thể loại';
@@ -98,36 +97,36 @@ export default async function GenresPage({ searchParams }) {
   }
 
   return (
-    <main className="genres-page titan-bg" style={{ minHeight: '100vh', paddingBottom: '100px', color: 'white' }}>
+    <main className="main-wrapper titan-bg">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, '\\u003c') }}
       />
       <Header />
       
-      <div className="container" style={{ paddingTop: '120px' }}>
-        <header className="fade-up" style={{ marginBottom: '50px' }}>
-            <div style={{ display: 'inline-block', padding: '4px 12px', background: 'rgba(255, 62, 62, 0.1)', border: '1px solid rgba(255, 62, 62, 0.3)', color: 'var(--accent)', fontSize: '0.7rem', fontWeight: 800, letterSpacing: '1px', borderRadius: 'var(--border-radius)', marginBottom: '15px' }}>THƯ VIỆN TRUYỆN</div>
-            <h1 style={{ fontSize: '2.5rem', fontWeight: 900, letterSpacing: '-1.5px', marginBottom: '10px', color: 'var(--text-primary)' }}>
+      <div className="container genres-container fade-in">
+        <header className="library-header-industrial fade-up">
+            <div className="library-badge-titan">THƯ VIỆN TRUYỆN TRANH</div>
+            <h1 className="library-title-industrial">
                 {activeGenre ? activeGenre.name : 'Khám Phá Tất Cả'}
             </h1>
-            <p style={{ color: 'var(--text-muted)', fontWeight: 600, fontSize: '1.1rem' }}>
+            <p className="library-desc-industrial">
                 {activeGenre 
                     ? `Danh sách các bộ truyện thuộc thể loại ${activeGenre.name} mới nhất.` 
-                    : 'Tìm kiếm truyện theo sở thích và thể loại bạn yêu thích.'}
+                    : 'Tìm kiếm tập hợp tinh hoa truyện tranh theo sở thích và thể loại bạn yêu thích.'}
             </p>
         </header>
 
         <div className="titan-genres-layout">
             <aside className="titan-genres-sidebar">
-                <div className="titan-nav-card">
-                    <h3 style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: '20px', paddingLeft: '10px' }}>THỂ LOẠI</h3>
+                <div className="titan-nav-card shadow-titan">
+                    <h3 className="sidebar-title-titan">THỂ LOẠI</h3>
                     <div className="titan-genre-scroll">
                         <Link 
                             href="/genres"
                             className={`titan-nav-item ${!type ? 'active' : ''}`}
                         >
-                            Tất cả truyện
+                            Tất cả nội dung
                         </Link>
                         {allGenres.map(g => (
                             <Link 
@@ -153,7 +152,7 @@ export default async function GenresPage({ searchParams }) {
                 ) : (
                     <GuardianBeastEmptyState 
                         title="DỮ LIỆU ĐANG CẬP NHẬT"
-                        message={`Hiện tại thể loại <strong style="color: var(--accent)">${activeGenre?.name || 'này'}</strong> chưa có truyện nào được cập nhật. Vui lòng quay lại sau.`}
+                        message={`Hiện tại thư viện <span class="accent-text-titan">${activeGenre?.name || 'này'}</span> chưa có bản ghi nào được lưu trữ. Vui lòng quay lại sau.`}
                         buttonText="Quay Lại Trang Chủ"
                     />
                 )}
@@ -162,6 +161,9 @@ export default async function GenresPage({ searchParams }) {
       </div>
 
       <Footer />
+      <style jsx>{`
+        .accent-text-titan { color: var(--accent); font-weight: 950; }
+      `}</style>
     </main>
   );
 }

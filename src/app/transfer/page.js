@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import { useRouter } from 'next/navigation';
 import { Zap, RefreshCw, CheckCircle, XCircle, ExternalLink } from 'lucide-react';
 
@@ -63,66 +64,67 @@ export default function TransferPage() {
     };
 
     return (
-        <main className="transfer-page titan-bg" style={{ minHeight: '100vh', paddingBottom: '100px', color: 'var(--text-primary)' }}>
+        <main className="main-wrapper titan-bg">
             <Header />
-            <div className="container fade-up" style={{ paddingTop: '140px', maxWidth: '900px' }}>
-                <header className="section-header" style={{ marginBottom: '50px', textAlign: 'center' }}>
-                    <div style={{ display: 'inline-block', padding: '6px 14px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 900, letterSpacing: '2px', marginBottom: '20px' }}>DI CẦN TIẾP NỐI</div>
-                    <h1 style={{ fontSize: '3.5rem', fontWeight: 950, letterSpacing: '-3px', marginBottom: '15px' }}>Dịch Chuyển Nội Dung</h1>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', maxWidth: '650px', margin: '0 auto', fontWeight: 600, lineHeight: 1.6 }}>
-                        Hệ thống giúp bạn chuyển dữ liệu từ nguồn ngoài về TruyenVip nhanh chóng và ổn định.
+            <div className="container transfer-container fade-up">
+                <header className="section-header-industrial">
+                    <div className="transfer-header-badge">DI CẦN TIẾP NỐI</div>
+                    <h1 className="transfer-title">Dịch Chuyển Nội Dung</h1>
+                    <p className="transfer-subtitle">
+                        Hệ thống giúp bạn chuyển dữ liệu từ nguồn ngoài về TruyenVip nhanh chóng và ổn định. Mỗi một liên kết là một hành trình mới.
                     </p>
                 </header>
 
-                <div className="glass-card" style={{ padding: '30px', borderRadius: 'var(--border-radius)', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)' }}>
-                    <div style={{ marginBottom: '25px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '10px' }}>
-                        <h3 style={{ fontSize: '1.3rem', fontWeight: 900, letterSpacing: '-0.5px' }}>Nhập liên kết chương truyện</h3>
-                        <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', opacity: 0.5 }}>Mỗi dòng một liên kết chương truyện</span>
+                <div className="transfer-form-card">
+                    <div className="card-header-industrial">
+                        <h3 className="card-title-industrial">Nhập liên kết chương truyện</h3>
+                        <span className="card-hint-industrial">Mỗi dòng một liên kết chương truyện (NetTruyen, TruyenQQ...)</span>
                     </div>
 
                     <form onSubmit={handleBatchTransfer}>
                         <textarea 
                             value={urls}
                             onChange={(e) => setUrls(e.target.value)}
-                            placeholder="Dán link NetTruyen hoặc TruyenQQ vào đây..."
-                            style={{ 
-                                width: '100%', minHeight: '220px', borderRadius: 'var(--border-radius)',
-                                background: 'rgba(0,0,0,0.03)', border: '1px solid var(--glass-border)',
-                                padding: '20px', color: '#10b981', fontFamily: '"Fira Code", monospace',
-                                fontSize: '0.9rem', lineHeight: 1.8, outline: 'none', transition: 'all 0.3s',
-                                marginBottom: '20px'
-                            }}
+                            placeholder="Dán các liên kết chương truyện vào đây..."
+                            className="transfer-textarea-titan"
                         />
                         <button 
                             type="submit" 
                             disabled={isProcessing || !urls.trim()}
-                            className={`btn btn-primary ${isProcessing ? 'processing' : ''}`}
-                            style={{ width: '100%', height: '55px', fontWeight: 800, fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
+                            className={`btn btn-primary btn-large-titan ${isProcessing ? 'processing' : ''}`}
                         >
-                            {isProcessing ? <><RefreshCw className="spin" size={24} /> Đang xử lý...</> : <><Zap size={24} /> Kích hoạt dịch chuyển</>}
+                            {isProcessing ? (
+                                <><RefreshCw className="spin" size={24} /> ĐANG XỬ LÝ DỮ LIỆU...</>
+                            ) : (
+                                <><Zap size={24} fill="currentColor" /> KÍCH HOẠT DỊCH CHUYỂN</>
+                            )}
                         </button>
                     </form>
 
                     {results.length > 0 && (
-                        <div className="fade-in" style={{ marginTop: '50px' }}>
-                            <h3 style={{ fontSize: '1.2rem', fontWeight: 900, marginBottom: '20px', opacity: 0.6 }}>Bản ghi dịch chuyển</h3>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        <div className="transfer-results-section fade-in">
+                            <h3 className="results-title-industrial">Bản ghi dịch chuyển</h3>
+                            <div className="results-list-industrial">
                                 {results.map((res, i) => (
-                                    <div key={i} style={{ 
-                                    padding: '12px 18px', borderRadius: 'var(--border-radius)', background: 'var(--bg-primary)', 
-                                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                                    border: `1px solid ${res.status === 'success' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255, 62, 62, 0.1)'}`
-                                    }}>
-                                        <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '65%' }}>{res.url}</div>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                                            {res.status === 'success' && (
-                                                <a href={res.link} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#3b82f6', textDecoration: 'none', fontWeight: 800, fontSize: '0.75rem' }}>
-                                                    XEM NGAY <ExternalLink size={14} />
-                                                </a>
+                                    <div key={i} className={`result-item-industrial ${res.status === 'success' ? 'is-success' : 'is-error'}`}>
+                                        <div className="result-url-industrial">{res.url}</div>
+                                        <div className="result-meta-industrial">
+                                            {res.status === 'success' ? (
+                                                <>
+                                                    <a href={res.link} target="_blank" rel="noreferrer" className="result-link-industrial">
+                                                        XEM NGAY <ExternalLink size={14} />
+                                                    </a>
+                                                    <div className="status-badge-industrial success">
+                                                        <CheckCircle size={18} />
+                                                        <span>THÀNH CÔNG</span>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <div className="status-badge-industrial error">
+                                                    <XCircle size={18} />
+                                                    <span>THẤT BẠI</span>
+                                                </div>
                                             )}
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontWeight: 900, fontSize: '0.75rem', textTransform: 'uppercase', color: res.status === 'success' ? '#10b981' : 'var(--accent)' }}>
-                                                {res.status === 'success' ? <CheckCircle size={18} /> : <XCircle size={18} />}
-                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -131,6 +133,89 @@ export default function TransferPage() {
                     )}
                 </div>
             </div>
+            <Footer />
+            <style jsx>{`
+                .section-header-industrial {
+                    text-align: center;
+                    margin-bottom: 60px;
+                }
+                .card-header-industrial {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: flex-end;
+                    flex-wrap: wrap;
+                    gap: 15px;
+                    margin-bottom: 30px;
+                }
+                .card-title-industrial {
+                    font-size: 1.5rem;
+                    font-weight: 950;
+                    letter-spacing: -0.5px;
+                    color: white;
+                }
+                .card-hint-industrial {
+                    font-size: 0.8rem;
+                    font-weight: 800;
+                    color: rgba(255, 255, 255, 0.3);
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+                .transfer-results-section {
+                    margin-top: 60px;
+                }
+                .results-title-industrial {
+                    font-size: 1.2rem;
+                    font-weight: 950;
+                    margin-bottom: 25px;
+                    color: rgba(255, 255, 255, 0.5);
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                }
+                .results-list-industrial {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 12px;
+                }
+                .result-url-industrial {
+                    font-size: 0.85rem;
+                    font-weight: 700;
+                    color: rgba(255, 255, 255, 0.6);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    max-width: 60%;
+                    font-family: var(--font-mono);
+                }
+                .result-meta-industrial {
+                    display: flex;
+                    align-items: center;
+                    gap: 20px;
+                }
+                .result-link-industrial {
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    color: #3b82f6;
+                    text-decoration: none;
+                    font-weight: 900;
+                    font-size: 0.8rem;
+                    letter-spacing: 0.5px;
+                    transition: all 0.3s;
+                }
+                .result-link-industrial:hover {
+                    color: #60a5fa;
+                }
+                .status-badge-industrial {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-weight: 950;
+                    font-size: 0.75rem;
+                    letter-spacing: 1px;
+                }
+                .status-badge-industrial.success { color: #10b981; }
+                .status-badge-industrial.error { color: var(--accent); }
+            `}</style>
         </main>
     );
 }

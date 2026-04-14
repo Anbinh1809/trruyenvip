@@ -1,81 +1,97 @@
 'use client';
 
 import { useHistory } from '@/context/HistoryContext';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import MangaCard from './MangaCard';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Library } from 'lucide-react';
+import { query, MANGA_CARD_FIELDS } from '@/lib/db';
 
 export default function RecommendedForYou() {
   const { history, mounted } = useHistory();
   const [recommendations, setRecommendations] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  const fetchRecommendations = useCallback(async () => {
-    setLoading(true);
-    try {
-      const lastMangaId = history?.[0]?.mangaId || '';
-      const res = await fetch(`/api/recommendations?mangaId=${lastMangaId}`);
-      if (res.ok) {
-        const data = await res.json();
-        setRecommendations(data);
-      }
-    } catch (e) {
-      console.error('Fetch recommendations error', e);
-    }
-    setLoading(false);
-  }, [history]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (mounted) {
-      const timer = setTimeout(() => fetchRecommendations(), 0);
-      return () => clearTimeout(timer);
-    }
-  }, [mounted, fetchRecommendations]);
-  
-  // SKELETON STATE: Stable Hydration Guardian
-  if (!mounted || (loading && recommendations.length === 0)) {
-    return (
-      <section className="section-titan">
-        <div className="section-header-titan">
-          <div className="header-label">
-            <span className="badge-red">GỢI Ý</span>
-            <h2 className="title-titan" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Sparkles size={20} color="var(--accent)" /> Dành riêng cho bạn
-            </h2>
-          </div>
-        </div>
-        <div className="shimmer-grid-titan">
-          {[1, 2, 3, 4].map(i => <div key={i} className="skeleton-premium-card" />)}
-        </div>
-      </section>
-    );
-  }
+    if (!mounted) return;
 
-  if (recommendations.length === 0) return null;
+    const fetchRecommendations = async () => {
+      setLoading(true);
+      try {
+        const genreIds = new Set();
+        history.forEach(item => {
+          if (item.genres) {
+            item.genres.forEach(g => genreIds.add(g.id));
+          }
+        });
+
+        let data;
+        if (genreIds.size > 0) {
+            const res = await fetch(`/api/recommendations?genres=${Array.from(genreIds).join(',')}`);
+            data = await res.json();
+        } else {
+            const res = await fetch('/api/manga/trending?limit=10');
+            data = await res.json();
+        }
+        setRecommendations(data || []);
+      } catch (err) {
+        console.error('Failed to fetch recommendations', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecommendations();
+  }, [history, mounted]);
+
+  if (!mounted) return null;
 
   return (
     <section className="section-titan fade-in">
       <div className="section-header-titan">
-        <div className="header-label">
-          <span className="badge-red">GỢI Ý</span>
-          <h2 className="title-titan" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Sparkles size={24} color="var(--accent)" /> Dành riêng cho bạn
-          </h2>
-          <p className="subtitle-titan">Dựa trên sở thích đọc truyện của bạn</p>
-        </div>
+        <h2 className="title-titan section-title-industrial">
+            {history.length > 0 ? (
+                <>
+                    <Sparkles size={28} color="var(--accent)" /> Gợi ý cho bạn
+                </>
+            ) : (
+                <>
+                    <Library size={28} color="var(--accent)" /> Truyện mới cập nhật
+                </>
+            )}
+        </h2>
       </div>
-      
+
       {loading ? (
-        <div className="shimmer-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '30px' }}>
-            {[1,2,3,4].map(i => <div key={i} className="shimmer" style={{ height: '350px', borderRadius: '20px', background: 'rgba(255,255,255,0.05)' }} />)}
+        <div className="shimmer-grid-titan">
+            {[1, 2, 3, 4, 5, 6].map(i => (
+                <div key={i} className="skeleton-industrial skeleton-card-titan" />
+            ))}
         </div>
       ) : (
         <div className="manga-grid-titan">
-          {recommendations.map((manga) => (
-            <MangaCard key={manga.id} manga={manga} />
-          ))}
+            {recommendations.map(manga => (
+                <MangaCard key={manga.id} manga={manga} />
+            ))}
         </div>
       )}
+
+      <style jsx>{`
+        .shimmer-grid-titan {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 25px;
+        }
+        .skeleton-card-titan {
+            aspect-ratio: 4/5.4;
+            border-radius: 12px;
+        }
+        @media (max-width: 768px) {
+            .shimmer-grid-titan {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 15px;
+            }
+        }
+      `}</style>
     </section>
   );
 }

@@ -17,7 +17,6 @@ export default function MobileGenreNav({ genres }) {
         }
     }, [currentType]);
 
-    // Icon mapping for premium look
     const getGenreIcon = (slug) => {
         const icons = {
             'action': <Sword size={14} />,
@@ -37,7 +36,6 @@ export default function MobileGenreNav({ genres }) {
                 <Link 
                     href="/genres"
                     className={`titan-genre-tag-mobile ${!currentType ? 'active' : ''}`}
-                    style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
                 >
                     <Library size={14} /> Tất cả
                 </Link>
@@ -46,12 +44,50 @@ export default function MobileGenreNav({ genres }) {
                         key={g.slug}
                         href={`/genres?type=${g.slug}`}
                         className={`titan-genre-tag-mobile ${currentType === g.slug ? 'active' : ''}`}
-                        style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
                     >
                         {getGenreIcon(g.slug)} {g.name}
                     </Link>
                 ))}
             </div>
+            <style jsx global>{`
+                .titan-mobile-genre-hud {
+                    position: sticky;
+                    top: var(--header-height);
+                    z-index: 1000;
+                    background: rgba(2, 6, 23, 0.9);
+                    backdrop-filter: blur(20px);
+                    border-bottom: 1px solid var(--glass-border);
+                    padding: 8px 0;
+                }
+                .titan-genre-scroller {
+                    display: flex;
+                    gap: 10px;
+                    padding: 4px 20px;
+                    overflow-x: auto;
+                    -webkit-overflow-scrolling: touch;
+                }
+                .titan-genre-tag-mobile {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 8px 16px;
+                    background: rgba(255, 255, 255, 0.04);
+                    border: 1px solid rgba(255, 255, 255, 0.08);
+                    border-radius: 30px;
+                    color: rgba(255, 255, 255, 0.6);
+                    font-size: 0.8rem;
+                    font-weight: 800;
+                    white-space: nowrap;
+                    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                    text-decoration: none;
+                }
+                .titan-genre-tag-mobile.active {
+                    background: var(--accent);
+                    border-color: var(--accent);
+                    color: white;
+                    box-shadow: 0 4px 15px rgba(255, 62, 62, 0.2);
+                }
+            `}</style>
         </div>
     );
 }

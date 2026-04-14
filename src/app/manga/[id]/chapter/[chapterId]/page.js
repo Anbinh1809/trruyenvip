@@ -1,230 +1,161 @@
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import ChapterContent from '@/components/ChapterContent';
+import ReaderSettings from '@/components/ReaderSettings';
 import { query } from '@/lib/db';
 import Link from 'next/link';
-import HistoryRecorder from '@/components/HistoryRecorder';
-import ReaderSettings from '@/components/ReaderSettings';
-import NextChapterPrefetcher from '@/components/NextChapterPrefetcher';
-import ReaderManager from '@/components/ReaderManager';
-import BackToTop from '@/components/BackToTop';
-import ReadingProgressBar from '@/components/ReadingProgressBar';
-import Footer from '@/components/Footer';
 import dynamic from 'next/dynamic';
-import ChapterContent from '@/components/ChapterContent';
-import { headers } from 'next/headers';
-import StructuredData from '@/components/SEO/StructuredData';
-import ShareButton from '@/components/Social/ShareButton';
+import { ChevronLeft, ChevronRight, Home, BookOpen, AlertTriangle } from 'lucide-react';
 
-export const revalidate = 3600; // ISR for Reader: High cache performance
-
-const CommentSection = dynamic(() => import('@/components/CommentSection'), { 
-  loading: () => <div className="loading-dots" style={{ padding: '40px', textAlign: 'center' }}>Đang tải bình luận...</div>
+// Lazy load comments to prevent hydration mismatches
+const Comments = dynamic(() => import('@/components/Comments'), { 
+  ssr: false,
+  loading: () => <div className="loading-dots-industrial">Đang tải bình luận...</div>
 });
- 
-export async function generateMetadata({ params }) {
-  const { id, chapterId } = await params;
-  const [mangaRes, chapRes] = await Promise.all([
-    query('SELECT title FROM manga WHERE id = @id', { id }),
-    query('SELECT title FROM chapters WHERE id = @id', { id: chapterId })
-  ]);
- 
-  const manga = mangaRes.recordset?.[0];
-  const chapter = chapRes.recordset?.[0];
- 
-  if (!manga || !chapter) return { title: 'Đang tải chương... - TruyenVip' };
-
-  // Fetch first image for better OG sharing
-  const imgRes = await query('SELECT image_url FROM chapterimages WHERE chapter_id = @id ORDER BY "order" ASC LIMIT 1', { id: chapterId });
-  const ogImage = imgRes.recordset?.[0]?.image_url 
-    ? `/api/proxy?url=${encodeURIComponent(imgRes.recordset[0].image_url)}&w=600&q=70`
-    : (manga.cover || '/placeholder-manga.svg');
- 
-  return {
-    title: `${chapter.title}: ${manga.title} - TruyenVip`,
-    description: `Đọc truyện tranh ${manga.title} - ${chapter.title} chất lượng cao, cập nhật mới nhất tại TruyenVip.`,
-    openGraph: {
-        title: `${chapter.title}: ${manga.title}`,
-        description: `Đọc ngay ${chapter.title} của ${manga.title} tại TruyenVip. Truyện bản đẹp, load cực nhanh!`,
-        images: [
-            {
-                url: ogImage,
-                width: 600,
-                height: 800,
-                alt: chapter.title
-            }
-        ],
-        type: 'book'
-    }
-  };
-}
 
 async function getChapterData(mangaId, chapterId) {
-  const [mangaResult, chapResult, imgResult] = await Promise.all([
-    query('SELECT id, title, cover FROM manga WHERE id = @id', { id: mangaId }),
-    query('SELECT id, title, source_url, chapter_number FROM chapters WHERE id = @id', { id: chapterId }),
-    query('SELECT image_url FROM chapterimages WHERE chapter_id = @id ORDER BY "order" ASC', { id: chapterId })
-  ]);
+  try {
+    const mangaRes = await query('SELECT title FROM manga WHERE id = @mangaId', { mangaId });
+    const manga = mangaRes.recordset[0];
+    if (!manga) return null;
 
-  if (!mangaResult.recordset || mangaResult.recordset.length === 0 || !chapResult.recordset || chapResult.recordset.length === 0) return null;
-  const chapter = chapResult.recordset[0];
-  const currentNum = chapter.chapter_number;
+    const chapterRes = await query('SELECT id, title, chapter_number, content FROM chapters WHERE id = @chapterId', { chapterId });
+    const chapter = chapterRes.recordset[0];
+    if (!chapter) return null;
 
-  // Targeted Next/Prev Queries for performance
-  const [prevChapRes, nextChapRes] = await Promise.all([
-    query(`SELECT id, title, chapter_number FROM chapters 
-           WHERE manga_id = @mangaId AND chapter_number < @num 
-           ORDER BY chapter_number DESC LIMIT 1`, { mangaId, num: currentNum }),
-    query(`SELECT id, title, chapter_number FROM chapters 
-           WHERE manga_id = @mangaId AND chapter_number > @num 
-           ORDER BY chapter_number ASC LIMIT 1`, { mangaId, num: currentNum })
-  ]);
+    const chaptersRes = await query('SELECT id, chapter_number, title FROM chapters WHERE manga_id = @mangaId ORDER BY chapter_number ASC', { mangaId });
+    const chapters = chaptersRes.recordset;
 
-  const prevChapter = prevChapRes.recordset?.[0] || null;
-  const nextChapter = nextChapRes.recordset?.[0] || null;
+    const currentIndex = chapters.findIndex(c => c.id == chapterId);
+    const prevChapter = currentIndex > 0 ? chapters[currentIndex - 1] : null;
+    const nextChapter = currentIndex < chapters.length - 1 ? chapters[currentIndex + 1] : null;
 
-  return {
-    manga: mangaResult.recordset[0],
-    chapter,
-    images: (imgResult.recordset || []).map(img => `/api/proxy?url=${encodeURIComponent(img.image_url)}&w=1200`),
-    prevChapter,
-    nextChapter
-  };
+    return { manga, chapter, chapters, prevChapter, nextChapter };
+  } catch (err) {
+    console.error('Fetch Chapter Error:', err);
+    return null;
+  }
 }
 
-export default async function ChapterReader({ params }) {
+export default async function ChapterPage({ params }) {
   const { id, chapterId } = await params;
   const data = await getChapterData(id, chapterId);
 
-  if (!data) return (
-    <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)' }}>
-      <div className="titan-loader-pulse"></div>
-    </div>
-  );
+  if (!data) {
+    return (
+        <div className="fullscreen-error-industrial titan-bg">
+            <AlertTriangle size={60} color="var(--accent)" />
+            <h2 className="error-title-industrial">LỖI TRUY XUẤT NỘI DUNG</h2>
+            <p className="error-desc-industrial">Không thể tìm thấy chương truyện này. Có thể liên kết đã hết hạn hoặc bị gỡ bỏ.</p>
+            <Link href="/" className="btn btn-primary err-btn-titan">QUAY LẠI TRANG CHỦ</Link>
+            <style jsx>{`
+                .fullscreen-error-industrial { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+                .error-title-industrial { font-size: 2rem; font-weight: 950; margin: 20px 0 10px; color: white; }
+                .error-desc-industrial { color: rgba(255,255,255,0.4); max-width: 400px; margin-bottom: 30px; font-weight: 700; }
+                .err-btn-titan { padding: 14px 40px; font-weight: 950; }
+            `}</style>
+        </div>
+    );
+  }
 
-  const prevChapter = data.prevChapter; 
-  const nextChapter = data.nextChapter?.id ? data.nextChapter : null;
-
-  const host = (await headers()).get('host') || 'truyenvip.com';
-  const protocol = host.startsWith('localhost') ? 'http' : 'https';
-  const origin = `${protocol}://${host}`;
-
-  const breadcrumbJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    'itemListElement': [
-      {
-        '@type': 'ListItem',
-        'position': 1,
-        'name': 'Trang chủ',
-        'item': `${origin}`
-      },
-      {
-        '@type': 'ListItem',
-        'position': 2,
-        'name': data.manga.title,
-        'item': `${origin}/manga/${data.manga.id}`
-      },
-      {
-        '@type': 'ListItem',
-        'position': 3,
-        'name': data.chapter.title,
-        'item': `${origin}/manga/${data.manga.id}/chapter/${data.chapter.id}`
-      }
-    ]
-  };
+  const { manga, chapter, nextChapter, prevChapter } = data;
 
   return (
-    <main className="reader-page titan-bg" style={{ minHeight: '100vh', color: 'white' }}>
-      <StructuredData data={breadcrumbJsonLd} />
-      <ReadingProgressBar />
-      <HistoryRecorder manga={data.manga} chapter={data.chapter} />
-      <ReaderSettings />
-      
-      <ReaderManager 
-        mangaId={id} 
-        prevChapterId={prevChapter?.id} 
-        nextChapterId={nextChapter?.id} 
-      />
-      
-      <div className="reader-sticky-nav">
-        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '100%', gap: '12px' }}>
-          <Link href={`/manga/${id}`} className="reader-back-link truncate-1" style={{ maxWidth: '200px' }}>
-            <span className="desktop-only">Quay lại: {data.manga.title}</span>
-            <span className="mobile-only">Back</span>
+    <main className="main-wrapper titan-bg reader-industrial-layout">
+      {/* 100% Industrial Reader HUD */}
+      <div className="reader-hud-titan shadow-titan">
+        <div className="container reader-nav-wrapper">
+          <Link href={`/manga/${id}`} className="reader-back-btn">
+            <ChevronLeft size={24} />
+            <span className="truncate-1 desktop-only">{manga.title}</span>
           </Link>
-          <div className="reader-chap-title truncate-1">{data.chapter.title}</div>
-          <div className="reader-nav-actions" style={{ display: 'flex', gap: '10px', alignItems: 'center', flexShrink: 0 }}>
-            <div className="nav-group" style={{ display: 'flex', gap: '8px' }}>
+
+          <div className="reader-nav-center">
+            <span className="current-chapter-pill">CHAPTER {chapter.chapter_number}</span>
+          </div>
+
+          <div className="reader-nav-actions-industrial">
+            <div className="nav-step-group">
                 {prevChapter && (
-                    <Link href={`/manga/${id}/chapter/${prevChapter.id}`} className="btn-reader-nav" title="Chương trước">
-                        Trước
+                    <Link href={`/manga/${id}/chapter/${prevChapter.id}`} className="titan-icon-btn nav-btn-reader" title="Chương trước">
+                        <ChevronLeft size={20} />
                     </Link>
                 )}
-                <ShareButton 
-                    title={`${data.chapter.title}: ${data.manga.title}`} 
-                    text={`Tôi đang đọc ${data.manga.title} tại TruyenVip, hay quá anh em ơi!`} 
-                    url={`${origin}/manga/${id}/chapter/${chapterId}`} 
-                    className="desktop-only"
-                />
                 {nextChapter && (
-                    <Link href={`/manga/${id}/chapter/${nextChapter.id}`} className="btn-reader-nav" title="Chương sau">
-                        Sau
+                    <Link href={`/manga/${id}/chapter/${nextChapter.id}`} className="titan-icon-btn nav-btn-reader" title="Chương sau">
+                        <ChevronRight size={20} />
                     </Link>
                 )}
             </div>
+            <div className="v-divider" />
+            <ReaderSettings />
           </div>
         </div>
       </div>
 
-      <div className="reader-container">
-        <ChapterContent chapterId={chapterId} initialImages={data.images} />
+      <div className="reader-content-industrial">
+        <ChapterContent 
+            mangaId={id} 
+            chapter={chapter} 
+            nextChapterId={nextChapter?.id} 
+            mangaTitle={manga.title}
+        />
       </div>
 
-      <div className="reader-footer" style={{ padding: '100px 0', borderTop: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.3)' }}>
-        <div className="container" style={{ maxWidth: '800px' }}>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '2px', color: 'rgba(255,255,255,0.4)', marginBottom: '15px', fontWeight: 800 }}>Bạn đã hoàn thành chương này</div>
-            <h2 style={{ fontSize: '2.2rem', fontWeight: 950, marginBottom: '40px', letterSpacing: '-1px' }}>{data.chapter.title}</h2>
-            
+      {/* Reader Footer: Finish Celebration */}
+      <footer className="reader-footer-industrial">
+        <div className="container reader-footer-container-titan">
+            <span className="finish-label-titan">BẠN ĐÃ HOÀN THÀNH CHƯƠNG NÀY</span>
+            <h2 className="finish-title-titan">{chapter.title || `Chương ${chapter.chapter_number}`}</h2>
+
             {nextChapter ? (
-                <div className="next-up-card-premium" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--glass-border)', borderRadius: 'var(--border-radius)', padding: '40px', marginBottom: '40px', textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '30px' }}>
-                    <div style={{ flex: 1 }}>
-                        <div style={{ color: 'var(--accent)', fontSize: '0.8rem', fontWeight: 900, marginBottom: '10px' }}>TIẾP THEO</div>
-                        <div style={{ fontSize: '1.4rem', fontWeight: 850 }}>{nextChapter.title}</div>
+                <div className="next-chapter-card-titan shadow-titan fade-in">
+                    <div className="next-chapter-info">
+                        <div className="next-up-tag">CHƯƠNG TIẾP THEO</div>
+                        <h4 className="next-chapter-title-titan">{nextChapter.title || `Chương ${nextChapter.chapter_number}`}</h4>
                     </div>
-                    <Link href={`/manga/${id}/chapter/${nextChapter.id}`} className="btn btn-primary" style={{ padding: '0 40px', height: '60px', display: 'flex', alignItems: 'center', fontSize: '1rem', fontWeight: 900, borderRadius: '12px', boxShadow: '0 10px 30px rgba(255, 62, 62, 0.3)' }}>
-                        Đọc Ngay
+                    <Link href={`/manga/${id}/chapter/${nextChapter.id}`} className="btn btn-primary next-btn-industrial">
+                        ĐỌC TIẾP <ChevronRight size={20} />
                     </Link>
                 </div>
             ) : (
-                <div style={{ padding: '40px', background: 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: 'var(--border-radius)', marginBottom: '40px' }}>
-                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#10b981' }}>🎉 Bạn đã đọc đến chương mới nhất!</div>
-                    <p style={{ opacity: 0.6, marginTop: '10px' }}>Hãy quay lại sau hoặc khám phá các bộ truyện khác.</p>
+                <div className="all-caught-up-industrial fade-in">
+                    <h3 className="caught-up-title">BẠN ĐÃ THEO KỊP CHƯƠNG MỚI NHẤT! 🎉</h3>
+                    <p className="caught-up-desc">Hãy theo dõi bộ truyện để nhận thông báo khi có chương mới.</p>
                 </div>
             )}
 
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '15px' }}>
-                {prevChapter && (
-                    <Link href={`/manga/${id}/chapter/${prevChapter.id}`} className="btn-utility-reader">
-                        ← Chương trước
-                    </Link>
-                )}
-                <Link href={`/manga/${id}`} className="btn-utility-reader">
-                    Mục lục truyện
+            <div className="reader-footer-actions">
+                <Link href="/" className="btn btn-glass footer-action-btn">
+                    <Home size={18} /> TRANG CHỦ
                 </Link>
-                <Link href="/" className="btn-utility-reader">
-                    Về Trang chủ
+                <Link href={`/manga/${id}`} className="btn btn-glass footer-action-btn">
+                    <BookOpen size={18} /> CHI TIẾT TRUYỆN
                 </Link>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <BackToTop />
-      <div className="container">
-          <CommentSection chapterId={chapterId} />
-      </div>
-      <div style={{ marginBottom: '100px' }} />
-      <Footer />
+            <div className="reader-comments-section">
+                <Comments mangaId={id} chapterId={chapterId} />
+            </div>
+        </div>
+      </footer>
+
+      <style jsx>{`
+        .reader-industrial-layout { color: white; }
+        .current-chapter-pill { background: var(--accent); color: white; font-weight: 950; font-size: 0.8rem; padding: 6px 18px; border-radius: 30px; letter-spacing: 1px; }
+        .reader-nav-actions-industrial { display: flex; align-items: center; gap: 20px; }
+        .nav-step-group { display: flex; gap: 8px; }
+        .nav-btn-reader { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); }
+        .v-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.1); }
+        .reader-content-industrial { padding-top: 70px; }
+        .reader-footer-container-titan { max-width: 850px; margin: 0 auto; }
+        .next-btn-industrial { padding: 0 40px; height: 60px; font-weight: 950; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; border-radius: 12px; }
+        .caught-up-desc { color: rgba(255,255,255,0.4); font-weight: 700; margin-top: 10px; }
+        .reader-footer-actions { display: flex; justify-content: center; gap: 15px; margin-bottom: 80px; }
+        .footer-action-btn { padding: 14px 25px; display: flex; align-items: center; gap: 10px; font-weight: 850; border-radius: 12px; }
+        .reader-comments-section { margin-top: 100px; text-align: left; }
+        .loading-dots-industrial { padding: 60px; text-align: center; color: rgba(255,255,255,0.4); font-weight: 800; letter-spacing: 1px; opacity: 0.5; }
+      `}</style>
     </main>
   );
 }

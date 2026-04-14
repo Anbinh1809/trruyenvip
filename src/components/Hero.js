@@ -1,63 +1,147 @@
 'use client';
 
-import Link from 'next/link';
 import Image from 'next/image';
-import { useFavorites } from '@/context/FavoritesContext';
-import { Flame, Calendar, Star, BookOpen, Heart } from 'lucide-react';
-
+import Link from 'next/link';
+import { Play, Info, Calendar, Star } from 'lucide-react';
 
 export default function Hero({ manga }) {
-  const { toggleFavorite, isFavorite } = useFavorites();
-  
   if (!manga) return null;
 
-  const favorited = isFavorite(manga.id);
-
   return (
-    <section className="titan-hero">
-      <div className="titan-hero-bg" style={{ backgroundImage: `url(${manga.cover || '/placeholder-manga.svg'})` }} />
-      <div className="titan-hero-overlay" />
+    <section className="titan-hero-section">
+      <div 
+        className="titan-hero-bg" 
+        style={{ '--hero-cover': `url(${manga.cover || '/placeholder-manga.svg'})` }} 
+      />
       
-      <div className="container hero-container" style={{ position: 'relative', zIndex: 10, display: 'grid', gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 0.8fr)', alignItems: 'center', gap: '50px' }}>
-        <div className="hero-content fade-in" style={{ position: 'relative', zIndex: 20 }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '4px 12px', background: 'rgba(255, 62, 62, 0.15)', color: '#ff3e3e', borderRadius: 'var(--border-radius)', fontWeight: 700, fontSize: '0.75rem', marginBottom: '15px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-            <Flame size={14} /> Đang Thịnh Hành
+      <div className="container hero-grid-industrial">
+        <div className="hero-content fade-in">
+          <div className="hero-tag-industrial">
+            <Star size={14} fill="currentColor" /> TRUYỆN NỔI BẬT
           </div>
-          <h1 className="titan-hero-title">{manga.title}</h1>
-          <p style={{ fontSize: '1.15rem', color: 'rgba(255,255,255,0.7)', lineHeight: '1.6', marginBottom: '30px', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-            {manga.description || 'Khám phá bộ truyện tranh đầy hấp dẫn này ngay bây giờ tại TruyenVip. Dữ liệu được cập nhật liên tục từ các nguồn hàng đầu.'}
+          
+          <h1 className="hero-title-titan">{manga.title}</h1>
+          
+          <p className="hero-desc-industrial">
+            {manga.description || 'Đang cập nhật nội dung cho tác phẩm này...'}
           </p>
-          <div style={{ display: 'flex', gap: '20px', marginBottom: '30px', fontWeight: 700, color: 'rgba(255,255,255,0.4)', fontSize: '0.9rem' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Calendar size={14} /> 2024</span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Star size={14} fill="currentColor" /> 4.9/5</span>
+          
+          <div className="hero-meta-industrial">
+            <span className="meta-item"><Calendar size={14} /> 2024</span>
+            <span className="meta-item accent-text"><Star size={14} fill="currentColor" /> 4.9/5</span>
+            <span className="meta-item desktop-only">{manga.genres?.slice(0, 2).map(g => g.name).join(' • ')}</span>
           </div>
-          <div style={{ display: 'flex', gap: '15px' }}>
-            <Link href={`/manga/${manga.id}`} className="btn btn-primary" style={{ padding: '15px 40px', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <BookOpen size={20} /> Đọc Ngay
+          
+          <div className="hero-actions-industrial">
+            <Link href={`/manga/${manga.id}`} className="btn btn-primary hero-btn-main">
+              <Play size={18} fill="currentColor" /> ĐỌC NGAY
             </Link>
-            <button 
-                className={`btn btn-outline ${favorited ? 'active' : ''}`} 
-                onClick={() => toggleFavorite(manga)}
-                style={{ border: 'none', background: 'rgba(255,255,255,0.08)', color: 'white', backdropFilter: 'blur(10px)', padding: '15px 30px', display: 'flex', alignItems: 'center', gap: '10px' }}
-            >
-              {favorited ? <><Heart size={18} fill="#ff3e3e" color="#ff3e3e" /> Đã yêu thích</> : '+ Thêm yêu thích'}
-            </button>
+            <Link href={`/manga/${manga.id}`} className="btn btn-glass hero-btn-sub">
+              <Info size={18} /> CHI TIẾT
+            </Link>
           </div>
         </div>
-        
-        <div className="titan-hero-artwork fade-in">
-             <div style={{ position: 'relative', width: '320px', height: '480px' }}>
+
+        <div className="hero-right-industrial fade-in">
+             <div className="hero-cover-container-industrial">
                 <Image 
                     src={manga.cover || '/placeholder-manga.svg'} 
                     alt={manga.title} 
                     fill 
-                    sizes="320px"
                     priority
-                    style={{ objectFit: 'cover' }}
+                    sizes="320px"
+                    className="hero-cover-img-industrial"
                 />
              </div>
         </div>
       </div>
+
+      <style jsx>{`
+        .titan-hero-bg {
+            background-image: var(--hero-cover);
+        }
+        .hero-title-titan {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            font-weight: 950;
+            color: white;
+            line-height: 1.1;
+            margin-bottom: 25px;
+            letter-spacing: -2px;
+        }
+        .hero-desc-industrial {
+            font-size: 1.1rem; 
+            color: rgba(255, 255, 255, 0.7); 
+            line-height: 1.6; 
+            margin-bottom: 35px; 
+            display: -webkit-box; 
+            WebkitLineClamp: 3; 
+            WebkitBoxOrient: vertical; 
+            overflow: hidden;
+            max-width: 600px;
+        }
+        .accent-text {
+            color: var(--accent);
+        }
+        .hero-actions-industrial {
+            display: flex;
+            gap: 20px;
+        }
+        .hero-btn-main {
+            padding: 16px 45px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 950;
+        }
+        .hero-btn-sub {
+            padding: 16px 35px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-weight: 850;
+        }
+        .hero-cover-container-industrial {
+            position: relative;
+            width: 300px;
+            aspect-ratio: 2/3;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+            transform: perspective(1000px) rotateY(-10deg);
+            transition: all 0.5s;
+        }
+        .hero-cover-container-industrial:hover {
+            transform: perspective(1000px) rotateY(0deg);
+            border-color: var(--accent);
+        }
+        .hero-cover-img-industrial {
+            object-fit: cover;
+        }
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        @media (max-width: 768px) {
+            .hero-actions-industrial {
+                flex-direction: column;
+            }
+            .hero-btn-main, .hero-btn-sub {
+                width: 100%;
+                justify-content: center;
+            }
+            .hero-cover-container-industrial {
+                display: none;
+            }
+        }
+      `}</style>
     </section>
   );
 }

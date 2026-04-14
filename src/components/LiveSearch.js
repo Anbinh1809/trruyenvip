@@ -1,14 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import NextLink from 'next/link';
 import Image from 'next/image';
-import { Search, X, Zap } from 'lucide-react';
+import { Search, X, Zap, Loader2 } from 'lucide-react';
 import { useToast } from '@/components/ToastProvider';
-import EmptyState from '@/components/EmptyState';
 
-export default function LiveSearch() {
+export default function LiveSearch({ onSelect }) {
   const { addToast } = useToast();
   const [q, setQ] = useState('');
   const [results, setResults] = useState([]);
@@ -38,6 +37,7 @@ export default function LiveSearch() {
     const timer = setTimeout(async () => {
       if (q.length >= 2 && !match) {
         setLoading(true);
+        setIsOpen(true);
         try {
           const res = await fetch(`/api/search/live?q=${encodeURIComponent(q)}`);
           if (res.ok) {
@@ -47,8 +47,8 @@ export default function LiveSearch() {
                 cover: m.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}&w=100` : (m.cover || '/placeholder-manga.svg')
             }));
             setResults(optimized);
-            setIsOpen(optimized.length > 0);
             setHighlightIndex(-1);
+            setIsOpen(optimized.length > 0 || q.length >= 2);
           }
         } catch (e) {
           console.error('[Search] Live fetch failed:', e);
@@ -57,14 +57,13 @@ export default function LiveSearch() {
         }
       } else {
         setResults([]);
-        setIsOpen(false);
+        if (!isUrl) setIsOpen(false);
         setHighlightIndex(-1);
       }
     }, 400);
 
     return () => clearTimeout(timer);
-  }, [q]);
-
+  }, [q, isUrl]);
 
   const handleSearch = (e) => {
     if (e) e.preventDefault();
@@ -74,6 +73,7 @@ export default function LiveSearch() {
         return;
     }
     setIsOpen(false);
+    if (onSelect) onSelect();
     router.push(`/search?q=${encodeURIComponent(q)}`);
   };
 
@@ -89,12 +89,13 @@ export default function LiveSearch() {
           const data = await res.json();
           if (data.success) {
               if (addToast) addToast('Đồng bộ dữ liệu thành công!', 'success');
+              if (onSelect) onSelect();
               router.push(data.redirectUrl);
           } else {
-              if (addToast) addToast(data.error || 'Tính năng này hiện đang bảo trì. Vui lòng thử lại sau.', 'error');
+              if (addToast) addToast(data.error || 'Tính năng này hiện đang bảo trì.', 'error');
           }
       } catch (e) {
-          if (addToast) addToast('Lỗi kết nối máy chủ. Vui lòng thử lại!', 'error');
+          if (addToast) addToast('Lỗi kết nối máy chủ.', 'error');
       } finally {
           setLoading(false);
       }
@@ -113,6 +114,7 @@ export default function LiveSearch() {
         e.preventDefault();
         const selected = results[highlightIndex];
         setIsOpen(false);
+        if (onSelect) onSelect();
         router.push(`/manga/${selected.id}`);
     } else if (e.key === 'Escape') {
         setIsOpen(false);
@@ -124,7 +126,6 @@ export default function LiveSearch() {
         <form className="titan-search-form" onSubmit={handleSearch}>
             <input 
                 type="text" 
-                name="search" 
                 placeholder="Tìm truyện hoặc dán link NetTruyen..." 
                 value={q}
                 autoComplete="off"
@@ -144,7 +145,7 @@ export default function LiveSearch() {
                     </button>
                 )}
                 <button type="submit" className="titan-search-submit">
-                    {loading ? <span className="loader-mini"></span> : <Search size={18} />}
+                    {loading ? <Loader2 size={18} className="animate-spin" /> : <Search size={18} />}
                 </button>
             </div>
         </form>
@@ -152,41 +153,121 @@ export default function LiveSearch() {
         {isOpen && (
             <div className="titan-results-panel fade-slide-up glass-titan">
                 {isUrl && (
-                    <div style={{ padding: '20px', borderBottom: '1px solid var(--glass-border)' }}>
-                        <button onClick={handleMigration} className="btn-primary" style={{ width: '100%', background: 'var(--accent)', color: 'white', border: 'none', padding: '14px', borderRadius: '6px', fontWeight: 950, fontSize: '0.75rem', cursor: 'pointer', letterSpacing: '1px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-                            <Zap size={16} /> {loading ? 'ĐANG XỬ LÝ...' : 'DỒN DỮ LIỆU TỪ NGUỒN NGOÀI'}
+                    <div className="titan-migration-bar-industrial">
+                        <button onClick={handleMigration} className="btn btn-primary migration-btn-titan">
+                            <Zap size={14} fill="currentColor" /> {loading ? 'ĐANG ĐỒNG BỘ...' : 'DỒN DỮ LIỆU NGUỒN NGOÀI'}
                         </button>
                     </div>
                 )}
                 
-                <div style={{ maxHeight: '420px', overflowY: 'auto' }} className="glass-scrollbar">
-                    {results.length > 0 ? results.map((m, idx) => (
-                        <NextLink 
-                            key={m.id} 
-                            href={`/manga/${m.id}`} 
-                            className={`live-result-item ${highlightIndex === idx ? 'highlighted' : ''}`}
-                            onClick={() => setIsOpen(false)}
-                        >
-                            <div className="result-thumb-titan">
-                                <Image src={m.cover} alt={m.title} fill sizes="50px" style={{ objectFit: 'cover' }} />
-                            </div>
-                            <div style={{ flex: 1 }}>
-                                <div className="result-title-titan truncate-1">{m.title}</div>
-                                <div className="result-sub-titan truncate-1">{m.author || 'Đang cập nhật'}</div>
-                            </div>
-                            {idx < 3 && <div className="hot-tag-titan">HOT</div>}
-                        </NextLink>
-                    )) : !loading && q.length >= 2 && (
-                        <div style={{ padding: '60px 20px', textAlign: 'center' }}>
-                            <div style={{ fontWeight: 950, fontSize: '1.2rem', color: 'white', marginBottom: '10px', letterSpacing: '-1px' }}>KHÔNG TÌM THẤY</div>
-                            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600, maxWidth: '240px', marginInline: 'auto', lineHeight: '1.5' }}>
-                                Rất tiếc, bộ truyện này chưa xuất hiện trong kho dữ liệu của chúng tôi.
-                            </p>
+                <div className="results-scroll-titan-industrial glass-scrollbar">
+                    {results.length > 0 ? (
+                        results.map((m, idx) => (
+                            <NextLink 
+                                key={m.id} 
+                                href={`/manga/${m.id}`} 
+                                className={`live-result-item-industrial ${highlightIndex === idx ? 'highlighted-industrial' : ''}`}
+                                onClick={() => { setIsOpen(false); if (onSelect) onSelect(); }}
+                            >
+                                <div className="result-thumb-titan-industrial">
+                                    <Image src={m.cover} alt={m.title} fill sizes="50px" className="titan-thumb-img-tag" />
+                                </div>
+                                <div className="result-info-titan-industrial">
+                                    <div className="result-title-titan-industrial truncate-1">{m.title}</div>
+                                    <div className="result-sub-titan-industrial truncate-1">{m.author || 'Đang cập nhật'}</div>
+                                </div>
+                                {idx < 3 && <div className="hot-tag-titan">HOT</div>}
+                            </NextLink>
+                        ))
+                    ) : !loading && q.length >= 2 && (
+                        <div className="search-empty-titan-industrial">
+                            <div className="empty-title-industrial">KHÔNG TÌM THẤY</div>
+                            <p className="empty-sub-industrial">Thử từ khóa khác hoặc dán link truyện.</p>
                         </div>
                     )}
                 </div>
             </div>
         )}
+        <style jsx>{`
+            .titan-migration-bar-industrial {
+                margin-bottom: 12px;
+            }
+            .migration-btn-titan {
+                width: 100%;
+                padding: 14px;
+                font-weight: 950;
+                font-size: 0.8rem;
+                letter-spacing: 0.5px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+            }
+            .results-scroll-titan-industrial {
+                max-height: 450px;
+                overflow-y: auto;
+                padding: 5px;
+            }
+            .live-result-item-industrial {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                padding: 10px;
+                border-radius: 12px;
+                text-decoration: none;
+                transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+                border: 1px solid transparent;
+            }
+            .live-result-item-industrial:hover, .highlighted-industrial {
+                background: rgba(255, 255, 255, 0.05);
+                border-color: rgba(255, 255, 255, 0.08);
+                transform: translateX(3px);
+            }
+            .result-thumb-titan-industrial {
+                width: 45px;
+                height: 60px;
+                border-radius: 8px;
+                overflow: hidden;
+                flex-shrink: 0;
+                position: relative;
+                border: 1px solid rgba(255, 255, 255, 0.05);
+            }
+            .titan-thumb-img-tag {
+                object-fit: cover;
+            }
+            .result-info-titan-industrial {
+                flex: 1;
+                min-width: 0;
+            }
+            .result-title-titan-industrial {
+                font-size: 0.95rem;
+                font-weight: 900;
+                color: white;
+                margin-bottom: 2px;
+                letter-spacing: -0.3px;
+            }
+            .result-sub-titan-industrial {
+                font-size: 0.75rem;
+                font-weight: 750;
+                color: rgba(255, 255, 255, 0.3);
+            }
+            .search-empty-titan-industrial {
+                padding: 80px 20px;
+                text-align: center;
+            }
+            .empty-title-industrial {
+                font-size: 1rem;
+                font-weight: 950;
+                color: rgba(255, 255, 255, 0.5);
+                letter-spacing: 1px;
+                margin-bottom: 8px;
+            }
+            .empty-sub-industrial {
+                font-size: 0.8rem;
+                font-weight: 750;
+                color: rgba(255, 255, 255, 0.2);
+            }
+        `}</style>
     </div>
   );
 }

@@ -1,13 +1,27 @@
 'use client';
 
-import Header from '@/components/Header';
 import { useState, useEffect } from 'react';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/components/ToastProvider';
 import Link from 'next/link';
+import { 
+    Users, 
+    BookOpen, 
+    Layers, 
+    Gift, 
+    ArrowRight, 
+    Activity, 
+    ShieldAlert, 
+    Zap, 
+    RefreshCcw,
+    Database,
+    Lock
+} from 'lucide-react';
 
 export default function AdminDashboard() {
-  const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
   const { addToast } = useToast();
   const [stats, setStats] = useState(null);
   const [crawlLoading, setCrawlLoading] = useState(false);
@@ -15,202 +29,168 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (isAuthenticated && user?.role === 'admin') {
       fetch('/api/admin/stats')
-        .then(res => {
-          if (!res.ok) throw new Error('Không thể truy xuất dữ liệu hệ thống');
-          return res.json();
-        })
-        .then(setStats)
-        .catch(err => {
-          console.error(err);
-          addToast(err.message, 'error');
-        });
+        .then(res => res.json())
+        .then(data => setStats(data))
+        .catch(err => console.error('Failed to fetch admin stats', err));
     }
-  }, [isAuthenticated, user, addToast]);
+  }, [isAuthenticated, user]);
 
   const triggerCrawl = async () => {
-    if (window.confirm('Bạn có chắc chắn muốn kích hoạt chu kỳ cào ngay bây giờ?')) {
-        let secret = localStorage.getItem('TRUYENVIP_CRON_SECRET') || '';
-        
-        if (!secret) {
-            secret = window.prompt('Nhập mã xác thực (CRON_SECRET) để kích hoạt:');
-            if (secret) localStorage.setItem('TRUYENVIP_CRON_SECRET', secret);
+    setCrawlLoading(true);
+    try {
+        const res = await fetch('/api/crawl', { method: 'POST' });
+        if (res.ok) {
+            addToast('Đã kích hoạt tiến trình quét dữ liệu tự động!', 'success');
+        } else {
+            addToast('Kích hoạt thất bại. Vui lòng kiểm tra log.', 'error');
         }
-
-        if (!secret) return;
-
-        setCrawlLoading(true);
-        try {
-            const res = await fetch('/api/cron', {
-                headers: { 'Authorization': `Bearer ${secret}` }
-            });
-            if (res.ok) {
-                addToast('🚀 Đã kích hoạt quy trình vá lỗi (Gap Healing) thành công!', 'success');
-            } else {
-                const errorData = await res.json().catch(() => ({}));
-                addToast(`❌ Lỗi kích hoạt: ${res.status} - ${errorData.error || 'Mã xác thực không chính xác'}`, 'error');
-                if (res.status === 401) localStorage.removeItem('TRUYENVIP_CRON_SECRET');
-            }
-        } catch (e) {
-            addToast('🚫 Kết nối với hệ thống bị gián đoạn!', 'error');
-        }
+    } catch (e) {
+        addToast('Lỗi kết nối máy chủ.', 'error');
+    } finally {
         setCrawlLoading(false);
     }
   };
 
-  if (authLoading) {
-      return (
-          <main className="main-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
-              <div className="loader-ring"></div>
-              <p style={{ marginTop: '20px', fontWeight: 700 }}>Đang xác thực...</p>
-          </main>
-      );
+  if (loading) {
+    return (
+        <div className="main-wrapper titan-bg">
+            <Header />
+            <div className="system-center-industrial">
+                <div className="titan-loader-pulse"></div>
+                <p className="loading-status-hint">Đang xác thực quyền quản trị...</p>
+            </div>
+        </div>
+    );
   }
 
   if (!isAuthenticated || user?.role !== 'admin') {
     return (
-        <main className="main-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', flexDirection: 'column', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
-            <h1 style={{ fontSize: '5rem' }}>🚫</h1>
-            <h2>Bạn không có quyền truy cập admin</h2>
-            <p style={{ color: 'var(--text-muted)', marginTop: '10px' }}>Quyền hạn hiện tại: {user?.role || 'Guest'}</p>
-            <Link href="/" className="btn btn-primary" style={{ marginTop: '30px' }}>Quay lại trang chủ</Link>
-        </main>
+        <div className="main-wrapper titan-bg">
+            <Header />
+            <div className="system-center-industrial">
+                <Lock size={60} color="var(--accent)" />
+                <h1 className="system-title-industrial">BẢO MẬT TỐI CAO</h1>
+                <p className="system-desc-industrial">Khu vực này chỉ dành cho các quản trị viên cấp cao của hệ thống.</p>
+                <Link href="/" className="btn btn-primary">QUAY LẠI TRANG CHỦ</Link>
+            </div>
+        </div>
     );
   }
 
-    return (
-        <main className="admin-page titan-bg" style={{ minHeight: '100vh', paddingBottom: '100px', color: 'white' }}>
-            <Header />
-            
-            <div className="container" style={{ paddingTop: '120px' }}>
-                <header style={{ marginBottom: '50px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                    <div>
-                        <h1 style={{ fontSize: '3rem', fontWeight: 950, marginBottom: '10px' }}>Dashboard Quản Trị</h1>
-                        <p style={{ color: 'rgba(255,255,255,0.5)', fontWeight: 600 }}>Chi tiết các chỉ số vận hành & hiệu suất hệ thống</p>
-                    </div>
-                </header>
+  return (
+    <main className="main-wrapper titan-bg admin-page">
+      <Header />
+      
+      <div className="container admin-container fade-in">
+        <header className="admin-header-industrial fade-up">
+            <div className="header-left">
+                <div className="library-badge-titan">SYSTEM OVERWATCH</div>
+                <h1 className="admin-title-industrial">DASHBOARD QUẢN TRỊ</h1>
+                <p className="admin-subtitle">Chi tiết các chỉ số vận hành & hiệu suất hệ thống thời gian thực.</p>
+            </div>
+        </header>
 
-                <div className="dash-grid-titan">
-                    <div className="stat-item-titan">
-                        <div className="stat-label-titan">📊 TỔNG NGƯỜI DÙNG</div>
-                        <div className="stat-value-titan">
-                            {stats ? stats.totalUsers : <div className="skeleton-shimmer" style={{ height: '3rem', width: '80px', borderRadius: 'var(--border-radius)' }} />}
-                        </div>
+        <section className="admin-stats-grid-industrial">
+            <div className="admin-stat-node-industrial fade-in" style={{ '--delay': '0s' }}>
+                <div className="admin-stat-label-industrial"><Users size={14} /> TỔNG NGƯỜI DÙNG</div>
+                <div className="admin-stat-value-industrial">
+                    {stats ? stats.totalUsers : <span className="skeleton-text-titan">...</span>}
+                </div>
+            </div>
+            <div className="admin-stat-node-industrial fade-in" style={{ '--delay': '0.05s' }}>
+                <div className="admin-stat-label-industrial"><BookOpen size={14} /> TỔNG ĐẦU TRUYỆN</div>
+                <div className="admin-stat-value-industrial">
+                    {stats ? stats.totalManga : <span className="skeleton-text-titan">...</span>}
+                </div>
+            </div>
+            <div className="admin-stat-node-industrial fade-in" style={{ '--delay': '0.1s' }}>
+                <div className="admin-stat-label-industrial"><Layers size={14} /> TỔNG CHƯƠNG</div>
+                <div className="admin-stat-value-industrial">
+                    {stats ? stats.totalChapters : <span className="skeleton-text-titan">...</span>}
+                </div>
+            </div>
+            <div className="admin-stat-node-industrial accent-node fade-in" style={{ '--delay': '0.15s' }}>
+                <div className="admin-stat-label-industrial"><Gift size={14} /> ĐANG ĐỢI ĐỔI QUÀ</div>
+                <div className="admin-stat-value-industrial">
+                    {stats ? stats.pendingRewards : <span className="skeleton-text-titan">...</span>}
+                </div>
+                <Link href="/admin/rewards" className="stat-action-link-titan">
+                    Quản lý ngay <ArrowRight size={14} />
+                </Link>
+            </div>
+        </section>
+
+        <section className="admin-action-grid-industrial">
+            <div className="admin-card-industrial shadow-titan fade-up">
+                <h2 className="admin-card-title-industrial"><Activity size={20} color="var(--accent)" /> QUẢN LÝ VẬN HÀNH</h2>
+                
+                <div className="monitored-task-box-industrial">
+                    <div className="task-stat-line">
+                        <span className="task-stat-label-industrial">Tasks Pending:</span>
+                        <span className="task-stat-value-titan status-pending">{stats?.taskPending || 0}</span>
                     </div>
-                    <div className="stat-item-titan">
-                        <div className="stat-label-titan">📚 TỔNG TRUYỆN</div>
-                        <div className="stat-value-titan">
-                            {stats ? stats.totalManga : <div className="skeleton-shimmer" style={{ height: '3rem', width: '80px', borderRadius: 'var(--border-radius)' }} />}
-                        </div>
+                    <div className="task-stat-line">
+                        <span className="task-stat-label-industrial">Failed Tasks:</span>
+                        <span className="task-stat-value-titan status-rejected">{stats?.taskFailed || 0}</span>
                     </div>
-                    <div className="stat-item-titan">
-                        <div className="stat-label-titan">📜 TỔNG CHƯƠNG</div>
-                        <div className="stat-value-titan">
-                            {stats ? stats.totalChapters : <div className="skeleton-shimmer" style={{ height: '3rem', width: '80px', borderRadius: 'var(--border-radius)' }} />}
-                        </div>
-                    </div>
-                    <div className="stat-item-titan highlight-titan">
-                        <div className="stat-label-titan" style={{ color: 'var(--accent)' }}>🎁 ĐỢI ĐỔI QUÀ</div>
-                        <div className="stat-value-titan" style={{ color: 'var(--accent)' }}>
-                            {stats ? stats.pendingRewards : <div className="skeleton-shimmer" style={{ height: '3rem', width: '40px', borderRadius: 'var(--border-radius)' }} />}
-                        </div>
-                        <Link href="/admin/rewards" className="action-link" style={{ marginTop: '15px', display: 'block', fontWeight: 800, color: 'var(--accent)', textDecoration: 'none' }}>Quản lý ngay →</Link>
+                    <div className="task-stat-line">
+                        <span className="task-stat-label-industrial">Syncs/Hour:</span>
+                        <span className="task-stat-value-titan status-approved">{stats?.syncsLastHour || 0}</span>
                     </div>
                 </div>
 
-                <section className="admin-actions-section">
-                    <h2 style={{ fontSize: '1.4rem', fontWeight: 800, marginBottom: '25px' }}>Quản lý hệ thống</h2>
-                    <div className="actions-list-titan">
-                        
-                        {/* Crawler Control */}
-                        <div className="action-node-titan">
-                            <div className="action-icon-titan">🕷️</div>
-                            <h3 className="action-title-titan">Titan Scraper (V2)</h3>
-                            <p className="action-desc-titan">Hệ thống cào truyện thông minh, tự động đồng bộ chương mới và xử lý ảnh cao cấp.</p>
-                            
-                            {/* TASK MONITOR MINI */}
-                            <div className="task-monitor-mini glass" style={{ padding: '12px', borderRadius: 'var(--border-radius)', marginBottom: '15px', background: 'rgba(255,255,255,0.03)' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 800 }}>
-                                    <span>HÀNG CHỜ:</span>
-                                    <span style={{ color: 'var(--accent)' }}>{stats?.taskPending || 0}</span>
-                                </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 800, marginTop: '5px' }}>
-                                    <span>LỖI:</span>
-                                    <span style={{ color: '#ef4444' }}>{stats?.taskFailed || 0}</span>
-                                </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 800, marginTop: '5px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '5px' }}>
-                                    <span>NHỊP TIM:</span>
-                                    <span style={{ color: '#10b981' }}>{stats?.syncsLastHour || 0} / GIỜ</span>
-                                </div>
-                            </div>
-
-                            <div style={{ display: 'flex', gap: '10px', marginTop: 'auto' }}>
-                                <button onClick={triggerCrawl} disabled={crawlLoading} className="btn btn-primary" style={{ flex: 1 }}>
-                                    {crawlLoading ? 'Đang gọi...' : 'Kích hoạt ngay'}
-                                </button>
-                                <button onClick={async () => {
-                                    if(confirm('Thử lại toàn bộ các task lỗi?')) {
-                                        const res = await fetch('/api/admin/tasks', { method: 'POST', body: JSON.stringify({ action: 'retry_failed' }) });
-                                        if (res.ok) addToast('Đã đưa các task lỗi về hàng chờ.', 'success');
-                                        else addToast('Thất bại khi khôi phục task.', 'error');
-                                    }
-                                }} className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '50px' }}>
-                                    🔄
-                                </button>
-                                <button onClick={async () => {
-                                    if(confirm('Xóa sạch toàn bộ các task đã hoàn thành?')) {
-                                        const res = await fetch('/api/admin/tasks', { method: 'POST', body: JSON.stringify({ action: 'purge_completed' }) });
-                                        if (res.ok) addToast('Đã dọn dẹp hàng chờ sạch sẽ.', 'success');
-                                        else addToast('Không thể dọn dẹp hàng chờ.', 'error');
-                                    }
-                                }} className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '50px' }}>
-                                    🧹
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Logs Control */}
-                        <div className="action-node-titan">
-                            <div className="action-icon-titan">⚙️</div>
-                            <h3 className="action-title-titan">Chẩn Đoán Hệ Thống</h3>
-                            <p className="action-desc-titan">Phân tích lỗi hàng chờ và tìm ra những bộ truyện đang gặp sự cố.</p>
-                            
-                            <div className="failure-list-mini glass" style={{ fontSize: '0.65rem', padding: '10px', borderRadius: 'var(--border-radius)', background: 'rgba(255,255,255,0.02)', maxHeight: '100px', overflowY: 'auto' }}>
-                                <div style={{ fontWeight: 900, color: 'var(--text-muted)', marginBottom: '5px' }}>LỖI CẬP NHẬT GẦN NHẤT:</div>
-                                {stats?.recentFailures?.length > 0 ? stats.recentFailures.map(f => (
-                                    <div key={f.id} style={{ marginBottom: '4px', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '2px' }}>
-                                        <span style={{ color: 'var(--accent)' }}>[{f.type}]</span> {f.last_error?.substring(0, 40)}...
-                                    </div>
-                                )) : <div style={{ opacity: 0.3 }}>Hoạt động bình thường.</div>}
-                            </div>
-
-                            {stats?.heatmap?.length > 0 && (
-                                <div className="heatmap-titan glass" style={{ marginTop: '10px', padding: '10px', borderRadius: 'var(--border-radius)', background: 'rgba(255,62,62,0.02)', border: '1px solid rgba(255,62,62,0.1)' }}>
-                                    <div style={{ fontSize: '0.6rem', fontWeight: 900, marginBottom: '5px', color: 'var(--accent)' }}>PHÂN TÍCH LỖI HỆ THỐNG:</div>
-                                    {stats.heatmap.map((h, i) => (
-                                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.6rem', marginBottom: '2px' }}>
-                                            <span style={{ opacity: 0.7 }}>{h.signature?.substring(0, 30)}...</span>
-                                            <span style={{ fontWeight: 800 }}>{h.count}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-
-                            <Link href="/admin/crawler" className="btn btn-outline" style={{ marginTop: 'auto', textAlign: 'center' }}>
-                                Quét Toàn Bộ Radar
-                            </Link>
-                        </div>
-
-                        {/* Other Tools */}
-                        <div className="action-node-titan dimmed" style={{ opacity: 0.6, pointerEvents: 'none' }}>
-                            <div className="action-icon-titan">🛠️</div>
-                            <h3 className="action-title-titan">Bảo Trì Hệ Thống</h3>
-                            <p className="action-desc-titan">Tính năng đang được phát triển. Sẽ sớm ra mắt trong các phiên bản kế tiếp.</p>
-                            <button className="btn btn-outline" disabled style={{ marginTop: 'auto', opacity: 0.5 }}>Sắp ra mắt</button>
-                        </div>
-
-                    </div>
-                </section>
+                <div className="admin-action-footer-titan">
+                    <button 
+                        onClick={triggerCrawl} 
+                        disabled={crawlLoading} 
+                        className="btn btn-primary full-width-titan"
+                    >
+                        {crawlLoading ? <RefreshCcw className="spin-titan" size={18} /> : <Zap size={18} />}
+                        KÍCH HOẠT QUÉT DỮ LIỆU
+                    </button>
+                    <div className="action-hint-titan">Thao tác này sẽ ép buộc Guardian Autopilot khởi chạy ngay lập tức.</div>
+                </div>
             </div>
-        </main>
-    );
+
+            <div className="admin-card-industrial shadow-titan fade-up">
+                <h2 className="admin-card-title-industrial"><ShieldAlert size={20} color="#f87171" /> NHẬT KÝ LỖI HỆ THỐNG</h2>
+                
+                <div className="failure-log-mini-industrial">
+                    <div className="failure-log-title">RECENT_SYNC_FAILURES:</div>
+                    {stats?.failures && stats.failures.length > 0 ? stats.failures.map(f => (
+                        <div key={f.id} className="failure-entry-industrial">
+                            <span className="err-type-tag">[{f.type}]</span> {f.last_error?.substring(0, 50)}...
+                        </div>
+                    )) : (
+                        <div className="empty-log-titan">Hoạt động bình thường.</div>
+                    )}
+                </div>
+
+                <div className="heatmap-engine-industrial shadow-inner-titan">
+                    <div className="heatmap-label-titan"><Database size={14} /> DB_LOAD_INDICATOR</div>
+                    <div className="heatmap-pulse-titan"></div>
+                </div>
+            </div>
+        </section>
+      </div>
+
+      <Footer />
+      <style jsx>{`
+        .skeleton-text-titan { opacity: 0.2; }
+        .stat-action-link-titan { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 950; color: var(--accent); text-decoration: none; margin-top: 20px; transition: all 0.3s; }
+        .stat-action-link-titan:hover { transform: translateX(5px); }
+        .full-width-titan { width: 100%; height: 55px; display: flex; align-items: center; justify-content: center; gap: 12px; font-weight: 950; letter-spacing: 1px; }
+        .action-hint-titan { font-size: 0.7rem; color: rgba(255,255,255,0.2); margin-top: 15px; text-align: center; }
+        .err-type-tag { color: var(--accent); font-weight: 900; }
+        .empty-log-titan { opacity: 0.3; padding: 20px; text-align: center; font-style: italic; }
+        .heatmap-label-titan { font-size: 0.65rem; color: rgba(255,255,255,0.2); font-weight: 950; letter-spacing: 2px; margin-bottom: 10px; }
+        .heatmap-pulse-titan { width: 100%; height: 4px; background: var(--accent); border-radius: 2px; box-shadow: 0 0 10px var(--accent); animation: scan 3s infinite linear; }
+        .spin-titan { animation: spin 1s infinite linear; }
+        @keyframes scan { 0% { opacity: 0.2; } 50% { opacity: 1; } 100% { opacity: 0.2; } }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .fade-in { animation: fadeIn 0.8s both var(--delay); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+      `}</style>
+    </main>
+  );
 }

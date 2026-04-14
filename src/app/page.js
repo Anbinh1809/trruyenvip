@@ -5,6 +5,7 @@ import Footer from '@/components/Footer';
 import { query, MANGA_CARD_FIELDS } from '@/lib/db';
 import Link from 'next/link';
 import { Suspense } from 'react';
+import { Sparkles, Zap, ChevronRight } from 'lucide-react';
 
 export const revalidate = 300; // ISR: Revalidate every 5 minutes
 
@@ -39,34 +40,35 @@ export default async function Home() {
   const recentManga = mangaList;
 
   return (
-    <main className="home-page titan-bg" style={{ minHeight: '100vh', paddingBottom: '100px', color: 'white' }}>
+    <main className="main-wrapper titan-bg home-page">
       <Header />
       
       {/* Hero Section: Premium Branding & SEO */}
-      <div className="home-hero-glow" style={{ position: 'relative', overflow: 'hidden', paddingTop: '120px', paddingBottom: '60px', background: 'radial-gradient(circle at 50% -20%, rgba(255, 62, 62, 0.15) 0%, transparent 70%)' }}>
-          <div className="container" style={{ textAlign: 'center', position: 'relative', zIndex: 10 }}>
-              <div style={{ display: 'inline-block', padding: '5px 15px', background: 'rgba(255, 62, 62, 0.1)', border: '1px solid rgba(255, 62, 62, 0.2)', borderRadius: '20px', color: 'var(--accent)', fontSize: '0.75rem', fontWeight: 900, letterSpacing: '2px', marginBottom: '20px' }}>PREMIUM READING EXPERIENCE</div>
-              <h1 style={{ fontSize: '3.5rem', fontWeight: 950, letterSpacing: '-2px', marginBottom: '15px', lineHeight: 1.1 }}>
-                  Truyen<span style={{ color: 'var(--accent)' }}>Vip</span>: Thế Giới Truyện Tranh <br/> Đỉnh Cao
+      <div className="home-hero-glow">
+          <div className="container center-content-titan">
+              <div className="hero-badge-titan">PREMIUM READING EXPERIENCE</div>
+              <h1 className="home-title-industrial">
+                  TRUYÊN<span className="accent-text-titan">VIP</span>: THẾ GIỚI TRUYỆN TRANH <br/> ĐỈNH CAO
               </h1>
-              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '1.2rem', fontWeight: 600, maxWidth: '700px', margin: '0 auto 40px' }}>
+              <p className="home-subtitle-industrial">
                   Trải nghiệm đọc truyện cinematic, tốc độ siêu nhanh và kho truyện khổng lồ từ những nguồn tốt nhất Việt Nam.
               </p>
           </div>
       </div>
 
-      <div className="container" style={{ position: 'relative', zIndex: 100 }}>
+      <div className="container relative-z-100">
         
-        <div style={{ marginBottom: '60px', marginTop: '-20px' }}>
-            <Suspense fallback={<div className="skeleton-loader" />}>
+        <div className="home-history-wrapper">
+            <Suspense fallback={<div className="skeleton-loader-industrial" />}>
                 <RecentlyRead />
             </Suspense>
         </div>
 
         <section className="section-titan fade-in">
-          <div className="section-header-nebula" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                <h2 style={{ fontSize: '1.6rem', fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>Truyện Đang Hot</h2>
+          <div className="section-header-nebula-industrial">
+            <div className="section-title-box-titan">
+                <Sparkles size={24} color="var(--accent)" />
+                <h2 className="section-title-industrial">TRUYỆN ĐANG HOT</h2>
             </div>
           </div>
           <div className="manga-grid-titan">
@@ -76,14 +78,15 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="section-titan fade-in" style={{ animationDelay: '0.2s' }}>
-          <div className="section-header-nebula" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                <h2 style={{ fontSize: '1.6rem', fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>Vừa Cập Nhật</h2>
+        <section className="section-titan fade-in">
+          <div className="section-header-nebula-industrial">
+            <div className="section-title-box-titan">
+                <Zap size={24} color="#60a5fa" />
+                <h2 className="section-title-industrial">VỪA CẬP NHẬT</h2>
             </div>
-            <div style={{ display: 'flex', gap: '15px' }}>
-                <Link href="/genres" className="btn-view-all" style={{ alignSelf: 'center' }}>Xem tất cả →</Link>
-            </div>
+            <Link href="/genres" className="btn-view-all-industrial">
+                XEM TẤT CẢ <ChevronRight size={18} />
+            </Link>
           </div>
           <div className="manga-grid-titan">
             {recentManga.map(manga => (
@@ -94,6 +97,13 @@ export default async function Home() {
       </div>
 
       <Footer />
+      <style jsx>{`
+        .center-content-titan { text-align: center; position: relative; z-index: 10; }
+        .accent-text-titan { color: var(--accent); }
+        .relative-z-100 { position: relative; z-index: 100; }
+        .skeleton-loader-industrial { height: 300px; background: rgba(255,255,255,0.02); border-radius: 24px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 0.8; } 100% { opacity: 0.5; } }
+      `}</style>
     </main>
   );
 }

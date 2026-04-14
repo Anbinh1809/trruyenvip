@@ -43,8 +43,7 @@ export default function ChapterContent({ chapterId, initialImages = [] }) {
                     const data = await res.json();
                     if (data.images && data.images.length > 0) {
                         const isHiFi = localStorage.getItem('truyenvip_hifi') === 'true';
-                        const isMobile = window.innerWidth < 768;
-                        const w = isHiFi ? 1800 : (isMobile ? 800 : 1200);
+                        const w = isHiFi ? 1800 : (window.innerWidth < 768 ? 800 : 1200);
                         const q = isHiFi ? 95 : 78;
 
                         setImages(data.images.map(img => 
@@ -79,8 +78,7 @@ export default function ChapterContent({ chapterId, initialImages = [] }) {
                         const imgData = await imgRes.json();
                         if (imgData.images?.length > 0) {
                             const isHiFi = localStorage.getItem('truyenvip_hifi') === 'true';
-                            const isMobile = window.innerWidth < 768;
-                            const w = isHiFi ? 1800 : (isMobile ? 800 : 1200);
+                            const w = isHiFi ? 1800 : (window.innerWidth < 768 ? 800 : 1200);
                             const q = isHiFi ? 95 : 78;
 
                             setImages(imgData.images.map(img =>
@@ -92,25 +90,18 @@ export default function ChapterContent({ chapterId, initialImages = [] }) {
                     }
                 }
                 startPolling();
-            } else if (res.status === 429) {
-                setError(data.error || 'Thao tác quá nhanh, vui lòng đợi một chút.');
-                setIsSyncing(false);
-            } else if (res.status === 404) {
-                setError('Chương này không tồn tại trong hệ thống. Vui lòng quay lại mục lục.');
-                setIsSyncing(false);
             } else {
-                setError(data.error || 'Hệ thống đang bảo trì hoặc nguồn không phản hồi. Vui lòng quay lại sau.');
+                setError(data.error || 'Hệ thống đang bảo trì hoặc nguồn không phản hồi.');
                 setIsSyncing(false);
             }
         } catch (e) {
-            setError('Lỗi kết nối máy chủ. Vui lòng kiểm tra mạng và thử lại.');
+            setError('Lỗi kết nối máy chủ. Vui lòng thử lại.');
             setIsSyncing(false);
         }
     }, [chapterId, startPolling]);
 
     useEffect(() => {
-        const chapterChanged = prevChapterId.current !== chapterId;
-        if (chapterChanged) {
+        if (prevChapterId.current !== chapterId) {
             setImages(initialImages);
             setIsSyncing(initialImages.length === 0);
             setError(null);
@@ -126,26 +117,40 @@ export default function ChapterContent({ chapterId, initialImages = [] }) {
 
     if (error) {
         return (
-            <div className="error-container" style={{ padding: '80px 20px', textAlign: 'center' }}>
-                <p style={{ color: 'var(--text-muted)', marginBottom: '20px' }}>{error}</p>
-                <button className="btn btn-primary" onClick={startSync}>Thử lại</button>
+            <div className="industrial-error-nebula fade-in">
+                <div className="error-icon-box">
+                    <AlertCircle size={48} />
+                </div>
+                <p className="error-text-industrial">{error}</p>
+                <button className="btn btn-primary err-retry-btn" onClick={startSync}>Thử lại ngay</button>
+                <style jsx>{`
+                    .error-icon-box {
+                        color: var(--accent);
+                        margin-bottom: 25px;
+                    }
+                    .err-retry-btn {
+                        padding: 14px 45px;
+                        font-weight: 950;
+                        letter-spacing: 1px;
+                    }
+                `}</style>
             </div>
         );
     }
 
     if (isSyncing && images.length === 0) {
         return (
-            <div className="syncing-container" style={{ padding: '120px 20px', textAlign: 'center' }}>
-                <div className="loader-ring" style={{ width: '80px', height: '80px', margin: '0 auto 30px' }}></div>
-                <h3 style={{ fontWeight: 800, fontSize: '1.4rem', marginBottom: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-                    <LinkIcon size={24} color="var(--accent)" /> Đang cào dữ liệu...
+            <div className="syncing-overlay-industrial fade-in">
+                <div className="loader-titan-ring" />
+                <h3 className="sync-title-industrial">
+                    <LinkIcon size={24} color="var(--accent)" /> ĐANG ĐỒNG BỘ DỮ LIỆU...
                 </h3>
-                <p style={{ color: 'var(--text-muted)', maxWidth: '400px', margin: '0 auto' }}>
-                    Hệ thống đang đồng bộ dữ liệu trực tiếp từ nguồn cho bạn, vui lòng đợi vài giây!
+                <p className="sync-sub-industrial">
+                    Hệ thống đang trích xuất nội dung trực tiếp từ nguồn chính cho bạn. Quá trình này thường mất khoảng 3-8 giây.
                 </p>
-                <div className="shimmer-group" style={{ marginTop: '50px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                    <div className="shimmer" style={{ width: '100%', height: '400px', borderRadius: '4px', background: 'rgba(255,255,255,0.05)' }}></div>
-                    <div className="shimmer" style={{ width: '100%', height: '400px', borderRadius: '4px', background: 'rgba(255,255,255,0.05)' }}></div>
+                <div className="shimmer-group-industrial">
+                    <div className="skeleton-industrial skeleton-reader-page" />
+                    <div className="skeleton-industrial skeleton-reader-page" />
                 </div>
             </div>
         );
@@ -157,11 +162,16 @@ export default function ChapterContent({ chapterId, initialImages = [] }) {
                 <ReaderImage key={`${chapterId}_${idx}`} src={img} idx={idx} />
             ))}
             {images.length === 0 && !isSyncing && (
-                <div style={{ padding: '80px 0', textAlign: 'center' }}>
-                    <p style={{ color: 'var(--text-muted)' }}>Chương này hiện không tìm thấy dữ liệu. Có thể hệ thống gặp lỗi hoặc truyện ở nguồn đã bị xóa.</p>
-                    <RecrawlButton chapterId={chapterId} />
+                <div className="empty-reader-state industrial-p-80">
+                    <p className="empty-desc-industrial">Chương này hiện không tìm thấy dữ liệu ảnh.</p>
+                    <div className="mt-30">
+                        <RecrawlButton chapterId={chapterId} />
+                    </div>
                 </div>
             )}
+            <style jsx>{`
+                .mt-30 { margin-top: 30px; }
+            `}</style>
         </div>
     );
 }
@@ -169,50 +179,35 @@ export default function ChapterContent({ chapterId, initialImages = [] }) {
 function ReaderImage({ src, idx }) {
     const [error, setError] = useState(false);
     const [loaded, setLoaded] = useState(false);
-    const [shouldLoad, setShouldLoad] = useState(idx < 5); // Load first 5 immediately
+    const [shouldLoad, setShouldLoad] = useState(idx < 3); 
     const [retryCount, setRetryCount] = useState(0);
-    const [imgWidth, setImgWidth] = useState(1600);
     const containerRef = useRef(null);
 
     useEffect(() => {
-        // High-Fidelity Check: Adjust width for 4K mode
-        if (localStorage.getItem('truyenvip_hifi') === 'true') {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
-            setImgWidth(2000);
-        }
-
         if (shouldLoad) return;
-
-        // ERGONOMIC VIEWPORT GUARD: Dynamic prefetching margin
-        const isHiFi = localStorage.getItem('truyenvip_hifi') === 'true';
-        const margin = isHiFi ? '1200px' : '800px';
-
         const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    setShouldLoad(true);
-                    observer.disconnect();
-                }
-            });
-        }, { rootMargin: margin });
+            if (entries[0].isIntersecting) {
+                setShouldLoad(true);
+                observer.disconnect();
+            }
+        }, { rootMargin: '1200px' });
 
         if (containerRef.current) observer.observe(containerRef.current);
         return () => observer.disconnect();
     }, [shouldLoad]);
 
-    const handleRetry = () => {
-        setError(false);
-        setRetryCount(prev => prev + 1);
-    };
-
     if (error) {
         return (
-            <div className="reader-img-wrapper" style={{ minHeight: '300px', border: '1px dashed rgba(255,62,62,0.2)', gap: '15px', flexDirection: 'column' }}>
+            <div className="reader-img-error-card industrial-error-nebula min-h-300">
                 <AlertCircle size={32} color="var(--accent)" />
-                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem' }}>Trang {idx + 1} mất kết nối.</p>
-                <button onClick={handleRetry} className="btn btn-glass btn-small" style={{ padding: '8px 20px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <p className="mt-20">Trang {idx + 1} mất kết nối.</p>
+                <button onClick={() => { setError(false); setRetryCount(c => c + 1); }} className="btn btn-outline btn-small mt-20">
                     <RefreshCw size={14} /> Thử lại
                 </button>
+                <style jsx>{`
+                    .min-h-300 { min-height: 300px; padding: 40px; }
+                    .mt-20 { margin-top: 20px; font-weight: 800; }
+                `}</style>
             </div>
         );
     }
@@ -220,18 +215,15 @@ function ReaderImage({ src, idx }) {
     return (
         <div className="reader-img-wrapper" ref={containerRef}>
             {(!loaded || !shouldLoad) && (
-                <div className="reader-image-placeholder">
+                <div className="reader-image-placeholder skeleton-industrial">
                     <span className="reader-page-num">TRANG {idx + 1}</span>
                 </div>
             )}
             {shouldLoad && (
                 <img 
-                    src={`${src}${src.includes('?') ? '&' : '?'}v=${retryCount}&w=${imgWidth}&q=85`} 
+                    src={`${src}${src.includes('?') ? '&' : '?'}v=${retryCount}`} 
                     alt={`page ${idx + 1}`} 
                     className={`reader-img-titan ${loaded ? 'reader-img-loaded' : ''}`}
-                    loading={idx < 5 ? "eager" : "lazy"} 
-                    decoding="async"
-                    fetchPriority={idx === 0 ? "high" : "auto"}
                     onLoad={() => setLoaded(true)}
                     onError={() => setError(true)}
                 />

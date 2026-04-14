@@ -5,54 +5,53 @@ import { useHistory } from '@/context/HistoryContext';
 import Link from 'next/link';
 import Image from 'next/image';
 import EmptyState from '@/components/EmptyState';
+import { Trash2, BookOpen, Clock } from 'lucide-react';
 
 export default function HistoryPage() {
   const { history, clearHistory } = useHistory();
 
     return (
-        <main className="history-page titan-bg" style={{ minHeight: '100vh', paddingBottom: '100px', color: 'white' }}>
+        <main className="main-wrapper titan-bg history-page">
             <Header />
             
-            <div className="container" style={{ paddingTop: '120px' }}>
-                <header style={{ marginBottom: '50px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '20px' }}>
-                    <div>
-                        <h1 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '10px', letterSpacing: '-1.5px' }}>Lịch sử đọc truyện</h1>
-                        <p style={{ color: 'rgba(255,255,255,0.4)', fontWeight: 600, fontSize: '1.1rem' }}>Danh sách các bộ truyện bạn đã đọc gần đây</p>
+            <div className="container history-container fade-in">
+                <header className="history-header-industrial fade-up">
+                    <div className="header-left-industrial">
+                        <div className="library-badge-titan">TRUYỆN ĐÃ XEM</div>
+                        <h1 className="history-title-industrial">LỊCH SỬ ĐỌC</h1>
+                        <p className="history-subtitle">Các bản ghi hoạt động đọc truyện của bạn trên hệ thống.</p>
                     </div>
                     {history.length > 0 && (
-                        <button className="btn btn-view-all" onClick={clearHistory} style={{ padding: '12px 25px' }}>
-                            Xoá lịch sử
+                        <button className="btn btn-outline clear-btn-industrial" onClick={clearHistory}>
+                            <Trash2 size={18} /> XOÁ LỊCH SỬ
                         </button>
                     )}
                 </header>
 
                 {history.length > 0 ? (
-                    <div className="history-grid-titan">
-                        {history.map((item) => (
-                            <div key={item.mangaId} className="action-node-titan fade-in" style={{ padding: 0, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)' }}>
-                                <Link href={`/manga/${item.mangaId}`} style={{ display: 'block', position: 'relative', width: '100%', aspectRatio: '2/3' }}>
+                    <div className="history-grid-industrial">
+                        {history.map((item, idx) => (
+                            <div key={item.mangaId} className="history-node-titan fade-in shadow-titan" style={{ '--delay': `${idx * 0.05}s` }}>
+                                <Link href={`/manga/${item.mangaId}`} className="history-cover-box">
                                     <Image 
                                         src={item.mangaCover} 
                                         alt={item.mangaTitle} 
                                         fill
                                         sizes="(max-width: 768px) 50vw, 300px"
-                                        style={{ objectFit: 'cover' }}
+                                        className="history-cover-img"
                                     />
-                                    <div style={{ position: 'absolute', bottom: '15px', left: '15px' }}>
-                                        <div style={{ background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', padding: '4px 10px', borderRadius: 'var(--border-radius)', fontSize: '0.75rem', fontWeight: 800, color: 'white', border: '1px solid rgba(255,255,255,0.1)' }}>
-                                            {new Date(item.timestamp).toLocaleDateString('vi-VN')}
-                                        </div>
+                                    <div className="history-chapter-tag shadow-titan">
+                                        <Clock size={12} /> {new Date(item.timestamp).toLocaleDateString('vi-VN')}
                                     </div>
                                 </Link>
-                                <div style={{ padding: '25px' }}>
-                                    <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'white', marginBottom: '10px', lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{item.mangaTitle}</h3>
-                                    <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--accent)', marginBottom: '20px', opacity: 0.9 }}>Dừng lại ở: {item.chapterTitle}</div>
+                                <div className="history-info-industrial">
+                                    <h3 className="history-item-title">{item.mangaTitle}</h3>
+                                    <div className="history-last-read">Dừng lại ở: {item.chapterTitle}</div>
                                     <Link 
                                         href={`/manga/${item.mangaId}/chapter/${item.chapterId}`} 
-                                        className="btn btn-primary"
-                                        style={{ display: 'block', textAlign: 'center', fontSize: '0.85rem', fontWeight: 800, padding: '12px' }}
+                                        className="btn btn-primary history-action-industrial"
                                     >
-                                        Đọc tiếp
+                                        ĐỌC TIẾP <BookOpen size={16} />
                                     </Link>
                                 </div>
                             </div>
@@ -60,13 +59,18 @@ export default function HistoryPage() {
                     </div>
                 ) : (
                     <EmptyState 
-                        title="Hành trình chưa bắt đầu"
-                        subtitle="Lịch sử đọc của bạn hiện đang trống. Hãy khám phá những tác phẩm tuyệt vời ngay bây giờ!"
-                        actionText="Khám phá ngay"
+                        title="HÀNH TRÌNH CHƯA BẮT ĐẦU"
+                        subtitle="Lịch sử đọc của bạn hiện đang trống. Hãy khám phá những tác phẩm tinh hoa ngay bây giờ!"
+                        actionText="KHÁM PHÁ NGAY"
                         actionUrl="/"
                     />
                 )}
             </div>
+            <style jsx>{`
+                .header-left-industrial { flex: 1; }
+                .history-node-titan { animation: fadeUp 0.8s both var(--delay); }
+                @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+            `}</style>
         </main>
     );
 }

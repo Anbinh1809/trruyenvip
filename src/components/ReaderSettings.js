@@ -1,174 +1,262 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Settings, Eye, Layout, Sun, Monitor, Smartphone, Type } from 'lucide-react';
+import { Settings, Eye, EyeOff, Layout, Palette, Monitor } from 'lucide-react';
 
 export default function ReaderSettings() {
   const [isOpen, setIsOpen] = useState(false);
-  const [filter, setFilter] = useState('none');
-  const [brightness, setBrightness] = useState(1);
+  const [incognito, setIncognito] = useState(false);
   const [isWebtoon, setIsWebtoon] = useState(true);
-  const [mounted, setMounted] = useState(false);
-
-  const handleBrightnessChange = (val) => {
-    setBrightness(val);
-    localStorage.setItem('truyenvip_brightness', val);
-    document.documentElement.style.setProperty('--reader-brightness', val);
-  };
-
-  const handleFilterChange = (f) => {
-    setFilter(f);
-    localStorage.setItem('truyenvip_reader_filter', f);
-    
-    const root = document.documentElement;
-    switch (f) {
-      case 'sepia': 
-        root.style.setProperty('--reader-filter', 'sepia(0.5) contrast(0.9)'); 
-        root.style.setProperty('--reader-bg', '#f4ecd8');
-        root.style.setProperty('--reader-text', '#5b4636');
-        break;
-      case 'blue-light': 
-        root.style.setProperty('--reader-filter', 'sepia(0.3) brightness(0.9) hue-rotate(-10deg)'); 
-        root.style.setProperty('--reader-bg', '#e8f1f2');
-        root.style.setProperty('--reader-text', '#2c3e50');
-        break;
-      case 'dark': 
-        root.style.setProperty('--reader-filter', 'invert(0.9) hue-rotate(180deg)'); 
-        root.style.setProperty('--reader-bg', '#050505');
-        root.style.setProperty('--reader-text', '#ffffff');
-        break;
-      case 'none':
-        root.style.setProperty('--reader-filter', 'none');
-        root.style.setProperty('--reader-bg', '#ffffff');
-        root.style.setProperty('--reader-text', '#000000');
-        break;
-      default: 
-        root.style.setProperty('--reader-filter', 'none');
-        root.style.setProperty('--reader-bg', '#050505');
-        root.style.setProperty('--reader-text', '#ffffff');
-    }
-  };
+  const [filter, setFilter] = useState('none');
+  const [isHiFi, setIsHiFi] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setMounted(true), 0);
-    const savedFilter = localStorage.getItem('truyenvip_reader_filter') || 'none';
-    const savedBrightness = parseFloat(localStorage.getItem('truyenvip_brightness') || '1');
-    const savedMode = localStorage.getItem('truyenvip_reader_mode') !== 'single';
-    setFilter(savedFilter);
-    setBrightness(savedBrightness);
-    setIsWebtoon(savedMode);
-    handleFilterChange(savedFilter);
-    document.documentElement.style.setProperty('--reader-brightness', savedBrightness);
-    return () => clearTimeout(timer);
+    const incog = localStorage.getItem('truyenvip_incognito') === 'true';
+    const mode = localStorage.getItem('truyenvip_read_mode') || 'webtoon';
+    const filt = localStorage.getItem('truyenvip_filter') || 'none';
+    const hifi = localStorage.getItem('truyenvip_hifi') === 'true';
+
+    setIncognito(incog);
+    setIsWebtoon(mode === 'webtoon');
+    setFilter(filt);
+    setIsHiFi(hifi);
   }, []);
 
-  const handleModeChange = (val) => {
-    setIsWebtoon(val);
-    localStorage.setItem('truyenvip_reader_mode', val ? 'webtoon' : 'single');
+  const toggleIncognito = () => {
+    const newVal = !incognito;
+    setIncognito(newVal);
+    localStorage.setItem('truyenvip_incognito', newVal.toString());
   };
 
-  useEffect(() => {
-    handleFilterChange(filter);
-  }, [filter]);
+  const toggleWebtoon = (val) => {
+    setIsWebtoon(val);
+    localStorage.setItem('truyenvip_read_mode', val ? 'webtoon' : 'page');
+  };
+
+  const updateFilter = (val) => {
+    setFilter(val);
+    localStorage.setItem('truyenvip_filter', val);
+  };
+
+  const toggleHiFi = () => {
+    const newVal = !isHiFi;
+    setIsHiFi(newVal);
+    localStorage.setItem('truyenvip_hifi', newVal.toString());
+    window.location.reload(); 
+  };
 
   return (
     <>
-      <div className="titan-reader-hud" onClick={() => setIsOpen(!isOpen)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Settings size={22} className={isOpen ? 'rotate-90' : ''} style={{ transition: 'transform 0.3s' }} />
+      <div className="titan-reader-hud" onClick={() => setIsOpen(!isOpen)} title="Cài đặt trình đọc">
+        <div className={`settings-icon-wrapper ${isOpen ? 'is-active' : ''}`}>
+          <Settings size={22} />
+        </div>
       </div>
 
       {isOpen && (
-        <div className="titan-reader-panel fade-in glass glass-scrollbar" style={{ zIndex: 10005 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-              <Monitor size={16} color="var(--accent)" />
-              <h4 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 950, letterSpacing: '0.5px' }}>Đọc Ẩn Danh</h4>
+        <div className="titan-reader-panel fade-in">
+          <div className="setting-header-industrial">
+              <span className="setting-icon-box">
+                {incognito ? <EyeOff size={18} /> : <Eye size={18} />}
+              </span>
+              <div className="setting-header-text">
+                  <h4 className="setting-main-title">Đọc Ẩn Danh</h4>
+                  <p className="setting-desc">Không lưu lịch sử đọc</p>
+              </div>
+              <button 
+                onClick={toggleIncognito} 
+                className={`titan-switch ${incognito ? 'active' : ''}`} 
+              />
           </div>
-          
+
           <div className="setting-group">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-                <Layout size={14} color="rgba(255,255,255,0.4)" />
-                <p style={{ margin: 0, fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', fontWeight: 700 }}>Chế độ hiển thị</p>
-            </div>
-            <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', padding: '4px', borderRadius: '12px' }}>
-              <button 
-                style={{ flex: 1, border: 'none', padding: '10px', borderRadius: '8px', fontSize: '0.75rem', cursor: 'pointer', background: isWebtoon ? 'var(--accent)' : 'transparent', color: isWebtoon ? 'white' : 'rgba(255,255,255,0.6)', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }} 
-                onClick={() => handleModeChange(true)}
-              >
-                <Smartphone size={14} /> Cuộn dọc
-              </button>
-              <button 
-                style={{ flex: 1, border: 'none', padding: '10px', borderRadius: '8px', fontSize: '0.75rem', cursor: 'pointer', background: !isWebtoon ? 'var(--accent)' : 'transparent', color: !isWebtoon ? 'white' : 'rgba(255,255,255,0.6)', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }} 
-                onClick={() => handleModeChange(false)}
-              >
-                <Type size={14} /> Từng trang
-              </button>
-            </div>
-          </div>
-
-          <div className="setting-group" style={{ marginTop: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-                <Sun size={14} color="rgba(255,255,255,0.4)" />
-                <p style={{ margin: 0, fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', fontWeight: 700 }}>Nền màn hình</p>
-            </div>
-            <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', padding: '4px', borderRadius: '12px' }}>
-              <button 
-                style={{ flex: 1, border: 'none', padding: '10px', borderRadius: '8px', fontSize: '0.75rem', cursor: 'pointer', background: filter === 'none' ? 'var(--accent)' : 'transparent', color: filter === 'none' ? 'white' : 'rgba(255,255,255,0.6)', fontWeight: 800 }} 
-                onClick={() => handleFilterChange('none')}
-              >
-                Sáng
-              </button>
-              <button 
-                style={{ flex: 1, border: 'none', padding: '10px', borderRadius: '8px', fontSize: '0.75rem', cursor: 'pointer', background: filter === 'dark' ? 'var(--accent)' : 'transparent', color: filter === 'dark' ? 'white' : 'rgba(255,255,255,0.6)', fontWeight: 800 }} 
-                onClick={() => handleFilterChange('dark')}
-              >
-                Tối
-              </button>
+            <label className="setting-label">
+                <Layout size={14} /> Chế độ hiển thị
+            </label>
+            <div className="setting-control-row">
+                <button 
+                  onClick={() => toggleWebtoon(true)}
+                  className={`btn-setting-toggle ${isWebtoon ? 'active' : ''}`}
+                >
+                    Cuộn dọc
+                </button>
+                <button 
+                  onClick={() => toggleWebtoon(false)}
+                  className={`btn-setting-toggle ${!isWebtoon ? 'active' : ''}`}
+                >
+                    Từng trang
+                </button>
             </div>
           </div>
 
-          <div className="setting-group" style={{ marginTop: '20px' }}>
-            <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginBottom: '8px', fontWeight: 700 }}>Chất Lượng Hình Ảnh</p>
+          <div className="setting-group">
+            <label className="setting-label">
+                <Palette size={14} /> Nền màn hình
+            </label>
+            <div className="setting-control-row">
+                <button 
+                  onClick={() => updateFilter('none')}
+                  className={`btn-setting-toggle ${filter === 'none' ? 'active' : ''}`}
+                >
+                    Mặc định
+                </button>
+                <button 
+                  onClick={() => updateFilter('dark')}
+                  className={`btn-setting-toggle ${filter === 'dark' ? 'active' : ''}`}
+                >
+                    Tối (OLED)
+                </button>
+            </div>
+          </div>
+
+          <div className="setting-group no-margin">
+            <label className="setting-label">
+                <Monitor size={14} /> Chất Lượng Hình Ảnh
+            </label>
             <div 
-              className="glass-action-item"
-              style={{ 
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
-                  background: 'rgba(255,255,255,0.05)', padding: '12px 15px', 
-                  borderRadius: '12px', cursor: 'pointer', border: '1px solid rgba(255,255,255,0.03)'
-              }}
-              onClick={() => {
-                  const current = localStorage.getItem('truyenvip_hifi') === 'true';
-                  localStorage.setItem('truyenvip_hifi', !current ? 'true' : 'false');
-                  window.dispatchEvent(new Event('storage'));
-                  setTimeout(() => window.location.reload(), 200);
-              }}
+              className={`hifi-toggle-card ${isHiFi ? 'active' : ''}`} 
+              onClick={toggleHiFi}
             >
-                <div>
-                    <div style={{ fontSize: '0.8rem', fontWeight: 800 }}>Chế độ Siêu nét 4K</div>
-                    <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>
-                        {mounted && localStorage.getItem('truyenvip_hifi') === 'true' ? 'Đang bật (Tốn dữ liệu)' : 'Đang tắt (Tiết kiệm)'}
-                    </div>
+                <div className="hifi-info">
+                    <div className="hifi-title">Chế độ Siêu nét 4K</div>
+                    <div className="hifi-sub">Yêu cầu mạng ổn định</div>
                 </div>
-                <div style={{ 
-                    width: '38px', height: '22px', borderRadius: '11px', 
-                    background: mounted && localStorage.getItem('truyenvip_hifi') === 'true' ? 'var(--accent)' : 'rgba(255,255,255,0.1)',
-                    position: 'relative', transition: '0.3s'
-                }}>
-                    <div style={{ 
-                        width: '16px', height: '16px', borderRadius: '50%', background: 'white',
-                        position: 'absolute', top: '3px', 
-                        left: mounted && localStorage.getItem('truyenvip_hifi') === 'true' ? '19px' : '3px',
-                        transition: '0.3s',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
-                    }} />
-                </div>
+                <div className={`titan-checkbox ${isHiFi ? 'checked' : ''}`} />
             </div>
-            <p style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.2)', marginTop: '10px', fontStyle: 'italic', lineHeight: '1.4' }}>
-                * Mặc định hệ thống nén ảnh thông minh để tối ưu 50% băng thông mà vẫn đảm bảo độ nét chuẩn trên Mobile.
-            </p>
+            <p className="setting-footer-hint">Tự động tối ưu hóa cho đường truyền nội bộ.</p>
           </div>
         </div>
       )}
+
+      <style jsx global>{`
+        .settings-icon-wrapper {
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+        }
+        .settings-icon-wrapper.is-active {
+            transform: rotate(90deg);
+        }
+        .setting-group.no-margin {
+            margin-bottom: 0 !important;
+        }
+        .setting-header-industrial {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .setting-icon-box {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 62, 62, 0.1);
+            border: 1px solid rgba(255, 62, 62, 0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+        }
+        .setting-main-title {
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 950;
+            color: white;
+            letter-spacing: -0.5px;
+        }
+        .setting-desc {
+            margin: 0;
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 750;
+        }
+        .titan-switch {
+            margin-left: auto;
+            width: 44px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+        .titan-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .titan-switch.active {
+            background: var(--accent);
+        }
+        .titan-switch.active::after {
+            left: calc(100% - 22px);
+        }
+        .hifi-toggle-card {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .hifi-toggle-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+        .hifi-toggle-card.active {
+            border-color: var(--accent);
+            background: rgba(255, 62, 62, 0.04);
+        }
+        .hifi-title {
+            font-size: 0.85rem;
+            font-weight: 900;
+            color: white;
+        }
+        .hifi-sub {
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.3);
+            font-weight: 750;
+            margin-top: 2px;
+        }
+        .titan-checkbox {
+            width: 22px;
+            height: 22px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            position: relative;
+            transition: all 0.3s;
+        }
+        .titan-checkbox.checked {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+        .titan-checkbox.checked::after {
+            content: '✓';
+            color: white;
+            font-size: 14px;
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .setting-footer-hint {
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.2);
+            margin-top: 15px;
+            font-style: italic;
+            font-weight: 700;
+        }
+      `}</style>
     </>
   );
 }

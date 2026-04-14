@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState, memo } from 'react';
 import { useFavorites } from '@/context/FavoritesContext';
-import { Bookmark, Star } from 'lucide-react';
+import { Bookmark, Star, Eye } from 'lucide-react';
 
 function MangaCard({ manga, isNew = false }) {
   const coverUrl = manga.cover?.startsWith('http') 
@@ -31,7 +31,6 @@ function MangaCard({ manga, isNew = false }) {
     return num.toString();
   };
 
-
   const formatTimeAgo = (dateStr) => {
     if (!dateStr) return 'Vừa xong';
     const now = new Date();
@@ -47,29 +46,18 @@ function MangaCard({ manga, isNew = false }) {
 
   return (
     <Link href={`/manga/${manga.id}`} className="manga-card-titan fade-up">
-      <div 
-        className={`card-media-titan ${!isLoaded ? 'skeleton-shimmer' : ''}`} 
-        style={{ 
-            aspectRatio: '4/5.2', 
-            borderRadius: 'var(--border-radius)', 
-            overflow: 'hidden', 
-            position: 'relative',
-            background: '#0a0a0a' // Solid anchor to prevent transparency flicker
-        }}
-      >
+      <div className={`card-media-titan ${!isLoaded ? 'skeleton-shimmer' : ''}`}>
         <Image 
           src={imgSrc} 
           alt={manga.title} 
           fill
           sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 20vw"
-          className="card-img-titan" 
-          style={{ opacity: isLoaded ? 1 : 0, transition: 'opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1)' }}
+          className={`card-img-titan ${isLoaded ? 'is-loaded' : ''}`} 
           onLoad={() => setIsLoaded(true)}
           onError={handleImgError}
           priority={isNew}
         />
         
-        {/* Badges on Top-Left */}
         <div className="manga-badge-container">
             <span className="manga-tag badge-time">
                 {formatTimeAgo(manga.last_crawled)}
@@ -81,7 +69,6 @@ function MangaCard({ manga, isNew = false }) {
             )}
         </div>
 
-        {/* Bookmark Button on Top-Right */}
         <button 
             className={`bookmark-btn ${favorited ? 'active' : ''}`}
             aria-label={favorited ? "Xóa khỏi yêu thích" : "Thêm vào yêu thích"}
@@ -94,24 +81,55 @@ function MangaCard({ manga, isNew = false }) {
             {favorited ? <Bookmark size={18} fill="currentColor" /> : <Bookmark size={18} />}
         </button>
 
-        {/* Subtle hover overlay */}
         <div className="card-overlay-titan">
-             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', fontWeight: 800, color: 'white' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>{manga.rating || '4.5'} <Star size={10} fill="currentColor" /></span>
-                  <span style={{ color: 'rgba(255,255,255,0.4)' }}>|</span>
-                  <span>{formatViews(views)} lượt xem</span>
+             <div className="card-stats-row">
+                  <span className="stat-item rating-text">
+                      {manga.rating || '4.5'} <Star size={11} fill="var(--accent)" color="var(--accent)" />
+                  </span>
+                  <span className="stat-divider">|</span>
+                  <span className="stat-item view-text">
+                    <Eye size={12} className="inline-icon" /> {formatViews(views)}
+                  </span>
              </div>
         </div>
       </div>
 
-      {/* Centered Text Content */}
-      <h3 className="card-title-centered truncate-2">{manga.title}</h3>
+      <h3 className="card-title-centered truncate-1">{manga.title}</h3>
       <p className="card-chapter-centered">
         {manga.last_chap_num && isNaN(manga.last_chap_num) ? 
             manga.last_chap_num : 
             (manga.last_chap_num && manga.last_chap_num !== '0' ? `Chương ${manga.last_chap_num}` : 'Đang cập nhật')
         }
       </p>
+
+      <style jsx>{`
+        .card-stats-row {
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            font-size: 0.75rem; 
+            font-weight: 950; 
+            color: white;
+        }
+        .stat-item {
+            display: flex; 
+            align-items: center; 
+            gap: 4px;
+        }
+        .stat-divider {
+            opacity: 0.3;
+        }
+        .inline-icon {
+            opacity: 0.6;
+        }
+        .card-img-titan {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .card-img-titan.is-loaded {
+            opacity: 1;
+        }
+      `}</style>
     </Link>
   );
 }

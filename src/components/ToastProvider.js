@@ -14,7 +14,7 @@ export function ToastProvider({ children }) {
     
     setTimeout(() => {
       setToasts((prev) => prev.filter(t => t.id !== id));
-    }, 5000); // 5s for readability
+    }, 5000); 
   }, []);
 
   const value = useMemo(() => ({ addToast }), [addToast]);
@@ -26,12 +26,12 @@ export function ToastProvider({ children }) {
         {toasts.map(toast => (
           <div 
             key={toast.id} 
-            className={`toast-titan ${toast.type} fade-up`}
+            className={`toast-titan toast-industrial ${toast.type} fade-up`}
           >
             <div className="toast-icon">
               {toast.type === 'success' ? <CheckCircle size={18} /> : (toast.type === 'error' ? <AlertCircle size={18} /> : <InfoIcon size={18} />)}
             </div>
-            <div className="toast-content" style={{ fontWeight: 600 }}>
+            <div className="toast-content toast-content-industrial">
               {toast.message}
             </div>
           </div>
@@ -41,12 +41,10 @@ export function ToastProvider({ children }) {
   );
 }
 
-// HARDENED HOOK: Prevents build-time crashes if used outside provider
 export const useToast = () => {
     const context = useContext(ToastContext);
     if (!context) {
-        // Return a dummy addToast to prevent destructuring errors during SSR/Build
-        return { addToast: () => console.warn('[Toast] addToast called outside provider') };
+        return { addToast: () => {} };
     }
     return context;
 };

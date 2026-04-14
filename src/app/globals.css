@@ -1,3 +1,5 @@
+@import './titan-pages.css';
+@import './titan-components.css';
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
@@ -40,7 +42,7 @@
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
   --accent: #ff3e3e;
-  --accent-gradient: linear-gradient(135deg, #ff3e3e 0%, #ff7e5f 100%);
+  --accent-gradient: linear-gradient(135deg, #ff3e3e 0%, #b91c1c 100%);
   --glass-bg: #111827;
   --glass-border: rgba(255, 255, 255, 0.05);
   --glass-blur: none;
@@ -52,9 +54,9 @@
   --font-heading: 'Outfit', sans-serif;
   /* Z-Index Architecture: Standardized Global Layers */
   --z-header: 1000;
-  --z-search: 2000;
-  --z-progress: 2100;
-  --z-modal: 5000;
+  --z-search: 3500;
+  --z-progress: 4000;
+  --z-modal: 6000;
   --z-mobile-nav: 9999;
 
   /* Nebula Design Tokens */
@@ -425,8 +427,13 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
 .manga-card-titan { transition: var(--transition); }
 
 .card-media-titan {
-  position: relative; aspect-ratio: 2/3; border-radius: var(--border-radius); overflow: hidden;
-  border: 1px solid var(--glass-border); transition: all 0.2s ease;
+  position: relative; 
+  aspect-ratio: 4/5.4; 
+  border-radius: 12px; 
+  overflow: hidden;
+  border: 1px solid var(--glass-border); 
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  background: #0a0a0a;
 }
 
 .manga-card-titan:hover .card-media-titan {
@@ -443,9 +450,18 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
 .manga-card-titan:hover .card-img-titan { transform: scale(1.08); }
 
 .card-overlay-titan {
-    position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 40%);
-    display: flex; flex-direction: column; justify-content: flex-end; padding: 15px; 
-    opacity: 0; transition: opacity 0.3s ease; z-index: 10;
+    position: absolute; 
+    inset: 0; 
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
+    display: flex; 
+    flex-direction: column; 
+    justify-content: flex-end; 
+    padding: 15px; 
+    opacity: 0; 
+    transition: all 0.3s ease; 
+    z-index: 10;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
 }
 .manga-card-titan:hover .card-overlay-titan { opacity: 1; }
 
@@ -484,8 +500,10 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
 .card-chapter-centered {
     text-align: center;
     font-size: 0.8rem;
-    font-weight: 500;
-    color: var(--text-muted);
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+    opacity: 0.8;
 }
 
 .skeleton { animation: shimmer 2s infinite; background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%); background-size: 1000px 100%; }

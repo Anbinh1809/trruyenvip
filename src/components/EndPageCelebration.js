@@ -1,129 +1,46 @@
 'use client';
 
-import { useEngagement } from '@/context/EngagementContext';
 import Link from 'next/link';
-import { Scroll, Search, Library } from 'lucide-react';
+import { Home, Bookmark, ArrowRight } from 'lucide-react';
 
-export default function EndPageCelebration({ mangaId, mangaTitle }) {
-    const { rankTitle } = useEngagement();
-
+export default function EndPageCelebration() {
     return (
-        <div className="end-celebration-titan fade-in">
-            <div className="celebration-glass-box">
-                <div className="celebration-icon-large">
-                    <Scroll size={80} strokeWidth={1} />
-                </div>
-                <h2 className="celebration-headline">CHÚC MỪNG BẠN!</h2>
-                <div className="rank-badge-finish">{rankTitle}</div>
-                <p className="celebration-message">
-                    Bạn đã đọc đến chương cuối cùng của bộ <strong>{mangaTitle}</strong>. 
-                    Tốc độ thật đáng khâm phục!
-                </p>
-                
-                <div className="celebration-divider" />
-                
-                <div className="next-steps-titan">
-                    <p style={{ fontSize: '0.8rem', opacity: 0.6, marginBottom: '20px', textTransform: 'uppercase', letterSpacing: '1px' }}>Mời bạn tham khảo thêm các tác phẩm khác:</p>
-                    <div className="action-grid-finish">
-                        <Link href="/" className="btn btn-accent btn-large" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-                            <Search size={18} />
-                            Tìm Tác Phẩm Mới
-                        </Link>
-                        <Link href="/bookmarks" className="btn btn-glass btn-large" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-                            <Library size={18} />
-                            Xem Tủ Truyện
-                        </Link>
-                    </div>
-                </div>
+        <div className="celebration-industrial glass-titan fade-in">
+            <h2 className="empty-title">CHÚC MỪNG BẠN ĐÃ ĐỌC XONG!</h2>
+            <span className="celebration-label">Hành trình tuyệt vời, mời bạn xem thêm các tác phẩm khác</span>
+            
+            <div className="celebration-actions">
+                <Link href="/" className="btn btn-primary btn-large-titan">
+                    <Home size={20} /> QUAY VỀ TRANG CHỦ
+                </Link>
+                <Link href="/bookmarks" className="btn btn-glass btn-large-titan">
+                    <Bookmark size={20} /> VÀO KHO TRUYỆN CÁ NHÂN
+                </Link>
+                <Link href="/genres" className="btn btn-outline-clear-industrial btn-large-titan">
+                    TÌM THỂ LOẠI MỚI <ArrowRight size={18} />
+                </Link>
             </div>
-
+            
             <style jsx>{`
-                .end-celebration-titan {
-                    padding: 80px 20px;
-                    display: flex;
-                    justify-content: center;
-                    background: linear-gradient(to bottom, transparent, rgba(255, 62, 62, 0.05));
-                }
-                .celebration-glass-box {
-                    max-width: 600px;
-                    width: 100%;
-                    background: rgba(255, 255, 255, 0.02);
-                    border: 1px solid rgba(255, 255, 255, 0.08);
-                    border-radius: 4px;
-                    padding: 50px 35px;
-                    text-align: center;
-                }
-                .celebration-glass-box::before {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    right: 0;
-                    width: 150px;
-                    height: 150px;
-                    background: radial-gradient(circle, rgba(255, 62, 62, 0.1) 0%, transparent 70%);
-                    z-index: -1;
-                }
-                .celebration-icon-large {
-                    color: var(--accent);
-                    margin-bottom: 25px;
-                    display: flex;
-                    justify-content: center;
-                    opacity: 0.8;
-                }
-                .celebration-headline {
-                    font-size: 2.2rem;
-                    font-weight: 950;
-                    letter-spacing: 2px;
+                .btn-glass {
+                    background: rgba(255, 255, 255, 0.08);
+                    backdrop-filter: blur(10px);
                     color: white;
-                    margin-bottom: 15px;
+                    border: 1px solid rgba(255, 255, 255, 0.1);
                 }
-                .rank-badge-finish {
-                    display: inline-block;
-                    padding: 4px 16px;
-                    background: var(--accent);
+                .btn-glass:hover {
+                    background: rgba(255, 255, 255, 0.12);
+                    border-color: rgba(255, 255, 255, 0.2);
+                }
+                .btn-outline-clear-industrial {
+                    background: transparent;
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    color: rgba(255, 255, 255, 0.6);
+                }
+                .btn-outline-clear-industrial:hover {
+                    background: rgba(255, 255, 255, 0.05);
+                    border-color: var(--accent);
                     color: white;
-                    border-radius: 4px;
-                    font-weight: 800;
-                    font-size: 0.8rem;
-                    margin-bottom: 25px;
-                }
-                .celebration-message {
-                    font-size: 1.1rem;
-                    line-height: 1.8;
-                    color: rgba(255,255,255,0.7);
-                    margin-bottom: 30px;
-                }
-                .celebration-divider {
-                    height: 1px;
-                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-                    margin: 40px 0;
-                }
-                .action-grid-finish {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 15px;
-                }
-                .btn-large {
-                    padding: 14px 20px;
-                    border-radius: 4px;
-                    font-weight: 800;
-                    font-size: 0.9rem;
-                    transition: var(--transition);
-                }
-                .btn-accent:hover {
-                    transform: translateY(-3px);
-                    box-shadow: 0 15px 30px rgba(255, 62, 62, 0.4);
-                }
-                @media (max-width: 600px) {
-                    .action-grid-finish {
-                        grid-template-columns: 1fr;
-                    }
-                    .celebration-glass-box {
-                        padding: 40px 20px;
-                    }
-                    .celebration-headline {
-                        font-size: 1.8rem;
-                    }
                 }
             `}</style>
         </div>

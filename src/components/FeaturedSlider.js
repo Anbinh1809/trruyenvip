@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Play, Info } from 'lucide-react';
 
 export default function FeaturedSlider({ mangaList }) {
   const slides = (mangaList || []).slice(0, 5); // Top 5
@@ -56,12 +57,12 @@ export default function FeaturedSlider({ mangaList }) {
 
   return (
     <section 
-        className="titan-slider"
+        className="titan-slider fade-in"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
     >
-        <div className="titan-slider-container" style={{ position: 'relative', overflow: 'hidden' }}>
+        <div className="titan-slider-container">
             {slides.map((manga, idx) => {
                 const coverUrl = manga.cover?.startsWith('http') 
                     ? `/api/proxy?url=${encodeURIComponent(manga.cover)}` 
@@ -71,29 +72,29 @@ export default function FeaturedSlider({ mangaList }) {
                     <div 
                         key={manga.id} 
                         className={`titan-slide ${idx === current ? 'active' : ''}`}
-                        style={{ 
-                            transition: 'opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                            zIndex: idx === current ? 10 : 1,
-                        }}
                     >
                         <Image 
-                            src={coverUrl} 
+                            src={coverUrl || '/placeholder-manga.svg'} 
                             alt={manga.title || 'Manga Cover'} 
                             fill 
-                            priority={idx <= 1} 
-                            loading={idx > 1 ? 'lazy' : undefined}
+                            priority={idx === 0}
+                            sizes="100vw"
                             className="titan-slide-image-masked"
                         />
                         <div className="titan-slide-overlay-premium" />
                         <div className="titan-slide-content-premium container">
-                            <div className="badge-red" style={{ padding: '5px 12px', borderRadius: 'var(--border-radius)', fontSize: '0.7rem', letterSpacing: '1px', marginBottom: '20px', width: 'fit-content' }}>TRUYỆN NỔI BẬT</div>
+                            <div className="hero-tag-industrial">TRUYỆN NỔI BẬT</div>
                             <h2 className="hero-title-titan">{manga.title}</h2>
-                            <p style={{ fontSize: '1.2rem', color: 'var(--text-primary)', opacity: 0.9, marginBottom: '40px', lineHeight: '1.6', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', maxWidth: '600px', textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
+                            <p className="hero-desc-industrial">
                                 Khám phá hành trình đầy kịch tính của {manga.title}. Đọc ngay để theo dõi những tình tiết mới nhất vừa được cập nhật tại TruyenVip.
                             </p>
-                            <div style={{ display: 'flex', gap: '20px' }}>
-                                <Link href={`/manga/${manga.id}`} className="btn btn-primary" style={{ padding: '16px 36px' }}>Đọc ngay</Link>
-                                <Link href={`/manga/${manga.id}`} className="btn btn-outline" style={{ background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(10px)' }}>Chi tiết</Link>
+                            <div className="hero-actions-industrial">
+                                <Link href={`/manga/${manga.id}`} className="btn btn-primary hero-btn-main">
+                                    <Play size={18} fill="currentColor" /> ĐỌC NGAY
+                                </Link>
+                                <Link href={`/manga/${manga.id}`} className="btn btn-glass hero-btn-sub">
+                                    <Info size={18} /> CHI TIẾT
+                                </Link>
                             </div>
                         </div>
                     </div>
@@ -101,7 +102,7 @@ export default function FeaturedSlider({ mangaList }) {
             })}
         </div>
 
-        <div style={{ position: 'absolute', bottom: '50px', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '15px', zIndex: 20 }}>
+        <div className="titan-slider-indicators">
             {slides.map((_, idx) => (
                 <div 
                     key={idx} 

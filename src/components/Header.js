@@ -21,7 +21,7 @@ export default function Header() {
   
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
 
     // Titan Heartbeat: Extend session
     let heartbeatInterval;
@@ -38,9 +38,15 @@ export default function Header() {
   }, [isAuthenticated]);
 
   useEffect(() => {
-    document.body.style.overflow = isMenuOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [isMenuOpen]);
+    if (isMenuOpen || isSearchOpen) {
+        document.body.classList.add('no-scroll-titan');
+    } else {
+        document.body.classList.remove('no-scroll-titan');
+    }
+    return () => { document.body.classList.remove('no-scroll-titan'); };
+  }, [isMenuOpen, isSearchOpen]);
+
+  if (!mounted) return null;
 
   return (
     <header className={`titan-header ${isScrolled ? 'header-scrolled' : ''}`}>
@@ -49,12 +55,14 @@ export default function Header() {
           <HeaderLogo />
 
           <nav className={`nav-titan ${isMenuOpen ? 'nav-open' : ''}`}>
-            <div className="mobile-only-header" style={{ display: isMenuOpen ? 'flex' : 'none', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: '30px' }}>
+            <div className="mobile-only-header">
                 <HeaderLogo />
-                <button className="close-btn" onClick={() => setIsMenuOpen(false)}><X size={24} /></button>
+                <button className="titan-icon-btn" onClick={() => setIsMenuOpen(false)}>
+                    <X size={20} />
+                </button>
             </div>
             
-            <div className="desktop-search-container desktop-only">
+            <div className="desktop-search-container">
                 <LiveSearch />
             </div>
             
@@ -65,29 +73,56 @@ export default function Header() {
             </div>
           </nav>
 
+          {/* MOBILE SEARCH OVERLAY (HUD) */}
           {isSearchOpen && (
-              <div className="mobile-search-hud fade-in">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '30px' }}>
-                      <button onClick={() => setIsSearchOpen(false)} className="titan-icon-btn"><X size={24} /></button>
-                      <h3 style={{ margin: 0, fontWeight: 950, letterSpacing: '-1px' }}>Tìm kiếm</h3>
+              <div className="mobile-search-hud-industrial fade-in">
+                  <div className="search-hud-header-industrial">
+                      <button onClick={() => setIsSearchOpen(false)} className="titan-icon-btn">
+                          <X size={20} />
+                      </button>
+                      <h3 className="search-hud-title-industrial">Tìm truyện</h3>
                   </div>
                   <LiveSearch onSelect={() => setIsSearchOpen(false)} />
               </div>
           )}
 
           <div className="header-actions">
-            <button className="search-toggle-mobile mobile-only titan-icon-btn" onClick={() => setIsSearchOpen(true)}>
+            <button className="mobile-only titan-icon-btn" onClick={() => setIsSearchOpen(true)}>
               <Search size={18} />
             </button>
 
             <UserActions loading={loading} />
 
-            <button className="mobile-menu-btn desktop-hide titan-icon-btn" onClick={() => setIsMenuOpen(true)}>
-              <Menu size={20} color="white" />
+            <button className="mobile-only titan-icon-btn" onClick={() => setIsMenuOpen(true)}>
+              <Menu size={20} />
             </button>
           </div>
         </div>
       </div>
+      <style jsx>{`
+        .mobile-search-hud-industrial {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-primary);
+            z-index: 6000;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .search-hud-header-industrial {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .search-hud-title-industrial {
+            margin: 0;
+            font-weight: 950;
+            letter-spacing: -1px;
+            font-size: 1.5rem;
+            color: white;
+        }
+      `}</style>
     </header>
   );
 }

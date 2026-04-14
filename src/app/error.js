@@ -11,31 +11,40 @@ export default function Error({ error, reset }) {
   }, [error]);
 
   return (
-    <div className="titan-chaos-wrap fade-in">
-      <div className="titan-chaos-card">
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '25px' }}>
-          <AlertTriangle size={60} color="var(--accent)" />
-        </div>
-        <h1 style={{ fontSize: '2rem', fontWeight: 900, marginBottom: '15px', letterSpacing: '1px' }}>HỆ THỐNG GIÁN ĐOẠN</h1>
-        <p style={{ fontSize: '1rem', lineHeight: 1.6, color: 'var(--text-secondary)', marginBottom: '30px', fontWeight: 500 }}>
-            Đã xảy ra lỗi không mong muốn trong quá trình xử lý. Vui lòng thử tải lại trang hoặc quay về trang chủ.
-        </p>
-        
-        {error?.digest && (
-            <p style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.2)', marginBottom: '20px', fontStyle: 'italic' }}>
-                Error ID: {error.digest}
+    <div className="main-wrapper titan-bg">
+        <div className="system-center-industrial fade-in">
+            <div className="center-icon-titan">
+                <AlertTriangle size={100} color="var(--accent)" className="pulse-titan" />
+            </div>
+            
+            <h1 className="system-title-industrial">THẬP TỰ ĐOẠN GIỚI</h1>
+            <p className="system-desc-industrial">
+                Hệ thống đã phát sinh một lỗi không lường trước. Kết nối đồng bộ đã bị gián đoạn tạm thời.
             </p>
-        )}
+            
+            {error?.digest && (
+                <div className="error-digest-tag">
+                    PROTOCOL_DIGEST: {error.digest}
+                </div>
+            )}
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            <button className="btn btn-primary" onClick={() => reset()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '15px 30px', borderRadius: '15px', fontWeight: 800 }}>
-                <RefreshCw size={20} /> Tải Lại Trang
-            </button>
-            <Link href="/" className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '15px 30px', borderRadius: '15px', fontWeight: 800, background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)', textDecoration: 'none', color: 'white' }}>
-                <Home size={20} /> Quay Lại Trang Chủ
-            </Link>
+            <div className="system-action-group">
+                <button className="btn btn-primary err-action-btn-titan" onClick={() => reset()}>
+                    <RefreshCw size={20} /> TẢI LẠI TRANG
+                </button>
+                <Link href="/" className="btn btn-glass err-action-btn-titan">
+                    <Home size={20} /> QUAY VỀ TRANG CHỦ
+                </Link>
+            </div>
         </div>
-      </div>
+        <style jsx>{`
+            .center-icon-titan { margin-bottom: 40px; }
+            .pulse-titan { filter: drop-shadow(0 0 20px rgba(255, 62, 62, 0.4)); animation: pulse 2s infinite; }
+            .error-digest-tag { font-family: monospace; font-size: 0.7rem; color: rgba(255,255,255,0.2); margin-bottom: 30px; letter-spacing: 1px; background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); }
+            .system-action-group { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 350px; }
+            .err-action-btn-titan { height: 60px; font-weight: 950; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 12px; border-radius: 12px; }
+            @keyframes pulse { 0% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.05); opacity: 1; } 100% { transform: scale(1); opacity: 0.8; } }
+        `}</style>
     </div>
   );
 }

@@ -7,7 +7,7 @@ import { Gift, Trophy, Package, Sparkles, X, Gem, CheckCircle2 } from 'lucide-re
 export default function MissionPanel() {
   const { dailyMissions, openChest, rankTitle, mounted } = useEngagement();
   const [isOpen, setIsOpen] = useState(false);
-  const [openingChest, setOpeningChest] = useState(null); // { missionId, prize }
+  const [openingChest, setOpeningChest] = useState(null); 
   const [claimedPrize, setClaimedPrize] = useState(null);
 
   if (!mounted) return null;
@@ -16,7 +16,6 @@ export default function MissionPanel() {
     const prize = openChest(missionId);
     if (prize) {
       setOpeningChest({ missionId, prize });
-      // Simulate animation
       setTimeout(() => {
         setClaimedPrize(prize);
       }, 1500);
@@ -29,98 +28,59 @@ export default function MissionPanel() {
   };
 
   const completedCount = dailyMissions.missions.filter(m => m.current >= m.target).length;
+  const unclaimedCount = dailyMissions.missions.filter(m => m.current >= m.target && !m.claimed).length;
 
   return (
     <>
-      {/* Floating Toggle Button */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="mission-toggle glass"
-        style={{
-            position: 'fixed',
-            right: '20px',
-            bottom: '100px',
-            width: '46px',
-            height: '46px',
-            borderRadius: 'var(--border-radius)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 2000,
-            background: 'rgba(255, 62, 62, 0.4)',
-            border: completedCount > dailyMissions.missions.filter(m => m.claimed).length ? '1px solid var(--accent)' : '1px solid var(--glass-border)',
-            cursor: 'pointer',
-            transition: 'var(--transition)'
-        }}
+        className={`mission-toggle ${unclaimedCount > 0 ? 'has-rewards' : ''}`}
+        title="Nhiệm vụ hàng ngày"
       >
-        <span style={{ color: 'white' }}>
-            {isOpen ? <X size={24} /> : <Gift size={24} />}
-        </span>
-        {completedCount > dailyMissions.missions.filter(m => m.claimed).length && (
-            <span style={{ position: 'absolute', top: 0, right: 0, width: '16px', height: '16px', background: 'var(--accent)', borderRadius: '50%', border: '2px solid white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ width: '6px', height: '6px', background: 'white', borderRadius: '50%' }}></span>
-            </span>
-        )}
+        {isOpen ? <X size={24} /> : <Gift size={24} />}
+        {unclaimedCount > 0 && <span className="mission-dot-industrial" />}
       </button>
 
-      {/* Main Panel */}
       {isOpen && (
-        <div className="mission-panel-overlay fade-in" onClick={() => setIsOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 10001, display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end', padding: '20px', paddingBottom: '90px' }}>
-          <div className="mission-panel glass glass-scrollbar" onClick={(e) => e.stopPropagation()} style={{ width: '100%', maxWidth: '380px', maxHeight: '70vh', borderRadius: 'var(--border-radius)', padding: '24px', border: '1px solid var(--glass-border)', overflowY: 'auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ background: 'var(--accent)', padding: '8px', borderRadius: 'var(--border-radius)' }}>
+        <div className="mission-panel-overlay fade-in" onClick={() => setIsOpen(false)}>
+          <div className="mission-panel glass-scrollbar" onClick={(e) => e.stopPropagation()}>
+            <div className="mission-header-industrial">
+                <div className="mission-header-left">
+                    <div className="mission-icon-box">
                         <Trophy size={20} color="white" />
                     </div>
-                    <div>
-                        <h3 style={{ margin: 0, fontWeight: 950, fontSize: '1.2rem', letterSpacing: '-0.5px' }}>Tiến Độ</h3>
-                        <p style={{ margin: 0, fontSize: '0.7rem', opacity: 0.5, textTransform: 'uppercase', letterSpacing: '1px' }}>Thử thách hàng ngày</p>
+                    <div className="mission-header-text">
+                        <h3 className="mission-title-main">Tiến Độ</h3>
+                        <p className="mission-subtitle">Thử thách hàng ngày</p>
                     </div>
                 </div>
-                <span className="badge" style={{ background: 'rgba(255,255,255,0.05)', padding: '4px 10px', borderRadius: 'var(--border-radius)', fontSize: '0.75rem', fontWeight: 700, border: '1px solid var(--glass-border)' }}>{rankTitle}</span>
+                <span className="badge-titan-rank">{rankTitle}</span>
             </div>
 
-            <div className="mission-list" style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+            <div className="mission-list-industrial">
                 {dailyMissions.missions.map(m => {
                     const isDone = m.current >= m.target;
                     const progress = Math.min((m.current / m.target) * 100, 100);
                     return (
-                        <div key={m.id} className={`mission-item ${isDone ? 'done' : ''}`} style={{ padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: 'var(--border-radius)', border: '1px solid var(--glass-border)', transition: 'var(--transition)' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', alignItems: 'center' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div key={m.id} className={`mission-item ${isDone ? 'done' : ''}`}>
+                            <div className="mission-item-header">
+                                <div className="mission-item-left">
                                     {isDone ? <CheckCircle2 size={16} color="var(--accent)" /> : <Sparkles size={16} color="#60a5fa" />}
-                                    <span style={{ fontWeight: 700, fontSize: '0.9rem', color: isDone ? 'var(--accent)' : 'white' }}>{m.label}</span>
+                                    <span className="mission-label-text">{m.label}</span>
                                 </div>
-                                <span style={{ fontSize: '0.8rem', fontWeight: 800, color: isDone ? 'var(--accent)' : 'var(--text-secondary)' }}>{m.current}/{m.target}</span>
+                                <span className="mission-count-text">{m.current}/{m.target}</span>
                             </div>
-                            <div className="progress-bg" style={{ height: '6px', background: 'rgba(255,255,255,0.08)', borderRadius: 'var(--border-radius)', position: 'relative', overflow: 'hidden' }}>
+                            <div className="mission-progress-bg">
                                 <div 
-                                    className="progress-fill" 
-                                    style={{ 
-                                        width: `${progress}%`, 
-                                        height: '100%', 
-                                        background: isDone ? 'var(--accent)' : '#60a5fa', 
-                                        transition: 'width 0.5s ease',
-                                    }} 
-                                ></div>
+                                    className={`mission-progress-fill ${isDone ? 'is-done-fill' : ''}`} 
+                                    style={{ '--progress': `${progress}%` }} 
+                                />
                             </div>
                             {isDone && (
                                 <button 
-                                    className={`btn ${m.claimed ? 'btn-outline' : 'btn-primary'}`}
+                                    className={`btn ${m.claimed ? 'btn-outline' : 'btn-primary'} mission-reward-btn`}
                                     onClick={() => !m.claimed && handleOpenChest(m.id)}
                                     disabled={m.claimed}
-                                    style={{ 
-                                        width: '100%', 
-                                        marginTop: '14px', 
-                                        padding: '10px', 
-                                        fontSize: '0.85rem', 
-                                        fontWeight: 800, 
-                                        borderRadius: 'var(--border-radius)',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: '8px'
-                                    }}
                                 >
                                     {m.claimed ? <CheckCircle2 size={16} /> : <Gem size={16} />}
                                     {m.claimed ? 'Đã nhận thưởng' : 'Nhận phần thưởng'}
@@ -134,36 +94,201 @@ export default function MissionPanel() {
         </div>
       )}
 
-      {/* Chest Opening Celebration */}
       {openingChest && (
-        <div className="chest-celebration-overlay fade-in" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.95)', backdropFilter: 'blur(10px)', zIndex: 20002, display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-            <div className={`celebration-content ${claimedPrize ? 'titan-prize-zoom' : ''}`} style={{ padding: '40px' }}>
-                <div className="chest-animation" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    {claimedPrize ? (
-                        <div className="prize-reveal">
-                            <div style={{ marginBottom: '30px', filter: 'drop-shadow(0 0 30px var(--accent))' }}>
-                                {claimedPrize.type === 'coin' ? <Gem size={80} color="var(--accent)" /> : <Sparkles size={80} color="#60a5fa" />}
-                            </div>
-                            <h2 style={{ fontSize: '3.5rem', fontWeight: 950, color: 'white', marginBottom: '10px', letterSpacing: '-2px' }}>+{claimedPrize.amount}</h2>
-                            <p style={{ color: 'var(--accent)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', fontSize: '0.9rem' }}>{claimedPrize.type.toUpperCase()} THƯỞNG</p>
-                            <p style={{ color: 'rgba(255,255,255,0.4)', marginTop: '20px', maxWidth: '300px' }}>Chúc mừng bạn đã hoàn thành nhiệm vụ và nhận được phần quà này.</p>
-                            <button className="btn btn-primary" onClick={closeCelebration} style={{ marginTop: '35px', padding: '14px 50px' }}>ĐÓNG</button>
+        <div className="chest-celebration-overlay fade-in">
+            <div className={`prize-reveal-content ${claimedPrize ? 'titan-prize-zoom' : ''}`}>
+                {claimedPrize ? (
+                    <div className="prize-reveal-card">
+                        <div className="prize-icon-glow">
+                            {claimedPrize.type === 'coin' ? <Gem size={80} color="var(--accent)" /> : <Sparkles size={80} color="#60a5fa" />}
                         </div>
-                    ) : (
-                        <div className="titan-chest-shake">
-                            <div style={{ color: 'var(--accent)', animation: 'pulse 1s infinite' }}>
-                                <Package size={120} strokeWidth={1} />
-                            </div>
-                            <h3 style={{ marginTop: '30px', color: 'white', fontWeight: 900, fontSize: '1.4rem' }}>ĐANG XỬ LÝ PHẦN THƯỞNG...</h3>
-                            <div style={{ width: '100px', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', marginTop: '20px', overflow: 'hidden' }}>
-                                <div className="skeleton-shimmer" style={{ width: '100%', height: '100%' }}></div>
-                            </div>
+                        <h2 className="prize-amount">+{claimedPrize.amount}</h2>
+                        <p className="prize-type-label">{claimedPrize.type.toUpperCase()} THƯỞNG</p>
+                        <p className="prize-desc-text">Chúc mừng bạn đã hoàn thành nhiệm vụ và nhận được phần quà này.</p>
+                        <button className="btn btn-primary prize-close-btn" onClick={closeCelebration}>ĐÓNG</button>
+                    </div>
+                ) : (
+                    <div className="titan-chest-shake">
+                        <div className="pulse-chest">
+                            <Package size={120} strokeWidth={1} />
                         </div>
-                    )}
-                </div>
+                        <h3 className="celebration-sync-text">ĐANG XỬ LÝ PHẦN THƯỞNG...</h3>
+                        <div className="celebration-loader-bar">
+                            <div className="skeleton-shimmer full-height" />
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
       )}
+
+      <style jsx global>{`
+        .mission-dot-industrial {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 14px;
+            height: 14px;
+            background: var(--accent);
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+        .mission-header-industrial {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .mission-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .mission-icon-box {
+            background: var(--accent);
+            padding: 8px;
+            border-radius: 10px;
+            display: flex;
+        }
+        .mission-title-main {
+            margin: 0;
+            font-weight: 950;
+            font-size: 1.25rem;
+            color: white;
+            letter-spacing: -0.5px;
+        }
+        .mission-subtitle {
+            margin: 0;
+            font-size: 0.7rem;
+            opacity: 0.5;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 800;
+        }
+        .badge-titan-rank {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            border: 1px solid var(--glass-border);
+            color: white;
+        }
+        .mission-list-industrial {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .mission-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .mission-item-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .mission-label-text {
+            font-weight: 800;
+            font-size: 0.9rem;
+            color: white;
+        }
+        .mission-item.done .mission-label-text {
+            color: var(--accent);
+        }
+        .mission-count-text {
+            font-size: 0.8rem;
+            font-weight: 900;
+            color: rgba(255, 255, 255, 0.4);
+        }
+        .mission-item.done .mission-count-text {
+            color: var(--accent);
+        }
+        .mission-progress-bg {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+        .mission-progress-fill {
+            height: 100%;
+            width: var(--progress);
+            background: #60a5fa;
+            border-radius: 3px;
+            transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .mission-progress-fill.is-done-fill {
+            background: var(--accent);
+        }
+        .mission-reward-btn {
+            width: 100%;
+            margin-top: 15px;
+            height: 44px;
+            border-radius: 12px;
+            font-weight: 900;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .prize-icon-glow {
+            margin-bottom: 30px;
+            filter: drop-shadow(0 0 40px var(--accent));
+        }
+        .prize-amount {
+            font-size: 4rem;
+            font-weight: 950;
+            color: white;
+            margin-bottom: 5px;
+            letter-spacing: -3px;
+        }
+        .prize-type-label {
+            color: var(--accent);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 0.95rem;
+        }
+        .prize-desc-text {
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 25px;
+            max-width: 320px;
+            margin-left: auto;
+            margin-right: auto;
+            font-weight: 700;
+            line-height: 1.6;
+        }
+        .prize-close-btn {
+            margin-top: 40px;
+            padding: 15px 60px;
+            border-radius: 30px;
+            font-weight: 950;
+        }
+        .pulse-chest {
+            color: var(--accent);
+            animation: titan-pulse 1.5s infinite;
+        }
+        .celebration-sync-text {
+            margin-top: 30px;
+            color: white;
+            font-weight: 950;
+            font-size: 1.4rem;
+            letter-spacing: 1px;
+        }
+        .celebration-loader-bar {
+            width: 120px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin: 25px auto 0;
+            overflow: hidden;
+        }
+        .full-height { height: 100%; }
+      `}</style>
     </>
   );
 }

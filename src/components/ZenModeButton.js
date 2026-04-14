@@ -8,9 +8,7 @@ export default function ZenModeButton() {
 
     const toggleZen = () => {
         if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen().catch(err => {
-                console.error(`Error attempting to enable full-screen mode: ${err.message}`);
-            });
+            document.documentElement.requestFullscreen().catch(() => {});
         } else {
             document.exitFullscreen();
         }
@@ -19,11 +17,6 @@ export default function ZenModeButton() {
     useEffect(() => {
         const handleFSChange = () => {
             setIsFull(!!document.fullscreenElement);
-            if (document.fullscreenElement) {
-                document.body.classList.add('zen-mode-active');
-            } else {
-                document.body.classList.remove('zen-mode-active');
-            }
         };
 
         const handleKeyDown = (e) => {
@@ -33,28 +26,22 @@ export default function ZenModeButton() {
         };
 
         document.addEventListener('fullscreenchange', handleFSChange);
-        document.addEventListener('webkitfullscreenchange', handleFSChange);
         document.addEventListener('keydown', handleKeyDown);
         
         return () => {
             document.removeEventListener('fullscreenchange', handleFSChange);
-            document.removeEventListener('webkitfullscreenchange', handleFSChange);
             document.removeEventListener('keydown', handleKeyDown);
-            document.body.classList.remove('zen-mode-active');
         };
     }, []);
 
     return (
         <button 
             onClick={toggleZen}
-            className={`titan-zen-btn ${isFull ? 'active' : ''}`}
-            title={isFull ? "Thoát Zen" : "Chế độ Zen (Toàn màn hình)"}
-            style={{ position: 'relative', zIndex: 1001, display: 'flex', alignItems: 'center', gap: '10px' }}
+            className={`btn-reader-nav titan-zen-btn ${isFull ? 'active' : ''}`}
+            title={isFull ? "Thoát Zen" : "Chế độ Zen (Toàn màn hình) [Z]"}
         >
-            <span style={{ display: 'flex', alignItems: 'center' }}>
-                {isFull ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
-            </span>
-            <span className="titan-zen-text">{isFull ? 'Thoát Zen' : 'Zen Mode'}</span>
+            {isFull ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+            <span className="desktop-only border-accent-bottom">{isFull ? 'Thoát Zen' : 'Zen Mode'}</span>
         </button>
-    );
+  );
 }

@@ -3,8 +3,10 @@
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import Link from 'next/link';
+import { LogIn, User, Lock, ArrowRight } from 'lucide-react';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
@@ -16,75 +18,91 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
-
-    const res = await login(username, password);
-    setLoading(false);
+    setError('');
     
-    if (res.success) {
+    try {
+      const success = await login(username, password);
+      if (success) {
         router.push('/');
-    } else {
-        // Detailed Error Handling for Industrial Polish
-        const errorMsg = res.error || 'Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản.';
-        setError(errorMsg);
+      } else {
+        setError('Tên đăng nhập hoặc mật khẩu không chính xác.');
+      }
+    } catch (err) {
+      setError('Đã xảy ra lỗi kết nối. Vui lòng thử lại.');
+    } finally {
+      setLoading(false);
     }
   };
 
-    return (
-        <main className="auth-page titan-bg" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-            <Header />
-            
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', position: 'relative', zIndex: 1 }}>
-                <div className="auth-container-titan fade-up" style={{ textAlign: 'center' }}>
-                    <div style={{ display: 'inline-block', padding: '4px 14px', background: 'rgba(255, 62, 62, 0.1)', border: '1px solid rgba(255, 62, 62, 0.3)', color: 'var(--accent)', borderRadius: 'var(--border-radius)', fontSize: '0.7rem', fontWeight: 800, letterSpacing: '2px', marginBottom: '20px' }}>
-                        TRUYEN VIP
-                    </div>
-                    <div className="auth-header">
-                        <h1 className="auth-title-titan">Chào mừng!</h1>
-                        <p className="auth-subtitle-titan">Đọc truyện tranh chất lượng cao tại TruyenVip</p>
-                    </div>
+  return (
+    <main className="main-wrapper titan-bg auth-page">
+      <Header />
+      
+      <div className="auth-wrapper-industrial">
+        <div className="auth-card-titan shadow-titan fade-up">
+            <div className="auth-badge-titan">TRUYENVIP SECURE LOGIN</div>
+            <h1 className="auth-title-industrial">ĐĂNG NHẬP</h1>
+            <p className="auth-subtitle-industrial">Truy cập vào thư viện và bộ sưu tập cá nhân của bạn.</p>
 
-                    <form className="auth-form-titan" onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '25px', textAlign: 'left' }}>
-                        {error && <div style={{ padding: '12px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#ef4444', borderRadius: 'var(--border-radius)', fontSize: '0.85rem', fontWeight: 700, textAlign: 'center' }}>{error}</div>}
-                        
-                        <div className="input-field-titan">
-                            <label className="input-label-titan">Tên đăng nhập</label>
-                            <input 
-                                className="input-control-titan"
-                                type="text" 
-                                placeholder="Nhập tên đăng nhập của bạn..." 
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                autoComplete="username"
-                                required
-                            />
-                        </div>
-
-                        <div className="input-field-titan">
-                            <label className="input-label-titan">Mật Khẩu</label>
-                            <input 
-                                className="input-control-titan"
-                                type="password" 
-                                placeholder="Nhập mật khẩu..." 
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                autoComplete="current-password"
-                                required
-                            />
-                        </div>
-
-                        <button type="submit" className="btn btn-primary" style={{ height: '55px', fontSize: '1rem', fontWeight: 800, marginTop: '15px' }} disabled={loading}>
-                            {loading ? 'Đang xác thực...' : 'Đăng nhập'}
-                        </button>
-                    </form>
-
-                    <div style={{ marginTop: '40px', fontSize: '0.95rem', color: 'rgba(255, 255, 255, 0.4)' }}>
-                        <span>Chưa có tài khoản? </span>
-                        <Link href="/auth/register" style={{ color: 'var(--accent)', fontWeight: 800, textDecoration: 'none', marginLeft: '5px' }}>Đăng ký tài khoản</Link>
+            <form className="auth-form-industrial" onSubmit={handleSubmit}>
+                {error && <div className="auth-error-banner fade-in">{error}</div>}
+                
+                <div className="auth-input-group">
+                    <label className="auth-label-titan">Tên đăng nhập</label>
+                    <div className="input-relative">
+                        <User className="input-icon-titan" size={18} />
+                        <input 
+                            type="text" 
+                            className="auth-input-titan with-icon"
+                            placeholder="Nhập tên đăng nhập..."
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                        />
                     </div>
                 </div>
+
+                <div className="auth-input-group">
+                    <label className="auth-label-titan">Mật khẩu</label>
+                    <div className="input-relative">
+                        <Lock className="input-icon-titan" size={18} />
+                        <input 
+                            type="password" 
+                            className="auth-input-titan with-icon"
+                            placeholder="Nhập mật khẩu..."
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+                </div>
+
+                <button 
+                    type="submit" 
+                    className="btn btn-primary auth-submit-btn-titan shadow-titan"
+                    disabled={loading}
+                >
+                    {loading ? 'ĐANG XỬ LÝ...' : 'ĐĂNG NHẬP HỆ THỐNG'} <LogIn size={20} />
+                </button>
+            </form>
+
+            <div className="auth-footer-industrial">
+                Chưa có tài khoản? 
+                <Link href="/auth/register" className="auth-link-titan">
+                    Đăng ký ngay <ArrowRight size={16} />
+                </Link>
             </div>
-        </main>
-    );
+        </div>
+      </div>
+
+      <Footer />
+      <style jsx>{`
+        .input-relative { position: relative; }
+        .input-icon-titan { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.2); transition: color 0.3s; }
+        .auth-input-titan.with-icon { padding-left: 50px; }
+        .auth-input-titan:focus + .input-icon-titan { color: var(--accent); }
+      `}</style>
+    </main>
+  );
 }

@@ -1,13 +1,14 @@
 'use client';
 
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import MangaCard from '@/components/MangaCard';
 import { useFavorites } from '@/context/FavoritesContext';
 import { useAuth } from '@/context/AuthContext';
 import { useHistory } from '@/context/HistoryContext';
 import Link from 'next/link';
 import EmptyState from '@/components/EmptyState';
-import { Gem, Sparkles } from 'lucide-react';
+import { Gem, Lock } from 'lucide-react';
 
 export default function FavoritesPage() {
   const { favorites, mounted } = useFavorites();
@@ -15,36 +16,34 @@ export default function FavoritesPage() {
   const { history } = useHistory();
   
   return (
-    <main className="main-wrapper titan-bg" style={{ minHeight: '100vh', paddingBottom: '100px', color: 'white' }}>
+    <main className="main-wrapper titan-bg favorites-page">
       <Header />
       
-      <div className="content container fade-in" style={{ marginTop: '120px' }}>
-        <section className="section-titan">
-          <div className="section-header-titan">
-            <div className="header-label">
-              <h2 className="title-titan" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <Gem size={28} color="var(--accent)" />
-                  Bộ sưu tập của bạn
-              </h2>
-              <p className="subtitle-titan">
+      <div className="container favorites-container fade-in">
+        <section className="favorites-content-industrial">
+          <header className="favorites-header-industrial fade-up">
+            <div className="header-left-industrial">
+              <div className="library-badge-titan">BỘ SƯU TẬP CỦA BẠN</div>
+              <h1 className="favorites-title-industrial">TRUYỆN YÊU THÍCH</h1>
+              <p className="favorites-subtitle">
                 {!mounted 
-                    ? 'Đang tải bộ sưu tập...' 
+                    ? 'Đang truy xuất dữ liệu bộ sưu tập...' 
                     : favorites.length > 0 
-                        ? `Lưu giữ ${favorites.length} bộ truyện tuyệt phẩm` 
-                        : 'Bắt đầu xây dựng danh sách của bạn.'}
+                        ? `Lưu giữ ${favorites.length} tuyệt phẩm tinh hoa` 
+                        : 'Bắt đầu xây dựng danh bạ truyện của riêng bạn.'}
               </p>
             </div>
             {!isAuthenticated && mounted && (
-                <div className="badge-red" style={{ padding: '8px 20px', fontSize: '0.8rem' }}>
-                    Hãy đăng nhập để đồng bộ vĩnh viễn
+                <div className="login-prompt-titan shadow-titan">
+                    <Lock size={16} /> Đăng nhập để đồng bộ vĩnh viễn
                 </div>
             )}
-          </div>
+          </header>
 
           {!mounted ? (
             <div className="manga-grid-titan">
               {[...Array(10)].map((_, i) => (
-                <div key={i} className="skeleton-shimmer" style={{ height: '350px', borderRadius: 'var(--border-radius)' }}></div>
+                <div key={i} className="skeleton-card-industrial" />
               ))}
             </div>
           ) : favorites.length > 0 ? (
@@ -58,14 +57,21 @@ export default function FavoritesPage() {
             </div>
           ) : (
             <EmptyState 
-              title="Danh sách trống"
+              title="KHO TRUYỆN CÒN TRỐNG"
               subtitle="Hãy cùng khám phá hàng ngàn bộ truyện hấp dẫn tại trang chủ ngay!"
-              actionText="Khám phá ngay"
+              actionText="KHÁM PHÁ NGAY"
               actionUrl="/"
             />
           )}
         </section>
       </div>
+      <Footer />
+      <style jsx>{`
+        .header-left-industrial { flex: 1; }
+        .login-prompt-titan { background: rgba(255, 62, 62, 0.1); border: 1px solid rgba(255, 62, 62, 0.2); pointer-events: none; padding: 12px 25px; border-radius: 12px; font-size: 0.85rem; font-weight: 850; color: var(--accent); display: flex; align-items: center; gap: 10px; letter-spacing: 0.5px; }
+        .skeleton-card-industrial { height: 400px; background: rgba(255,255,255,0.02); border-radius: 20px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 0.8; } 100% { opacity: 0.5; } }
+      `}</style>
     </main>
   );
 }

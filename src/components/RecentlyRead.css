@@ -1,0 +1,210 @@
+/* ==========================================================================
+   TITAN-GRADE RECENTLY READ SYSTEM
+   Standardized Industrial UX - Cinematic Performance
+   ========================================================================== */
+
+.recently-read-titan {
+    margin-bottom: 60px;
+    width: 100%;
+}
+
+/* QUICK RESUME BANNER: CINEMATIC POLISH */
+.quick-resume-banner-titan {
+    position: relative;
+    width: 100%;
+    min-height: 220px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000;
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.quick-resume-banner-titan:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+}
+
+.banner-bg-titan {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center 20%;
+    filter: blur(40px) brightness(0.4);
+    opacity: 0.6;
+    transform: scale(1.1);
+    z-index: 1;
+}
+
+.banner-content-titan {
+    position: relative;
+    z-index: 10;
+    padding: 40px;
+    width: 100%;
+    max-width: 800px;
+}
+
+.banner-label-titan {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px;
+    background: rgba(255, 62, 62, 0.15);
+    border: 1px solid rgba(255, 62, 62, 0.3);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    margin-bottom: 18px;
+    text-transform: uppercase;
+}
+
+.banner-title-titan {
+    font-size: 2.2rem;
+    font-weight: 950;
+    margin-bottom: 10px;
+    letter-spacing: -1.5px;
+    line-height: 1.1;
+    color: white;
+    text-shadow: 0 5px 15px rgba(0,0,0,0.5);
+}
+
+.banner-sub-titan {
+    font-size: 1rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 25px;
+}
+
+.banner-btn-titan {
+    padding: 12px 35px;
+    font-weight: 900;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+}
+
+.pulse-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--accent);
+    animation: titan-pulse 1.5s infinite;
+}
+
+@keyframes titan-pulse {
+    0% { transform: scale(0.9); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.6; }
+    100% { transform: scale(0.9); opacity: 1; }
+}
+
+/* MINI HISTORY GRID */
+.titan-recent-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    width: 100%;
+}
+
+.titan-recent-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.titan-recent-card:hover {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.15);
+    transform: translateX(5px);
+}
+
+.titan-recent-image {
+    width: 50px;
+    height: 70px;
+    position: relative;
+    border-radius: 6px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: var(--bg-secondary);
+}
+
+.titan-recent-title {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 850;
+    color: white;
+    letter-spacing: -0.3px;
+}
+
+.titan-recent-badge {
+    background: rgba(255,255,255,0.04);
+    padding: 3px 10px;
+    border-radius: 5px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    margin-top: 6px;
+    display: inline-block;
+}
+
+/* SKELETON REFINEMENT */
+.recent-skeleton-titan {
+    display: flex;
+    gap: 20px;
+    overflow: hidden;
+}
+
+.recent-skeleton-item {
+    flex: 1;
+    height: 80px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 10px;
+}
+
+/* RESPONSIVE REFINEMENT */
+@media (max-width: 768px) {
+    .banner-content-titan { padding: 25px; }
+    .banner-title-titan { font-size: 1.6rem; }
+    .banner-sub-titan { font-size: 0.9rem; }
+    .titan-recent-grid { grid-template-columns: 1fr; }
+}
+
+/* FINAL INDUSTRIAL POLISH */
+.recent-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.recent-history-label {
+    display: flex; 
+    align-items: center; 
+    gap: 10px;
+}
+
+.badge-history-titan {
+    font-size: 0.65rem;
+    font-weight: 950;
+    color: #60a5fa;
+    background: rgba(96, 165, 250, 0.1);
+    padding: 4px 10px;
+    border-radius: 5px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.titan-recent-info {
+    flex: 1;
+    min-width: 0;
+}

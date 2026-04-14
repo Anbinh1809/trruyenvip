@@ -20,9 +20,10 @@ export default function DailyCheckIn() {
     }
   }, [mounted]);
 
-  if (!mounted) return <div className="skeleton-loader" style={{ height: '200px', borderRadius: 'var(--border-radius)' }} />;
+  if (!mounted) return <div className="skeleton-loader-industrial" />;
 
   const alreadyChecked = lastCheckIn === serverDate;
+  const currentStreak = isSuccess ? checkInStreak : (alreadyChecked ? checkInStreak : checkInStreak);
 
   const handleCheckIn = () => {
     const result = checkIn(serverDate);
@@ -30,46 +31,84 @@ export default function DailyCheckIn() {
     setIsSuccess(result.success);
   };
 
-  const currentStreak = isSuccess ? checkInStreak : (alreadyChecked ? checkInStreak : checkInStreak);
-
   return (
     <section className="checkin-section-titan fade-up">
         <div className="glass-titan-checkin">
-            <div className="checkin-text" style={{ flex: 1, minWidth: 0 }}>
+            <div className="checkin-info-industrial">
                 <h3 className="checkin-title">Điểm danh hằng ngày</h3>
-                <p className="checkin-subtitle" style={{ fontSize: '0.85rem', marginBottom: '20px' }}>Nhận VipCoins và XP mỗi lần báo danh.</p>
+                <p className="checkin-subtitle">Nhận VipCoins và XP mỗi lần báo danh.</p>
                 
-                <div className="streak-container" style={{ position: 'relative', marginTop: '25px' }}>
+                <div className="streak-container-industrial">
                     <div className="streak-bar-titan">
                         {[1, 2, 3, 4, 5, 6, 7].map((d) => (
-                            <div key={d} className={`streak-step ${d <= currentStreak ? 'active' : ''}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                            <div key={d} className={`streak-step ${d <= currentStreak ? 'active' : ''}`}>
                                 {d === 7 && (
-                                    <div style={{ position: 'absolute', top: '-30px', color: currentStreak >= 7 ? 'var(--accent)' : 'rgba(255,255,255,0.2)', animation: currentStreak >= 7 ? 'bounce 2s infinite' : 'none' }}>
+                                    <div className={`streak-gift-box ${currentStreak >= 7 ? 'is-active' : ''}`}>
                                         {currentStreak >= 7 ? <Gift size={20} /> : <Lock size={18} />}
                                     </div>
                                 )}
                             </div>
                         ))}
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '12px', fontSize: '0.7rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>
+                    <div className="streak-meta">
                         <span>Khởi đầu</span>
                         <span>Phần thưởng (Ngày 7)</span>
                     </div>
                 </div>
             </div>
 
-            <div className="checkin-action" style={{ textAlign: 'center' }}>
+            <div className="checkin-action">
                 <button 
                     className={`btn-titan-checkin ${alreadyChecked ? 'checked' : 'active'}`} 
                     onClick={handleCheckIn}
                     disabled={alreadyChecked}
-                    style={{ width: '100%', minWidth: '180px' }}
                 >
                     {alreadyChecked ? 'Đã điểm danh' : 'Điểm danh ngay'}
                 </button>
-                {msg && <p style={{ marginTop: '12px', fontSize: '0.8rem', fontWeight: 800, color: isSuccess ? 'var(--accent)' : '#ff4444' }}>{msg}</p>}
+                {msg && <p className={`checkin-msg-industrial ${isSuccess ? 'success' : 'error'}`}>{msg}</p>}
             </div>
         </div>
+        <style jsx>{`
+            .checkin-info-industrial {
+                flex: 1;
+                min-width: 0;
+            }
+            .streak-container-industrial {
+                position: relative;
+                margin-top: 35px;
+            }
+            .streak-gift-box {
+                position: absolute;
+                top: -35px;
+                color: rgba(255, 255, 255, 0.1);
+                transition: all 0.5s;
+            }
+            .streak-gift-box.is-active {
+                color: var(--accent);
+                animation: titan-bounce 2s infinite;
+            }
+            .checkin-msg-industrial {
+                margin-top: 15px;
+                font-size: 0.85rem;
+                font-weight: 900;
+                letter-spacing: 0.3px;
+                animation: fade-in 0.3s ease;
+            }
+            .checkin-msg-industrial.success { color: var(--accent); }
+            .checkin-msg-industrial.error { color: #ff4444; }
+            
+            .skeleton-loader-industrial {
+                height: 180px;
+                background: rgba(255, 255, 255, 0.02);
+                border-radius: 20px;
+                border: 1px dashed var(--glass-border);
+            }
+
+            @keyframes titan-bounce {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-8px); }
+            }
+        `}</style>
     </section>
   );
 }

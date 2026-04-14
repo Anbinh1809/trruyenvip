@@ -13,7 +13,6 @@ export default function RewardTimer({ chapterId }) {
   const [seconds, setSeconds] = useState(0);
 
   useEffect(() => {
-    // Mỗi 60 giây đọc truyện sẽ cộng 1 phút vào tiến trình nhiệm vụ
     const timer = setInterval(() => {
       setSeconds(prev => {
           if (prev >= 59) {
@@ -27,10 +26,10 @@ export default function RewardTimer({ chapterId }) {
     return () => clearInterval(timer);
   }, [updateMission]);
 
-  // UI tinh giản, không gây phiền nhiễu khi đọc
   return (
-    <div className="mission-progress-hint" style={{ position: 'fixed', right: '30px', bottom: '170px', fontSize: '0.65rem', opacity: 0.4, pointerEvents: 'none', display: 'flex', alignItems: 'center', gap: '5px' }}>
-        <Zap size={10} color="var(--accent)" /> Đang thiền định... ({seconds}s)
+    <div className="progress-hint-industrial fade-in">
+        <Zap size={10} color="var(--accent)" className="pulse-slow" /> 
+        <span>ĐANG TÍNH ĐIỂM NGỘ TÍNH... ({seconds}s)</span>
     </div>
   );
 }

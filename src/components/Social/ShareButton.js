@@ -1,6 +1,6 @@
 'use client';
 
-import { Share2, Link, Check } from 'lucide-react';
+import { Share2, Check } from 'lucide-react';
 import { useState } from 'react';
 
 /**
@@ -40,31 +40,45 @@ export default function ShareButton({ title, text, url, className = "" }) {
     return (
         <button 
             onClick={handleShare}
-            className={`btn-share-titan ${className}`}
-            style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '10px 20px',
-                borderRadius: 'var(--border-radius)',
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                color: 'var(--text-primary)',
-                fontSize: '0.85rem',
-                fontWeight: 800,
-                cursor: 'pointer',
-                transition: 'var(--transition)'
-            }}
+            className={`btn-share-industrial ${className} ${copied ? 'is-copied' : ''}`}
         >
             {copied ? (
                 <>
-                    <Check size={16} color="#10b981" /> <span>Đã sao chép!</span>
+                    <Check size={16} className="text-emerald" /> <span>Đã sao chép!</span>
                 </>
             ) : (
                 <>
                     <Share2 size={16} /> <span>Chia sẻ</span>
                 </>
             )}
+            <style jsx>{`
+                .btn-share-industrial {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 10px;
+                    padding: 10px 24px;
+                    border-radius: 12px;
+                    background: rgba(255, 255, 255, 0.04);
+                    border: 1px solid var(--glass-border);
+                    color: white;
+                    font-size: 0.85rem;
+                    font-weight: 850;
+                    cursor: pointer;
+                    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                }
+                .btn-share-industrial:hover {
+                    background: rgba(255, 255, 255, 0.08);
+                    border-color: rgba(255, 255, 255, 0.15);
+                    transform: translateY(-2px);
+                }
+                .btn-share-industrial.is-copied {
+                    border-color: #10b981;
+                    background: rgba(16, 185, 129, 0.05);
+                }
+                .text-emerald {
+                    color: #10b981;
+                }
+            `}</style>
         </button>
     );
 }

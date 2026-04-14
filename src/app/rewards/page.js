@@ -1,11 +1,12 @@
 'use client';
 
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useEngagement } from '@/context/EngagementContext';
 import { useToast } from '@/components/ToastProvider';
-import { Coins, Landmark, CheckCircle, Clock, AlertTriangle, XCircle, CreditCard, User } from 'lucide-react';
+import { Coins, Landmark, CheckCircle, Clock, AlertTriangle, XCircle, CreditCard } from 'lucide-react';
 
 const REWARDS_CATALOG = [
     { label: 'Rút 10.000đ', value: 10, cost: 10000, color: '#ff3e3e' },
@@ -100,83 +101,92 @@ export default function RewardsPage() {
   };
 
   if (authLoading || !mounted) return (
-    <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)' }}>
-        <div className="loader-ring"></div>
+    <div className="fullscreen-loader-industrial">
+        <div className="loader-titan-ring" />
+        <style jsx>{`
+            .fullscreen-loader-industrial {
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                background: var(--bg-primary);
+            }
+        `}</style>
     </div>
   );
 
   return (
-    <main className="main-wrapper titan-bg" style={{ minHeight: '100vh', color: 'white' }}>
+    <main className="main-wrapper titan-bg">
       <Header />
       
-      <div className="container fade-in" style={{ marginTop: '140px', paddingBottom: '100px' }}>
-        <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-               <h1 style={{ fontSize: '3rem', fontWeight: 950, marginBottom: '15px', color: 'var(--accent)' }}>Rút Tiền Tài Khoản</h1>
-               <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '1.1rem', maxWidth: '600px', margin: '0 auto 40px', fontWeight: 600 }}>Cày truyện nhận thưởng. Chuyển tiền trực tiếp về ngân hàng của bạn.</p>
+      <div className="container rewards-container fade-in">
+        <div className="rewards-header-box">
+               <h1 className="rewards-title-industrial">Rút Tiền Tài Khoản</h1>
+               <p className="rewards-subtitle-industrial">Cày truyện nhận thưởng. Chuyển tiền trực tiếp về ngân hàng của bạn. Tỷ lệ quy đổi: 1 VipCoin = 1 VNĐ.</p>
                
-               <div className="glass" style={{ display: 'inline-flex', alignItems: 'center', gap: '15px', padding: '15px 30px', borderRadius: 'var(--border-radius)', border: '1px solid var(--accent)' }}>
-                  <Coins size={32} color="#fbbf24" />
-                  <div style={{ textAlign: 'left' }}>
-                      <span style={{ fontSize: '0.75rem', fontWeight: 800, opacity: 0.5, textTransform: 'uppercase' }}>VipCoins hiện có</span>
-                      <div style={{ fontSize: '1.6rem', fontWeight: 900 }}>{vipCoins.toLocaleString()}</div>
+               <div className="coins-display-industrial">
+                  <Coins size={40} color="#fbbf24" strokeWidth={1.5} />
+                  <div className="coins-meta-industrial">
+                      <span className="coins-label-industrial">VipCoins hiện có</span>
+                      <div className="coins-amount-industrial">{vipCoins.toLocaleString()}</div>
                   </div>
                </div>
         </div>
 
-        <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '40px' }}>
+        <div className="rewards-main-grid-industrial">
           {/* FORM SECTION */}
-          <div className="glass" style={{ padding: '35px', borderRadius: 'var(--border-radius)', border: '1px solid var(--glass-border)' }}>
-                <h3 style={{ fontSize: '1.5rem', fontWeight: 900, marginBottom: '30px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <Landmark size={24} color="var(--accent)" /> Thông tin thụ hưởng
+          <div className="redemption-form-card shadow-titan">
+                <h3 className="form-title-industrial">
+                    <Landmark size={24} color="var(--accent)" /> THÔNG TIN THỤ HƯỞNG
                 </h3>
                 
-                <div className="input-group-titan" style={{ marginBottom: '20px' }}>
-                        <label className="input-label-titan">Ngân hàng / Ví</label>
-                        <select className="input-titan" value={bankName} onChange={(e) => setBankName(e.target.value)} style={{ width: '100%', background: 'rgba(255,255,255,0.05)', color: 'white' }}>
+                <div className="input-field-industrial">
+                        <label className="field-label-titan">NGÂN HÀNG / VÍ ĐIỆN TỬ</label>
+                        <select className="select-titan-industrial" value={bankName} onChange={(e) => setBankName(e.target.value)}>
                             {BANK_LIST.map(b => <option key={b} value={b}>{b}</option>)}
                         </select>
                 </div>
                 
-                <div className="input-group-titan" style={{ marginBottom: '20px' }}>
-                        <label className="input-label-titan">Số tài khoản</label>
-                        <input className="input-titan" type="text" placeholder="Nhập STK..." value={accountNo} onChange={(e) => setAccountNo(e.target.value)} />
+                <div className="input-field-industrial">
+                        <label className="field-label-titan">SỐ TÀI KHOẢN</label>
+                        <input className="input-titan-industrial" type="text" placeholder="Nhập số tài khoản..." value={accountNo} onChange={(e) => setAccountNo(e.target.value)} />
                 </div>
 
-                <div className="input-group-titan" style={{ marginBottom: '30px' }}>
-                        <label className="input-label-titan">Tên chủ tài khoản</label>
-                        <input className="input-titan" type="text" placeholder="NGUYEN VAN A..." value={accountHolder} onChange={(e) => setAccountHolder(e.target.value)} style={{ textTransform: 'uppercase' }} />
+                <div className="input-field-industrial">
+                        <label className="field-label-titan">TÊN CHỦ TÀI KHOẢN (KHÔNG DẤU)</label>
+                        <input className="input-titan-industrial uppercase-text" type="text" placeholder="NGUYEN VAN A..." value={accountHolder} onChange={(e) => setAccountHolder(e.target.value)} />
                 </div>
 
                 {msg && (
-                    <div className="fade-in" style={{ 
-                        padding: '15px', borderRadius: 'var(--border-radius)', textAlign: 'center', fontWeight: 700, 
-                        background: msgType === 'success' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255, 62, 62, 0.1)', 
-                        color: msgType === 'success' ? '#10b981' : 'var(--accent)', 
-                        border: `1px solid ${msgType === 'success' ? '#10b98133' : '#ff3e3e33'}`,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px'
-                    }}>
+                    <div className={`form-message-industrial fade-in ${msgType}`}>
                         {msgType === 'success' ? <CheckCircle size={20} /> : <AlertTriangle size={20} />}
-                        <span style={{ fontSize: '0.9rem' }}>{msg}</span>
+                        <span>{msg}</span>
                     </div>
                 )}
+                
+                <div className="form-safety-hint">
+                    <CheckCircle size={14} className="text-secondary" />
+                    Bảo mật 256-bit SSL. Giao dịch an toàn tuyệt đối.
+                </div>
           </div>
 
           {/* CATALOG SECTION */}
-          <div>
-                <h3 style={{ marginBottom: '25px', fontWeight: 900, fontSize: '1.6rem' }}>Chọn mệnh giá rút</h3>
-                <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px' }}>
+          <div className="redemption-catalog-industrial">
+                <h3 className="catalog-title-industrial">CHỌN MỆNH GIÁ RÚT</h3>
+                <div className="redeem-grid-titan">
                     {REWARDS_CATALOG.map(item => (
-                        <div key={item.value} className="glass card-titan" style={{ padding: '30px', textAlign: 'center', border: `1px solid ${item.color}33`, transition: 'all 0.3s ease' }}>
-                            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px', color: item.color }}>
-                                <CreditCard size={48} />
+                        <div key={item.value} className="redeem-card-titan">
+                            <div className="card-icon-industrial" style={{ color: item.color }}>
+                                <CreditCard size={48} strokeWidth={1.5} />
                             </div>
-                            <h4 style={{ fontSize: '1.4rem', fontWeight: 900, marginBottom: '5px' }}>{item.label}</h4>
-                            <p style={{ opacity: 0.5, fontSize: '0.85rem', marginBottom: '20px' }}>Tốn {item.cost.toLocaleString()} Coins</p>
+                            <h4 className="card-label-industrial">{item.label}</h4>
+                            <p className="card-cost-industrial">Tốn {item.cost.toLocaleString()} Coins</p>
                             <button 
-                                className="btn btn-primary" 
+                                className="btn btn-primary redeem-btn-titan" 
                                 disabled={loading || vipCoins < item.cost}
                                 onClick={() => handleRedeem(item)}
-                                style={{ background: vipCoins < item.cost ? 'rgba(255,255,255,0.05)' : item.color, width: '100%', opacity: vipCoins < item.cost ? 0.3 : 1 }}
+                                style={{ background: vipCoins < item.cost ? 'rgba(255,255,255,0.05)' : item.color }}
                             >
                                 {loading ? '...' : (vipCoins < item.cost ? 'Chưa đủ Coins' : 'Rút ngay')}
                             </button>
@@ -184,30 +194,211 @@ export default function RewardsPage() {
                     ))}
                 </div>
 
-                <div style={{ marginTop: '50px' }}>
-                        <h3 style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '25px', fontWeight: 900, fontSize: '1.6rem' }}>
-                            <Clock size={24} color="#60a5fa" /> Lịch sử rút tiền
+                <div className="redemption-history-section">
+                        <h3 className="history-title-industrial">
+                            <Clock size={24} color="#60a5fa" /> LỊCH SỬ GIAO DỊCH
                         </h3>
-                        <div className="glass" style={{ borderRadius: 'var(--border-radius)', padding: '5px', maxHeight: '400px', overflowY: 'auto' }}>
+                        <div className="history-list-industrial glass-scrollbar">
                             {history.map(req => (
-                                <div key={req.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                    <div>
-                                        <div style={{ fontWeight: 900, fontSize: '1.1rem', marginBottom: '3px' }}>{req.card_value}k → <span style={{ color: 'var(--accent)' }}>{req.bank_name || 'Legacy'}</span></div>
-                                        <div style={{ fontSize: '0.75rem', opacity: 0.4 }}>{new Date(req.created_at).toLocaleString()}</div>
+                                <div key={req.id} className="history-item-industrial">
+                                    <div className="history-main-info">
+                                        <div className="history-value-row">{req.card_value}k → <span className="bank-name-industrial">{req.bank_name || 'Legacy'}</span></div>
+                                        <div className="history-time-industrial">{new Date(req.created_at).toLocaleString('vi-VN')}</div>
                                     </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 800, fontSize: '0.85rem' }}>
-                                        {req.status === 'Pending' && <span style={{ color: '#ffa500' }}>● Chờ duyệt</span>}
-                                        {req.status === 'Done' && <span style={{ color: '#10b981' }}>● Hoàn tất</span>}
-                                        {req.status === 'Rejected' && <span style={{ color: '#ef4444' }}>● Từ chối</span>}
+                                    <div className={`status-pill-industrial ${req.status.toLowerCase()}`}>
+                                        <div className="status-dot" />
+                                        <span>{req.status === 'Pending' ? 'CHỜ DUYỆT' : (req.status === 'Done' ? 'HOÀN TẤT' : 'TỪ CHỐI')}</span>
                                     </div>
                                 </div>
                             ))}
-                            {history.length === 0 && <div style={{ padding: '60px', textAlign: 'center', opacity: 0.3 }}>Chưa có giao dịch nào gần đây.</div>}
+                            {history.length === 0 && <div className="history-empty-state">Chưa có giao dịch nào được thực hiện.</div>}
                         </div>
                 </div>
           </div>
         </div>
       </div>
+      <Footer />
+      <style jsx>{`
+        .rewards-container {
+            padding-top: 140px;
+            padding-bottom: 100px;
+        }
+        .rewards-title-industrial {
+            font-size: 3.5rem; 
+            font-weight: 950; 
+            margin-bottom: 20px; 
+            color: var(--accent);
+            letter-spacing: -3px;
+        }
+        .rewards-subtitle-industrial {
+            color: rgba(255,255,255,0.4); 
+            font-size: 1.1rem; 
+            max-width: 650px; 
+            margin: 0 auto 50px; 
+            font-weight: 600;
+            line-height: 1.7;
+        }
+        .coins-meta-industrial { text-align: left; }
+        .coins-label-industrial {
+            font-size: 0.75rem; 
+            font-weight: 900; 
+            opacity: 0.5; 
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+        .coins-amount-industrial {
+            font-size: 2rem; 
+            font-weight: 950;
+            letter-spacing: -1px;
+            color: white;
+        }
+        .rewards-main-grid-industrial {
+            display: grid; 
+            grid-template-columns: 380px 1fr; 
+            gap: 60px;
+            align-items: flex-start;
+        }
+        .redemption-form-card {
+            padding: 40px; 
+            border-radius: 24px; 
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+        }
+        .form-title-industrial {
+            font-size: 1.2rem; 
+            font-weight: 950; 
+            margin-bottom: 40px; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+        .field-label-titan {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 950;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+        .input-field-industrial { margin-bottom: 25px; }
+        .select-titan-industrial, .input-titan-industrial {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            padding: 15px 20px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .select-titan-industrial:focus, .input-titan-industrial:focus {
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .uppercase-text { text-transform: uppercase; }
+        .form-message-industrial {
+            padding: 20px; 
+            border-radius: 16px; 
+            font-weight: 800; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-top: 30px;
+        }
+        .form-message-industrial.success {
+            background: rgba(16, 185, 129, 0.1); 
+            color: #10b981; 
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        .form-message-industrial.error {
+            background: rgba(255, 62, 62, 0.1); 
+            color: var(--accent); 
+            border: 1px solid rgba(255, 62, 62, 0.2);
+        }
+        .form-safety-hint {
+            margin-top: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.2);
+        }
+        .catalog-title-industrial {
+            font-size: 1.4rem;
+            font-weight: 950;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+            color: white;
+        }
+        .card-icon-industrial { margin-bottom: 20px; opacity: 0.8; }
+        .card-label-industrial { font-size: 1.5rem; font-weight: 950; margin-bottom: 8px; color: white; }
+        .card-cost-industrial { font-size: 0.9rem; font-weight: 700; color: rgba(255, 255, 255, 0.4); margin-bottom: 25px; }
+        .redeem-btn-titan { width: 100%; border-radius: 12px; font-weight: 950; font-size: 1rem; padding: 14px; }
+        .redemption-history-section { margin-top: 80px; }
+        .history-title-industrial {
+            font-size: 1.4rem;
+            font-weight: 950;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+        .history-list-industrial {
+            background: rgba(15, 23, 42, 0.3);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .history-item-industrial {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.3s;
+        }
+        .history-item-industrial:hover { background: rgba(255, 255, 255, 0.02); }
+        .history-item-industrial:last-child { border-bottom: none; }
+        .history-value-row { font-size: 1.3rem; font-weight: 950; color: white; margin-bottom: 4px; }
+        .bank-name-industrial { color: #60a5fa; }
+        .history-time-industrial { font-size: 0.8rem; font-weight: 700; color: rgba(255, 255, 255, 0.3); }
+        .status-pill-industrial {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 950;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            letter-spacing: 1px;
+        }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .status-pill-industrial.pending { color: #ffa500; }
+        .status-pill-industrial.pending .status-dot { background: #ffa500; box-shadow: 0 0 10px #ffa500; }
+        .status-pill-industrial.done { color: #10b981; }
+        .status-pill-industrial.done .status-dot { background: #10b981; box-shadow: 0 0 10px #10b981; }
+        .status-pill-industrial.rejected { color: #ef4444; }
+        .status-pill-industrial.rejected .status-dot { background: #ef4444; box-shadow: 0 0 10px #ef4444; }
+        .history-empty-state { padding: 80px; text-align: center; color: rgba(255, 255, 255, 0.2); font-weight: 800; }
+        @media (max-width: 1024px) {
+            .rewards-main-grid-industrial { grid-template-columns: 1fr; }
+            .rewards-title-industrial { font-size: 2.5rem; }
+        }
+      `}</style>
     </main>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import { useAuth } from '@/context/AuthContext';
 import { useEngagement } from '@/context/EngagementContext';
 import { useToast } from '@/components/ToastProvider';
@@ -48,114 +49,127 @@ export default function ProfilePage() {
 
   if (!isAuthenticated) {
     return (
-        <main className="main-wrapper titan-bg" style={{ minHeight: '100vh', paddingBottom: '100px', color: 'white' }}>
+        <main className="main-wrapper titan-bg">
             <Header />
-            <div className="container" style={{ marginTop: '200px', textAlign: 'center' }}>
-                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '30px' }}>
+            <div className="container auth-required-industrial fade-up">
+                <div className="center-icon-titan">
                     <AlertOctagon size={80} color="var(--accent)" />
                 </div>
-                <h1 style={{ fontSize: '2rem', fontWeight: 900 }}>Yêu cầu đăng nhập</h1>
-                <p style={{ color: 'var(--text-muted)', marginBottom: '30px', fontWeight: 600 }}>Cần đăng nhập để xem thông tin cá nhân.</p>
-                <Link href="/auth/login" className="btn btn-primary" style={{ padding: '14px 40px' }}>Đăng Nhập</Link>
+                <h1 className="auth-required-title">Yêu cầu đăng nhập</h1>
+                <p className="auth-required-subtitle">Cần đăng nhập để xem thông tin cá nhân và quản lý tài khoản của bạn.</p>
+                <Link href="/auth/login" className="btn btn-primary login-trigger-titan">ĐĂNG NHẬP NGAY</Link>
             </div>
+            <Footer />
+            <style jsx>{`
+                .center-icon-titan { display: flex; justify-content: center; margin-bottom: 30px; }
+                .auth-required-subtitle { color: rgba(255,255,255,0.4); margin-bottom: 40px; font-weight: 700; font-size: 1.1rem; }
+                .login-trigger-titan { padding: 18px 60px; font-weight: 950; letter-spacing: 1px; }
+            `}</style>
         </main>
     );
   }
 
   return (
-    <main className="main-wrapper titan-bg" style={{ minHeight: '100vh', paddingBottom: '100px', color: 'white' }}>
+    <main className="main-wrapper titan-bg">
       <Header />
       
-      <div className="container fade-in" style={{ marginTop: '120px', maxWidth: '800px' }}>
-        <section className="profile-card-titan" style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <div style={{ width: '140px', height: '140px', borderRadius: '70px', background: 'rgba(255,255,255,0.05)', margin: '0 auto 25px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '4px solid var(--accent)', boxShadow: '0 0 30px rgba(255, 62, 62, 0.2)' }}>
+      <div className="container profile-container fade-in">
+        <section className="profile-card-industrial">
+          <div className="avatar-wrapper-titan">
             {user.avatar ? (
-                <img src={user.avatar} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src={user.avatar} alt="Avatar" className="avatar-img-industrial" />
             ) : (
                 <User size={60} color="rgba(255,255,255,0.2)" />
             )}
           </div>
-          <h1 style={{ fontSize: '2rem', fontWeight: 900, marginBottom: '5px' }}>{user.username}</h1>
-          <p style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: 'var(--accent)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', fontSize: '0.8rem' }}>
-            {user.role === 'admin' ? <><Shield size={16} /> Quản trị viên</> : <><User size={16} /> Độc giả VIP</>}
+          <h1 className="profile-name-industrial">{user.username}</h1>
+          <p className="profile-role-badge">
+            {user.role === 'admin' ? <><Shield size={16} /> QUẢN TRỊ VIÊN</> : <><User size={16} /> ĐỘC GIẢ VIP</>}
           </p>
           
-          <div style={{ marginTop: '35px', display: 'flex', gap: '10px', maxWidth: '450px', margin: '35px auto 0' }}>
+          <div className="avatar-form-industrial">
             <input 
                 type="text" 
                 placeholder="Dán link ảnh đại diện mới..." 
                 value={avatarUrl}
                 onChange={(e) => setAvatarUrl(e.target.value)}
-                style={{ flex: 1, padding: '10px 16px', borderRadius: 'var(--border-radius)', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', color: 'white', fontWeight: 600, outline: 'none' }}
+                className="input-titan-profile"
             />
             <button 
                 onClick={handleUpdateAvatar} 
-                className="btn btn-primary" 
+                className="btn btn-primary avatar-update-btn" 
                 disabled={updating || !avatarUrl.trim()}
-                style={{ padding: '0 20px' }}
             >
-                {updating ? '...' : 'Cập nhật'}
+                {updating ? '...' : 'CẬP NHẬT'}
             </button>
           </div>
           {user.role === 'admin' && (
-              <Link href="/admin" className="btn btn-outline" style={{ marginTop: '25px', padding: '12px 35px', fontWeight: 700, color: 'var(--accent)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '10px' }}>
-                <ShieldCheck size={18} /> Bảng điều khiển Admin
+              <Link href="/admin" className="btn btn-outline admin-portal-btn-titan">
+                <ShieldCheck size={18} /> BẢNG ĐIỀU KHIỂN QUẢN TRỊ
               </Link>
           )}
         </section>
 
-        <div className="stat-grid-titan" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '40px' }}>
-            <div className="stat-card-titan glass" style={{ padding: '25px', borderRadius: 'var(--border-radius)', textAlign: 'center', border: '1px solid var(--glass-border)' }}>
-                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
-                    <Coins size={28} color="#fbbf24" />
+        <div className="stat-grid-profile">
+            <div className="stat-card-profile">
+                <div className="stat-icon-box">
+                    <Coins size={32} color="#fbbf24" />
                 </div>
-                <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>VipCoins</div>
-                <div style={{ fontSize: '1.8rem', fontWeight: 900 }}>{new Intl.NumberFormat().format(vipCoins)}</div>
+                <div className="stat-label-profile">VipCoins</div>
+                <div className="stat-value-profile">{new Intl.NumberFormat().format(vipCoins)}</div>
             </div>
-            <div className="stat-card-titan glass" style={{ padding: '25px', borderRadius: 'var(--border-radius)', textAlign: 'center', border: '1px solid var(--glass-border)' }}>
-                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
-                    <Sparkles size={28} color="var(--accent)" />
+            <div className="stat-card-profile">
+                <div className="stat-icon-box">
+                    <Sparkles size={32} color="var(--accent)" />
                 </div>
-                <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>Cấp Độ</div>
-                <div style={{ fontSize: '1.8rem', fontWeight: 900 }}>{level}</div>
+                <div className="stat-label-profile">Cấp Độ</div>
+                <div className="stat-value-profile">{level}</div>
             </div>
-            <div className="stat-card-titan glass" style={{ padding: '25px', borderRadius: 'var(--border-radius)', textAlign: 'center', border: '1px solid var(--glass-border)' }}>
-                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
-                    <Activity size={28} color="#60a5fa" />
+            <div className="stat-card-profile">
+                <div className="stat-icon-box">
+                    <Activity size={32} color="#60a5fa" />
                 </div>
-                <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>Hạng</div>
-                <div style={{ fontSize: '1.2rem', fontWeight: 900, color: 'var(--accent)' }}>{rankTitle}</div>
+                <div className="stat-label-profile">Hạng</div>
+                <div className="stat-value-profile accent-rank">{rankTitle}</div>
             </div>
         </div>
 
-        <section className="glass" style={{ padding: '30px', borderRadius: 'var(--border-radius)', border: '1px solid var(--glass-border)', marginBottom: '40px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontWeight: 800, fontSize: '0.95rem' }}>
-                <span>Tiến độ</span>
-                <span style={{ color: 'var(--accent)' }}>{Math.floor(xpProgress)}%</span>
+        <section className="xp-progress-section shadow-titan">
+            <div className="xp-header-profile">
+                <span className="xp-label-main">TIẾN ĐỘ CẤP BẬC</span>
+                <span className="xp-percent-tag">{Math.floor(xpProgress)}%</span>
             </div>
-            <div style={{ width: '100%', height: '8px', background: 'rgba(255,255,255,0.08)', borderRadius: 'var(--border-radius)', overflow: 'hidden' }}>
-                <div style={{ width: `${xpProgress}%`, height: '100%', background: 'var(--accent)', borderRadius: 'var(--border-radius)' }} />
+            <div className="xp-track-industrial">
+                <div className="xp-fill-industrial" style={{ '--progress': `${xpProgress}%` }} />
             </div>
-            <p style={{ marginTop: '15px', fontSize: '0.85rem', color: 'rgba(255,255,255,0.4)', textAlign: 'center', fontWeight: 600 }}>
-                Cần thêm <strong style={{ color: 'white' }}>{new Intl.NumberFormat().format((level * 100) - xp)} XP</strong> để lên cấp tiếp theo.
+            <p className="xp-footer-hint">
+                Cần thêm <strong>{new Intl.NumberFormat().format((level * 100) - xp)} XP</strong> để thăng cấp tiếp theo.
             </p>
         </section>
 
-        <div className="profile-actions" style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '100px' }}>
-            <Link href="/favorites" className="nav-link-titan glass" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 25px', borderRadius: 'var(--border-radius)', fontSize: '1rem', textDecoration: 'none', color: 'white' }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><Heart size={18} color="var(--accent)" /> Truyện yêu thích</span>
-                <ChevronRight size={18} style={{ opacity: 0.3 }} />
+        <div className="profile-actions-list">
+            <Link href="/favorites" className="profile-action-node">
+                <span className="node-left-industrial"><Heart size={20} color="var(--accent)" /> TRUYỆN YÊU THÍCH</span>
+                <ChevronRight size={18} className="node-arrow" />
             </Link>
-            <Link href="/history" className="nav-link-titan glass" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 25px', borderRadius: 'var(--border-radius)', fontSize: '1rem', textDecoration: 'none', color: 'white' }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><History size={18} color="#60a5fa" /> Lịch sử đọc truyện</span>
-                <ChevronRight size={18} style={{ opacity: 0.3 }} />
+            <Link href="/history" className="profile-action-node">
+                <span className="node-left-industrial"><History size={20} color="#60a5fa" /> LỊCH SỬ ĐỌC TRUYỆN</span>
+                <ChevronRight size={18} className="node-arrow" />
             </Link>
-            <div style={{ height: '1px', background: 'var(--glass-border)', margin: '8px 0' }} />
-            <button onClick={logout} style={{ background: 'rgba(255, 62, 62, 0.05)', color: '#ff4d4d', border: '1px solid rgba(255, 62, 62, 0.15)', padding: '18px 25px', borderRadius: 'var(--border-radius)', fontWeight: 700, fontSize: '0.95rem', cursor: 'pointer', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
-                <LogOut size={18} /> Đăng xuất
+            <button onClick={logout} className="logout-btn-industrial">
+                <LogOut size={20} /> ĐĂNG XUẤT TÀI KHOẢN
             </button>
         </div>
       </div>
+      <Footer />
+      <style jsx>{`
+        .avatar-update-btn { padding: 0 35px; font-weight: 950; font-size: 0.85rem; }
+        .admin-portal-btn-titan { margin-top: 30px; padding: 14px 40px; font-weight: 950; letter-spacing: 1px; display: inline-flex; gap: 12px; }
+        .accent-rank { color: var(--accent) !important; font-size: 1.4rem !important; }
+        .node-arrow { opacity: 0.3; transition: transform 0.3s; }
+        .profile-action-node:hover .node-arrow { opacity: 1; transform: translateX(5px); }
+        .xp-footer-hint strong { color: white; }
+      `}</style>
     </main>
   );
 }
