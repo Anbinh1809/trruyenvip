@@ -6,7 +6,9 @@ import { query } from '../db.js';
 global.crawlerState = global.crawlerState || {
     status: 'idle',
     currentManga: null,
+    currentMangaTitle: null,
     currentChapter: null,
+    currentChapterTitle: null,
     currentImage: null,
     discoveryPage: 1,
     isArchivalPulse: false,
@@ -24,7 +26,9 @@ export function updateTelemetry(data) {
     
     if (data.status) global.crawlerState.status = data.status;
     if (data.currentManga !== undefined) global.crawlerState.currentManga = data.currentManga;
+    if (data.currentMangaTitle !== undefined) global.crawlerState.currentMangaTitle = data.currentMangaTitle;
     if (data.currentChapter !== undefined) global.crawlerState.currentChapter = data.currentChapter;
+    if (data.currentChapterTitle !== undefined) global.crawlerState.currentChapterTitle = data.currentChapterTitle;
     if (data.currentImage !== undefined) global.crawlerState.currentImage = data.currentImage;
     if (data.successCount !== undefined) global.crawlerState.successCount = (global.crawlerState.successCount || 0) + data.successCount;
     if (data.failCount !== undefined) global.crawlerState.failCount = (global.crawlerState.failCount || 0) + data.failCount;

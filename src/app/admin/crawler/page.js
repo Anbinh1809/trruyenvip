@@ -211,13 +211,12 @@ export default function CrawlerDashboard() {
                                 <h3 style={{ textTransform: 'uppercase', fontSize: '0.7rem', letterSpacing: '2px', color: 'var(--accent)' }}>TRẠNG THÁI XỬ LÝ THỜI GIAN THỰC</h3>
                                 <div style={{ fontSize: '0.6rem', padding: '2px 8px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', fontWeight: 900 }}>TỰ ĐỘNG CHUYỂN NGUỒN: BẬT</div>
                             </div>
-                            <div style={{ marginBottom: '25px' }}>
-                                <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)', marginBottom: '5px' }}>TRUYỆN ĐANG XỬ LÝ</div>
-                                <div style={{ fontSize: '1.2rem', fontWeight: 900 }}>{telemetry?.currentManga || 'Đang chờ chu kỳ...'}</div>
-                            </div>
-                            <div style={{ display: 'flex', gap: '40px' }}>
                                 <div>
-                                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', marginBottom: '5px' }}>CHAPTER SLUG</div>
+                                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', marginBottom: '5px' }}>ĐANG XỬ LÝ TRUYỆN</div>
+                                    <div style={{ fontWeight: 900, fontSize: '1rem', color: 'var(--accent)' }}>{telemetry?.currentManga || '--'}</div>
+                                </div>
+                                <div>
+                                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', marginBottom: '5px' }}>CHƯƠNG HIỆN TẠI</div>
                                     <div style={{ fontWeight: 800 }}>{telemetry?.currentChapter || '--'}</div>
                                 </div>
                                 <div>

@@ -10,7 +10,7 @@ import { SOURCES } from './mirrors.js';
 
 // Concurrency State
 let activeChapterScrapes = 0;
-const MAX_CONCURRENT_CHAPTERS = 15;
+const MAX_CONCURRENT_CHAPTERS = 35;
 const inProgressManga = new Set();
 const inProgressChapters = new Set();
 
@@ -29,16 +29,30 @@ async function executeTask(taskRow) {
         switch (taskRow.type) {
             case 'chapter_scrape': {
                 const { chapId, url, source, force } = payload;
+                const chapRes = await query("SELECT c.title, m.title as m_title FROM chapters c JOIN manga m ON c.manga_id = m.id WHERE c.id = @chapId LIMIT 1", { chapId });
+                const titles = chapRes.recordset?.[0];
+                updateTelemetry({ 
+                    status: 'scraping_images', 
+                    currentManga: titles?.m_title || chapId.split('_')[0],
+                    currentChapter: titles?.title || chapId
+                });
                 await crawlChapterImages(chapId, url, source, force);
                 break;
             }
             case 'manga_sync': {
                 const { mangaId, url, source, earlyExit } = payload;
+                const mRes = await query("SELECT title FROM manga WHERE id = @mangaId LIMIT 1", { mangaId });
+                updateTelemetry({ 
+                    status: 'manga_sync', 
+                    currentManga: mRes.recordset?.[0]?.title || mangaId,
+                    currentChapter: 'Full Metadata'
+                });
                 await crawlFullMangaChapters(mangaId, url, source, earlyExit);
                 break;
             }
             case 'system_discovery': {
                 const { source, pageCount } = payload;
+                updateTelemetry({ status: 'discovery', currentManga: `Global: ${source}`, currentChapter: `Page 1..${pageCount}` });
                 await crawlLatest(source, pageCount);
                 break;
             }
@@ -90,7 +104,7 @@ export async function processQueue() {
 
     const tasks = pickRes.recordset || [];
     if (tasks.length === 0) {
-        setTimeout(processQueue, 3000);
+        setTimeout(processQueue, 1000); // Poll every 1s instead of 3s
         return;
     }
 
@@ -197,7 +211,6 @@ export async function crawlFullMangaChapters(mangaId, url, source, earlyExit = f
                 `, { chapId, mangaId, title: chapTitle, url: chapUrl, chapNum });
 
                 queueChapterScrape(chapId, chapUrl, source).catch(() => {});
-                await new Promise(r => setTimeout(r, 20));
             } catch (chapterErr) {
                 console.error(`[Crawler][Error] Failed to process chapter:`, chapterErr.message);
             }
@@ -249,7 +262,6 @@ export async function crawlLatest(source = 'nettruyen', pageCount = 1, startPage
                 
                 // Queue Sync for existing or new manga
                 await queueMangaSync(slug, mangaUrl, source, true, 4);
-                await new Promise(r => setTimeout(r, 100));
             }
         } catch (e) {
             console.error(`[Crawler] Page ${p} Discovery failed:`, e.message);
@@ -270,7 +282,7 @@ export async function crawlChapterImages(chapId, url, source = 'nettruyen', forc
             if ((existing.recordset?.[0]?.count || 0) > 3) return existing.recordset[0].count;
         }
 
-        updateTelemetry({ status: 'scraping_images', currentChapter: chapId });
+        updateTelemetry({ status: 'scraping_images' });
         const response = await fetchWithRetry(url);
         const images = parsers.parseChapterImages(response.data, source);
 
