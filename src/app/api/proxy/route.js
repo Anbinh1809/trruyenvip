@@ -152,10 +152,13 @@ export async function GET(request) {
             
             if (width > 0) {
                 transformer = transformer.resize({ 
-                    width: Math.min(width, 2500), // Increased cap for 4K
+                    width: Math.min(width, 1800),
                     withoutEnlargement: true 
                 });
             }
+
+            // SHARPENING: Improve crispness of manga text and line art
+            transformer = transformer.sharpen({ sigma: 0.8, m1: 1.0, m2: 2.0 });
 
             let processedBuffer;
             let finalMime = 'image/webp';
@@ -163,13 +166,13 @@ export async function GET(request) {
 
             if (supportsAvif) {
                 processedBuffer = await transformer
-                    .avif({ quality: Math.min(quality, 70), effort: 2 }) // Quality boost
+                    .avif({ quality: 90, effort: 3 })
                     .toBuffer();
                 finalMime = 'image/avif';
                 optTag = `sharp-avif-${winningStrategy}`;
             } else {
                 processedBuffer = await transformer
-                    .webp({ quality: Math.max(quality, 85), effort: 4 }) // Quality boost
+                    .webp({ quality: 95, effort: 4, lossless: false })
                     .toBuffer();
             }
 

@@ -6,24 +6,26 @@ export const revalidate = 300; // Cache for 5 minutes
 export async function GET() {
     try {
         const result = await query(`
-            SELECT id, username, level, xp, avatar, contribution_points, badge_ids
-            FROM "Users"
-            ORDER BY level DESC, xp DESC
+            SELECT id, username, xp, vipcoins, avatar
+            FROM users
+            ORDER BY xp DESC
             LIMIT 50
         `);
 
-        // Compute rank in JS instead of dbo.calculateRank
-        const usersWithRank = (result.recordset || []).map(u => {
+        // Compute rank tier from XP
+        const usersWithRank = (result.recordset || []).map((u, index) => {
             let rankStr = 'Thành viên mới';
-            if (u.level >= 100) rankStr = 'Thành viên danh dự';
-            else if (u.level >= 75) rankStr = 'Hội viên kim cương';
-            else if (u.level >= 50) rankStr = 'Hội viên vàng';
-            else if (u.level >= 30) rankStr = 'Độc giả cao cấp';
-            else if (u.level >= 10) rankStr = 'Độc giả trung thành';
+            const xp = u.xp || 0;
+            if (xp >= 10000) rankStr = 'Thành viên danh dự';
+            else if (xp >= 5000) rankStr = 'Hội viên kim cương';
+            else if (xp >= 2000) rankStr = 'Hội viên vàng';
+            else if (xp >= 500) rankStr = 'Độc giả cao cấp';
+            else if (xp >= 100) rankStr = 'Độc giả trung thành';
             
             return {
                 ...u,
-                rank: rankStr
+                rank: rankStr,
+                position: index + 1,
             };
         });
 

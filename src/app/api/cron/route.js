@@ -1,5 +1,6 @@
-import { queueMangaSync, queueDiscovery, SOURCES } from '@/lib/crawler';
- 
+import { queueDiscovery } from '@/lib/crawler';
+import { runMaintenance } from '@/lib/maintenance';
+
 export async function GET(request) {
   const authHeader = request.headers.get('authorization');
   const secret = process.env.CRON_SECRET;
@@ -9,14 +10,18 @@ export async function GET(request) {
   }
  
   try {
-    // TITAN ARCHITECTURE: Instead of running the heavy crawl in the HTTP request (timeout risk),
-    // we queue it in our background task system.
+    // 1. PERFORM SYSTEM MAINTENANCE FIRST
+    // This keeps the Neon DB lean by pruning old logs, orphans, and stuck tasks.
+    const maintenance = await runMaintenance();
+
+    // 2. TITAN ARCHITECTURE: Queue heavy discovery tasks
     await queueDiscovery('nettruyen', 3, 10);
     await queueDiscovery('truyenqq', 3, 10);
     
     return Response.json({ 
         success: true, 
-        message: 'Cron triggered: Priority discovery queued in background.' 
+        message: 'Cron triggered: Maintenance complete and tasks queued.',
+        maintenance: maintenance.results
     }, { status: 200 });
   } catch (error) {
     console.error('[CRON API] Trigger Error:', error.message);
