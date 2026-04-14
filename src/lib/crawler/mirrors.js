@@ -3,27 +3,23 @@
  */
 
 export const SOURCES = {
-    NETTRUYEN: 'https://www.nettruyenme.com/',
+    NETTRUYEN: 'https://nettruyen.us.com/',
     NETTRUYEN_MIRRORS: [
-        'https://www.nettruyenme.com/', 
-        'https://www.nettruyenpro.com/', 
+        'https://nettruyen.us.com/',
+        'https://www.nettruyenus.com/', 
         'https://www.nettruyennew.com/', 
-        'https://www.nettruyenking.com/', 
         'https://www.nettruyenon.com/',
-        'https://www.nettruyenco.vn/',
+        'https://www.nettruyentv.com/',
+        'https://www.nettruyenv.com/',
         'https://www.nettruyenmax.com/',
-        'https://www.nettruyenvi.com/',
-        'https://www.nettruyencc.com/',
-        'https://www.nettruyeninfo.com/',
-        'https://www.nettruyenus.com/',
-        'https://www.nettruyentv.com/'
+        'https://www.nettruyenpro.com/'
     ],
     TRUYENQQ: 'https://truyenqqno.com/',
     TRUYENQQ_MIRRORS: [
         'https://truyenqqno.com/',
-        'https://truyenqqvi.com/',
-        'https://truyenqqvn.com/',
-        'https://truyenqqtop.com/'
+        'https://truyenqq.top/',
+        'https://truyenqq.info/',
+        'https://truyenqq.nu/'
     ]
 };
 
@@ -36,11 +32,11 @@ global.mirrorScores = global.mirrorScores || {};
 global.mirrorQuarantine = global.mirrorQuarantine || {};
 
 export const USER_AGENTS = [
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0'
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0',
+    'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36'
 ];
 
 export const SEARCH_REFERERS = [

@@ -68,3 +68,22 @@ export function parseChapterNumber(title) {
     const fallbackMatch = title.match(/(\d+(?:\.\d+)?)/);
     return fallbackMatch ? parseFloat(fallbackMatch[1]) : null;
 }
+/**
+ * TITAN DOMAIN INFERENCE: Predicts potential new domains when old ones die
+ */
+export function inferAlternativeMirrors(mirrorUrl) {
+    if (!mirrorUrl) return [];
+    try {
+        const url = new URL(mirrorUrl);
+        const domain = url.hostname;
+        const base = domain.split('.').slice(0, -1).join('.');
+        
+        // Common TLD evolution patterns in Vietnam
+        const tlds = ['tv', 'com', 'us', 'win', 'pro', 'me', 'info', 'asia'];
+        return tlds
+            .map(tld => `${url.protocol}//${base}.${tld}/`)
+            .filter(m => m !== mirrorUrl);
+    } catch {
+        return [];
+    }
+}
