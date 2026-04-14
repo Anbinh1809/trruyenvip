@@ -18,14 +18,8 @@ const Comments = dynamic(() => import('@/components/CommentSection'), {
 
 async function getChapterData(mangaId, chapterId) {
   try {
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(mangaId);
-    
-    let mangaRes;
-    if (isUuid) {
-        mangaRes = await query('SELECT id, title FROM manga WHERE id = @mangaId', { mangaId });
-    } else {
-        mangaRes = await query('SELECT id, title FROM manga WHERE normalized_title = @mangaId', { mangaId });
-    }
+    // TITAN SMART LOOKUP 2.0: Check both id and normalized_title simultaneously
+    const mangaRes = await query('SELECT id, title FROM manga WHERE id = @mangaId OR normalized_title = @mangaId LIMIT 1', { mangaId });
     
     const manga = mangaRes.recordset[0];
     if (!manga) return null;
