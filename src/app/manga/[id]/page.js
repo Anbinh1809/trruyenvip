@@ -207,39 +207,51 @@ export default async function MangaDetail({ params }) {
       <StructuredData data={jsonLd} />
       <StructuredData data={breadcrumbJsonLd} />
       <Header />
-      <div className="detail-hero-titan" style={{ backgroundImage: `url(${manga.cover})` }} />
+      
+      {/* Dynamic Backdrop: Standardized Proxy Handling */}
+      <div 
+        className="detail-hero-titan" 
+        style={{ backgroundImage: `url(${manga.cover})` }} 
+      />
       
       <div className="container detail-content-wrapper" style={{ minHeight: '600px' }}>
         <div className="detail-header responsive-header">
           <DetailCover src={manga.cover} alt={manga.title} />
+          
           <div className="detail-info">
             <h1 className="detail-title">{manga.title}</h1>
+            
             {manga.alternative_titles && manga.alternative_titles !== manga.title && (
                 <p className="detail-subtitle">
                     {manga.alternative_titles}
                 </p>
             )}
-            <div className="pill-group">
-                <div className="detail-actions-titan" style={{ display: 'flex', gap: '15px', marginTop: '30px', flexWrap: 'wrap' }}>
-                    <Link href={`/manga/${id}/chapter/${manga.chapters[0]?.id || ''}`} className="btn btn-primary" style={{ padding: '12px 35px' }}>ĐỌC NGAY</Link>
-                    <ShareButton 
-                        title={manga.title} 
-                        text={`Đọc truyện ${manga.title} bản đẹp, load nhanh tại TruyenVip!`} 
-                        url={`${origin}/manga/${manga.id}`} 
-                    />
-                </div>
+
+            <div className="pill-group" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '30px' }}>
                 <span className="pill author-pill" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <PenTool size={14} /> {manga.author || 'Đang cập nhật'}
                 </span>
                 <span className="pill status-pill accent">{manga.status || 'Đang cập nhật'}</span>
+                
                 {(manga.genres || []).map(g => (
                     <Link key={g.id} href={`/genres?type=${g.slug}`} className="pill genre-pill glass">
                         {g.name}
                     </Link>
                 ))}
-                {(!manga.genres || manga.genres.length === 0) && (
-                    <span className="pill genre-pill glass" style={{ opacity: 0.5 }}>Đang cập nhật</span>
+            </div>
+            
+            <div className="detail-actions-titan" style={{ display: 'flex', gap: '15px', marginBottom: '35px', flexWrap: 'wrap' }}>
+                <Link href={`/manga/${id}/chapter/${manga.chapters[0]?.id || ''}`} className="btn btn-primary" style={{ padding: '12px 35px' }}>
+                    ĐỌC NGAY
+                </Link>
+                {manga.chapters.length > 0 && (
+                    <ContinueReadingButton mangaId={manga.id} chapters={manga.chapters} />
                 )}
+                <ShareButton 
+                    title={manga.title} 
+                    text={`Đọc truyện ${manga.title} bản đẹp, load nhanh tại TruyenVip!`} 
+                    url={`${origin}/manga/${manga.id}`} 
+                />
             </div>
             
             <div className="description-container glass">
@@ -252,12 +264,6 @@ export default async function MangaDetail({ params }) {
                         <Link href={`https://truyenqqno.com/truyen-tranh/${manga.id}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', fontWeight: 800, textDecoration: 'underline' }}>Xem chi tiết tại nguồn gốc</Link>
                     </div>
                 )}
-            </div>
-
-            <div className="detail-actions">
-              {manga.chapters.length > 0 && (
-                <ContinueReadingButton mangaId={manga.id} chapters={manga.chapters} />
-              )}
             </div>
 
           </div>

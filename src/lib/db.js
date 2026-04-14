@@ -23,8 +23,10 @@ const isCloudDB = connectionString?.includes('supabase') ||
 
 const pool = new Pool({ 
     connectionString: connectionString,
-    connectionTimeoutMillis: 10000, 
+    connectionTimeoutMillis: 15000, // Increased for serverless cold-starts
+    idleTimeoutMillis: 30000,        // Prune stale connections
     max: 10, 
+    allowExitOnIdle: true,          // Allow build process to terminate cleanly
     ssl: isCloudDB ? { rejectUnauthorized: false } : false
 });
 
@@ -35,7 +37,6 @@ const MAX_CACHE_SIZE = 500;
 /**
  * TITAN QUERY TRANSLATOR
  * Automatically adapts MSSQL syntax to PostgreSQL at runtime.
- * Supports: @params -> $n, TOP -> LIMIT, GETDATE() -> NOW(), [col] -> "col"
  */
 function translateSql(sql, params) {
     if (translationCache.has(sql)) {
@@ -69,60 +70,44 @@ function translateSql(sql, params) {
         }
     }
 
-    // 2. String Concatenation Fix (MSSQL + to Postgres ||)
-    // Converts $1 + '%' OR '%' + $1 OR 'A' + 'B'
+    // 2. String Concatenation Fix
     translatedSql = translatedSql.replace(/(\$\d+|'[^']*')\s*\+\s*(\$\d+|'[^']*')/gi, '$1 || $2');
 
-    // 3. Robust TOP to LIMIT translation
-    // Handles SELECT TOP 10 ..., SELECT DISTINCT TOP 10 ..., and subqueries
-    // Postgres LIMIT must be at the end of the clause.
-    // Refined: Stop only at query terminator (;) or end of string ($) to support subqueries.
+    // 3. TOP to LIMIT
     translatedSql = translatedSql.replace(/(SELECT\s+(?:DISTINCT\s+)?TOP\s+\(?(\d+|\$\d+)\)?)(.*?)(?=;|$)/gis, (match, prefix, limit, rest) => {
         const selectStmt = prefix.toUpperCase().includes('DISTINCT') ? 'SELECT DISTINCT' : 'SELECT';
         if (/\bLIMIT\b/i.test(rest)) return match;
         return `${selectStmt}${rest} LIMIT ${limit}`;
     });
 
-    // 4. Common Function Mapping
+    // 4. Common Functions
     translatedSql = translatedSql.replace(/LIKE\s+N'/gi, "LIKE '");
     translatedSql = translatedSql.replace(/GETDATE\(\)/gi, 'NOW()');
     translatedSql = translatedSql.replace(/ISNULL/gi, 'COALESCE');
     translatedSql = translatedSql.replace(/LEN\s*\(/gi, 'LENGTH(');
     translatedSql = translatedSql.replace(/CHARINDEX\(([^,]+),\s*([^)]+)\)/gi, 'STRPOS($2, $1)');
 
-    // 5. Convert DATEADD (e.g., DATEADD(hour, -1, GETDATE()) -> NOW() - INTERVAL '1 hour')
-    // Supports hardcoded values, $1 placeholders, and @params
+    // 5. DATEADD
     translatedSql = translatedSql.replace(/DATEADD\s*\(\s*(\w+)\s*,\s*(-?\s*(?:\d+|\$\d+|@\w+))\s*,\s*([^)]+)\)/gi, (match, unit, amount, date) => {
         const isParam = amount.includes('$') || amount.includes('@');
-        if (isParam) {
-            // Complex case: dynamic interval
-            return `(${date} + (${amount} * INTERVAL '1 ${unit}'))`;
-        }
+        if (isParam) return `(${date} + (${amount} * INTERVAL '1 ${unit}'))`;
         const cleanAmount = amount.replace(/\s+/g, '');
         const absAmount = Math.abs(parseInt(cleanAmount));
         const sign = parseInt(cleanAmount) >= 0 ? '+' : '-';
         return `(${date} ${sign} INTERVAL '${absAmount} ${unit}')`;
     });
 
-    // 6. Convert SQL Server specific operators (CROSS APPLY / OUTER APPLY / OUTPUT)
+    // 6. Operators
     translatedSql = translatedSql.replace(/CROSS APPLY/gi, 'CROSS JOIN LATERAL');
     translatedSql = translatedSql.replace(/OUTER APPLY/gi, 'LEFT JOIN LATERAL');
     translatedSql = translatedSql.replace(/OUTPUT\s+inserted\.(\w+)/gi, 'RETURNING $1');
     translatedSql = translatedSql.replace(/OUTPUT\s+inserted\.\*/gi, 'RETURNING *');
 
     // 7. Schema & Identifier Cleanup
-    // More aggressive dbo removal to handle [dbo]. / "dbo". / dbo. prefixes
     translatedSql = translatedSql.replace(/(?:\[dbo\]|"dbo"|dbo)\./gi, ''); 
-
-    // PostgreSQL requires exact case match for quoted identifiers. 
-    // Since our Neon tables/columns are entirely lowercase, we forcefully lowercase any bracketed or quoted identifiers.
-    // [vipCoins] -> "vipcoins"
     translatedSql = translatedSql.replace(/\[([^\]]+)\]/g, (match, p1) => `"${p1.toLowerCase()}"`);
-    
-    // "Manga" -> "manga"
     translatedSql = translatedSql.replace(/"([^"]+)"/g, (match, p1) => `"${p1.toLowerCase()}"`);
 
-    // Cache the result for future identical queries
     if (translationCache.size < MAX_CACHE_SIZE) {
         translationCache.set(sql, { translatedSql, paramOrder });
     }
@@ -130,14 +115,17 @@ function translateSql(sql, params) {
     return { sql: translatedSql, values };
 }
 
-export async function query(sqlString, params = {}, client = null) {
+/**
+ * TITAN QUERY EXECUTOR with Self-Healing Retries
+ */
+export async function query(sqlString, params = {}, client = null, retryCount = 0) {
     const { sql: psql, values } = translateSql(sqlString, params);
+    const MAX_RETRIES = 3;
     
     try {
         const executor = client || pool;
         const result = await executor.query(psql, values);
         
-        // Emulate mssql .recordset and .recordsets for backward compatibility
         const rows = result.rows || [];
         return {
             recordset: rows,
@@ -146,7 +134,20 @@ export async function query(sqlString, params = {}, client = null) {
             rowCount: result.rowCount || 0
         };
     } catch (err) {
-        // Always log translated SQL on error to assist production debugging
+        // Connection Termination / Timeout Error Codes
+        const isTerminationError = 
+            err.message.includes('Connection terminated') || 
+            err.code === 'ECONNRESET' || 
+            err.code === '57P01' || // admin_shutdown
+            err.code === '57P03';   // cannot_connect_now
+            
+        if (isTerminationError && retryCount < MAX_RETRIES && !client) {
+            const delay = 500 * Math.pow(2, retryCount);
+            console.warn(`[PG RETRY ${retryCount + 1}/${MAX_RETRIES}] Connection lost. Retrying in ${delay}ms...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            return query(sqlString, params, client, retryCount + 1);
+        }
+
         console.error(`[PG ERROR] ${err.message} \nOriginal SQL: ${sqlString.substring(0, 300)} \nTranslated: ${psql.substring(0, 300)}`);
         throw err;
     }
@@ -156,17 +157,32 @@ export async function query(sqlString, params = {}, client = null) {
  * Managed Transaction for PostgreSQL
  */
 export async function withTransaction(callback) {
-    const client = await pool.connect();
+    let client;
+    const MAX_CONN_RETRIES = 2;
+    let connAttempt = 0;
+
+    // Wrap connection logic to handle initial cold starts
+    while (connAttempt <= MAX_CONN_RETRIES) {
+        try {
+            client = await pool.connect();
+            break;
+        } catch (e) {
+            if (connAttempt === MAX_CONN_RETRIES) throw e;
+            connAttempt++;
+            await new Promise(r => setTimeout(r, 1000 * connAttempt));
+        }
+    }
+
     try {
         await client.query('BEGIN');
         const result = await callback(client);
         await client.query('COMMIT');
         return result;
     } catch (err) {
-        await client.query('ROLLBACK');
+        if (client) await client.query('ROLLBACK');
         throw err;
     } finally {
-        client.release();
+        if (client) client.release();
     }
 }
 

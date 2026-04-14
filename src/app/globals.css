@@ -50,7 +50,12 @@
   --border-radius: 4px;
   --font-body: 'Inter', sans-serif;
   --font-heading: 'Outfit', sans-serif;
+  /* Z-Index Architecture: Standardized Global Layers */
   --z-header: 1000;
+  --z-search: 2000;
+  --z-progress: 2100;
+  --z-modal: 5000;
+  --z-mobile-nav: 9999;
 
   /* Nebula Design Tokens */
   --nebula-blue: #4dc6e8;
@@ -64,6 +69,7 @@
 .truncate-1 {
     display: -webkit-box;
     -webkit-line-clamp: 1;
+    line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -72,6 +78,7 @@
 .truncate-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1150,10 +1157,15 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
     border-bottom: none;
 }
 
+.chapter-item-titan:nth-child(even) {
+    background: rgba(255, 255, 255, 0.015);
+}
+
 .chapter-item-titan:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 62, 62, 0.08);
     color: var(--accent);
     padding-left: 25px;
+    border-left: 3px solid var(--accent);
 }
 
 .titan-filter-grid {
@@ -1505,7 +1517,7 @@ nextjs-portal, #nextjs-portal { display: none !important; }
     left: 0;
     width: 100%;
     height: 3px;
-    z-index: 2200;
+    z-index: var(--z-progress);
     background: rgba(255, 255, 255, 0.05);
 }
 

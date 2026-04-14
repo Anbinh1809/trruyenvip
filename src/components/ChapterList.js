@@ -99,7 +99,7 @@ export default function ChapterList({ mangaId, chapters }) {
         </div>
       ) : (
         <div className="chapter-grid-titan">
-            {filteredChapters.map(chapter => (
+            {displayedChapters.map(chapter => (
                 <Link 
                     key={chapter.id} 
                     href={`/manga/${mangaId}/chapter/${chapter.id}`} 
@@ -118,6 +118,16 @@ export default function ChapterList({ mangaId, chapters }) {
                     </span>
                 </Link>
             ))}
+            
+            {hasMore && (
+                <button 
+                    onClick={() => setDisplayCount(prev => prev + 100)}
+                    className="btn btn-outline"
+                    style={{ margin: '30px auto', display: 'flex', width: 'fit-content', padding: '12px 40px' }}
+                >
+                    XEM THÊM CHƯƠNG
+                </button>
+            )}
         </div>
       )}
     </section>
