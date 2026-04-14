@@ -23,11 +23,16 @@ const isCloudDB = connectionString?.includes('supabase') ||
 
 const pool = new Pool({ 
     connectionString: connectionString,
-    connectionTimeoutMillis: 15000, // Increased for serverless cold-starts
+    connectionTimeoutMillis: 30000, // Titan-grade timeout for cold starts
     idleTimeoutMillis: 30000,        // Prune stale connections
     max: 10, 
     allowExitOnIdle: true,          // Allow build process to terminate cleanly
     ssl: isCloudDB ? { rejectUnauthorized: false } : false
+});
+
+// GLOBAL POOL ERROR HANDLER: Proactively handle idle connection losses
+pool.on('error', (err) => {
+    console.warn('[PG POOL WARNING] Idle client error:', err.message);
 });
 
 // Cache for translated SQL to avoid regex overhead on every query
@@ -134,16 +139,20 @@ export async function query(sqlString, params = {}, client = null, retryCount = 
             rowCount: result.rowCount || 0
         };
     } catch (err) {
-        // Connection Termination / Timeout Error Codes
+        const errMsg = err.message.toLowerCase();
+        
+        // Comprehensive Detection of Network/Termination/Timeout errors
         const isTerminationError = 
-            err.message.includes('Connection terminated') || 
+            errMsg.includes('terminated') || 
+            errMsg.includes('timeout') || 
+            errMsg.includes('reset') ||
             err.code === 'ECONNRESET' || 
-            err.code === '57P01' || // admin_shutdown
-            err.code === '57P03';   // cannot_connect_now
+            err.code === '57P01' || 
+            err.code === '57P03';
             
         if (isTerminationError && retryCount < MAX_RETRIES && !client) {
-            const delay = 500 * Math.pow(2, retryCount);
-            console.warn(`[PG RETRY ${retryCount + 1}/${MAX_RETRIES}] Connection lost. Retrying in ${delay}ms...`);
+            const delay = 1000 * Math.pow(2, retryCount); // Slightly longer delay for advanced hardening
+            console.warn(`[PG RETRY ${retryCount + 1}/${MAX_RETRIES}] Reason: ${err.message}. Retrying in ${delay}ms...`);
             await new Promise(resolve => setTimeout(resolve, delay));
             return query(sqlString, params, client, retryCount + 1);
         }
