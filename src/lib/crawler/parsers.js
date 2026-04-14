@@ -109,6 +109,20 @@ export function parseChapterImages(html, sourceName, sourceUrl) {
             }
         });
     });
+
+    // TITAN BROAD-SPECTRUM FALLBACK (Regex Scan)
+    if (images.size === 0) {
+        const imgRegex = /https?:\/\/[^"'>\s]+\.(?:jpg|jpeg|png|webp|avif)(?:\?[^"'>\s]*)?/gi;
+        let match;
+        while ((match = imgRegex.exec(html)) !== null) {
+            const src = match[0];
+            if (!src.includes('proxy') && !src.includes('logo') && !src.includes('banner')) {
+                images.add(resolveUrl(src, sourceUrl));
+            }
+            // Protective limit: don't loop forever on massive malicious HTML
+            if (images.size > 500) break;
+        }
+    }
     
     return Array.from(images);
 }

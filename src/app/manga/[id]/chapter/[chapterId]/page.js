@@ -48,6 +48,21 @@ async function getChapterData(mangaId, chapterId) {
         return null;
     }
 
+    // TITAN CONTENT RECOVERY: Auto-sync if images are missing
+    let imagesRes = await query('SELECT image_url FROM chapterimages WHERE chapter_id = @id ORDER BY "order" ASC', { id: chapterId });
+    if (!imagesRes.recordset || imagesRes.recordset.length === 0) {
+        console.log(`[Aegis:Sync] No images for ${chapterId}. Triggering Hot-Sync...`);
+        const { crawlChapterImages } = await import('@/lib/crawler/engine');
+        // Infer source from URL or default to nettruyen style
+        const source = chapter.source_url?.includes('truyenqq') ? 'truyenqq' : 'nettruyen';
+        if (chapter.source_url) {
+            await crawlChapterImages(chapterId, chapter.source_url, source, true);
+            // Refresh images after sync
+            imagesRes = await query('SELECT image_url FROM chapterimages WHERE chapter_id = @id ORDER BY "order" ASC', { id: chapterId });
+        }
+    }
+    const images = imagesRes.recordset || [];
+
     const chaptersRes = await query(`
         SELECT id, chapter_number, title 
         FROM chapters 
@@ -73,7 +88,7 @@ async function getChapterData(mangaId, chapterId) {
         }
     }
 
-    return { manga: { ...manga, cover: signedCover }, chapter, chapters, prevChapter, nextChapter };
+    return { manga: { ...manga, cover: signedCover }, chapter, chapters, prevChapter, nextChapter, images };
   } catch (err) {
     console.error('Fetch Chapter Error:', err);
     return null;
@@ -95,11 +110,10 @@ export default async function ChapterPage({ params }) {
     );
   }
 
-    const { manga, chapter, chapters, nextChapter, prevChapter } = data;
+    const { manga, chapter, chapters, nextChapter, prevChapter, images } = data;
     
     // Server-side image signing (Ultra-Fidelity)
-    const imagesRes = await query('SELECT image_url FROM chapterimages WHERE chapter_id = @id ORDER BY "order" ASC', { id: chapterId });
-    const initialImages = (imagesRes.recordset || []).map(img => {
+    const initialImages = images.map(img => {
         const w = 1200; // Default server-side width
         const q = 80;   // Default quality
         const sig = generateProxySignature(img.image_url, w, q);
