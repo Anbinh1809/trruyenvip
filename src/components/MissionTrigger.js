@@ -17,7 +17,6 @@ export default function MissionTrigger({ type, increment = 1 }) {
     const now = Date.now();
 
     if (lastTrigger && (now - parseInt(lastTrigger)) < 30000) {
-        console.log(`[MissionTrigger] Throttled heartbeat for ${type}.`);
         return;
     }
 

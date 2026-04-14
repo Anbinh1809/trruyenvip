@@ -156,7 +156,7 @@ export function EngagementProvider({ children }) {
              const data = await res.json();
              // If rate limited, we just wait for next cycle
              if (res.status !== 429) {
-                console.error('Failed to sync engagement deltas:', data.error);
+                // Silent failure for production stability
              }
         }
     } catch (e) {
@@ -278,7 +278,6 @@ export function EngagementProvider({ children }) {
             const { dateString } = await timeRes.json();
             
             if (state.dailyMissions.date !== dateString) {
-                console.log('[Engagement] New day detected by Server. Resetting daily missions.');
                 dispatch({ type: 'RESET_MISSIONS' });
                 // We also update the mission date to the server's date string
                 localStorage.setItem('truyenvip_daily_missions', JSON.stringify({ ...state.dailyMissions, date: dateString }));

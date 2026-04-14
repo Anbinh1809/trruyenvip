@@ -138,6 +138,9 @@ export default async function MangaDetail({ params }) {
           </div>
       </main>
   );
+  const host = (await headers()).get('host') || 'truyenvip.com';
+  const protocol = host.startsWith('localhost') ? 'http' : 'https';
+  const origin = `${protocol}://${host}`;
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -160,9 +163,7 @@ export default async function MangaDetail({ params }) {
     }
   };
 
-  const host = (await headers()).get('host') || 'truyenvip.com';
-  const protocol = host.startsWith('localhost') ? 'http' : 'https';
-  const origin = `${protocol}://${host}`;
+
 
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',

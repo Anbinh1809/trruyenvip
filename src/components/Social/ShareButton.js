@@ -23,7 +23,7 @@ export default function ShareButton({ title, text, url, className = "" }) {
             try {
                 await navigator.share(shareData);
             } catch (err) {
-                console.log('Share cancelled or failed', err);
+                // Silently handle cancellation
             }
         } else {
             // Fallback: Copy to clipboard

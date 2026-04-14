@@ -47,8 +47,7 @@ export default function ChapterPrefetcher({ mangaId, chapters = [] }) {
             targets.push(chapters[0].id);
         }
 
-        // Silent Pre-sync for instant loading
-        // console.log(`[Prefetcher] Proactively syncing ${targets.length} chapters...`);
+
 
         // 2. Trigger JIT-Sync for targets
         for (const chapId of targets) {

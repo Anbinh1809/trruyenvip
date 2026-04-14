@@ -18,7 +18,6 @@ export default function NextChapterPrefetcher({ nextChapterId, nextChapterImages
         
         // ORACLE PRE-SYNC: If no images found in DB, trigger a silent JIT-Sync
         if (nextChapterImages.length === 0) {
-            console.log(`[Oracle] Neural Gap Detected. Silently triggering JIT-Sync for: ${nextChapterId}`);
             try {
                 await fetch('/api/crawler/jit-sync', {
                     method: 'POST',
@@ -29,13 +28,10 @@ export default function NextChapterPrefetcher({ nextChapterId, nextChapterImages
                 setPrefetched(true);
                 return;
             } catch (e) {
-                console.error('[Oracle] JIT-Sync Trigger failed:', e.message);
+                // Silent fail
             }
         }
 
-        console.log(`[Oracle] Optimistically pre-fetching ${nextChapterImages.length} images for chapter: ${nextChapterId}`);
-        
-        // Pre-fetch only the first 5 images to save bandwidth while still giving a massive performance boost
         const slice = nextChapterImages.slice(0, 5);
         
         const promises = slice.map(img => {
@@ -51,7 +47,6 @@ export default function NextChapterPrefetcher({ nextChapterId, nextChapterImages
 
         await Promise.all(promises);
         setPrefetched(true);
-        console.log(`[Oracle] Next chapter pre-fetch complete.`);
     };
 
     prefetchImages();

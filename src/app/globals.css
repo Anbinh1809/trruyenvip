@@ -3,11 +3,7 @@
   100% { background-position: 200% 0; }
 }
 
-@keyframes glow-pulse {
-    0% { box-shadow: 0 0 5px rgba(255, 62, 62, 0.1); }
-    50% { box-shadow: 0 0 12px rgba(255, 62, 62, 0.3); }
-    100% { box-shadow: 0 0 5px rgba(255, 62, 62, 0.1); }
-}
+
 
 .skeleton-shimmer {
   background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
@@ -164,7 +160,7 @@ body {
     height: 380px;
     position: relative;
     margin-bottom: 40px;
-    filter: drop-shadow(0 0 30px rgba(255, 62, 62, 0.2));
+    filter: none;
 }
 
 @media (max-width: 768px) {
@@ -307,6 +303,7 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
     margin-bottom: 25px;
     background: linear-gradient(to right, #fff, #94a3b8);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
 }
@@ -457,7 +454,7 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
     margin-top: 12px;
     margin-bottom: 4px;
     color: var(--text-primary);
-    display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;
+    display: -webkit-box; -webkit-line-clamp: 1; line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;
 }
 
 .card-chapter-centered {
@@ -768,8 +765,7 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
 /* Keyframes & Animations */
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes pulseAccent { 0% { box-shadow: 0 0 0 0 rgba(255, 62, 62, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(255, 62, 62, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 62, 62, 0); } }
-@keyframes spinFade { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
 
 .fade-up { animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 .fade-in { animation: fadeIn 0.8s ease forwards; }
@@ -808,7 +804,7 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
     border: 1px solid var(--glass-border); border-radius: var(--border-radius);
     z-index: 2000; overflow: hidden;
 }
-.btn-migrate-pulse { }
+
 
 /* Daily CheckIn Components */
 .checkin-section-titan { margin-bottom: 50px; position: relative; z-index: 10; }
@@ -1735,7 +1731,7 @@ nextjs-portal, #nextjs-portal { display: none !important; }
 
 /* RANK AURAS - removed glow effects for minimalist UI */
 /* RANK AURAS - removed for minimalist UI */
-.rank-aura-premium { }
+
 
 /* ERGONOMIC BRIGHTNESS ENGINE */
 :root {
@@ -1823,6 +1819,7 @@ nextjs-portal, #nextjs-portal { display: none !important; }
 
 .chapter-scroll-item {
     scroll-margin-top: 100px;
+}
 
 /* ==========================================================================
    QUICK RESUME BANNER (HOME PAGE HERO)
