@@ -27,6 +27,26 @@
     width: 100%;
 }
 
+.logo {
+    font-size: 1.6rem;
+    font-weight: 950;
+    letter-spacing: -1px;
+    text-transform: uppercase;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    transition: transform 0.3s ease;
+}
+
+.logo:hover {
+    transform: scale(1.02);
+}
+
+.logo span:last-child {
+    text-shadow: 0 0 15px rgba(255, 62, 62, 0.4);
+}
+
 .nav-titan {
     display: flex;
     align-items: center;
