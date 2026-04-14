@@ -66,43 +66,92 @@ export default function DetailActions({ mangaId, firstChapterId, mangaTitle, man
     };
 
     return (
-        <div className="detail-actions-titan">
-            {mangaHistory ? (
-                <Link 
-                    href={`/manga/${mangaId}/chapter/${mangaHistory.chapterId}`} 
-                    className="btn btn-primary read-btn-titan shadow-titan continue-btn-industrial"
-                    onMouseEnter={() => handleHover(mangaHistory.chapterId)}
-                    onMouseLeave={handleHoverExit}
-                >
-                    <Play size={20} fill="currentColor" /> ĐỌC TIẾP CHƯƠNG {mangaHistory.chapterNumber}
-                </Link>
-            ) : (
-                <Link 
-                    href={firstChapterId ? `/manga/${mangaId}/chapter/${firstChapterId}` : '#'} 
-                    className={`btn btn-primary read-btn-titan shadow-titan ${!firstChapterId ? 'disabled-industrial op-50' : ''}`}
-                    onMouseEnter={() => handleHover(firstChapterId)}
-                    onMouseLeave={handleHoverExit}
-                    onClick={(e) => !firstChapterId && e.preventDefault()}
-                >
-                    <BookOpen size={20} /> {firstChapterId ? 'ĐỌC TỪ ĐẦU' : 'CHƯA CÓ CHƯƠNG'}
-                </Link>
-            )}
-            
-            <FavoriteButton manga={{ id: mangaId, title: mangaTitle, cover: mangaCover }} />
-            
-            <button className="btn btn-glass share-btn-titan shadow-titan" onClick={handleShare}>
-                <Share2 size={20} /> CHIA SẺ
-            </button>
+        <div className="detail-actions-traditional">
+            <div className="action-row-main">
+                {mangaHistory ? (
+                    <Link 
+                        href={`/manga/${mangaId}/chapter/${mangaHistory.chapterId}`} 
+                        className="btn-mirror btn-green shadow-titan"
+                        onMouseEnter={() => handleHover(mangaHistory.chapterId)}
+                        onMouseLeave={handleHoverExit}
+                    >
+                        <Play size={18} fill="currentColor" /> Đọc tiếp chương {mangaHistory.chapterNumber}
+                    </Link>
+                ) : (
+                    <Link 
+                        href={firstChapterId ? `/manga/${mangaId}/chapter/${firstChapterId}` : '#'} 
+                        className={`btn-mirror btn-green shadow-titan ${!firstChapterId ? 'disabled-mirror' : ''}`}
+                        onMouseEnter={() => handleHover(firstChapterId)}
+                        onMouseLeave={handleHoverExit}
+                        onClick={(e) => !firstChapterId && e.preventDefault()}
+                    >
+                        <BookOpen size={18} /> Đọc từ đầu
+                    </Link>
+                )}
+                
+                <FavoriteButton manga={{ id: mangaId, title: mangaTitle, cover: mangaCover }} />
+            </div>
+
+            <div className="action-row-sub">
+                <button className="btn-mirror btn-purple shadow-titan" onClick={() => alert('Đã thích truyện!')}>
+                    <Heart size={18} fill="currentColor" /> Thích
+                </button>
+            </div>
 
             <style jsx>{`
-                .continue-btn-industrial {
-                    background: linear-gradient(135deg, var(--accent) 0%, #ff4d4d 100%);
-                    animation: pulse-titan 2s infinite;
+                .detail-actions-traditional {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 15px;
+                    margin-top: 20px;
                 }
-                @keyframes pulse-titan {
-                    0% { box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0.4); }
-                    70% { box-shadow: 0 0 0 15px rgba(var(--accent-rgb), 0); }
-                    100% { box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0); }
+                .action-row-main {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 15px;
+                }
+                .action-row-sub {
+                    display: grid;
+                    grid-template-columns: 1fr;
+                }
+                .btn-mirror {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 10px;
+                    padding: 12px 20px;
+                    border-radius: 6px;
+                    font-size: 0.95rem;
+                    font-weight: 800;
+                    color: white;
+                    text-decoration: none;
+                    border: none;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                    text-transform: none;
+                }
+                .btn-green {
+                    background-color: #8bc34a;
+                }
+                .btn-green:hover {
+                    background-color: #7cb342;
+                    transform: translateY(-2px);
+                }
+                .btn-purple {
+                    background-color: #bc00e0;
+                }
+                .btn-purple:hover {
+                    background-color: #a300c2;
+                    transform: translateY(-2px);
+                }
+                .disabled-mirror {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
+                @media (max-width: 480px) {
+                    .action-row-main {
+                        grid-template-columns: 1fr;
+                    }
                 }
             `}</style>
         </div>

@@ -198,68 +198,81 @@ export default async function MangaDetailPage({ params }) {
       />
 
       <div className="container detail-content-wrapper fade-in">
-        {/* TITAN BREADCRUMBS */}
-        <nav className="breadcrumb-titan-industrial">
-            <Link href="/" className="breadcrumb-node">TRANG CHỦ</Link>
-            <span className="sep-titan">/</span>
-            <Link href="/genres" className="breadcrumb-node">THỂ LOẠI</Link>
-            <span className="sep-titan">/</span>
-            <span className="current-node-titan">{manga.title}</span>
+        {/* TRADITIONAL BREADCRUMBS */}
+        <nav className="breadcrumb-traditional">
+            <Link href="/" className="bread-node">Trang Chủ</Link>
+            <span className="bread-sep">/</span>
+            <Link href="/genres" className="bread-node">Manga</Link>
+            <span className="bread-sep">/</span>
+            <span className="bread-current">{manga.title}</span>
         </nav>
 
-        <div className="detail-grid-titan">
-            {/* LEFT: COVER & STATS */}
-            <div className="detail-left-column">
-                <div className="detail-cover-box shadow-titan">
+        <div className="manga-detail-traditional">
+            <div className="detail-top-section">
+                <div className="detail-left-cover">
                     <DetailCover src={manga.cover} alt={manga.title} />
                 </div>
                 
-                <div className="detail-meta-stats-industrial">
-                    <div className="meta-stat-node shadow-titan">
-                        <Star size={20} color="#fbbf24" fill="#fbbf24" />
-                        <div className="stat-info">
-                            <span className="stat-label-industrial">ĐÁNH GIÁ</span>
-                            <span className="stat-value-industrial">4.9/5.0</span>
+                <div className="detail-right-info">
+                    <h1 className="traditional-title" itemProp="name">{manga.title}</h1>
+                    
+                    {/* TRADITIONAL INFO TABLE */}
+                    <div className="info-table-titan">
+                        <div className="info-row">
+                            <span className="info-label"><User size={14} className="info-icon" /> Tên khác</span>
+                            <span className="info-value">{manga.alternative_titles || manga.title}</span>
+                        </div>
+                        <div className="info-row">
+                            <span className="info-label"><User size={14} className="info-icon" /> Tác giả</span>
+                            <span className="info-value text-accent">{manga.author || 'Đang cập nhật'}</span>
+                        </div>
+                        <div className="info-row">
+                            <span className="info-label"><Calendar size={14} className="info-icon" /> Ngày tạo</span>
+                            <span className="info-value">{new Date(manga.last_crawled || Date.now()).toLocaleDateString('vi-VN')}</span>
+                        </div>
+                        <div className="info-row">
+                            <span className="info-label"><BookOpen size={14} className="info-icon" /> Tổng số chap</span>
+                            <span className="info-value">{manga.chapters?.length || 0}</span>
+                        </div>
+                        <div className="info-row">
+                            <span className="info-label"><Star size={14} className="info-icon" /> Tình trạng</span>
+                            <span className="info-value">{manga.status || 'Đang tiến hành'}</span>
+                        </div>
+                        <div className="info-row">
+                            <span className="info-label"><Star size={14} className="info-icon" /> Đánh giá</span>
+                            <span className="info-value">{manga.rating || '4.9'} / 5.0</span>
+                        </div>
+                        <div className="info-row">
+                            <span className="info-label"><Heart size={14} className="info-icon" /> Lượt theo dõi</span>
+                            <span className="info-value">12.5k</span>
+                        </div>
+                        <div className="info-row">
+                            <span className="info-label"><Eye size={14} className="info-icon" /> Lượt xem</span>
+                            <span className="info-value">{manga.views || '125,000'}</span>
                         </div>
                     </div>
-                    <div className="meta-stat-node shadow-titan">
-                        <Heart size={20} color="var(--accent)" fill="var(--accent)" />
-                        <div className="stat-info">
-                            <span className="stat-label-industrial">YÊU THÍCH</span>
-                            <span className="stat-value-industrial">12.5k</span>
-                        </div>
+
+                    <div className="genre-cloud-traditional">
+                        {manga.genres.map((g, idx) => (
+                            <Link key={idx} href={`/genres/${g.slug}`} className="genre-pill-traditional">{g.name}</Link>
+                        ))}
                     </div>
+
+                    <DetailActions 
+                        mangaId={id} 
+                        firstChapterId={manga.chapters?.length > 0 ? manga.chapters[manga.chapters.length - 1]?.id : null} 
+                        mangaTitle={manga.title}
+                        mangaCover={manga.rawCover || manga.cover}
+                    />
                 </div>
             </div>
 
-            {/* RIGHT: INFO & CHAPTERS */}
-            <div className="detail-right-column">
-                <div className="detail-header-industrial">
-                    <div className="genre-cloud-industrial">
-                        {manga.genres.map((g, idx) => (
-                            <Link key={idx} href={`/genres/${g.slug}`} className="genre-tag-titan">{g.name}</Link>
-                        ))}
-                    </div>
-                    <h1 className="detail-title-industrial" itemProp="name">{manga.title}</h1>
-                    
-                    <div className="pill-group-industrial">
-                        <span className="author-pill-titan">
-                            <User size={16} /> {manga.author || 'Đang cập nhật'}
-                        </span>
-                        <span className="status-pill-titan">
-                            <Calendar size={16} /> 2024 • {manga.status || 'Đang tiến hành'}
-                        </span>
-                    </div>
-                </div>
-
-                <p className="detail-desc-industrial" itemProp="description">
+            <div className="detail-description-traditional">
+                <h3 className="desc-title-traditional">Nội dung truyện</h3>
+                <p className="desc-content-traditional" itemProp="description">
                     {manga.description || 'Chưa có tóm tắt nội dung cho bộ truyện này. Chúng tôi sẽ cập nhật trong thời gian sớm nhất.'}
                 </p>
-
-                <DetailActions 
-                    mangaId={id} 
-                    firstChapterId={manga.chapters?.length > 0 ? manga.chapters[manga.chapters.length - 1]?.id : null} 
-                    mangaTitle={manga.title}
+            </div>
                     mangaCover={manga.cover}
                 />
 
