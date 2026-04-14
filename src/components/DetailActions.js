@@ -16,7 +16,6 @@ export default function DetailActions({ mangaId, firstChapterId, mangaTitle, man
         // TITAN INTENT: 200ms threshold to confirm user interest
         hoverTimer.current = setTimeout(async () => {
             try {
-                console.log(`[Titan] Pre-fetching first chapter for ${mangaId}...`);
                 const res = await fetch(`/api/reader/chapter-images?id=${encodeURIComponent(firstChapterId)}`);
                 if (res.ok) {
                     const data = await res.json();

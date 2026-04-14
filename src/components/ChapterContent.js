@@ -71,7 +71,6 @@ export default function ChapterContent({ mangaId, chapter, nextChapterId, prevCh
                 if (res.ok) {
                     const data = await res.json();
                     if (data.images && data.images.length > 0) {
-                    if (data.images && data.images.length > 0) {
                         const isHiFi = localStorage.getItem('truyenvip_hifi') === 'true';
                         const isTurbo = localStorage.getItem('truyenvip_turbo') === 'true';
                         
@@ -89,7 +88,7 @@ export default function ChapterContent({ mangaId, chapter, nextChapterId, prevCh
                     }
                 }
             } catch (e) {
-                // Continue polling
+                // Polling retry
             }
         }, 800);
     }, [chapterId, stopPolling]);

@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { headers } from 'next/headers';
 import Footer from '@/components/Footer';
 import GuardianBeastEmptyState from '@/components/GuardianBeastEmptyState';
-import "@/app/genres.css";
 
 export const revalidate = 600; // ISR: Revalidate every 10 minutes
 
