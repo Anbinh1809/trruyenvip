@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/components/ToastProvider';
 import Link from 'next/link';
-import { Landmark, User, CreditCard, CheckCircle, XCircle, Clock, Search } from 'lucide-react';
+import { Landmark, User, CreditCard, CheckCircle, XCircle, Clock, Search, Slash } from 'lucide-react';
 
 export default function AdminRewardsPage() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();

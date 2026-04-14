@@ -6,7 +6,7 @@ import { query, MANGA_CARD_FIELDS } from '@/lib/db';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300; // ISR: Revalidate every 5 minutes
 
 export const metadata = {
   title: 'TruyenVip - Nền tảng Đọc Truyện Tranh Online Cao Cấp',
@@ -25,7 +25,7 @@ async function getManga() {
 
     return (result.recordset || []).map(m => ({
       ...m,
-      cover: m.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : (m.cover || '/placeholder-manga.svg'),
+      cover: m.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}&w=400&q=75` : (m.cover || '/placeholder-manga.svg'),
     }));
   } catch (err) {
     console.error('DB Fetch Error:', err.message);

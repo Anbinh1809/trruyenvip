@@ -128,35 +128,44 @@ export default function ReaderSettings() {
           </div>
 
           <div className="setting-group" style={{ marginTop: '20px' }}>
-            <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginBottom: '8px' }}>Chất Lượng Hình Ảnh</p>
+            <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginBottom: '8px', fontWeight: 700 }}>Chất Lượng Hình Ảnh</p>
             <div 
+              className="glass-action-item"
               style={{ 
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
-                  background: 'rgba(255,255,255,0.05)', padding: '10px 15px', 
-                  borderRadius: '12px', cursor: 'pointer' 
+                  background: 'rgba(255,255,255,0.05)', padding: '12px 15px', 
+                  borderRadius: '12px', cursor: 'pointer', border: '1px solid rgba(255,255,255,0.03)'
               }}
               onClick={() => {
-                  const nextVal = localStorage.getItem('truyenvip_hifi') !== 'true';
-                  localStorage.setItem('truyenvip_hifi', nextVal ? 'true' : 'false');
-                  window.dispatchEvent(new Event('storage')); // Trigger update
-                  setTimeout(() => window.location.reload(), 200); // Reload to apply new width to all images
+                  const current = localStorage.getItem('truyenvip_hifi') === 'true';
+                  localStorage.setItem('truyenvip_hifi', !current ? 'true' : 'false');
+                  window.dispatchEvent(new Event('storage'));
+                  setTimeout(() => window.location.reload(), 200);
               }}
             >
-                <div style={{ fontSize: '0.75rem', fontWeight: 700 }}>Chế độ 4K Sắc Nét</div>
+                <div>
+                    <div style={{ fontSize: '0.8rem', fontWeight: 800 }}>Chế độ Siêu nét 4K</div>
+                    <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>
+                        {mounted && localStorage.getItem('truyenvip_hifi') === 'true' ? 'Đang bật (Tốn dữ liệu)' : 'Đang tắt (Tiết kiệm)'}
+                    </div>
+                </div>
                 <div style={{ 
-                    width: '36px', height: '20px', borderRadius: '10px', 
+                    width: '38px', height: '22px', borderRadius: '11px', 
                     background: mounted && localStorage.getItem('truyenvip_hifi') === 'true' ? 'var(--accent)' : 'rgba(255,255,255,0.1)',
                     position: 'relative', transition: '0.3s'
                 }}>
                     <div style={{ 
-                        width: '14px', height: '14px', borderRadius: '50%', background: 'white',
+                        width: '16px', height: '16px', borderRadius: '50%', background: 'white',
                         position: 'absolute', top: '3px', 
                         left: mounted && localStorage.getItem('truyenvip_hifi') === 'true' ? '19px' : '3px',
-                        transition: '0.3s'
+                        transition: '0.3s',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
                     }} />
                 </div>
             </div>
-            <p style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.2)', marginTop: '5px' }}>Tốn băng thông hơn, ảnh sắc nét tuyệt đối.</p>
+            <p style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.2)', marginTop: '10px', fontStyle: 'italic', lineHeight: '1.4' }}>
+                * Mặc định hệ thống nén ảnh thông minh để tối ưu 50% băng thông mà vẫn đảm bảo độ nét chuẩn trên Mobile.
+            </p>
           </div>
         </div>
       )}

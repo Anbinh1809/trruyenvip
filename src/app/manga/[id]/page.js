@@ -11,6 +11,8 @@ import ContinueReadingButton from '@/components/ContinueReadingButton';
 import { headers } from 'next/headers';
 import Footer from '@/components/Footer';
 import { AlertCircle, PenTool, Info, Library } from 'lucide-react';
+import StructuredData from '@/components/SEO/StructuredData';
+import ShareButton from '@/components/Social/ShareButton';
 
 const stripHtml = (html) => {
     if (!html) return '';
@@ -87,16 +89,20 @@ async function getMangaDetail(id) {
   
   let related = [];
   if (genresRes.recordset && genresRes.recordset.length > 0) {
-    const firstGenreId = genresRes.recordset[0].id;
+    // Smart Suggest Logic: Rank by genre overlap count
+    const genreIds = genresRes.recordset.map(g => g.id);
     try {
         const relatedRes = await query(`
-            SELECT m.id, m.title, m.cover, m.last_chap_num, m.rating, m.views
-            FROM Manga m
-            JOIN MangaGenres mg ON m.id = mg.genre_id
-            WHERE mg.genre_id = @genreId AND m.id != @id
-            ORDER BY m.last_crawled DESC
+            SELECT m.id, m.title, m.cover, m.last_chap_num, m.rating, m.views,
+                   COUNT(mg.genre_id) as overlap_count
+            FROM "Manga" m
+            JOIN "MangaGenres" mg ON m.id = mg.manga_id
+            WHERE mg.genre_id IN (${genreIds.join(',')}) 
+              AND m.id != @id
+            GROUP BY m.id, m.title, m.cover, m.last_chap_num, m.rating, m.views
+            ORDER BY overlap_count DESC, m.views DESC, m.last_crawled DESC
             LIMIT 6
-        `, { genreId: firstGenreId, id });
+        `, { id });
 
         related = (relatedRes.recordset || []).map(m => ({
             ...m,
@@ -135,15 +141,23 @@ export default async function MangaDetail({ params }) {
 
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Book',
+    '@type': 'Series',
     'name': manga.title,
     'description': manga.description,
+    'url': `${origin}/manga/${manga.id}`,
     'image': manga.cover,
     'author': {
       '@type': 'Person',
       'name': manga.author || 'Đang cập nhật'
     },
-    'genre': manga.genres.map(g => g.name).join(', '),
+    'genre': manga.genres.map(g => g.name),
+    'aggregateRating': {
+      '@type': 'AggregateRating',
+      'ratingValue': manga.rating || 4.5,
+      'bestRating': 5,
+      'worstRating': 1,
+      'ratingCount': (manga.views || 0) / 10 + 5 // Heuristic for engagement
+    }
   };
 
   const host = (await headers()).get('host') || 'truyenvip.com';
@@ -185,14 +199,8 @@ export default async function MangaDetail({ params }) {
 
   return (
     <main className="detail-page fade-in">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, '\\u003c') }}
-      />
+      <StructuredData data={jsonLd} />
+      <StructuredData data={breadcrumbJsonLd} />
       <Header />
       <div className="detail-hero-titan" style={{ backgroundImage: `url(${manga.cover})` }} />
       
@@ -207,6 +215,14 @@ export default async function MangaDetail({ params }) {
                 </p>
             )}
             <div className="pill-group">
+                <div className="detail-actions-titan" style={{ display: 'flex', gap: '15px', marginTop: '30px', flexWrap: 'wrap' }}>
+                    <Link href={`/manga/${id}/chapter/${manga.chapters[0]?.id || ''}`} className="btn btn-primary" style={{ padding: '12px 35px' }}>ĐỌC NGAY</Link>
+                    <ShareButton 
+                        title={manga.title} 
+                        text={`Đọc truyện ${manga.title} bản đẹp, load nhanh tại TruyenVip!`} 
+                        url={`${origin}/manga/${manga.id}`} 
+                    />
+                </div>
                 <span className="pill author-pill" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <PenTool size={14} /> {manga.author || 'Đang cập nhật'}
                 </span>

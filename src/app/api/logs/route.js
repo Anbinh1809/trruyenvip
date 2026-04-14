@@ -9,7 +9,7 @@ export async function GET(request) {
     }
 
     try {
-        const res = await query('SELECT * FROM "CrawlLogs" ORDER BY created_at DESC LIMIT 50');
+        const res = await query('SELECT * FROM crawllogs ORDER BY created_at DESC LIMIT 50');
         return Response.json(res.recordset || []);
     } catch (err) {
         return new Response('Database error', { status: 500 });

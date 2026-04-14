@@ -16,14 +16,14 @@ export async function runMaintenance() {
     };
 
     try {
-        // 1. Prune CrawlLogs (Keep 24 hours of logs only to save space)
+        // 1. Prune crawllogs (Keep 24 hours of logs only to save space)
         const logRes = await query(`
-            DELETE FROM CrawlLogs 
+            DELETE FROM crawllogs 
             WHERE created_at < NOW() - INTERVAL '1 day'
         `);
         results.logsPurged = logRes.rowsAffected?.[0] || 0;
 
-        // 2. Prune GuardianReports (Keep 3 days)
+        // 2. Prune guardianreports (Keep 3 days)
         const reportRes = await query(`
             DELETE FROM guardianreports 
             WHERE created_at < NOW() - INTERVAL '3 days'
@@ -32,17 +32,17 @@ export async function runMaintenance() {
 
         // 3. Recover Orphaned Tasks (Stuck for > 1 hour)
         const taskRes = await query(`
-            UPDATE CrawlerTasks 
+            UPDATE crawlertasks 
             SET status = 'pending', updated_at = NOW() 
             WHERE status = 'processing' 
             AND updated_at < NOW() - INTERVAL '1 hour'
         `);
         results.tasksRecovered = taskRes.rowsAffected?.[0] || 0;
 
-        // 4. Clean Orphaned ChapterImages (If chapter was deleted but images stayed)
+        // 4. Clean Orphaned chapterimages (If chapter was deleted but images stayed)
         const orphanRes = await query(`
-            DELETE FROM ChapterImages 
-            WHERE chapter_id NOT IN (SELECT id FROM Chapters)
+            DELETE FROM chapterimages 
+            WHERE chapter_id NOT IN (SELECT id FROM chapters)
         `);
         results.orphanImagesRemoved = orphanRes.rowsAffected?.[0] || 0;
 

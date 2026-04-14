@@ -18,16 +18,12 @@ export async function GET(request) {
     try {
         const res = await query(`
             SELECT id, title, cover, last_chap_num, views_at_source as views, alternative_titles
-            FROM "Manga" 
-            WHERE normalized_title LIKE CONCAT(@q, '%') -- Indexed prefix search
-            OR normalized_title LIKE CONCAT('%-', @q, '%') -- Mid-word match
-            OR alternative_titles LIKE CONCAT('%', @q, '%') -- Alternative titles match
+            FROM manga 
+            WHERE normalized_title % @q -- Trigram similarity match
+            OR normalized_title LIKE CONCAT('%', @q, '%') -- Substring match (GIN optimized)
+            OR alternative_titles % @q -- Alternative titles fuzzy match
             ORDER BY 
-                CASE 
-                    WHEN normalized_title LIKE CONCAT(@q, '%') THEN 0 
-                    WHEN normalized_title LIKE CONCAT('%-', @q, '%') THEN 1
-                    ELSE 2 
-                END,
+                similarity(normalized_title, @q) DESC,
                 views_at_source DESC,
                 last_crawled DESC
             LIMIT 6

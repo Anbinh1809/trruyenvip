@@ -7,7 +7,7 @@ import { headers } from 'next/headers';
 import Footer from '@/components/Footer';
 import GuardianBeastEmptyState from '@/components/GuardianBeastEmptyState';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 600; // ISR: Revalidate every 10 minutes
 
 
 export async function generateMetadata({ searchParams }) {
@@ -46,7 +46,7 @@ async function getData(currentSlug) {
 
         manga = (mangaRes.recordset || []).map(item => ({
             ...item,
-            cover: item.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(item.cover)}` : (item.cover || '/placeholder-manga.svg')
+            cover: item.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(item.cover)}&w=400&q=75` : (item.cover || '/placeholder-manga.svg')
         }));
 
         activeGenre = allGenres.find(g => g.slug === currentSlug);
@@ -54,7 +54,7 @@ async function getData(currentSlug) {
         const mangaRes = await query(`SELECT ${MANGA_CARD_FIELDS} FROM "Manga" ORDER BY last_crawled DESC LIMIT 36`);
         manga = (mangaRes.recordset || []).map(item => ({
             ...item,
-            cover: item.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(item.cover)}` : (item.cover || '/placeholder-manga.svg')
+            cover: item.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(item.cover)}&w=400&q=75` : (item.cover || '/placeholder-manga.svg')
         }));
     }
 

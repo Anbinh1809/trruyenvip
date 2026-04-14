@@ -9,22 +9,21 @@ export async function POST(request) {
             return NextResponse.json({ error: 'Chưa đăng nhập' }, { status: 401 });
         }
 
-        const { xpDelta, coinDelta } = await request.json();
+        const { xpDelta } = await request.json();
         const deltaXp = parseInt(xpDelta || 0);
-        const deltaCoin = parseInt(coinDelta || 0);
 
         // 1. Return early if no changes
-        if (deltaXp === 0 && deltaCoin === 0) {
+        if (deltaXp === 0) {
             return NextResponse.json({ success: true });
         }
 
         // 2. Sanity Check: Prevent massive injections
-        if (Math.abs(deltaXp) > 1000 || Math.abs(deltaCoin) > 2000) {
+        if (Math.abs(deltaXp) > 1000) {
             return NextResponse.json({ error: 'Dữ liệu bất thường' }, { status: 400 });
         }
 
         // 2. High-Frequency Check (Rate Limiting)
-        const userRes = await query(`SELECT last_stats_update FROM "Users" WHERE uuid = @uuid`, { uuid: session.uuid });
+        const userRes = await query(`SELECT last_stats_update FROM users WHERE uuid = @uuid`, { uuid: session.uuid });
         const lastUpdate = userRes.recordset[0]?.last_stats_update;
         const now = new Date();
 
@@ -37,16 +36,14 @@ export async function POST(request) {
         }
 
 
-        // 3. Apply Update
+        // 3. Apply Update (Hardened: No more coinDelta from client)
         await query(`
-            UPDATE "Users" 
+            UPDATE users 
             SET xp = xp + @xp, 
-                "vipCoins" = "vipCoins" + @coins,
                 last_stats_update = NOW()
             WHERE uuid = @uuid
         `, {
-            xp: parseInt(xpDelta || 0),
-            coins: parseInt(coinDelta || 0),
+            xp: parseInt(deltaXp || 0),
             uuid: session.uuid
         });
 

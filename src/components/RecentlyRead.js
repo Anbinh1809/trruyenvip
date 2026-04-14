@@ -30,35 +30,77 @@ export default function RecentlyRead() {
 
   if (!history || history.length === 0) return null;
 
+  const mostRecent = history[0];
+  const others = history.slice(1, 4);
+
   return (
-    <section className="recently-read-titan fade-in" style={{ position: 'relative', overflow: 'hidden' }}>
-      <div className="section-header-titan">
-        <div className="header-label" style={{ position: 'relative' }}>
-          <span className="badge-blue">LỊCH SỬ</span>
-          <h2 className="title-titan" style={{ fontSize: '1.4rem', margin: '10px 0 0' }}>Đọc Tiếp</h2>
-        </div>
-        <Link href="/history" className="btn-view-all">Tất cả →</Link>
+    <section className="recently-read-titan fade-in">
+      {/* High-Impact Quick Resume Banner */}
+      <div className="quick-resume-banner-titan" style={{ marginBottom: '40px' }}>
+          <div className="banner-bg-titan" style={{ backgroundImage: `url(${mostRecent.mangaCover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(mostRecent.mangaCover)}` : (mostRecent.mangaCover || '/placeholder-manga.svg')})` }}></div>
+          <div className="banner-content-titan">
+              <div className="banner-label-titan">
+                  <span className="pulse-dot"></span> ĐANG ĐỌC DỞ
+              </div>
+              <h2 className="banner-title-titan">{mostRecent.mangaTitle}</h2>
+              <p className="banner-sub-titan">Bạn đã đọc đến Chương {mostRecent.chapterNumber || 'N/A'}</p>
+              <Link href={`/manga/${mostRecent.mangaId}/chapter/${mostRecent.chapterId}`} className="btn btn-primary banner-btn-titan">
+                  Tiếp tục hành trình →
+              </Link>
+          </div>
       </div>
-      
-      <div className="titan-recent-grid" style={{ position: 'relative' }}>
-        {history.slice(0, 4).map((item) => (
-          <Link key={item.mangaId} href={`/manga/${item.mangaId}/chapter/${item.chapterId}`} className="titan-recent-card" style={{ position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
-            <div className="titan-recent-image" style={{ position: 'relative', flexShrink: 0 }}>
-              <Image 
-                src={item.mangaCover ? (item.mangaCover.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(item.mangaCover)}` : item.mangaCover) : '/placeholder-manga.svg'} 
-                alt={item.mangaTitle || 'Manga'} 
-                fill
-                sizes="150px"
-                className="titan-recent-img"
-              />
+
+      {others.length > 0 && (
+        <>
+            <div className="section-header-titan" style={{ marginBottom: '20px' }}>
+                <div className="header-label">
+                <span className="badge-blue" style={{ fontSize: '0.65rem' }}>LỊCH SỬ KHÁC</span>
+                </div>
+                <Link href="/history" className="btn-view-all">Tất cả →</Link>
             </div>
-            <div className="titan-recent-info" style={{ position: 'relative', paddingLeft: '10px', minWidth: 0 }}>
-              <h4 className="titan-recent-title" style={{ margin: 0 }}>{item.mangaTitle}</h4>
-              <p className="titan-recent-chapter" style={{ margin: '4px 0 0' }}>C. {item.chapterTitle?.replace(/[^0-9.]/g, '') || 'N/A'}</p>
+            
+            <div className="titan-recent-grid">
+                {others.map((item) => (
+                <Link key={item.mangaId} href={`/manga/${item.mangaId}/chapter/${item.chapterId}`} className="titan-recent-card">
+                    <div className="titan-recent-image">
+                    <Image 
+                        src={item.mangaCover ? (item.mangaCover.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(item.mangaCover)}` : item.mangaCover) : '/placeholder-manga.svg'} 
+                        alt={item.mangaTitle || 'Manga'} 
+                        fill
+                        sizes="120px"
+                        className="titan-recent-img"
+                    />
+                    </div>
+                    <div className="titan-recent-info" style={{ minWidth: 0, flex: 1 }}>
+                    <h4 className="titan-recent-title" style={{ 
+                        margin: 0, 
+                        fontSize: '0.95rem', 
+                        fontWeight: 800, 
+                        display: '-webkit-box', 
+                        WebkitLineClamp: 1, 
+                        WebkitBoxOrient: 'vertical', 
+                        overflow: 'hidden' 
+                    }}>
+                        {item.mangaTitle}
+                    </h4>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '6px' }}>
+                        <span style={{ 
+                            background: 'rgba(255,255,255,0.05)', 
+                            padding: '2px 8px', 
+                            borderRadius: '4px', 
+                            fontSize: '0.7rem', 
+                            fontWeight: 700, 
+                            color: 'rgba(255,255,255,0.6)'
+                        }}>
+                        C. {item.chapterNumber || 'N/A'}
+                        </span>
+                    </div>
+                    </div>
+                </Link>
+                ))}
             </div>
-          </Link>
-        ))}
-      </div>
+        </>
+      )}
     </section>
   );
 }

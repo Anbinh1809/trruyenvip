@@ -17,7 +17,7 @@ export async function GET() {
         
         // 1. Repair relative Chapter URLs
         const relativeChapters = await query(`
-            SELECT id, source_url FROM "Chapters" 
+            SELECT id, source_url FROM chapters 
             WHERE source_url LIKE '/%'
         `);
         
@@ -38,7 +38,7 @@ export async function GET() {
 
         // 2. Clear images for 404 logs so they can be re-crawled with fixed links
         // (Simplified: Just delete logs and let the scheduler retry)
-        await query('DELETE FROM "CrawlLogs" WHERE status = \'error\'');
+        await query('DELETE FROM crawllogs WHERE status = \'error\'');
 
         return NextResponse.json({
             status: 'success',

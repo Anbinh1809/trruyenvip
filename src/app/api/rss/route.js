@@ -14,15 +14,15 @@ export async function GET(request) {
                 m.title as manga_title,
                 m.cover as manga_cover,
                 m.description as manga_description
-            FROM "Chapters" c
-            JOIN "Manga" m ON c.manga_id = m.id
+            FROM chapters c
+            JOIN manga m ON c.manga_id = m.id
             ORDER BY c.updated_at DESC
             LIMIT 50
         `);
 
         const chapters = result.recordset || [];
         const host = request.headers.get('host') || 'truyenvip.com';
-        const protocol = host.startsWith('localhost') ? 'http' : 'https';
+        const protocol = request.headers.get('x-forwarded-proto') || (host.startsWith('localhost') ? 'http' : 'https');
         const origin = `${protocol}://${host}`;
 
         const rssItems = chapters.map(chap => {

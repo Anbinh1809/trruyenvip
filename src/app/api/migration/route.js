@@ -81,7 +81,7 @@ export async function POST(req) {
 
         // 2. Lookup or Initialize Manga (Hardened lookup with Postgres-native concatenation)
         let manga = await query(`
-            SELECT id FROM "Manga" 
+            SELECT id FROM manga 
             WHERE id = @mangaId 
             OR source_url = @url
             OR source_url LIKE '%/' || @mangaId
@@ -108,7 +108,7 @@ export async function POST(req) {
         let redirectUrl = `/manga/${mangaId}`;
 
         if (internalChapterId) {
-            const chap = await query('SELECT id FROM "Chapters" WHERE id = @chapId', { chapId: internalChapterId });
+            const chap = await query('SELECT id FROM chapters WHERE id = @chapId', { chapId: internalChapterId });
             if (chap.recordset?.[0]) {
                 redirectUrl = `/manga/${mangaId}/chapter/${internalChapterId}`;
             }

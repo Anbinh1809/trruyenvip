@@ -19,7 +19,7 @@ export async function POST(request) {
         // Fetch user: Universal login (Username or Email)
         const idLower = username.toString().trim().toLowerCase();
         const res = await query(`
-            SELECT * FROM "Users" 
+            SELECT * FROM users 
             WHERE LOWER(username) = @id OR LOWER(email) = @id
         `, { id: idLower });
         const user = res.recordset?.[0];
@@ -52,7 +52,7 @@ export async function POST(request) {
                 username: user.username, 
                 uuid: user.uuid, 
                 xp: user.xp, 
-                vipCoins: user.vipCoins, 
+                vipCoins: user.vipcoins, 
                 role: user.role 
             }
         });

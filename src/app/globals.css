@@ -117,12 +117,7 @@ body {
 .toast-icon { font-size: 1.5rem; }
 .toast-content { font-weight: 800; font-size: 0.95rem; color: white; }
 
-@keyframes fade-up {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.fade-up { animation: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+/* fade-up is defined below in animations section */
 
 /* Heartbeat Indicator */
 .heartbeat-dot {
@@ -1313,32 +1308,36 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-headin
 nextjs-portal, #nextjs-portal { display: none !important; }
 
 .recently-read-titan {
-    background: rgba(255,255,255,0.02);
-    border-radius: var(--border-radius);
-    padding: 20px;
-    border: 1px solid rgba(255,255,255,0.05);
+    background: rgba(255,255,255,0.015);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid rgba(255,255,255,0.03);
+    margin-bottom: 30px;
 }
 .titan-recent-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
 }
 .titan-recent-card {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 10px;
-    border-radius: var(--border-radius);
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.05);
-    transition: 0.3s;
+    gap: 16px;
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.04);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     text-decoration: none;
     overflow: hidden;
+    position: relative;
 }
 .titan-recent-card:hover { 
-    background: rgba(255,255,255,0.08);
-    transform: translateY(-2px);
-    border-color: var(--accent);
+    background: rgba(255,255,255,0.07);
+    transform: translateY(-4px);
+    border-color: rgba(255,255,255,0.15);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
 }
 .titan-recent-image {
     width: 60px;
@@ -1769,10 +1768,140 @@ nextjs-portal, #nextjs-portal { display: none !important; }
     from { box-shadow: 0 0 60px rgba(255, 62, 62, 0.4); }
     to { box-shadow: 0 0 200px rgba(255, 62, 62, 0.9); }
 }
+/* ==========================================================================
+   INFINITE SCROLL READER APOTHEOSIS
+   ========================================================================== */
+.chapter-divider-titan {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 80px 0;
+    width: 100%;
+    margin: 40px 0;
+    opacity: 0.8;
+}
 
+.divider-line {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--glass-border), transparent);
+    flex: 1;
+}
 
+.divider-badge {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--glass-border);
+    padding: 8px 24px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
 
+.loading-next-chapter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 100px 0;
+    color: var(--text-muted);
+    font-weight: 800;
+    letter-spacing: 1px;
+}
 
+.end-of-manga {
+    text-align: center;
+    padding: 100px 0;
+    color: var(--text-muted);
+    font-weight: 800;
+    font-size: 1.2rem;
+    border-top: 1px dashed var(--glass-border);
+    margin-top: 50px;
+}
+
+.chapter-scroll-item {
+    scroll-margin-top: 100px;
+
+/* ==========================================================================
+   QUICK RESUME BANNER (HOME PAGE HERO)
+   ========================================================================== */
+.quick-resume-banner-titan {
+    position: relative;
+    width: 100%;
+    min-height: 240px;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--glass-border);
+    background: var(--bg-secondary);
+}
+
+.banner-bg-titan {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center 20%;
+    filter: blur(40px) brightness(0.4);
+    opacity: 0.6;
+    transform: scale(1.1);
+}
+
+.banner-content-titan {
+    position: relative;
+    z-index: 2;
+    padding: 40px;
+    width: 100%;
+}
+
+.banner-label-titan {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.75rem;
+    font-weight: 900;
+    color: var(--accent);
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+}
+
+.pulse-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--accent);
+    animation: pulse-ring 2s infinite;
+}
+
+.banner-title-titan {
+    font-size: 2.2rem;
+    font-weight: 950;
+    margin: 0 0 10px;
+    line-height: 1.1;
+    letter-spacing: -1px;
+}
+
+.banner-sub-titan {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-bottom: 25px;
+}
+
+.banner-btn-titan {
+    height: 50px;
+    padding: 0 30px;
+    font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+    .quick-resume-banner-titan { min-height: 300px; padding: 30px 20px; }
+    .banner-content-titan { padding: 0; }
+    .banner-title-titan { font-size: 1.8rem; }
+}
 
 
 

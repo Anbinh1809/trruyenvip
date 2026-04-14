@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import { parseChapterNumber } from '@/lib/crawler';
 
 /**
  * Maintenance tool to repair NULL 'chapter_number' values by parsing titles.
@@ -10,19 +11,17 @@ export async function GET() {
         console.log('[Maintenance] Starting Chapter Number Repair...');
         
         const chapters = await query(`
-            SELECT id, title FROM "Chapters" 
+            SELECT id, title FROM chapters 
             WHERE chapter_number IS NULL
         `);
         
         let repairedCount = 0;
-        const numberRegex = /(\d+(\.\d+)?)/; // Match integers and decimals
 
         const tasks = chapters.recordset || [];
         for (const chap of tasks) {
-            const match = chap.title.match(numberRegex);
-            if (match) {
-                const num = parseFloat(match[1]);
-                await query('UPDATE "Chapters" SET chapter_number = @num WHERE id = @id', { num, id: chap.id });
+            const num = parseChapterNumber(chap.title);
+            if (num !== null) {
+                await query('UPDATE chapters SET chapter_number = @num WHERE id = @id', { num, id: chap.id });
                 repairedCount++;
             }
         }

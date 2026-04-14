@@ -157,22 +157,26 @@ export async function GET(request) {
                 });
             }
 
-            // SHARPENING: Improve crispness of manga text and line art
+            // SMART COMPRESSION: Use the requested quality (q) or default to 75 (Standard)
+            const finalQuality = Math.min(Math.max(quality, 60), 96);
+            
+            // SHARPENING: Improve crispness of manga text and line art (compensates for compression)
             transformer = transformer.sharpen({ sigma: 0.8, m1: 1.0, m2: 2.0 });
 
             let processedBuffer;
             let finalMime = 'image/webp';
-            let optTag = `sharp-webp-${winningStrategy}`;
+            let optTag = `sharp-webp-${winningStrategy}-q${finalQuality}`;
 
             if (supportsAvif) {
+                // AVIF is superior for manga line-art: 10-15% lower quality looks like WebP 85-90%
                 processedBuffer = await transformer
-                    .avif({ quality: 90, effort: 3 })
+                    .avif({ quality: finalQuality, effort: 3 })
                     .toBuffer();
                 finalMime = 'image/avif';
-                optTag = `sharp-avif-${winningStrategy}`;
+                optTag = `sharp-avif-${winningStrategy}-q${finalQuality}`;
             } else {
                 processedBuffer = await transformer
-                    .webp({ quality: 95, effort: 4, lossless: false })
+                    .webp({ quality: finalQuality, effort: 4, lossless: false })
                     .toBuffer();
             }
 

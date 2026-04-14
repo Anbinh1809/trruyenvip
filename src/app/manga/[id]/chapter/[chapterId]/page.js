@@ -10,6 +10,11 @@ import ReadingProgressBar from '@/components/ReadingProgressBar';
 import Footer from '@/components/Footer';
 import dynamic from 'next/dynamic';
 import ChapterContent from '@/components/ChapterContent';
+import { headers } from 'next/headers';
+import StructuredData from '@/components/SEO/StructuredData';
+import ShareButton from '@/components/Social/ShareButton';
+
+export const revalidate = 3600; // ISR for Reader: High cache performance
 
 const CommentSection = dynamic(() => import('@/components/CommentSection'), { 
   loading: () => <div className="loading-dots" style={{ padding: '40px', textAlign: 'center' }}>Đang tải bình luận...</div>
@@ -26,10 +31,29 @@ export async function generateMetadata({ params }) {
   const chapter = chapRes.recordset?.[0];
  
   if (!manga || !chapter) return { title: 'Đang tải chương... - TruyenVip' };
+
+  // Fetch first image for better OG sharing
+  const imgRes = await query('SELECT image_url FROM "ChapterImages" WHERE chapter_id = @id ORDER BY "order" ASC LIMIT 1', { id: chapterId });
+  const ogImage = imgRes.recordset?.[0]?.image_url 
+    ? `/api/proxy?url=${encodeURIComponent(imgRes.recordset[0].image_url)}&w=600&q=70`
+    : (manga.cover || '/placeholder-manga.svg');
  
   return {
     title: `${chapter.title}: ${manga.title} - TruyenVip`,
-    description: `Đọc truyện tranh ${manga.title} - ${chapter.title} chất lượng cao, cập nhật mới nhất tại TruyenVip.`
+    description: `Đọc truyện tranh ${manga.title} - ${chapter.title} chất lượng cao, cập nhật mới nhất tại TruyenVip.`,
+    openGraph: {
+        title: `${chapter.title}: ${manga.title}`,
+        description: `Đọc ngay ${chapter.title} của ${manga.title} tại TruyenVip. Truyện bản đẹp, load cực nhanh!`,
+        images: [
+            {
+                url: ogImage,
+                width: 600,
+                height: 800,
+                alt: chapter.title
+            }
+        ],
+        type: 'book'
+    }
   };
 }
 
@@ -55,20 +79,14 @@ async function getChapterData(mangaId, chapterId) {
   ]);
 
   const prevChapter = prevChapRes.recordset?.[0] || null;
-  const nextChapterId = nextChapRes.recordset?.[0]?.id || null;
-
-  let nextChapterImages = [];
-  if (nextChapterId) {
-      const nextImgRes = await query('SELECT image_url FROM "ChapterImages" WHERE chapter_id = @id ORDER BY "order" ASC', { id: nextChapterId });
-      nextChapterImages = nextImgRes.recordset || [];
-  }
+  const nextChapter = nextChapRes.recordset?.[0] || null;
 
   return {
     manga: mangaResult.recordset[0],
     chapter,
     images: (imgResult.recordset || []).map(img => `/api/proxy?url=${encodeURIComponent(img.image_url)}&w=1200`),
     prevChapter,
-    nextChapter: { id: nextChapterId, title: nextChapRes.recordset?.[0]?.title, images: nextChapterImages }
+    nextChapter
   };
 }
 
@@ -83,10 +101,40 @@ export default async function ChapterReader({ params }) {
   );
 
   const prevChapter = data.prevChapter; 
-  const nextChapter = data.nextChapter.id ? data.nextChapter : null;
+  const nextChapter = data.nextChapter?.id ? data.nextChapter : null;
+
+  const host = (await headers()).get('host') || 'truyenvip.com';
+  const protocol = host.startsWith('localhost') ? 'http' : 'https';
+  const origin = `${protocol}://${host}`;
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    'itemListElement': [
+      {
+        '@type': 'ListItem',
+        'position': 1,
+        'name': 'Trang chủ',
+        'item': `${origin}`
+      },
+      {
+        '@type': 'ListItem',
+        'position': 2,
+        'name': data.manga.title,
+        'item': `${origin}/manga/${data.manga.id}`
+      },
+      {
+        '@type': 'ListItem',
+        'position': 3,
+        'name': data.chapter.title,
+        'item': `${origin}/manga/${data.manga.id}/chapter/${data.chapter.id}`
+      }
+    ]
+  };
 
   return (
     <main className="reader-page titan-bg" style={{ minHeight: '100vh', color: 'white' }}>
+      <StructuredData data={breadcrumbJsonLd} />
       <ReadingProgressBar />
       <HistoryRecorder manga={data.manga} chapter={data.chapter} />
       <ReaderSettings />
@@ -111,6 +159,12 @@ export default async function ChapterReader({ params }) {
                         Trước
                     </Link>
                 )}
+                <ShareButton 
+                    title={`${data.chapter.title}: ${data.manga.title}`} 
+                    text={`Tôi đang đọc ${data.manga.title} tại TruyenVip, hay quá anh em ơi!`} 
+                    url={`${origin}/manga/${id}/chapter/${chapterId}`} 
+                    className="desktop-only"
+                />
                 {nextChapter && (
                     <Link href={`/manga/${id}/chapter/${nextChapter.id}`} className="btn-reader-nav" title="Chương sau">
                         Sau
@@ -124,17 +178,6 @@ export default async function ChapterReader({ params }) {
       <div className="reader-container">
         <ChapterContent chapterId={chapterId} initialImages={data.images} />
       </div>
-
-      {data.nextChapter.id && (
-          <NextChapterPrefetcher 
-            nextChapterId={data.nextChapter.id} 
-            nextChapterImages={data.nextChapter.images} 
-          />
-      )}
-
-      {nextChapter && (
-          <link rel="prefetch" href={`/manga/${id}/chapter/${nextChapter.id}`} />
-      )}
 
       <div className="reader-footer" style={{ padding: '80px 0', borderTop: '1px solid var(--glass-border)' }}>
         <div className="container">

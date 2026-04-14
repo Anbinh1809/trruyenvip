@@ -15,11 +15,10 @@ export function AuthProvider({ children }) {
             if (res.ok) {
                 const data = await res.json();
                 if (data.authenticated) {
-                    console.log(`[Auth] Identity verified: ${data.user.username}`);
+                    // Identity verified; silent for production
                     setUser(data.user);
                     setIsAuthenticated(true);
                 } else {
-                    console.log('[Auth] No session found');
                     setUser(null);
                     setIsAuthenticated(false);
                 }

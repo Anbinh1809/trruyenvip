@@ -42,9 +42,13 @@ export default function ChapterContent({ chapterId, initialImages = [] }) {
                 if (res.ok) {
                     const data = await res.json();
                     if (data.images && data.images.length > 0) {
-                        const optimizedWidth = window.innerWidth < 768 ? 1000 : 1600;
+                        const isHiFi = localStorage.getItem('truyenvip_hifi') === 'true';
+                        const isMobile = window.innerWidth < 768;
+                        const w = isHiFi ? 1800 : (isMobile ? 800 : 1200);
+                        const q = isHiFi ? 95 : 78;
+
                         setImages(data.images.map(img => 
-                            `/api/proxy?url=${encodeURIComponent(img.image_url)}&w=${optimizedWidth}&q=85`
+                            `/api/proxy?url=${encodeURIComponent(img.image_url)}&w=${w}&q=${q}`
                         ));
                         setIsSyncing(false);
                         stopPolling();
@@ -53,7 +57,7 @@ export default function ChapterContent({ chapterId, initialImages = [] }) {
             } catch (e) {
                 // Continue polling
             }
-        }, 800); // Tightened from 1500ms to 800ms
+        }, 800);
     }, [chapterId, stopPolling]);
 
     const startSync = useCallback(async () => {
@@ -69,22 +73,24 @@ export default function ChapterContent({ chapterId, initialImages = [] }) {
             const data = await res.json().catch(() => ({}));
 
             if (res.ok) {
-                // Sync completed synchronously on Vercel — fetch images immediately
                 if (data.imageCount > 0) {
                     const imgRes = await fetch(`/api/reader/chapter-images?id=${encodeURIComponent(chapterId)}`);
                     if (imgRes.ok) {
                         const imgData = await imgRes.json();
                         if (imgData.images?.length > 0) {
-                            const optimizedWidth = window.innerWidth < 768 ? 1000 : 1600;
+                            const isHiFi = localStorage.getItem('truyenvip_hifi') === 'true';
+                            const isMobile = window.innerWidth < 768;
+                            const w = isHiFi ? 1800 : (isMobile ? 800 : 1200);
+                            const q = isHiFi ? 95 : 78;
+
                             setImages(imgData.images.map(img =>
-                                `/api/proxy?url=${encodeURIComponent(img.image_url)}&w=${optimizedWidth}&q=85`
+                                `/api/proxy?url=${encodeURIComponent(img.image_url)}&w=${w}&q=${q}`
                             ));
                             setIsSyncing(false);
                             return;
                         }
                     }
                 }
-                // Fallback: start polling in case sync is still writing
                 startPolling();
             } else if (res.status === 429) {
                 setError(data.error || 'Thao tác quá nhanh, vui lòng đợi một chút.');
@@ -135,7 +141,7 @@ export default function ChapterContent({ chapterId, initialImages = [] }) {
                     <LinkIcon size={24} color="var(--accent)" /> Đang cào dữ liệu...
                 </h3>
                 <p style={{ color: 'var(--text-muted)', maxWidth: '400px', margin: '0 auto' }}>
-                    Chương này chưa được lưu sẵn. Hệ thống đang đồng bộ dữ liệu trực tiếp từ nguồn cho bạn, vui lòng đợi vài giây!
+                    Hệ thống đang đồng bộ dữ liệu trực tiếp từ nguồn cho bạn, vui lòng đợi vài giây!
                 </p>
                 <div className="shimmer-group" style={{ marginTop: '50px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
                     <div className="shimmer" style={{ width: '100%', height: '400px', borderRadius: '4px', background: 'rgba(255,255,255,0.05)' }}></div>
@@ -177,7 +183,10 @@ function ReaderImage({ src, idx }) {
 
         if (shouldLoad) return;
 
-        // ERGONOMIC VIEWPORT GUARD
+        // ERGONOMIC VIEWPORT GUARD: Dynamic prefetching margin
+        const isHiFi = localStorage.getItem('truyenvip_hifi') === 'true';
+        const margin = isHiFi ? '1200px' : '800px';
+
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -185,7 +194,7 @@ function ReaderImage({ src, idx }) {
                     observer.disconnect();
                 }
             });
-        }, { rootMargin: '1200px' }); // Aggressive prefetching for zero-wait scrolling
+        }, { rootMargin: margin });
 
         if (containerRef.current) observer.observe(containerRef.current);
         return () => observer.disconnect();

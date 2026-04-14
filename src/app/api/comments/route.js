@@ -1,114 +1,97 @@
 import { query } from '@/lib/db';
-import { getSession } from '@/lib/auth';
+import { withTitan } from '@/lib/api-handler';
 
-export async function GET(request) {
-    const { searchParams } = new URL(request.url);
-    const chapterId = searchParams.get('chapterId');
+export const GET = withTitan({
+    handler: async (req) => {
+        const { searchParams } = new URL(req.url);
+        const chapterId = searchParams.get('chapterId');
 
-    if (!chapterId) {
-        return new Response('Missing chapterId', { status: 400 });
-    }
+        if (!chapterId) {
+            throw { status: 400, message: 'Missing chapterId' };
+        }
 
-    try {
         const res = await query(`
-            SELECT c.id, c.chapter_id, c.username as user_name, c.content, c.parent_id, c.likes, c.created_at,
-                   u.xp as user_xp, u.role as user_role
-            FROM "Comments" c
-            LEFT JOIN "Users" u ON c.user_uuid = u.uuid
+            SELECT c.id, c.chapter_id, c.user_name, c.content, c.parent_id, c.likes, c.created_at,
+                   u.xp as user_xp, u.role as user_role, c.user_uuid
+            FROM comments c
+            LEFT JOIN users u ON c.user_uuid = u.uuid
             WHERE c.chapter_id = @chapterId 
             ORDER BY c.created_at DESC
         `, { chapterId });
-        return Response.json(res.recordset || []);
-    } catch (err) {
-        return Response.json({ error: 'Database error' }, { status: 500 });
+        
+        return res.recordset || [];
     }
-}
-export async function PATCH(request) {
-    try {
-        const session = await getSession();
-        if (!session) return new Response('Vui lòng đăng nhập để thích bình luận.', { status: 401 });
+});
 
-        const body = await request.json();
-        const { id, action } = body;
-
-        if (action === 'like') {
-            await query(`UPDATE "Comments" SET likes = likes + 1 WHERE id = @id`, { id });
-            return Response.json({ success: true });
-        }
-        return Response.json({ error: 'Invalid action' }, { status: 400 });
-    } catch (err) {
-        return Response.json({ error: 'Database error' }, { status: 500 });
-    }
-}
-
-export async function DELETE(request) {
-    try {
-        const session = await getSession();
-        if (!session) return new Response('Unauthorized', { status: 401 });
-
-        const { searchParams } = new URL(request.url);
-        const id = searchParams.get('id');
-
-        if (!id) return new Response('Missing ID', { status: 400 });
-
-        // Authenticate permission: Only owner or admin can delete
-        const comment = await query(`SELECT user_uuid FROM "Comments" WHERE id = @id`, { id });
-        if (!comment.recordset || comment.recordset.length === 0) return new Response('Bình luận không tồn tại', { status: 404 });
-
-        const isOwner = comment.recordset[0].user_uuid === session.uuid;
-        const isAdmin = session.role === 'admin';
-
-        if (!isOwner && !isAdmin) {
-            return new Response('Bạn không có quyền xóa bình luận này', { status: 403 });
-        }
-
-        await query(`DELETE FROM "Comments" WHERE id = @id OR parent_id = @id`, { id });
-        return new Response('Đã xóa bình luận', { status: 200 });
-    } catch (err) {
-        console.error('Delete error', err);
-        return new Response('Lỗi hệ thống khi xóa bình luận', { status: 500 });
-    }
-}
-
-
-export async function POST(request) {
-    try {
-        const session = await getSession();
-        if (!session) {
-            return new Response('Vui lòng đăng nhập để bình luận', { status: 401 });
-        }
-
-        const body = await request.json();
+export const POST = withTitan({
+    authenticated: true,
+    handler: async (req, session) => {
+        const body = await req.json();
         const { chapterId, content, parentId } = body;
 
         if (!chapterId || !content) {
-            return new Response('Missing fields', { status: 400 });
+            throw { status: 400, message: 'Missing fields' };
         }
 
         const userUuid = session.uuid;
-        const userName = session.username || session.name || 'Khách ẩn danh';
+        const userName = session.username || 'Khách ẩn danh';
 
-        // --- RATE LIMITING (HARDENED) ---
-        // Check if user recently commented (within 10 seconds) by UUID to prevent name-change bypass
+        // RATE LIMIT: 10s between comments
         const recentCheck = await query(`
-            SELECT created_at FROM "Comments" 
+            SELECT created_at FROM comments 
             WHERE user_uuid = @userUuid 
             AND created_at > NOW() - INTERVAL '10 seconds'
             LIMIT 1
         `, { userUuid });
 
-        if (recentCheck.recordset && recentCheck.recordset.length > 0) {
-            return Response.json({ error: 'Yêu cầu bình luận quá nhanh. Vui lòng đợi 10 giây.' }, { status: 429 });
+        if (recentCheck.recordset?.length > 0) {
+            throw { status: 429, message: 'Yêu cầu bình luận quá nhanh. Vui lòng đợi 10 giây.' };
         }
 
         await query(`
-            INSERT INTO "Comments" (chapter_id, username, content, parent_id, user_uuid)
+            INSERT INTO comments (chapter_id, user_name, content, parent_id, user_uuid)
             VALUES (@chapterId, @userName, @content, @parentId, @userUuid)
         `, { chapterId, userName, content, parentId, userUuid });
 
-        return new Response('Bình luận thành công!', { status: 201 });
-    } catch (err) {
-        console.error('[Comments API] Add error:', err.message);
-        return new Response('Lỗi hệ thống khi gửi bình luận', { status: 500 });
+        return { success: true, message: 'Bình luận thành công!' };
     }
-}
+});
+
+export const PATCH = withTitan({
+    authenticated: true,
+    handler: async (req, session) => {
+        const { id, action } = await req.json();
+
+        if (action === 'like') {
+            // Basic throttling in HOF could be added, but here we keep simple update
+            await query(`UPDATE comments SET likes = likes + 1 WHERE id = @id`, { id });
+            return { success: true };
+        }
+        
+        throw { status: 400, message: 'Invalid action' };
+    }
+});
+
+export const DELETE = withTitan({
+    authenticated: true,
+    handler: async (req, session) => {
+        const { searchParams } = new URL(req.url);
+        const id = searchParams.get('id');
+
+        if (!id) throw { status: 400, message: 'Missing ID' };
+
+        // Permission check
+        const comment = await query(`SELECT user_uuid FROM comments WHERE id = @id`, { id });
+        if (!comment.recordset?.length) throw { status: 404, message: 'Bình luận không tồn tại' };
+
+        const isOwner = comment.recordset[0].user_uuid === session.uuid;
+        const isAdmin = session.role === 'admin';
+
+        if (!isOwner && !isAdmin) {
+            throw { status: 403, message: 'Bạn không có quyền xóa bình luận này' };
+        }
+
+        await query(`DELETE FROM comments WHERE id = @id OR parent_id = @id`, { id });
+        return { success: true, message: 'Đã xóa bình luận' };
+    }
+});

@@ -13,12 +13,19 @@ export default function ExpandableText({ text, limit = 300 }) {
       .replace(/<script\b[^>]*>([\s\S]*?)<\/script>/gim, '')
       .replace(/<iframe\b[^>]*>([\s\S]*?)<\/iframe>/gim, '')
       .replace(/<object\b[^>]*>([\s\S]*?)<\/object>/gim, '')
+      .replace(/<embed\b[^>]*>([\s\S]*?)<\/embed>/gim, '')
+      .replace(/<applet\b[^>]*>([\s\S]*?)<\/applet>/gim, '')
+      .replace(/<meta\b[^>]*>/gim, '')
+      .replace(/<link\b[^>]*>/gim, '')
       .replace(/on\w+="[^"]*"/gim, '')
       .replace(/on\w+='[^']*'/gim, '')
       .replace(/on\w+=\S+/gim, '')
       .replace(/javascript:[^"']*/gim, '#')
       .replace(/data:[^"']*/gim, '#')
-      .replace(/style="[^"]*"/gim, '');
+      .replace(/base64[^"']*/gim, '#')
+      .replace(/style="[^"]*"/gim, '')
+      .replace(/class="[^"]*"/gim, '')
+      .replace(/id="[^"]*"/gim, '');
   };
 
   const sanitizedFull = sanitizeHtml(text);
