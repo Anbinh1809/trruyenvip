@@ -250,27 +250,47 @@ export const MANGA_CARD_FIELDS = `id, title, cover, last_chap_num, rating, views
 
 export async function cleanLegacyEncoding() {
     try {
-        console.log('[TITAN INFO] Starting automated project sanitation (PostgreSQL)...');
+        console.log('[DB_MAINTENANCE] Starting Titan Sanitization Cycle...');
 
-        // 1. MANGA TABLE SANITIZATION
+        // 0. SCHEMA HARDENING (PostgreSQL Optimization)
+        await query('CREATE INDEX IF NOT EXISTS idx_manga_normalized_title ON manga (normalized_title)');
+        await query('CREATE INDEX IF NOT EXISTS idx_chapters_manga_id ON chapters (manga_id)');
+        await query('CREATE INDEX IF NOT EXISTS idx_readhistory_uuid ON readhistory (user_uuid)');
+        await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS last_stats_update TIMESTAMP WITH TIME ZONE');
+        await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS mission_data JSONB');
         await query("UPDATE manga SET last_chap_num = 'Đang cập nhật' WHERE last_chap_num = '??'");
         await query("UPDATE manga SET author = 'Đang cập nhật' WHERE author = '??'");
         await query("UPDATE manga SET description = REPLACE(description, '??', '') WHERE description LIKE '%??%'");
         await query("UPDATE manga SET title = REPLACE(title, '??', '') WHERE title LIKE '%??%'");
+
+        // TITAN-SLUG CLEANUP: Standardize IDs and Slugs (Accent Stripping)
+        // This handles older SQL Server data that migrated with accented titles
+        await query(`
+            UPDATE manga 
+            SET normalized_title = LOWER(id)
+            WHERE normalized_title IS NULL OR normalized_title = ''
+        `);
         
         // 2. CHAPTERS TABLE SANITIZATION
         // Note: content might be large, we use a targeted update to avoid locking
         await query("UPDATE chapters SET title = REPLACE(title, '??', '') WHERE title LIKE '%??%'");
         
         // 3. AUTOMATED LOG & RESOURCE PRUNING (Maintain high performance)
-        await query("DELETE FROM crawllogs WHERE created_at < NOW() - INTERVAL '15 days'");
-        await query("DELETE FROM guardianreports WHERE created_at < NOW() - INTERVAL '30 days'");
+        await query("DELETE FROM crawllogs WHERE created_at < NOW() - INTERVAL '3 days'");
+        await query("DELETE FROM guardianreports WHERE created_at < NOW() - INTERVAL '7 days'");
         await query("DELETE FROM notifications WHERE is_read = TRUE AND created_at < NOW() - INTERVAL '30 days'");
-        await query("DELETE FROM comment_reports WHERE created_at < NOW() - INTERVAL '60 days'");
         await query("DELETE FROM readhistory WHERE updated_at < NOW() - INTERVAL '30 days'");
         await query("DELETE FROM ratelimits WHERE reset_at < NOW()");
 
-        // 4. ORPHANED IMAGE PURGE: Remove images for chapters that no longer exist
+        // 4. TASK RECOVERY: Reset tasks stuck in 'processing' for > 1 hour
+        await query(`
+            UPDATE crawlertasks 
+            SET status = 'pending', updated_at = NOW() 
+            WHERE status = 'processing' 
+            AND updated_at < NOW() - INTERVAL '1 hour'
+        `);
+
+        // 5. ORPHANED IMAGE PURGE: Remove images for chapters that no longer exist
         await query(`
             DELETE FROM chapterimages 
             WHERE chapter_id NOT IN (SELECT id FROM chapters)

@@ -44,15 +44,27 @@ export async function generateMetadata({ params }) {
 async function getManga(id) {
   try {
     // TITAN SMART LOOKUP 2.0: Check both id and normalized_title simultaneously
-    // This handles both native UUIDs and migrated slugs in the same column.
-    const res = await query(`
+    let res = await query(`
         SELECT ${MANGA_CARD_FIELDS}, description, author, status, last_crawled, normalized_title
         FROM manga 
         WHERE id = @id OR normalized_title = @id
         LIMIT 1
     `, { id });
 
-    const manga = res.recordset[0];
+    let manga = res.recordset[0];
+
+    // TITAN SMART LOOKUP 3.0: Fallback to Title match if slug fails (handle accented discrepancies)
+    if (!manga) {
+        const cleanId = id.replace(/-/g, '%');
+        res = await query(`
+            SELECT ${MANGA_CARD_FIELDS}, description, author, status, last_crawled, normalized_title
+            FROM manga 
+            WHERE title ILIKE @cleanId OR alternative_titles ILIKE @cleanId
+            LIMIT 1
+        `, { cleanId: `%${cleanId}%` });
+        manga = res.recordset[0];
+    }
+
     if (!manga) return null;
 
     // Fetch chapters (Always use the internal primary ID for sub-queries)

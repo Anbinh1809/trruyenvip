@@ -1,27 +1,32 @@
 import { query } from '@/lib/db';
+import { NextResponse } from 'next/server';
 
-export async function POST(req) {
+export async function POST(request) {
     try {
-        const body = await req.json();
+        const body = await request.json();
         const { message, stack, digest, url } = body;
+        const ip = request.headers.get('x-forwarded-for') || '127.0.0.1';
 
-        // Log to AuditLogs for now, but in a real titan-grade system, this would go to Sentry or a dedicated table
+        // Log to guardianreports table for visibility in Admin Dashboard
         await query(`
-            INSERT INTO AuditLogs (user_id, action, details) 
-            VALUES (0, 'CLIENT_CRASH', @details)
-        `, { 
+            INSERT INTO guardianreports (type, message, details, severity)
+            VALUES ('CRASH', @message, @details, 'CRITICAL')
+        `, {
+            message: message || 'Web Crash',
             details: JSON.stringify({ 
-                msg: message?.substring(0, 500), 
-                stack: stack?.substring(0, 1000), 
+                stack, 
                 digest, 
-                url,
-                ua: req.headers.get('user-agent'),
-                ts: new Date().toISOString()
-            }) 
+                url, 
+                ip, 
+                userAgent: request.headers.get('user-agent'),
+                timestamp: new Date().toISOString()
+            })
         });
 
-        return new Response(JSON.stringify({ success: true }), { status: 200 });
+        return NextResponse.json({ success: true });
     } catch (e) {
-        return new Response('Error saving crash report', { status: 500 });
+        // Silently fail to avoid infinite error loops
+        console.error('[REPORT_CRASH_FAILURE]', e);
+        return NextResponse.json({ success: false }, { status: 500 });
     }
 }

@@ -5,10 +5,10 @@ import { NextResponse } from 'next/server';
 export async function GET() {
     try {
         const trending = await query(`
-            SELECT m.id, m.title, m.cover
+            SELECT m.id, m.title, m.cover, m.normalized_title
             FROM manga m
             JOIN chapters c ON m.id = c.manga_id
-            GROUP BY m.id, m.title, m.cover
+            GROUP BY m.id, m.title, m.cover, m.normalized_title
             ORDER BY COUNT(c.id) DESC
             LIMIT 5
         `);

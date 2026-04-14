@@ -1,5 +1,5 @@
 import { queueDiscovery } from '@/lib/crawler';
-import { runMaintenance } from '@/lib/maintenance';
+import { cleanLegacyEncoding } from '@/lib/db';
 
 export async function GET(request) {
   const authHeader = request.headers.get('authorization');
@@ -10,8 +10,8 @@ export async function GET(request) {
   }
  
   try {
-    // 1. PERFORM SYSTEM MAINTENANCE FIRST
-    const maintenance = await runMaintenance();
+    // 1. PERFORM SYSTEM MAINTENANCE FIRST (Unified Titan Engine)
+    await cleanLegacyEncoding();
 
     // 2. TITAN ARCHITECTURE: Queue heavy discovery tasks
     // Page 1 is always the latest updates

@@ -27,14 +27,14 @@ export default function TrendingTicker() {
     <div className="trending-ticker-titan">
       <div className="trending-ticker-content">
         {items.map((item, idx) => (
-          <Link key={item.id} href={`/manga/${item.id}`} className="trending-ticker-item">
+          <Link key={item.id} href={`/manga/${item.normalized_title || item.id}`} className="trending-ticker-item">
             <span className="hot-indicator">HOT #{idx + 1}</span>
             {item.title}
           </Link>
         ))}
         {/* Mirror items for seamless loop */}
         {items.map((item, idx) => (
-          <Link key={`${item.id}-mirror`} href={`/manga/${item.id}`} className="trending-ticker-item">
+          <Link key={`${item.id}-mirror`} href={`/manga/${item.normalized_title || item.id}`} className="trending-ticker-item">
             <span className="hot-indicator">HOT #{idx + 1}</span>
             {item.title}
           </Link>

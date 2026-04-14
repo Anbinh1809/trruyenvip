@@ -28,13 +28,20 @@ export default function RegisterPage() {
       setLoading(false);
       return;
     }
+
+    // TITAN IDENTITY: Ensure device UUID is present
+    let uuid = localStorage.getItem('truyenvip_user_uuid');
+    if (!uuid) {
+        uuid = 'user-' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        localStorage.setItem('truyenvip_user_uuid', uuid);
+    }
     
     try {
-      const success = await register(username, password, email);
-      if (success) {
+      const response = await register({ username, password, email, uuid });
+      if (response.success) {
         router.push('/');
       } else {
-        setError('Tên đăng nhập đã tồn tại hoặc dữ liệu không hợp lệ.');
+        setError(response.error || 'Tên đăng nhập đã tồn tại hoặc dữ liệu không hợp lệ.');
       }
     } catch (err) {
       setError('Đã xảy ra lỗi kết nối. Vui lòng thử lại.');

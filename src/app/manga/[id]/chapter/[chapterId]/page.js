@@ -19,9 +19,21 @@ const Comments = dynamic(() => import('@/components/CommentSection'), {
 async function getChapterData(mangaId, chapterId) {
   try {
     // TITAN SMART LOOKUP 2.0: Check both id and normalized_title simultaneously
-    const mangaRes = await query('SELECT id, title FROM manga WHERE id = @mangaId OR normalized_title = @mangaId LIMIT 1', { mangaId });
+    let mangaRes = await query('SELECT id, title, cover FROM manga WHERE id = @mangaId OR normalized_title = @mangaId LIMIT 1', { mangaId });
     
-    const manga = mangaRes.recordset[0];
+    let manga = mangaRes.recordset[0];
+
+    // TITAN SMART LOOKUP 3.0: Fallback to Title match if slug fails
+    if (!manga) {
+        const cleanId = mangaId.replace(/-/g, '%');
+        mangaRes = await query(`
+            SELECT id, title FROM manga 
+            WHERE title ILIKE @cleanId OR alternative_titles ILIKE @cleanId
+            LIMIT 1
+        `, { cleanId: `%${cleanId}%` });
+        manga = mangaRes.recordset[0];
+    }
+    
     if (!manga) return null;
 
     const internalMangaId = manga.id;
@@ -41,7 +53,20 @@ async function getChapterData(mangaId, chapterId) {
     const prevChapter = currentIndex > 0 ? chapters[currentIndex - 1] : null;
     const nextChapter = currentIndex < chapters.length - 1 ? chapters[currentIndex + 1] : null;
 
-    return { manga, chapter, chapters, prevChapter, nextChapter };
+    // Sign manga cover for history consistency
+    let signedCover = '/placeholder-manga.svg';
+    if (manga.cover) {
+        if (manga.cover.startsWith('http')) {
+            const w = 400;
+            const q = 75;
+            const sig = generateProxySignature(manga.cover, w, q);
+            signedCover = `/api/proxy?url=${encodeURIComponent(manga.cover)}&w=${w}&q=${q}&sig=${sig}`;
+        } else {
+            signedCover = manga.cover;
+        }
+    }
+
+    return { manga: { ...manga, cover: signedCover }, chapter, chapters, prevChapter, nextChapter };
   } catch (err) {
     console.error('Fetch Chapter Error:', err);
     return null;

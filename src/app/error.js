@@ -45,9 +45,9 @@ export default function Error({ error, reset }) {
                 <ShieldAlert size={100} color="var(--accent)" className="pulse-titan" />
             </div>
             
-            <h1 className="system-title-industrial">PHÁ KỶ CHƯỚNG GIỚI</h1>
+            <h1 className="system-title-industrial">HỆ THỐNG GẶP SỰ CỐ</h1>
             <p className="system-desc-industrial">
-                Hệ thống phát hiện một xung đột dữ liệu nghiêm trọng. Titan-Shield đã được kích hoạt để bảo vệ thực thể dữ liệu của bạn.
+                Chúng tôi đã phát hiện một xung đột dữ liệu bất ngờ. Chế độ bảo vệ đã được kích hoạt để đảm bảo an toàn cho trải nghiệm đọc của bạn.
             </p>
             
             {error?.digest && (

@@ -236,3 +236,12 @@
     .titan-recent-grid { grid-template-columns: 1fr; }
 }
 
+@media (max-width: 480px) {
+    .banner-content-titan { padding: 20px; }
+    .banner-title-titan { font-size: 1.35rem; letter-spacing: -0.5px; }
+    .banner-sub-titan { font-size: 0.8rem; margin-bottom: 15px; }
+    .banner-btn-titan-industrial { padding: 10px 20px; width: 100%; border-radius: 8px; }
+    .quick-resume-banner-titan { min-height: 180px; }
+    .titan-recent-card-industrial { padding: 10px; }
+}
+
