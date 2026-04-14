@@ -2,12 +2,20 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { Search, ArrowUpDown, Ghost, Loader2, AlertCircle } from 'lucide-react';
+import { Search, ArrowUpDown, Ghost, Loader2, Navigation, Check } from 'lucide-react';
+import { useHistory } from '@/context/HistoryContext';
 
 export default function ChapterList({ mangaId, chapters }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [displayCount, setDisplayCount] = useState(50);
   const [sortOrder, setSortOrder] = useState('desc'); // 'desc' = newest first
+  const { history, mounted } = useHistory();
+
+  // TITAN CHRONICLE: Determine reading state
+  const mangaHistory = useMemo(() => {
+    if (!mounted) return null;
+    return history.find(h => h.mangaId === mangaId);
+  }, [history, mangaId, mounted]);
 
   const sortedChapters = useMemo(() => {
     return [...(chapters || [])].sort((a, b) => {
@@ -35,7 +43,7 @@ export default function ChapterList({ mangaId, chapters }) {
     <section className="chapter-list-section fade-in">
       <div className="chapter-list-header-industrial">
         <h2 className="chapter-list-title-titan">
-          Danh sách chương <span className="text-secondary-titan">({chapters?.length || 0})</span>
+          DANH SÁCH CHƯƠNG <span className="text-secondary-titan">({chapters?.length || 0})</span>
         </h2>
         
         <div className="chapter-list-actions-industrial">
@@ -44,7 +52,7 @@ export default function ChapterList({ mangaId, chapters }) {
                 className="btn-sort-titan-industrial"
                 aria-label={sortOrder === 'desc' ? 'Sắp xếp cũ nhất' : 'Sắp xếp mới nhất'}
             >
-                <ArrowUpDown size={14} /> {sortOrder === 'desc' ? 'Mới nhất' : 'Cũ nhất'}
+                <ArrowUpDown size={14} /> {sortOrder === 'desc' ? 'MỚI NHẤT' : 'CŨ NHẤT'}
             </button>
 
             <div className="chapter-search-box-industrial">
@@ -73,47 +81,63 @@ export default function ChapterList({ mangaId, chapters }) {
         </div>
       ) : (
         <>
-            <div className="chapter-grid-titan">
-                {displayedChapters.map(chapter => (
-                    <Link 
-                        key={chapter.id} 
-                        href={chapter.status === 'ghost' ? '#' : `/manga/${mangaId}/chapter/${chapter.id}`} 
-                        className={`chapter-item-titan-industrial status-${chapter.status || 'pending'}`}
-                        onClick={(e) => chapter.status === 'ghost' && e.preventDefault()}
-                    >
-                        <div className="chapter-main-info">
-                            <span className="chapter-num-pill">Chương {chapter.chapter_number}</span>
-                            {chapter.title && chapter.title !== `Chương ${chapter.chapter_number}` && (
-                                <span className="chapter-title-industrial truncate-1">{chapter.title}</span>
-                            )}
-                            
-                            {/* STATUS BADGES */}
-                            {chapter.status === 'ghost' && (
-                                <span className="badge-ghost-titan" title="Nguồn lỗi hoặc không có ảnh">
-                                    <Ghost size={12} /> LỖI NGUỒN
+            <div className="chapter-list-linear-industrial">
+                {displayedChapters.map(chapter => {
+                    const isLastRead = mangaHistory?.chapterId === chapter.id;
+                    const isGhost = chapter.status === 'ghost';
+                    
+                    return (
+                        <Link 
+                            key={chapter.id} 
+                            href={isGhost ? '#' : `/manga/${mangaId}/chapter/${chapter.id}`} 
+                            className={`chapter-row-titan ${isLastRead ? 'last-read-node shadow-titan' : ''} status-${chapter.status || 'pending'}`}
+                            onClick={(e) => isGhost && e.preventDefault()}
+                        >
+                            <div className="chapter-row-left">
+                                <div className="chapter-primary-info">
+                                    <span className="chapter-num-pill-v2">Chương {chapter.chapter_number}</span>
+                                    {chapter.title && chapter.title !== `Chương ${chapter.chapter_number}` && (
+                                        <span className="chapter-title-v2 truncate-1">{chapter.title}</span>
+                                    )}
+                                </div>
+                                
+                                <div className="chapter-badges-v2">
+                                    {isLastRead && (
+                                        <span className="badge-history-titan">
+                                            <Navigation size={10} fill="currentColor" /> LẦN ĐỌC CUỐI
+                                        </span>
+                                    )}
+                                    {isGhost && (
+                                        <span className="badge-ghost-v2">
+                                            <Ghost size={12} /> LỖI NGUỒN
+                                        </span>
+                                    )}
+                                    {chapter.status === 'pending' && (
+                                        <span className="badge-pending-v2">
+                                            <Loader2 size={12} className="animate-spin" /> ĐANG TẢI
+                                        </span>
+                                    )}
+                                    {((new Date() - new Date(chapter.updated_at)) < (48 * 60 * 60 * 1000)) && (
+                                        <span className="badge-new-v2">MỚI</span>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="chapter-row-right">
+                                <span className="chapter-date-v2">
+                                    {new Date(chapter.updated_at || chapter.created_at).toLocaleDateString('vi-VN')}
                                 </span>
-                            )}
-                            {chapter.status === 'pending' && (
-                                <span className="badge-pending-titan" title="Đang xử lý dữ liệu">
-                                    <Loader2 size={12} className="animate-spin" /> ĐANG TẢI
-                                </span>
-                            )}
-                            {((new Date() - new Date(chapter.updated_at)) < (48 * 60 * 60 * 1000)) && (
-                                <span className="badge-new-titan">MỚI</span>
-                            )}
-                        </div>
-                        <span className="chapter-date-industrial">
-                            {new Date(chapter.updated_at || chapter.created_at).toLocaleDateString('vi-VN')}
-                        </span>
-                    </Link>
-                ))}
+                            </div>
+                        </Link>
+                    );
+                })}
             </div>
             
             {hasMore && (
                 <div className="load-more-industrial">
                     <button 
                         onClick={() => setDisplayCount(prev => prev + 100)}
-                        className="btn btn-outline load-more-btn-titan"
+                        className="btn btn-outline load-more-btn-titan shadow-titan"
                     >
                         XEM THÊM CHƯƠNG
                     </button>
@@ -123,180 +147,250 @@ export default function ChapterList({ mangaId, chapters }) {
       )}
 
       <style jsx>{`
-        .badge-ghost-titan {
-            background: rgba(239, 68, 68, 0.1);
+        .chapter-list-linear-industrial {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+        }
+
+        .chapter-row-titan {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 24px;
+            background: rgba(255, 255, 255, 0.02);
+            text-decoration: none;
+            transition: all 0.2s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            position: relative;
+        }
+
+        .chapter-row-titan:last-child {
+            border-bottom: none;
+        }
+
+        .chapter-row-titan:hover {
+            background: rgba(255, 255, 255, 0.06);
+            padding-left: 30px;
+        }
+
+        .chapter-row-titan.last-read-node {
+            background: rgba(var(--accent-rgb, 255, 0, 0), 0.08);
+            border-left: 4px solid var(--accent);
+            z-index: 2;
+        }
+
+        .chapter-row-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            min-width: 0;
+        }
+
+        .chapter-primary-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 140px;
+        }
+
+        .chapter-num-pill-v2 {
+            font-weight: 950;
+            color: white;
+            font-size: 0.95rem;
+            white-space: nowrap;
+        }
+
+        .chapter-title-v2 {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 700;
+        }
+
+        .chapter-badges-v2 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-history-titan {
+            background: var(--accent);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 0.6rem;
+            font-weight: 950;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.3);
+        }
+
+        .badge-new-v2 {
+            background: #10b981;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.6rem;
+            font-weight: 950;
+        }
+
+        .badge-ghost-v2 {
             color: #ef4444;
-            padding: 2px 8px;
-            border-radius: 4px;
             font-size: 0.65rem;
             font-weight: 900;
             display: flex;
             align-items: center;
             gap: 4px;
         }
-        .badge-pending-titan {
-            background: rgba(59, 130, 246, 0.1);
+
+        .badge-pending-v2 {
             color: #3b82f6;
-            padding: 2px 8px;
-            border-radius: 4px;
             font-size: 0.65rem;
             font-weight: 900;
             display: flex;
             align-items: center;
             gap: 4px;
         }
-        .chapter-item-titan-industrial.status-ghost {
-            opacity: 0.5;
-            cursor: not-allowed;
-            border-style: dashed;
+
+        .chapter-date-v2 {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.2);
+            font-weight: 800;
         }
-        .chapter-item-titan-industrial.status-ghost:hover {
-            transform: none;
-            border-color: var(--glass-border);
-        }
+
         .chapter-list-header-industrial {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 40px;
-            gap: 30px;
-            flex-wrap: wrap;
+            margin-bottom: 30px;
+            gap: 20px;
         }
+
         .chapter-list-title-titan {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: 950;
             color: white;
-            letter-spacing: -1px;
+            letter-spacing: 2px;
             margin: 0;
         }
+
         .text-secondary-titan {
-            opacity: 0.3;
+            opacity: 0.2;
         }
+
         .chapter-list-actions-industrial {
             display: flex;
             align-items: center;
             gap: 15px;
-            flex: 1;
-            justify-content: flex-end;
-            min-width: 320px;
         }
+
         .btn-sort-titan-industrial {
             display: flex;
             align-items: center;
             gap: 10px;
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid var(--glass-border);
-            padding: 12px 20px;
-            border-radius: 12px;
+            padding: 10px 18px;
+            border-radius: 10px;
             color: white;
-            font-size: 0.85rem;
-            font-weight: 850;
+            font-size: 0.75rem;
+            font-weight: 900;
             cursor: pointer;
             transition: all 0.3s;
-            white-space: nowrap;
+            letter-spacing: 1px;
         }
+
         .btn-sort-titan-industrial:hover {
             background: rgba(255, 255, 255, 0.08);
             border-color: rgba(255, 255, 255, 0.15);
         }
+
         .chapter-search-box-industrial {
             position: relative;
-            flex: 1;
-            max-width: 400px;
+            width: 250px;
         }
+
         .chapter-search-input-industrial {
             width: 100%;
             background: rgba(2, 6, 23, 0.4);
             border: 1px solid var(--glass-border);
-            padding: 12px 20px 12px 50px;
-            border-radius: 12px;
+            padding: 10px 15px 10px 45px;
+            border-radius: 10px;
             color: white;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 600;
             outline: none;
             transition: all 0.3s;
         }
+
         .chapter-search-input-industrial:focus {
             border-color: var(--accent);
-            background: rgba(2, 6, 23, 0.6);
         }
+
         .search-icon-industrial {
             position: absolute;
-            left: 18px;
+            left: 15px;
             top: 50%;
             transform: translateY(-50%);
             opacity: 0.3;
             color: white;
             display: flex;
         }
-        .chapter-grid-titan {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 15px;
-        }
-        .chapter-item-titan-industrial {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 18px 24px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--glass-border);
-            border-radius: 14px;
-            text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .chapter-item-titan-industrial:hover {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: var(--accent);
-            transform: translateX(5px);
-        }
-        .chapter-main-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            min-width: 0;
-        }
-        .chapter-num-pill {
-            font-weight: 950;
-            color: white;
-            font-size: 0.9rem;
-            white-space: nowrap;
-        }
-        .chapter-title-industrial {
-            font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.4);
-            font-weight: 700;
-        }
-        .chapter-date-industrial {
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.2);
-            font-weight: 800;
-            white-space: nowrap;
-        }
+
         .load-more-industrial {
             display: flex;
             justify-content: center;
-            margin-top: 50px;
+            margin-top: 40px;
         }
+
         .load-more-btn-titan {
-            padding: 15px 50px;
+            padding: 14px 40px;
             font-weight: 950;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-            border-radius: 30px;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.03);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
         }
+
+        .load-more-btn-titan:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
         @media (max-width: 768px) {
+            .chapter-row-titan {
+                padding: 12px 16px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .chapter-row-right {
+                width: 100%;
+                text-align: right;
+            }
             .chapter-list-header-industrial {
                 flex-direction: column;
-                align-items: stretch;
+                align-items: flex-start;
             }
             .chapter-list-actions-industrial {
-                flex-direction: column;
-                min-width: 100%;
-            }
-            .btn-sort-titan-industrial, .chapter-search-box-industrial {
                 width: 100%;
-                max-width: 100%;
+            }
+            .chapter-search-box-industrial {
+                width: 100%;
+            }
+            .chapter-primary-info {
+                min-width: 0;
             }
         }
       `}</style>
