@@ -21,7 +21,7 @@ async function getChapterData(mangaId, chapterId) {
     // TITAN SMART LOOKUP 2.0: Check both id and normalized_title simultaneously (Case-Insensitive)
     const cleanMangaId = mangaId?.toString().trim();
     let mangaRes = await query('SELECT id, title, cover FROM manga WHERE id = @id OR normalized_title ILIKE @id LIMIT 1', { id: cleanMangaId });
-    const manga = mangaRes.recordset[0];
+    let manga = mangaRes.recordset[0];
 
     // TITAN SMART LOOKUP 3.0: Fallback to Title match if slug fails
     if (!manga) {
