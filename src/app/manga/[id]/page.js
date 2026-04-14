@@ -49,7 +49,7 @@ async function getManga(id) {
     let res = await query(`
         SELECT ${MANGA_CARD_FIELDS}, description
         FROM manga 
-        WHERE id = @id OR LOWER(normalized_title) = LOWER(@id)
+        WHERE id = @id OR normalized_title ILIKE @id
         LIMIT 1
     `, { id: cleanId });
 
@@ -59,7 +59,7 @@ async function getManga(id) {
     if (!manga) {
         const cleanId = id.replace(/-/g, '%');
         res = await query(`
-            SELECT ${MANGA_CARD_FIELDS}, description, author, status, last_crawled, normalized_title
+            SELECT ${MANGA_CARD_FIELDS}, description
             FROM manga 
             WHERE title ILIKE @cleanId OR alternative_titles ILIKE @cleanId
             LIMIT 1
