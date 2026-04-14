@@ -81,7 +81,7 @@ async function getManga(id) {
         FROM genres g
         JOIN mangagenres mg ON g.id = mg.genre_id
         WHERE mg.manga_id = @internalId
-    `, { id });
+    `, { internalId });
     
     return {
       ...manga,
