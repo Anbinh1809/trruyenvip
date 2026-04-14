@@ -42,7 +42,7 @@ export default function Header() {
   }, [isMenuOpen]);
 
   return (
-    <header className={`titan-header minimalist-nav ${isScrolled ? 'header-scrolled' : ''}`}>
+    <header className={`titan-header ${isScrolled ? 'header-scrolled' : ''}`}>
       <div className="container">
         <div className="header-wrapper">
           <HeaderLogo />
@@ -58,9 +58,9 @@ export default function Header() {
             </div>
             
             <div className="nav-links">
-                <a href="/genres" className="nav-link-titan" onClick={() => setIsMenuOpen(false)}>Thể loại</a>
-                <a href="/transfer" className="nav-link-titan" onClick={() => setIsMenuOpen(false)}>Dịch chuyển</a>
-                <a href="/leaderboard" className="nav-link-titan" onClick={() => setIsMenuOpen(false)}>Xếp hạng</a>
+                <Link href="/genres" className="nav-link-titan" onClick={() => setIsMenuOpen(false)}>Thể loại</Link>
+                <Link href="/transfer" className="nav-link-titan" onClick={() => setIsMenuOpen(false)}>Dịch chuyển</Link>
+                <Link href="/leaderboard" className="nav-link-titan" onClick={() => setIsMenuOpen(false)}>Xếp hạng</Link>
             </div>
           </nav>
 
@@ -68,7 +68,7 @@ export default function Header() {
               <div className="mobile-search-hud fade-in">
                   <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '30px' }}>
                       <button onClick={() => setIsSearchOpen(false)} className="titan-icon-btn"><X size={24} /></button>
-                      <h3 style={{ margin: 0, fontWeight: 800 }}>Tìm kiếm</h3>
+                      <h3 style={{ margin: 0, fontWeight: 950, letterSpacing: '-1px' }}>Tìm kiếm</h3>
                   </div>
                   <LiveSearch onSelect={() => setIsSearchOpen(false)} />
               </div>

@@ -120,91 +120,67 @@ export default function LiveSearch() {
   };
 
   return (
-    <div 
-        className="titan-search-container titan-results-panel" 
-        ref={searchRef} 
-        style={{ position: 'relative', width: '100%' }}
-    >
-        <form 
-            style={{ 
-                position: 'relative', background: 'rgba(255, 255, 255, 0.05)', 
-                border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: 'var(--border-radius)', 
-                display: 'flex', alignItems: 'center', padding: '2px 5px', transition: 'all 0.3s ease' 
-            }} 
-            onSubmit={handleSearch}
-        >
+    <div className="titan-search-container" ref={searchRef}>
+        <form className="titan-search-form" onSubmit={handleSearch}>
             <input 
                 type="text" 
                 name="search" 
                 placeholder="Tìm truyện hoặc dán link NetTruyen..." 
                 value={q}
                 autoComplete="off"
+                className="titan-search-input"
                 onChange={(e) => setQ(e.target.value)}
                 onFocus={() => q.length >= 2 && setIsOpen(true)}
                 onKeyDown={handleKeyDown}
-                style={{ 
-                    background: 'none', border: 'none', color: 'var(--text-primary)', padding: '12px 20px', 
-                    width: '100%', fontSize: '0.95rem', fontWeight: 600, outline: 'none' 
-                }}
             />
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingRight: '15px' }}>
+            <div className="titan-search-actions">
                 {q && !loading && (
                     <button 
                         type="button" 
                         onClick={() => { setQ(''); setResults([]); setIsOpen(false); }}
-                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.3, cursor: 'pointer', background: 'none', border: 'none', color: 'white' }}
+                        className="titan-search-clear"
                     >
-                        <X size={18} />
+                        <X size={16} />
                     </button>
                 )}
-                {loading ? <span className="loader-mini"></span> : <button type="submit" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.8, background: 'none', border: 'none', color: 'white' }}><Search size={18} /></button>}
+                <button type="submit" className="titan-search-submit">
+                    {loading ? <span className="loader-mini"></span> : <Search size={18} />}
+                </button>
             </div>
         </form>
 
         {isOpen && (
-            <div id="live-search-results" className="titan-results-panel fade-slide-up">
+            <div className="titan-results-panel fade-slide-up glass-titan">
                 {isUrl && (
-                    <div style={{ padding: '15px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                        <button onClick={handleMigration} className="btn-primary" style={{ width: '100%', background: 'var(--accent)', color: 'white', border: 'none', padding: '12px', borderRadius: 'var(--border-radius)', fontWeight: 900, fontSize: '0.75rem', cursor: 'pointer', letterSpacing: '1px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                    <div style={{ padding: '20px', borderBottom: '1px solid var(--glass-border)' }}>
+                        <button onClick={handleMigration} className="btn-primary" style={{ width: '100%', background: 'var(--accent)', color: 'white', border: 'none', padding: '14px', borderRadius: '6px', fontWeight: 950, fontSize: '0.75rem', cursor: 'pointer', letterSpacing: '1px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
                             <Zap size={16} /> {loading ? 'ĐANG XỬ LÝ...' : 'DỒN DỮ LIỆU TỪ NGUỒN NGOÀI'}
                         </button>
-                        <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textAlign: 'center', marginTop: '8px', fontWeight: 700, textTransform: 'uppercase' }}>Hệ thống phát hiện liên kết ngoài</div>
                     </div>
                 )}
                 
-                <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                <div style={{ maxHeight: '420px', overflowY: 'auto' }} className="glass-scrollbar">
                     {results.length > 0 ? results.map((m, idx) => (
                         <Link 
                             key={m.id} 
                             href={`/manga/${m.id}`} 
-                            style={{ 
-                                display: 'flex', alignItems: 'center', gap: '15px', padding: '12px 20px', 
-                                textDecoration: 'none', transition: 'all 0.2s ease', 
-                                borderBottom: '1px solid rgba(255,255,255,0.02)',
-                                background: highlightIndex === idx ? 'rgba(255,255,255,0.05)' : 'transparent'
-                            }} 
+                            className={`live-result-item ${highlightIndex === idx ? 'highlighted' : ''}`}
                             onClick={() => setIsOpen(false)}
                         >
-                            <div style={{ width: '40px', height: '55px', position: 'relative', borderRadius: '6px', overflow: 'hidden' }}>
-                                <Image 
-                                    src={m.cover} 
-                                    alt={m.title} 
-                                    fill 
-                                    sizes="50px" 
-                                    style={{ objectFit: 'cover' }} 
-                                />
+                            <div className="result-thumb-titan">
+                                <Image src={m.cover} alt={m.title} fill sizes="50px" style={{ objectFit: 'cover' }} />
                             </div>
                             <div style={{ flex: 1 }}>
-                                <div className="truncate-1" style={{ fontWeight: 800, color: 'var(--text-primary)', fontSize: '0.9rem', marginBottom: '2px' }}>{m.title}</div>
-                                <div className="truncate-1" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>{m.author || 'Đang cập nhật'}</div>
+                                <div className="result-title-titan truncate-1">{m.title}</div>
+                                <div className="result-sub-titan truncate-1">{m.author || 'Đang cập nhật'}</div>
                             </div>
-                            {idx < 3 && <div style={{ fontSize: '0.6rem', background: 'rgba(255, 62, 62, 0.1)', color: 'var(--accent)', padding: '2px 6px', borderRadius: '4px', fontWeight: 900 }}>HOT</div>}
+                            {idx < 3 && <div className="hot-tag-titan">HOT</div>}
                         </Link>
                     )) : !loading && q.length >= 2 && (
-                        <div style={{ padding: '40px 20px', textAlign: 'center' }}>
-                            <div style={{ fontWeight: 900, fontSize: '1.1rem', color: 'white', marginBottom: '8px' }}>KHÔNG TÌM THẤY</div>
-                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600, maxWidth: '200px', marginInline: 'auto' }}>
-                                Kết quả tìm kiếm hiện chưa có trong cơ sở dữ liệu.
+                        <div style={{ padding: '60px 20px', textAlign: 'center' }}>
+                            <div style={{ fontWeight: 950, fontSize: '1.2rem', color: 'white', marginBottom: '10px', letterSpacing: '-1px' }}>KHÔNG TÌM THẤY</div>
+                            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600, maxWidth: '240px', marginInline: 'auto', lineHeight: '1.5' }}>
+                                Rất tiếc, bộ truyện này chưa xuất hiện trong kho dữ liệu của chúng tôi.
                             </p>
                         </div>
                     )}
