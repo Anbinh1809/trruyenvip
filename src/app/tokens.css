@@ -4,7 +4,7 @@
    ========================================================================== */
 
 :root {
-  /* Premium Dark Theme Core */
+  /* Premium Dark Theme Core (Default) */
   --bg-primary: #020617;
   --bg-secondary: #0a0a0a;
   --bg-tertiary: #111827;
@@ -14,9 +14,10 @@
   --accent: #ff3e3e;
   --accent-gradient: linear-gradient(135deg, #ff3e3e 0%, #b91c1c 100%);
   --glass-bg: #111827;
-  --glass-border: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.07);
   --glass-blur: blur(20px);
-  --header-height: 60px;
+  --header-height: 72px;
+  --header-bg: rgba(2, 6, 23, 0.82);
   --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   --border-radius: 12px;
@@ -41,6 +42,25 @@
   --rank-gold: #fbbf24;
   --rank-silver: #94a3b8;
   --rank-bronze: #b45309;
+}
+
+/* ==========================================================================
+   LIGHT THEME — Applied via data-theme="light" on <html>
+   ========================================================================== */
+[data-theme='light'] {
+  --bg-primary: #f4f6f9;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #e8edf5;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --accent: #e02020;
+  --accent-gradient: linear-gradient(135deg, #e02020 0%, #9b1c1c 100%);
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --header-bg: rgba(255, 255, 255, 0.88);
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
+  --nebula-glass: rgba(0, 0, 0, 0.06);
 }
 
 /* GLOBAL KINETIC CONSTANTS */

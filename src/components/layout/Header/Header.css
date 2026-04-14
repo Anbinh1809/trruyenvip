@@ -1,43 +1,103 @@
 /* ==========================================================================
-   TITAN-GRADE CORE HEADER SYSTEM
-   Standardized Industrial UX - Zero Redundancy
+   TITAN HEADER — Production Grade
+   Uses CSS custom properties from tokens.css for full light/dark support
    ========================================================================== */
 
+/* ── Body offset so fixed header doesn't cover content ───────────────────── */
+body {
+    padding-top: var(--header-height);
+}
+
+/* ── Core Header Shell ───────────────────────────────────────────────────── */
 .titan-header {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     height: var(--header-height);
-    background: rgba(2, 6, 23, 0.8);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
+    background: var(--header-bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     border-bottom: 1px solid var(--glass-border);
     z-index: var(--z-header);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background 0.3s ease, height 0.3s ease, box-shadow 0.3s ease;
     display: flex;
     align-items: center;
 }
 
 .header-scrolled {
-    background: rgba(2, 6, 23, 0.95);
     height: 60px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.25);
 }
 
+/* In light mode the scrolled header should tighten up too */
+[data-theme='light'] .titan-header {
+    background: var(--header-bg);
+    border-bottom-color: var(--glass-border);
+}
+
+/* ── Inner Layout ────────────────────────────────────────────────────────── */
 .header-wrapper {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    gap: 20px;
+    gap: 24px;
+    flex-wrap: nowrap;
 }
 
-/* NAVIGATION SYSTEM */
+/* ── Logo ────────────────────────────────────────────────────────────────── */
+.logo-industrial {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 1.6rem;
+    font-weight: 900;
+    letter-spacing: -1.5px;
+    text-decoration: none;
+    flex-shrink: 0;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s;
+    line-height: 1;
+}
+
+.logo-industrial:hover {
+    transform: scale(1.04);
+    opacity: 0.9;
+}
+
+.logo-icon {
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-right: 2px;
+}
+
+.logo-primary {
+    color: var(--text-primary);
+}
+
+.logo-accent-titan {
+    color: var(--accent);
+    position: relative;
+}
+
+/* Small badge below the logo 'Vip' part */
+.logo-accent-titan::after {
+    content: 'PRO';
+    position: absolute;
+    bottom: -8px;
+    right: 0;
+    font-size: 0.38rem;
+    font-weight: 950;
+    letter-spacing: 1.5px;
+    color: var(--accent);
+    opacity: 0.7;
+}
+
+/* ── Desktop Navigation ──────────────────────────────────────────────────── */
 .nav-titan {
     display: flex;
     align-items: center;
-    gap: 40px;
+    gap: 32px;
     flex: 1;
     justify-content: center;
 }
@@ -45,19 +105,20 @@
 .nav-links {
     display: flex;
     align-items: center;
-    gap: 30px;
+    gap: 28px;
 }
 
 .nav-link-titan {
-    font-size: 0.85rem;
-    font-weight: 800;
+    font-size: 0.82rem;
+    font-weight: 700;
     color: var(--text-secondary);
     text-transform: uppercase;
-    letter-spacing: 1.5px;
-    transition: all 0.25s ease;
-    position: relative;
-    padding: 8px 0;
+    letter-spacing: 1.2px;
     text-decoration: none;
+    position: relative;
+    padding: 6px 0;
+    transition: color 0.25s ease;
+    white-space: nowrap;
 }
 
 .nav-link-titan::after {
@@ -68,48 +129,56 @@
     width: 0;
     height: 2px;
     background: var(--accent);
+    border-radius: 2px;
     transition: width 0.3s ease;
 }
 
 .nav-link-titan:hover {
-    color: white;
-    transform: translateY(-1px);
+    color: var(--text-primary);
 }
 
 .nav-link-titan:hover::after {
     width: 100%;
 }
 
-/* ACTIONS & UTILITIES */
+/* ── Desktop Search ──────────────────────────────────────────────────────── */
+.desktop-search-container {
+    width: 100%;
+    max-width: 380px;
+    flex-shrink: 1;
+}
+
+/* ── Header Actions (right side) ─────────────────────────────────────────── */
 .header-actions {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 12px;
     flex-shrink: 0;
 }
 
+/* ── Icon Buttons ────────────────────────────────────────────────────────── */
 .titan-icon-btn {
-    width: 42px;
-    height: 42px;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(128, 128, 128, 0.08);
+    border: 1px solid var(--glass-border);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: var(--text-primary);
     cursor: pointer;
-    transition: all 0.3s;
+    transition: background 0.25s, border-color 0.25s, transform 0.25s;
+    flex-shrink: 0;
 }
 
 .titan-icon-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(128, 128, 128, 0.15);
     border-color: var(--accent);
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(255, 62, 62, 0.2);
 }
 
-/* LIVE SEARCH INDUSTRIAL REFINEMENT */
+/* ── Search Input (Live Search) ──────────────────────────────────────────── */
 .titan-search-container {
     position: relative;
     width: 100%;
@@ -124,21 +193,26 @@
 
 .titan-search-input {
     width: 100%;
-    height: 44px;
-    background: rgba(255, 255, 255, 0.04);
+    height: 42px;
+    background: rgba(128, 128, 128, 0.07);
     border: 1px solid var(--glass-border);
     border-radius: 10px;
-    padding: 0 50px 0 20px;
-    color: white;
-    font-size: 0.9rem;
-    font-weight: 700;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 0 48px 0 18px;
+    color: var(--text-primary);
+    font-size: 0.88rem;
+    font-weight: 600;
+    transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+    font-family: var(--font-body);
+}
+
+.titan-search-input::placeholder {
+    color: var(--text-muted);
 }
 
 .titan-search-input:focus {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(128, 128, 128, 0.12);
     border-color: var(--accent);
-    box-shadow: 0 0 25px rgba(255, 62, 62, 0.1);
+    box-shadow: 0 0 0 3px rgba(255, 62, 62, 0.1);
     outline: none;
 }
 
@@ -147,61 +221,64 @@
     right: 5px;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
 }
 
-.titan-search-submit, .titan-search-clear {
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
+.titan-search-submit,
+.titan-search-clear {
+    width: 32px;
+    height: 32px;
+    border-radius: 7px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba(255, 255, 255, 0.4);
-    transition: all 0.25s;
+    color: var(--text-muted);
+    transition: color 0.2s, background 0.2s;
     background: transparent;
     border: none;
     cursor: pointer;
 }
 
-.titan-search-submit:hover, .titan-search-clear:hover {
-    color: white;
-    background: rgba(255, 255, 255, 0.05);
+.titan-search-submit:hover,
+.titan-search-clear:hover {
+    color: var(--text-primary);
+    background: rgba(128, 128, 128, 0.1);
 }
 
+/* ── Results Panel ───────────────────────────────────────────────────────── */
 .titan-results-panel {
     position: absolute;
-    top: calc(100% + 12px);
+    top: calc(100% + 10px);
     left: 0;
     right: 0;
-    background: rgba(2, 6, 23, 0.95);
-    border-radius: 12px;
+    background: var(--bg-secondary);
+    border-radius: 14px;
     border: 1px solid var(--glass-border);
     overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    z-index: var(--z-search);
 }
 
 .live-result-item {
     display: flex;
     align-items: center;
-    gap: 15px;
-    padding: 12px 18px;
-    transition: all 0.25s;
+    gap: 14px;
+    padding: 11px 16px;
+    transition: background 0.2s;
     text-decoration: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid var(--glass-border);
 }
 
-.live-result-item:last-child {
-    border-bottom: none;
-}
+.live-result-item:last-child { border-bottom: none; }
 
-.live-result-item:hover, .live-result-item.highlighted {
-    background: rgba(255, 255, 255, 0.06);
+.live-result-item:hover,
+.live-result-item.highlighted {
+    background: rgba(128, 128, 128, 0.07);
 }
 
 .result-thumb-titan {
-    width: 42px;
-    height: 58px;
+    width: 40px;
+    height: 54px;
     position: relative;
     border-radius: 6px;
     overflow: hidden;
@@ -210,81 +287,50 @@
 }
 
 .result-title-titan {
-    font-size: 0.9rem;
-    font-weight: 850;
-    color: white;
-    margin-bottom: 4px;
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 3px;
 }
 
 .result-sub-titan {
-    font-size: 0.75rem;
+    font-size: 0.73rem;
     color: var(--text-muted);
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .hot-tag-titan {
-    font-size: 0.65rem;
-    font-weight: 950;
+    font-size: 0.62rem;
+    font-weight: 900;
     color: var(--accent);
     background: rgba(255, 62, 62, 0.1);
-    padding: 4px 8px;
+    padding: 3px 7px;
     border-radius: 5px;
     letter-spacing: 0.5px;
 }
 
-.titan-migration-bar {
-    padding: 15px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-/* SEARCH SYSTEM COHESION */
-.desktop-search-container {
-    width: 100%;
-    max-width: 400px;
-    margin: 0 20px;
-}
-
-.mobile-only-header {
-    display: none;
-    width: 100%;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 40px;
-}
-
-/* MOBILE HUD SEARCH CAPTURE */
-.mobile-search-hud-industrial {
-    position: fixed;
-    inset: 0;
-    background: var(--bg-primary);
-    z-index: 6000;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    animation: fadeIn 0.3s ease;
-}
-
-.search-hud-header-industrial {
+/* ── User Profile Dropdown ────────────────────────────────────────────────── */
+.header-actions-group {
     display: flex;
     align-items: center;
-    gap: 15px;
-    margin-bottom: 30px;
+    gap: 12px;
 }
 
-.search-hud-title-industrial {
-    margin: 0;
-    font-weight: 950;
-    letter-spacing: -1px;
-    font-size: 1.5rem;
-    color: white;
+.skeleton-user-actions {
+    width: 88px;
+    height: 38px;
+    border-radius: 10px;
+    background: rgba(128,128,128,0.08);
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+.login-btn-titan {
+    padding: 9px 22px;
+    font-size: 0.84rem;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
 }
 
-/* USER PROFILE REFINEMENT */
 .user-profile-titan {
     position: relative;
 }
@@ -292,32 +338,57 @@
 .profile-trigger {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 18px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    gap: 8px;
+    padding: 8px 14px;
+    background: rgba(128, 128, 128, 0.07);
+    border: 1px solid var(--glass-border);
     border-radius: 10px;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: background 0.25s, border-color 0.25s, transform 0.25s;
 }
 
 .profile-trigger:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(128, 128, 128, 0.13);
     border-color: var(--accent);
     transform: translateY(-2px);
 }
 
+.profile-icon-titan {
+    color: var(--accent);
+    stroke-width: 2.5px;
+}
+
+.username-text {
+    font-weight: 800;
+    font-size: 0.84rem;
+    letter-spacing: -0.2px;
+    color: var(--text-primary);
+}
+
+.trigger-arrow {
+    opacity: 0.45;
+    transition: transform 0.3s;
+    color: var(--text-primary);
+}
+
+.user-profile-titan:hover .trigger-arrow {
+    transform: rotate(180deg);
+}
+
 .profile-dropdown-titan {
     position: absolute;
-    top: calc(100% + 15px);
+    top: calc(100% + 14px);
     right: 0;
     width: 240px;
     padding: 10px;
-    border-radius: 12px;
+    border-radius: 14px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     opacity: 0;
     visibility: hidden;
-    transform: translateY(15px);
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateY(12px);
+    transition: opacity 0.3s, visibility 0.3s, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     z-index: var(--z-modal);
 }
 
@@ -327,86 +398,162 @@
     transform: translateY(0);
 }
 
+.user-info-plate {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--glass-border);
+    margin-bottom: 6px;
+}
+
+.user-member-label {
+    font-size: 0.62rem;
+    font-weight: 950;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 3px;
+}
+
+.user-display-name {
+    font-size: 0.92rem;
+    font-weight: 900;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .dropdown-item {
-    display: block;
-    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 16px;
     border-radius: 8px;
-    font-size: 0.85rem;
+    font-size: 0.84rem;
     font-weight: 700;
     color: var(--text-secondary);
-    transition: all 0.25s;
+    transition: background 0.2s, color 0.2s, padding-left 0.2s;
     text-decoration: none;
+    width: 100%;
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-align: left;
 }
 
 .dropdown-item:hover {
-    background: rgba(255, 255, 255, 0.06);
-    color: white;
-    padding-left: 22px;
+    background: rgba(128, 128, 128, 0.08);
+    color: var(--text-primary);
+    padding-left: 20px;
 }
 
-/* RESPONSIVE ARCHITECTURE */
+.dropdown-item.admin-link {
+    color: var(--accent);
+}
+
+.logout-btn {
+    color: var(--text-muted);
+}
+
+.logout-btn:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.07);
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: var(--glass-border);
+    margin: 5px 0;
+}
+
+/* ── Mobile HUD Search Overlay ────────────────────────────────────────────── */
+.mobile-only-header {
+    display: none;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 36px;
+}
+
+.mobile-search-hud-industrial {
+    position: fixed;
+    inset: 0;
+    background: var(--bg-primary);
+    z-index: 6000;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn 0.25s ease;
+}
+
+.search-hud-header-industrial {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 28px;
+}
+
+.search-hud-title-industrial {
+    margin: 0;
+    font-weight: 900;
+    letter-spacing: -0.8px;
+    font-size: 1.4rem;
+    color: var(--text-primary);
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+
+/* Hide desktop nav links and search at 1200px */
 @media (max-width: 1200px) {
-    .nav-titan .nav-links {
-        display: none !important;
-    }
-    
-    .desktop-search-container {
-        display: none !important;
-    }
+    .nav-titan .nav-links { display: none !important; }
+    .desktop-search-container { display: none !important; }
 }
 
+/* Mobile drawer at ≤1024px */
 @media (max-width: 1024px) {
     .nav-titan {
         position: fixed;
         top: 0;
         right: -100%;
-        width: 100%;
-        max-width: 380px;
-        height: 100vh;
-        background: rgba(2, 6, 23, 0.98);
-        padding: 40px;
+        width: min(380px, 90vw);
+        height: 100dvh;
+        background: var(--bg-secondary);
+        border-left: 1px solid var(--glass-border);
+        padding: 36px 32px;
         flex-direction: column;
         align-items: flex-start;
         justify-content: flex-start;
-        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         z-index: var(--z-mobile-nav);
-        box-shadow: -20px 0 80px rgba(0,0,0,0.6);
+        box-shadow: -20px 0 80px rgba(0,0,0,0.4);
+        gap: 0;
     }
 
-    .nav-titan.nav-open {
-        right: 0;
-    }
+    .nav-titan.nav-open { right: 0; }
 
     .nav-titan.nav-open .nav-links {
         display: flex !important;
         flex-direction: column;
         align-items: flex-start;
         width: 100%;
-        gap: 20px;
+        gap: 0;
     }
 
     .nav-titan.nav-open .nav-link-titan {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
         width: 100%;
-        padding: 15px 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 14px 0;
+        border-bottom: 1px solid var(--glass-border);
+        letter-spacing: 0;
     }
 
-    .mobile-only-header {
-        display: flex;
-    }
+    .mobile-only-header { display: flex; }
 }
 
+/* Utility: hide on desktop / show on mobile */
 @media (min-width: 1025px) {
     .mobile-only { display: none !important; }
 }
 
 @media (max-width: 768px) {
-    .container {
-        width: 92%;
-    }
-    
-    .logo {
-        font-size: 1.3rem;
-    }
+    body { padding-top: var(--header-height); }
 }
