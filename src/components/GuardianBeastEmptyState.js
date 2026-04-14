@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import NextLink from 'next/link';
 import { Ghost } from 'lucide-react';
 
 export default function GuardianBeastEmptyState({ 
@@ -23,9 +23,9 @@ export default function GuardianBeastEmptyState({
             </h3>
             <p style={{ color: 'rgba(255,255,255,0.4)', maxWidth: '500px', margin: '0 auto', fontWeight: 500, fontSize: '0.95rem', lineHeight: '1.7' }} dangerouslySetInnerHTML={{ __html: message || defaultMessage }} />
             
-            <Link href={buttonHref} className="btn btn-primary" style={{ marginTop: '30px', padding: '12px 35px' }}>
+            <NextLink href={buttonHref} className="btn btn-primary" style={{ marginTop: '30px', padding: '12px 35px' }}>
                 {buttonText}
-            </Link>
+            </NextLink>
         </div>
     );
 }

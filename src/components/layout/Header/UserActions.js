@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import NextLink from 'next/link';
 import { User, LogOut, Sun, Moon } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -16,9 +16,9 @@ export default function UserActions({ loading }) {
   return (
     <div className="header-actions-group">
       {!loading && !isAuthenticated ? (
-         <Link href="/auth/login" className="btn btn-primary login-btn" style={{ padding: '8px 20px', fontSize: '0.85rem' }}>
+         <NextLink href="/auth/login" className="btn btn-primary login-btn" style={{ padding: '8px 20px', fontSize: '0.85rem' }}>
            Đăng nhập
-         </Link>
+         </NextLink>
       ) : (
           isAuthenticated && (
               <div className="user-profile-titan desktop-only">
@@ -29,10 +29,10 @@ export default function UserActions({ loading }) {
                   
                   <div className="profile-dropdown-titan glass-titan">
                       <div style={{ padding: '10px 15px', fontSize: '0.65rem', fontWeight: 900, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '1px' }}>Tài khoản</div>
-                      <Link href="/profile" className="dropdown-item">Hồ sơ cá nhân</Link>
-                      <Link href="/favorites" className="dropdown-item">Truyện yêu thích</Link>
+                      <NextLink href="/profile" className="dropdown-item">Hồ sơ cá nhân</NextLink>
+                      <NextLink href="/favorites" className="dropdown-item">Truyện yêu thích</NextLink>
                       {user?.role === 'admin' && (
-                          <Link href="/admin" className="dropdown-item admin-link">Bảng điều khiển Admin</Link>
+                          <NextLink href="/admin" className="dropdown-item admin-link">Bảng điều khiển Admin</NextLink>
                       )}
                       <div className="dropdown-divider" />
                       <button onClick={logout} className="dropdown-item logout-btn">Đăng xuất</button>

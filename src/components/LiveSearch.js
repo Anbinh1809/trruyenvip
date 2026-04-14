@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import NextLink from 'next/link';
 import Image from 'next/image';
 import { Search, X, Zap } from 'lucide-react';
 import { useToast } from '@/components/ToastProvider';
@@ -161,7 +161,7 @@ export default function LiveSearch() {
                 
                 <div style={{ maxHeight: '420px', overflowY: 'auto' }} className="glass-scrollbar">
                     {results.length > 0 ? results.map((m, idx) => (
-                        <Link 
+                        <NextLink 
                             key={m.id} 
                             href={`/manga/${m.id}`} 
                             className={`live-result-item ${highlightIndex === idx ? 'highlighted' : ''}`}
@@ -175,7 +175,7 @@ export default function LiveSearch() {
                                 <div className="result-sub-titan truncate-1">{m.author || 'Đang cập nhật'}</div>
                             </div>
                             {idx < 3 && <div className="hot-tag-titan">HOT</div>}
-                        </Link>
+                        </NextLink>
                     )) : !loading && q.length >= 2 && (
                         <div style={{ padding: '60px 20px', textAlign: 'center' }}>
                             <div style={{ fontWeight: 950, fontSize: '1.2rem', color: 'white', marginBottom: '10px', letterSpacing: '-1px' }}>KHÔNG TÌM THẤY</div>

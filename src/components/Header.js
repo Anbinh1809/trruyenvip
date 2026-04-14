@@ -1,5 +1,6 @@
 'use client';
 
+import NextLink from 'next/link';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useIsMounted } from '@/hooks/useIsMounted';
@@ -7,7 +8,6 @@ import LiveSearch from '@/components/LiveSearch';
 import { Search, X, Menu } from 'lucide-react';
 
 // Sub-components
-import Link from 'next/link';
 import HeaderLogo from './layout/Header/HeaderLogo';
 import UserActions from './layout/Header/UserActions';
 import './layout/Header/Header.css';
@@ -59,9 +59,9 @@ export default function Header() {
             </div>
             
             <div className="nav-links">
-                <Link href="/genres" className="nav-link-titan" onClick={() => setIsMenuOpen(false)}>Thể loại</Link>
-                <Link href="/transfer" className="nav-link-titan" onClick={() => setIsMenuOpen(false)}>Dịch chuyển</Link>
-                <Link href="/leaderboard" className="nav-link-titan" onClick={() => setIsMenuOpen(false)}>Xếp hạng</Link>
+                <NextLink href="/genres" className="nav-link-titan" onClick={() => setIsMenuOpen(false)}>Thể loại</NextLink>
+                <NextLink href="/transfer" className="nav-link-titan" onClick={() => setIsMenuOpen(false)}>Dịch chuyển</NextLink>
+                <NextLink href="/leaderboard" className="nav-link-titan" onClick={() => setIsMenuOpen(false)}>Xếp hạng</NextLink>
             </div>
           </nav>
 
