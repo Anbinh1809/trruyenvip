@@ -10,9 +10,32 @@ export default function ChapterContent({ mangaId, chapter, nextChapterId, prevCh
     const chapterId = chapter?.id;
     const [images, setImages] = useState(initialImages);
     const [isSyncing, setIsSyncing] = useState(initialImages.length === 0);
+    const [isSkimming, setIsSkimming] = useState(false);
     const [error, setError] = useState(null);
     const pollInterval = useRef(null);
     const prevChapterIdRef = useRef(chapterId);
+    const lastScrollPos = useRef(0);
+    const skimmingTimeout = useRef(null);
+ 
+    // TITAN VELOCITY SENSOR: Detects fast skim reading
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentPos = window.scrollY;
+            const diff = Math.abs(currentPos - lastScrollPos.current);
+            lastScrollPos.current = currentPos;
+
+            if (diff > 80) { // Fast scroll threshold
+                if (!isSkimming) setIsSkimming(true);
+                if (skimmingTimeout.current) clearTimeout(skimmingTimeout.current);
+                skimmingTimeout.current = setTimeout(() => setIsSkimming(false), 800);
+            }
+        };
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            if (skimmingTimeout.current) clearTimeout(skimmingTimeout.current);
+        };
+    }, [isSkimming]);
 
     // TITAN MASTER HOTKEYS
     useReaderKeys(mangaId, prevChapterId, nextChapterId);
@@ -48,9 +71,15 @@ export default function ChapterContent({ mangaId, chapter, nextChapterId, prevCh
                 if (res.ok) {
                     const data = await res.json();
                     if (data.images && data.images.length > 0) {
+                    if (data.images && data.images.length > 0) {
                         const isHiFi = localStorage.getItem('truyenvip_hifi') === 'true';
-                        const w = isHiFi ? 1800 : (window.innerWidth < 768 ? 800 : 1200);
-                        const q = isHiFi ? 95 : 78;
+                        const isTurbo = localStorage.getItem('truyenvip_turbo') === 'true';
+                        
+                        let w = window.innerWidth < 768 ? 800 : 1200;
+                        let q = 78;
+
+                        if (isHiFi) { w = 1800; q = 95; }
+                        else if (isTurbo) { w = 800; q = 60; }
 
                         setImages(data.images.map(img => 
                             getSignedProxyUrl(img.image_url, w, q)
@@ -84,8 +113,13 @@ export default function ChapterContent({ mangaId, chapter, nextChapterId, prevCh
                         const imgData = await imgRes.json();
                         if (imgData.images?.length > 0) {
                             const isHiFi = localStorage.getItem('truyenvip_hifi') === 'true';
-                            const w = isHiFi ? 1800 : (window.innerWidth < 768 ? 800 : 1200);
-                            const q = isHiFi ? 95 : 78;
+                            const isTurbo = localStorage.getItem('truyenvip_turbo') === 'true';
+                            
+                            let w = window.innerWidth < 768 ? 800 : 1200;
+                            let q = 78;
+
+                            if (isHiFi) { w = 1800; q = 95; }
+                            else if (isTurbo) { w = 800; q = 60; }
 
                             setImages(imgData.images.map(img =>
                                 getSignedProxyUrl(img.image_url, w, q)
@@ -165,7 +199,7 @@ export default function ChapterContent({ mangaId, chapter, nextChapterId, prevCh
     return (
         <div className="reader-img-container fade-in">
             {images.map((img, idx) => (
-                <ReaderImage key={`${chapterId}_${idx}`} src={img} idx={idx} />
+                <ReaderImage key={`${chapterId}_${idx}`} src={img} idx={idx} isSkimming={isSkimming} />
             ))}
             {images.length === 0 && !isSyncing && (
                 <div className="empty-reader-state industrial-p-80">
@@ -182,7 +216,7 @@ export default function ChapterContent({ mangaId, chapter, nextChapterId, prevCh
     );
 }
 
-function ReaderImage({ src, idx }) {
+function ReaderImage({ src, idx, isSkimming }) {
     const [error, setError] = useState(false);
     const [loaded, setLoaded] = useState(false);
     const [shouldLoad, setShouldLoad] = useState(idx < 3); 
@@ -191,16 +225,21 @@ function ReaderImage({ src, idx }) {
 
     useEffect(() => {
         if (shouldLoad) return;
+        const isMobile = window.innerWidth < 768;
+        
+        // SKIMMER INTELLIGENCE: Dynamic lookahead based on velocity
+        const margin = isSkimming ? '6000px' : (isMobile ? '800px' : '1200px');
+        
         const observer = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting) {
                 setShouldLoad(true);
                 observer.disconnect();
             }
-        }, { rootMargin: '2500px' }); // TITAN-GRADE LOOKAHEAD
+        }, { rootMargin: margin }); 
 
         if (containerRef.current) observer.observe(containerRef.current);
         return () => observer.disconnect();
-    }, [shouldLoad]);
+    }, [shouldLoad, isSkimming]);
 
     if (error) {
         return (

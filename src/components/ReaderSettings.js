@@ -9,6 +9,7 @@ export default function ReaderSettings() {
   const [isWebtoon, setIsWebtoon] = useState(true);
   const [filter, setFilter] = useState('none');
   const [isHiFi, setIsHiFi] = useState(false);
+  const [isTurbo, setIsTurbo] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -16,12 +17,14 @@ export default function ReaderSettings() {
     const mode = localStorage.getItem('truyenvip_read_mode') || 'webtoon';
     const filt = localStorage.getItem('truyenvip_filter') || 'none';
     const hifi = localStorage.getItem('truyenvip_hifi') === 'true';
+    const turbo = localStorage.getItem('truyenvip_turbo') === 'true';
 
     startTransition(() => {
         setIncognito(incog);
         setIsWebtoon(mode === 'webtoon');
         setFilter(filt);
         setIsHiFi(hifi);
+        setIsTurbo(turbo);
     });
   }, []);
 
@@ -29,6 +32,14 @@ export default function ReaderSettings() {
     const newVal = !incognito;
     setIncognito(newVal);
     localStorage.setItem('truyenvip_incognito', newVal.toString());
+  };
+
+  const toggleTurbo = () => {
+    const newVal = !isTurbo;
+    setIsTurbo(newVal);
+    localStorage.setItem('truyenvip_turbo', newVal.toString());
+    if (newVal) localStorage.setItem('truyenvip_hifi', 'false'); // Disable HiFi if Turbo is on
+    window.location.reload();
   };
 
   const toggleWebtoon = (val) => {
@@ -127,22 +138,38 @@ export default function ReaderSettings() {
 
           <div className="setting-group no-margin">
             <label className="setting-label">
-                <Monitor size={14} aria-hidden="true" /> Chất Lượng Hình Ảnh
+                <Monitor size={14} aria-hidden="true" /> Hiệu năng & Chất lượng
             </label>
+            
+            <button 
+              className={`hifi-toggle-card turbo-card ${isTurbo ? 'active' : ''}`} 
+              onClick={toggleTurbo}
+              role="switch"
+              aria-checked={isTurbo}
+              aria-label="Chế độ Tăng tốc Turbo"
+            >
+                <div className="hifi-info">
+                    <div className="hifi-title">⚡ Chế độ Tăng tốc Turbo</div>
+                    <div className="hifi-sub">Ưu tiên load ảnh ngay lập tức</div>
+                </div>
+                <div className={`titan-checkbox ${isTurbo ? 'checked' : ''}`} />
+            </button>
+
             <button 
               className={`hifi-toggle-card ${isHiFi ? 'active' : ''}`} 
               onClick={toggleHiFi}
               role="switch"
               aria-checked={isHiFi}
               aria-label="Chế độ hình ảnh siêu nét 4K"
+              disabled={isTurbo}
             >
                 <div className="hifi-info">
-                    <div className="hifi-title">Chế độ Siêu nét 4K</div>
-                    <div className="hifi-sub">Yêu cầu mạng ổn định</div>
+                    <div className="hifi-title">💎 Chế độ Siêu nét 4K</div>
+                    <div className="hifi-sub">Dành cho mạng tốc độ cao</div>
                 </div>
                 <div className={`titan-checkbox ${isHiFi ? 'checked' : ''}`} />
             </button>
-            <p className="setting-footer-hint">Tự động tối ưu hóa cho đường truyền nội bộ.</p>
+            <p className="setting-footer-hint">Tự động tối ưu hóa dựa trên lựa chọn của bạn.</p>
           </div>
         </div>
       )}

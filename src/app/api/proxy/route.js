@@ -186,10 +186,13 @@ export async function GET(request) {
             }
 
             // SMART COMPRESSION: Use the requested quality (q) or default to 75 (Standard)
-            const finalQuality = Math.min(Math.max(quality, 60), 96);
+            const finalQuality = Math.min(Math.max(quality, 30), 96);
+            const isTurbo = finalQuality <= 65;
             
             // SHARPENING: Improve crispness of manga text and line art (compensates for compression)
-            transformer = transformer.sharpen({ sigma: 0.8, m1: 1.0, m2: 2.0 });
+            // Stiffer sharpening for Turbo mode to maintain readability
+            const sigma = isTurbo ? 1.0 : 0.8;
+            transformer = transformer.sharpen({ sigma, m1: 1.0, m2: 2.0 });
 
             let processedBuffer;
             let finalMime = 'image/webp';
@@ -197,14 +200,16 @@ export async function GET(request) {
 
             if (supportsAvif) {
                 // AVIF is superior for manga line-art: 10-15% lower quality looks like WebP 85-90%
+                // Use effort: 2 for Turbo to speed up processing
                 processedBuffer = await transformer
-                    .avif({ quality: finalQuality, effort: 3 })
+                    .avif({ quality: finalQuality, effort: isTurbo ? 2 : 3 })
                     .toBuffer();
                 finalMime = 'image/avif';
                 optTag = `sharp-avif-${winningStrategy}-q${finalQuality}`;
             } else {
+                // Effort 6 for standard, Effort 4 for Turbo to balance OOM/Speed
                 processedBuffer = await transformer
-                    .webp({ quality: finalQuality, effort: 4, lossless: false })
+                    .webp({ quality: finalQuality, effort: isTurbo ? 2 : 4, lossless: false })
                     .toBuffer();
             }
 
