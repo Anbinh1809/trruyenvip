@@ -47,7 +47,7 @@ async function getManga(id) {
     // TITAN SMART LOOKUP 2.0: Check both id and normalized_title simultaneously (Case-Insensitive)
     const cleanId = id?.toString().trim();
     let res = await query(`
-        SELECT ${MANGA_CARD_FIELDS}, description, author, status, last_crawled, normalized_title
+        SELECT ${MANGA_CARD_FIELDS}, description
         FROM manga 
         WHERE id = @id OR LOWER(normalized_title) = LOWER(@id)
         LIMIT 1
