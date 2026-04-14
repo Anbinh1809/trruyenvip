@@ -1,6 +1,7 @@
 import Header from '@/components/Header';
 import MangaCard from '@/components/MangaCard';
 import { query, MANGA_CARD_FIELDS } from '@/lib/db';
+import { generateProxySignature } from '@/lib/crypto';
 import Footer from '@/components/Footer';
 import GuardianBeastEmptyState from '@/components/GuardianBeastEmptyState';
 import "@/app/search.css";
@@ -42,10 +43,17 @@ async function searchManga(q, page = 1) {
       LIMIT @pageSize OFFSET @offset
     `, { slug: `%${searchSlug}%`, q: `%${sanitizedQ}%`, offset, pageSize });
 
-    const manga = result.recordset.map(m => ({
-      ...m,
-      cover: m.cover && m.cover.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : (m.cover || '/placeholder-manga.svg'),
-    }));
+    const manga = result.recordset.map(m => {
+        const coverUrl = m.cover || '/placeholder-manga.svg';
+        let finalCover = coverUrl;
+        if (coverUrl.startsWith('http')) {
+            const w = 400;
+            const q = 75;
+            const sig = generateProxySignature(coverUrl, w, q);
+            finalCover = `/api/proxy?url=${encodeURIComponent(coverUrl)}&w=${w}&q=${q}&sig=${sig}`;
+        }
+        return { ...m, cover: finalCover };
+    });
 
     return { manga, total };
   } catch (err) {

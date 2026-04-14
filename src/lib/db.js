@@ -246,7 +246,7 @@ export async function bulkInsert(tableName, rows, client = null) {
     }
 }
 
-export const MANGA_CARD_FIELDS = `id, title, cover, last_chap_num, rating, views, author, status, last_crawled`;
+export const MANGA_CARD_FIELDS = `id, title, cover, last_chap_num, rating, views, author, status, last_crawled, normalized_title`;
 
 export async function cleanLegacyEncoding() {
     try {
@@ -267,7 +267,7 @@ export async function cleanLegacyEncoding() {
         await query("DELETE FROM guardianreports WHERE created_at < NOW() - INTERVAL '30 days'");
         await query("DELETE FROM notifications WHERE is_read = TRUE AND created_at < NOW() - INTERVAL '30 days'");
         await query("DELETE FROM comment_reports WHERE created_at < NOW() - INTERVAL '60 days'");
-        await query("DELETE FROM readhistory WHERE updated_at < NOW() - INTERVAL '120 days'");
+        await query("DELETE FROM readhistory WHERE updated_at < NOW() - INTERVAL '30 days'");
         await query("DELETE FROM ratelimits WHERE reset_at < NOW()");
 
         // 4. ORPHANED IMAGE PURGE: Remove images for chapters that no longer exist
@@ -358,7 +358,7 @@ export async function loadSystemState(key) {
  * Periodically run the automated maintenance service.
  */
 if (typeof setInterval !== 'undefined') {
-    setInterval(cleanLegacyEncoding, 1000 * 60 * 60 * 6); // Every 6 hours
+    setInterval(cleanLegacyEncoding, 1000 * 60 * 60 * 5); // Every 5 hours - User requested
 }
 
 

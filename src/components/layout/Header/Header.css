@@ -9,6 +9,13 @@ body {
 }
 
 /* ── Core Header Shell ───────────────────────────────────────────────────── */
+:root {
+    --header-bg: rgba(255, 255, 255, 0.85);
+}
+[data-theme='dark'] {
+    --header-bg: rgba(10, 15, 30, 0.85);
+}
+
 .titan-header {
     position: fixed;
     top: 0;
@@ -16,8 +23,8 @@ body {
     right: 0;
     height: var(--header-height);
     background: var(--header-bg);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
     border-bottom: 1px solid var(--glass-border);
     z-index: var(--z-header);
     transition: background 0.3s ease, height 0.3s ease, box-shadow 0.3s ease;
@@ -26,14 +33,9 @@ body {
 }
 
 .header-scrolled {
-    height: 60px;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.25);
-}
-
-/* In light mode the scrolled header should tighten up too */
-[data-theme='light'] .titan-header {
+    height: 64px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
     background: var(--header-bg);
-    border-bottom-color: var(--glass-border);
 }
 
 /* ── Inner Layout ────────────────────────────────────────────────────────── */
@@ -42,55 +44,77 @@ body {
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    gap: 24px;
+    gap: 30px;
     flex-wrap: nowrap;
 }
 
-/* ── Logo ────────────────────────────────────────────────────────────────── */
-.logo-industrial {
+/* ── Premium Logo System ─────────────────────────────────────────────────── */
+.logo-industrial-premium {
     display: flex;
     align-items: center;
-    gap: 4px;
-    font-size: 1.6rem;
-    font-weight: 900;
-    letter-spacing: -1.5px;
+    gap: 15px;
     text-decoration: none;
     flex-shrink: 0;
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.logo-industrial-premium:hover {
+    transform: translateX(3px);
+}
+
+.logo-icon-wrapper {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 62, 62, 0.1);
+    border: 1px solid rgba(255, 62, 62, 0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.logo-icon-titan {
+    color: var(--accent);
+    z-index: 2;
+    filter: drop-shadow(0 0 8px rgba(255, 62, 62, 0.5));
+}
+
+.logo-glow-titan {
+    position: absolute;
+    width: 60%;
+    height: 60%;
+    background: var(--accent);
+    filter: blur(15px);
+    opacity: 0.3;
+    z-index: 1;
+}
+
+.logo-text-stack {
+    display: flex;
+    flex-direction: column;
     line-height: 1;
 }
 
-.logo-industrial:hover {
-    transform: scale(1.04);
-    opacity: 0.9;
-}
-
-.logo-icon {
-    color: var(--accent);
-    flex-shrink: 0;
-    margin-right: 2px;
-}
-
-.logo-primary {
-    color: var(--text-primary);
-}
-
-.logo-accent-titan {
-    color: var(--accent);
-    position: relative;
-}
-
-/* Small badge below the logo 'Vip' part */
-.logo-accent-titan::after {
-    content: 'PRO';
-    position: absolute;
-    bottom: -8px;
-    right: 0;
-    font-size: 0.38rem;
+.logo-main-titan {
+    font-size: 1.4rem;
     font-weight: 950;
-    letter-spacing: 1.5px;
+    color: var(--text-primary);
+    letter-spacing: -0.5px;
+}
+
+.logo-main-titan .accent {
     color: var(--accent);
-    opacity: 0.7;
+}
+
+.logo-sub-titan {
+    font-size: 0.55rem;
+    font-weight: 900;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    margin-top: 2px;
+    text-transform: uppercase;
 }
 
 /* ── Desktop Navigation ──────────────────────────────────────────────────── */
@@ -478,7 +502,7 @@ body {
     position: fixed;
     inset: 0;
     background: var(--bg-primary);
-    z-index: 6000;
+    z-index: 11000;
     padding: 20px;
     display: flex;
     flex-direction: column;

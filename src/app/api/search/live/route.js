@@ -1,4 +1,5 @@
 import { query } from '@/lib/db';
+import { generateProxySignature } from '@/lib/crypto';
 
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
@@ -17,7 +18,7 @@ export async function GET(request) {
 
     try {
         const res = await query(`
-            SELECT id, title, cover, last_chap_num, views_at_source as views, alternative_titles
+            SELECT ${MANGA_CARD_FIELDS}
             FROM manga 
             WHERE normalized_title % @q -- Trigram similarity match
             OR normalized_title LIKE CONCAT('%', @q, '%') -- Substring match (GIN optimized)
@@ -29,11 +30,24 @@ export async function GET(request) {
             LIMIT 6
         `, { q: cleanQ });
 
+        const results = (res.recordset || []).map(m => {
+            const w = 100;
+            const q = 75;
+            const coverUrl = m.cover || '/placeholder-manga.svg';
+            let finalCover = coverUrl;
 
-        return Response.json((res.recordset || []).map(m => ({
-            ...m,
-            cover: m.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : (m.cover || '/placeholder-manga.svg'),
-        })));
+            if (coverUrl.startsWith('http')) {
+                const sig = generateProxySignature(coverUrl, w, q);
+                finalCover = `/api/proxy?url=${encodeURIComponent(coverUrl)}&w=${w}&q=${q}&sig=${sig}`;
+            }
+
+            return {
+                ...m,
+                cover: finalCover
+            };
+        });
+
+        return Response.json(results);
     } catch (e) {
         console.error('Live Search Error:', e);
         return Response.json([]);

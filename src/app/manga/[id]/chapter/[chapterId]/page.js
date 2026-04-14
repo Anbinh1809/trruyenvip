@@ -3,6 +3,7 @@ import Footer from '@/components/Footer';
 import ChapterContent from '@/components/ChapterContent';
 import ReaderSettings from '@/components/ReaderSettings';
 import { query } from '@/lib/db';
+import { generateProxySignature } from '@/lib/crypto';
 import "@/app/reader.css";
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
@@ -17,15 +18,29 @@ const Comments = dynamic(() => import('@/components/CommentSection'), {
 
 async function getChapterData(mangaId, chapterId) {
   try {
-    const mangaRes = await query('SELECT title FROM manga WHERE id = @mangaId', { mangaId });
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(mangaId);
+    
+    let mangaRes;
+    if (isUuid) {
+        mangaRes = await query('SELECT id, title FROM manga WHERE id = @mangaId', { mangaId });
+    } else {
+        mangaRes = await query('SELECT id, title FROM manga WHERE normalized_title = @mangaId', { mangaId });
+    }
+    
     const manga = mangaRes.recordset[0];
     if (!manga) return null;
 
+    const internalMangaId = manga.id;
     const chapterRes = await query('SELECT id, title, chapter_number, content FROM chapters WHERE id = @chapterId', { chapterId });
     const chapter = chapterRes.recordset[0];
     if (!chapter) return null;
 
-    const chaptersRes = await query('SELECT id, chapter_number, title FROM chapters WHERE manga_id = @mangaId ORDER BY chapter_number ASC', { mangaId });
+    const chaptersRes = await query(`
+        SELECT id, chapter_number, title 
+        FROM chapters 
+        WHERE manga_id = @internalMangaId 
+        ORDER BY NULLIF(regexp_replace(chapter_number, '[^0-9.]', '', 'g'), '')::numeric ASC
+    `, { internalMangaId });
     const chapters = chaptersRes.recordset;
 
     const currentIndex = chapters.findIndex(c => c.id === chapterId);
@@ -54,50 +69,59 @@ export default async function ChapterPage({ params }) {
     );
   }
 
-  const { manga, chapter, chapters, nextChapter, prevChapter } = data;
+    const { manga, chapter, chapters, nextChapter, prevChapter } = data;
+    
+    // Server-side image signing (Ultra-Fidelity)
+    const imagesRes = await query('SELECT image_url FROM chapterimages WHERE chapter_id = @id ORDER BY "order" ASC', { id: chapterId });
+    const initialImages = (imagesRes.recordset || []).map(img => {
+        const w = 1200; // Default server-side width
+        const q = 80;   // Default quality
+        const sig = generateProxySignature(img.image_url, w, q);
+        return `/api/proxy?url=${encodeURIComponent(img.image_url)}&w=${w}&q=${q}&sig=${sig}`;
+    });
 
-  return (
-    <main className="main-wrapper titan-bg reader-industrial-layout">
-      {/* 100% Industrial Reader HUD */}
-      <div className="reader-hud-titan shadow-titan">
-        <div className="container reader-nav-wrapper">
-          <Link href={`/manga/${id}`} className="reader-back-btn">
-            <ChevronLeft size={24} />
-            <span className="truncate-1 desktop-only">{manga.title}</span>
-          </Link>
-
-          <div className="reader-nav-center">
-            <ChapterSelector mangaId={id} chapters={chapters} currentId={chapterId} />
-          </div>
-
-          <div className="reader-nav-actions-industrial">
-            <div className="nav-step-group">
-                {prevChapter && (
-                    <Link href={`/manga/${id}/chapter/${prevChapter.id}`} className="titan-icon-btn nav-btn-reader" title="Chương trước">
-                        <ChevronLeft size={20} />
+    return (
+        <main className="main-wrapper titan-bg reader-industrial-layout">
+            <div className="reader-hud-titan shadow-titan">
+                <div className="container reader-nav-wrapper">
+                    <Link href={`/manga/${id}`} className="reader-back-btn">
+                        <ChevronLeft size={24} />
+                        <span className="truncate-1 desktop-only">{manga.title}</span>
                     </Link>
-                )}
-                {nextChapter && (
-                    <Link href={`/manga/${id}/chapter/${nextChapter.id}`} className="titan-icon-btn nav-btn-reader" title="Chương sau">
-                        <ChevronRight size={20} />
-                    </Link>
-                )}
+
+                    <div className="reader-nav-center">
+                        <ChapterSelector mangaId={id} chapters={chapters} currentId={chapterId} />
+                    </div>
+
+                    <div className="reader-nav-actions-industrial">
+                        <div className="nav-step-group">
+                            {prevChapter && (
+                                <Link href={`/manga/${id}/chapter/${prevChapter.id}`} className="titan-icon-btn nav-btn-reader" title="Chương trước">
+                                    <ChevronLeft size={20} />
+                                </Link>
+                            )}
+                            {nextChapter && (
+                                <Link href={`/manga/${id}/chapter/${nextChapter.id}`} className="titan-icon-btn nav-btn-reader" title="Chương sau">
+                                    <ChevronRight size={20} />
+                                </Link>
+                            )}
+                        </div>
+                        <div className="v-divider" />
+                        <ReaderSettings />
+                    </div>
+                </div>
             </div>
-            <div className="v-divider" />
-            <ReaderSettings />
-          </div>
-        </div>
-      </div>
 
-      <div className="reader-content-industrial">
-        <ChapterContent 
-            mangaId={id} 
-            chapter={chapter} 
-            nextChapterId={nextChapter?.id} 
-            prevChapterId={prevChapter?.id}
-            mangaTitle={manga.title}
-        />
-      </div>
+            <div className="reader-content-industrial">
+                <ChapterContent 
+                    mangaId={id} 
+                    chapter={chapter} 
+                    nextChapterId={nextChapter?.id} 
+                    prevChapterId={prevChapter?.id}
+                    mangaTitle={manga.title}
+                    initialImages={initialImages}
+                />
+            </div>
 
       {/* Reader Footer: Finish Celebration */}
       <footer className="reader-footer-industrial">

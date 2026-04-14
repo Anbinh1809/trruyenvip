@@ -52,8 +52,10 @@ export async function POST(req) {
         // 1. Ensure Manga exists
         const mangaCheck = await query('SELECT id FROM manga WHERE id = @id', { id: mangaSlug });
         if (mangaCheck.recordset.length === 0) {
+            const rawTitle = mangaSlug.replace(/-/g, ' ');
+            const capitalizeTitle = rawTitle.replace(/\b\w/g, l => l.toUpperCase());
             await query('INSERT INTO manga (id, title, source_url) VALUES (@id, @title, @url) ON CONFLICT DO NOTHING', 
-                { id: mangaSlug, title: mangaSlug.replace(/-/g, ' '), url: url.split('/chap-')[0] });
+                { id: mangaSlug, title: capitalizeTitle, url: url.split('/chap-')[0] });
         }
 
         // 2. Identify and Queue Sync

@@ -42,13 +42,9 @@ export default function LiveSearch({ onSelect }) {
           const res = await fetch(`/api/search/live?q=${encodeURIComponent(q)}`);
           if (res.ok) {
             const data = await res.json();
-            const optimized = data.map(m => ({
-                ...m,
-                cover: m.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}&w=100` : (m.cover || '/placeholder-manga.svg')
-            }));
-            setResults(optimized);
+            setResults(data);
             setHighlightIndex(-1);
-            setIsOpen(optimized.length > 0 || q.length >= 2);
+            setIsOpen(data.length > 0 || q.length >= 2);
           }
         } catch (e) {
           console.error('[Search] Live fetch failed:', e);
@@ -115,7 +111,7 @@ export default function LiveSearch({ onSelect }) {
         const selected = results[highlightIndex];
         setIsOpen(false);
         if (onSelect) onSelect();
-        router.push(`/manga/${selected.id}`);
+        router.push(`/manga/${selected.normalized_title || selected.id}`);
     } else if (e.key === 'Escape') {
         setIsOpen(false);
     }
@@ -165,7 +161,7 @@ export default function LiveSearch({ onSelect }) {
                         results.map((m, idx) => (
                             <NextLink 
                                 key={m.id} 
-                                href={`/manga/${m.id}`} 
+                                href={`/manga/${m.normalized_title || m.id}`} 
                                 className={`live-result-item-industrial ${highlightIndex === idx ? 'highlighted-industrial' : ''}`}
                                 onClick={() => { setIsOpen(false); if (onSelect) onSelect(); }}
                             >

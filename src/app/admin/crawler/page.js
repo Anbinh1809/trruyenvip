@@ -65,6 +65,25 @@ export default function AdminCrawlerPage() {
     }
   };
 
+  const triggerAction = async (action) => {
+    try {
+        const res = await fetch('/api/admin/crawler/action', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            alert(data.message || 'Lệnh đã được gửi thành công!');
+            fetchData();
+        } else {
+            alert('Lỗi: ' + (data.error || 'Yêu cầu không thể hoàn thành.'));
+        }
+    } catch (e) {
+        alert('Lỗi kết nối máy chủ.');
+    }
+  };
+
   if (loading || (fetching && !telemetry)) {
     return (
         <div className="main-wrapper titan-bg">
@@ -114,6 +133,45 @@ export default function AdminCrawlerPage() {
                 </button>
             </div>
         </header>
+
+        <section className="crawler-actions-industrial fade-up shadow-titan">
+            <h2 className="section-subtitle-industrial"><Cpu size={18} /> CƠ CHẾ TÁC CHIẾN</h2>
+            <div className="action-button-grid-titan">
+                <button 
+                    className={`btn-action-titan ${telemetry?.status && telemetry.status !== 'idle' ? 'dimmed' : 'active'}`}
+                    onClick={() => triggerAction('start_autopilot')}
+                    disabled={telemetry?.status && telemetry.status !== 'idle'}
+                >
+                    <Rocket size={20} />
+                    <div className="action-text">
+                        <span className="action-title">KÍCH HOẠT AUTOPILOT</span>
+                        <span className="action-desc">Chạy vòng lặp Guardian tự động</span>
+                    </div>
+                </button>
+
+                <button 
+                    className="btn-action-titan active"
+                    onClick={() => triggerAction('force_discovery')}
+                >
+                    <Flame size={20} />
+                    <div className="action-text">
+                        <span className="action-title">QUÉT TRANG MỚI</span>
+                        <span className="action-desc">Discovery Page 1 - 5 (Ưu tiên)</span>
+                    </div>
+                </button>
+
+                <button 
+                    className="btn-action-titan"
+                    onClick={() => triggerAction('maintenance')}
+                >
+                    <ShieldCheck size={20} />
+                    <div className="action-text">
+                        <span className="action-title">DỌN DẸP HỆ THỐNG</span>
+                        <span className="action-desc">Prune Logs & Orphaned Records</span>
+                    </div>
+                </button>
+            </div>
+        </section>
 
         <section className="crawler-stats-grid fade-in">
             <div className="telemetry-card-titan shadow-titan">

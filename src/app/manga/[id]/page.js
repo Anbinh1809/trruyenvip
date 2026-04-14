@@ -43,19 +43,32 @@ export async function generateMetadata({ params }) {
 
 async function getManga(id) {
   try {
-    const res = await query(`
-        SELECT ${MANGA_CARD_FIELDS}, description, author, status, last_crawled
-        FROM manga WHERE id = @id
-    `, { id });
+    // TITAN SMART LOOKUP: Support both UUID and SLUG (normalized_title)
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    
+    let res;
+    if (isUuid) {
+        res = await query(`
+            SELECT ${MANGA_CARD_FIELDS}, description, author, status, last_crawled, normalized_title
+            FROM manga WHERE id = @id
+        `, { id });
+    } else {
+        res = await query(`
+            SELECT ${MANGA_CARD_FIELDS}, description, author, status, last_crawled, normalized_title
+            FROM manga WHERE normalized_title = @id
+        `, { id });
+    }
+
     const manga = res.recordset[0];
     if (!manga) return null;
 
-    // Fetch chapters
+    // Fetch chapters (Always use the numeric/uuid internal ID for sub-queries)
+    const internalId = manga.id;
     const chaptersRes = await query(`
         SELECT id, chapter_number, title, created_at, updated_at, status 
-        FROM chapters WHERE manga_id = @id 
-        ORDER BY chapter_number DESC
-    `, { id });
+        FROM chapters WHERE manga_id = @internalId 
+        ORDER BY NULLIF(regexp_replace(chapter_number, '[^0-9.]', '', 'g'), '')::numeric DESC, created_at DESC
+    `, { internalId });
 
     // Fetch genres via junction table
     const genresRes = await query(`

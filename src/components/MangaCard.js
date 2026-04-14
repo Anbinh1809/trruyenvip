@@ -10,7 +10,7 @@ import { getSignedProxyUrl } from '@/lib/crypto';
 
 function MangaCard({ manga, isNew = false, priority = false }) {
   const coverUrl = manga.cover 
-    ? getSignedProxyUrl(manga.cover, 0, 75) 
+    ? (manga.cover.includes('/api/proxy') ? manga.cover : getSignedProxyUrl(manga.cover, 400, 75)) 
     : '/placeholder-manga.svg';
     
   const [imgSrc, setImgSrc] = useState(coverUrl);
@@ -48,12 +48,12 @@ function MangaCard({ manga, isNew = false, priority = false }) {
 
   return (
     <Link 
-      href={`/manga/${manga.id}`} 
+      href={`/manga/${manga.normalized_title || manga.id}`} 
       className="manga-card-titan fade-up"
       itemScope 
       itemType="http://schema.org/CreativeWork"
     >
-      <meta itemprop="url" content={`/manga/${manga.id}`} />
+      <meta itemprop="url" content={`/manga/${manga.normalized_title || manga.id}`} />
       <div className={`card-media-titan ${!isLoaded ? 'skeleton-shimmer' : ''}`}>
         <Image 
           src={imgSrc} 

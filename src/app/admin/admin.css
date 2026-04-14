@@ -215,6 +215,93 @@
 .status-dot-active { width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px #10b981; margin-right: 8px; }
 .status-dot-idle { width: 8px; height: 8px; border-radius: 50%; background: #64748b; margin-right: 8px; }
 
+/* ── Crawler Operational Stance ─────────────────────────────────────────── */
+.crawler-actions-industrial {
+    background: var(--bg-secondary);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius);
+    padding: 24px;
+    margin-bottom: 30px;
+}
+
+.section-subtitle-industrial {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    font-weight: 850;
+    color: var(--text-muted);
+    letter-spacing: 1.5px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+.action-button-grid-titan {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.btn-action-titan {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 20px;
+    background: rgba(128, 128, 128, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: left;
+    width: 100%;
+}
+
+.btn-action-titan:hover {
+    background: rgba(128, 128, 128, 0.1);
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+.btn-action-titan.active {
+    border-color: var(--accent);
+    background: rgba(255, 62, 62, 0.03);
+}
+
+.btn-action-titan.dimmed {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(1);
+}
+
+.btn-action-titan svg {
+    color: var(--accent);
+    flex-shrink: 0;
+}
+
+.action-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.action-title {
+    font-size: 0.95rem;
+    font-weight: 900;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+
+.action-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .action-button-grid-titan {
+        grid-template-columns: 1fr;
+    }
+}
+
 .worker-load-indicator { width: 100px; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; }
 .load-fill { height: 100%; background: var(--accent); transition: width 0.5s ease; box-shadow: 0 0 10px var(--accent); }
 
