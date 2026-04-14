@@ -234,23 +234,29 @@ export const MANGA_CARD_FIELDS = `id, title, cover, last_chap_num, rating, views
 
 export async function cleanLegacyEncoding() {
     try {
-        console.log('[Maintenance] Starting automated project sanitation (PostgreSQL)...');
+        console.log('[TITAN INFO] Starting automated project sanitation (PostgreSQL)...');
 
-        // 1. DATA SANITIZATION
+        // 1. MANGA TABLE SANITIZATION
         await query("UPDATE manga SET last_chap_num = 'Đang cập nhật' WHERE last_chap_num = '??'");
         await query("UPDATE manga SET author = 'Đang cập nhật' WHERE author = '??'");
+        await query("UPDATE manga SET description = REPLACE(description, '??', '') WHERE description LIKE '%??%'");
+        await query("UPDATE manga SET title = REPLACE(title, '??', '') WHERE title LIKE '%??%'");
         
-        // 2. AUTOMATED LOG PRUNING (Maintain high-performance for 30 days, purge history)
+        // 2. CHAPTERS TABLE SANITIZATION
+        // Note: content might be large, we use a targeted update to avoid locking
+        await query("UPDATE chapters SET title = REPLACE(title, '??', '') WHERE title LIKE '%??%'");
+        
+        // 3. AUTOMATED LOG PRUNING
         await query("DELETE FROM crawllogs WHERE created_at < NOW() - INTERVAL '30 days'");
         await query("DELETE FROM guardianreports WHERE created_at < NOW() - INTERVAL '30 days'");
         
-        // 3. INDEX HARDENING: Ensure GIN indexes exist for fast prefix and fuzzy searches
+        // 4. INDEX HARDENING
         await query("CREATE INDEX IF NOT EXISTS idx_manga_normalized_title_gin ON manga USING gin(normalized_title gin_trgm_ops)");
         await query("CREATE INDEX IF NOT EXISTS idx_manga_alternative_titles_gin ON manga USING gin(alternative_titles gin_trgm_ops)");
         
-        console.log('[Maintenance] Project SANITIZED: Log pruning/indexing completed.');
+        console.log('[TITAN INFO] Project SANITIZED: Log pruning and encoding fixes completed.');
     } catch (e) {
-        console.error('[Maintenance] Project Sanitation failed:', e.message);
+        console.error('[TITAN ERROR] Project Sanitation failed:', e.message);
     }
 }
 

@@ -1,4 +1,3 @@
-@import './titan-pages.css';
 @import './titan-components.css';
 @keyframes shimmer {
   0% { background-position: -200% 0; }
@@ -33,39 +32,21 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
-:root {
-  /* Premium Dark Theme Core */
-  --bg-primary: #020617;
-  --bg-secondary: #0a0a0a;
-  --bg-tertiary: #111827;
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --accent: #ff3e3e;
-  --accent-gradient: linear-gradient(135deg, #ff3e3e 0%, #b91c1c 100%);
-  --glass-bg: #111827;
-  --glass-border: rgba(255, 255, 255, 0.05);
-  --glass-blur: none;
-  --header-height: 60px;
-  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --transition: all 0.2s ease;
-  --border-radius: 4px;
-  --font-body: 'Inter', sans-serif;
-  --font-heading: 'Outfit', sans-serif;
-  /* Z-Index Architecture: Standardized Global Layers */
-  --z-header: 1000;
-  --z-search: 3500;
-  --z-progress: 4000;
-  --z-modal: 6000;
-  --z-mobile-nav: 9999;
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  font-family: var(--font-body);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+}
 
-  /* Nebula Design Tokens */
-  --nebula-blue: #4dc6e8;
-  --nebula-orange: #ffb400;
-  --nebula-red: #ff4757;
-  --nebula-glass: rgba(255, 255, 255, 0.1);
-  --focal-mask: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.85) 100%);
-  --toast-bg: rgba(10, 10, 10, 0.9);
+h1, h2, h3, h4, .title-titan, .hero-title-titan { 
+  font-family: var(--font-heading); 
+  font-weight: 700;
+  letter-spacing: -0.5px;
 }
 
 .truncate-1 {
@@ -85,149 +66,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
-
-html {
-    scroll-behavior: smooth;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-body {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  overflow-x: hidden;
-  margin: 0;
-}
-
-/* TITAN TOAST SYSTEM */
-.toast-container-titan {
-    position: fixed;
-    top: 100px;
-    right: 30px;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    pointer-events: none;
-}
-
-.toast-titan {
-    min-width: 320px;
-    background: var(--toast-bg);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: var(--border-radius);
-    padding: 16px 24px;
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-    pointer-events: auto;
-    transition: var(--transition);
-}
-
-.toast-titan:hover {
-    transform: translateX(-5px);
-    border-color: var(--accent);
-}
-
-.toast-titan.success { border-left: 5px solid #10b981; }
-.toast-titan.error { border-left: 5px solid #ef4444; }
-.toast-titan.info { border-left: 5px solid #3b82f6; }
-
-.toast-icon { font-size: 1.5rem; }
-.toast-content { font-weight: 800; font-size: 0.95rem; color: white; }
-
-/* fade-up is defined below in animations section */
-
-/* Heartbeat Indicator */
-.heartbeat-dot {
-    width: 6px;
-    height: 6px;
-    background: #10b981;
-    border-radius: 50%;
-    position: relative;
-}
-.heartbeat-dot::after {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    border-radius: 50%;
-    background: #10b981;
-    animation: pulse-ring 2s infinite;
-}
-@keyframes pulse-ring {
-    0% { transform: scale(0.5); opacity: 0.8; }
-    100% { transform: scale(3); opacity: 0; }
-}
-
-.titan-slide-image-masked {
-  object-fit: cover;
-  object-position: center 25%;
-  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
-}
-
-.empty-state-titan {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 100px 20px;
-    background: rgba(255,255,255,0.02);
-    border: 1px dashed rgba(255,255,255,0.08);
-    border-radius: var(--border-radius);
-}
-
-.empty-illustration {
-    width: 380px;
-    height: 380px;
-    position: relative;
-    margin-bottom: 40px;
-    filter: none;
-}
-
-@media (max-width: 768px) {
-    .empty-illustration {
-        width: 250px;
-        height: 250px;
-    }
-}
-
-[data-theme='dark'] {
-  --bg-primary: #050505;
-  --bg-secondary: #0a0a0a;
-  --bg-tertiary: #111111;
-  --text-primary: #ffffff;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --glass-bg: #111111;
-  --glass-border: rgba(255, 255, 255, 0.05);
-}
-
-* { box-sizing: border-box; padding: 0; margin: 0; }
-
-a { text-decoration: none; color: inherit; }
-button, input, textarea { font-family: inherit; }
-
-
-html, body {
-  max-width: 100vw;
-  overflow-x: hidden;
-  font-family: var(--font-body);
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  line-height: 1.6;
-  scroll-behavior: smooth;
-  -webkit-font-smoothing: antialiased;
-}
-
-.titan-bg { background-color: var(--bg-primary); }
-.container { width: 94%; max-width: 1440px; margin: 0 auto; }
-
-h1, h2, h3, h4, .title-titan, .hero-title-titan { font-family: var(--font-heading); }
 
 /* ==========================================================================
    TITAN LAYOUT ORCHESTRA

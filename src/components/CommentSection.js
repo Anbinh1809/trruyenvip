@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useTransition } from 'react';
 import Link from 'next/link';
 import { useEngagement } from '@/context/EngagementContext';
 import { useAuth } from '@/context/AuthContext';
@@ -17,14 +17,17 @@ export default function CommentSection({ chapterId }) {
   const { addToast } = useToast();
   const { user, isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(true);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    if (isAuthenticated && user) {
-        setUserName(user.username);
-    } else {
-        const savedName = typeof window !== 'undefined' ? localStorage.getItem('truyenvip_username') : null;
-        if (savedName) setUserName(savedName);
-    }
+    startTransition(() => {
+        if (isAuthenticated && user) {
+            setUserName(user.username);
+        } else {
+            const savedName = typeof window !== 'undefined' ? localStorage.getItem('truyenvip_username') : null;
+            if (savedName) setUserName(savedName);
+        }
+    });
   }, [isAuthenticated, user]);
 
   const fetchComments = useCallback(async () => {
@@ -42,7 +45,11 @@ export default function CommentSection({ chapterId }) {
   }, [chapterId]);
 
   useEffect(() => {
-    if (chapterId) fetchComments();
+    if (chapterId) {
+        startTransition(() => {
+            fetchComments();
+        });
+    }
   }, [chapterId, fetchComments]);
 
   const handleSubmit = async (e) => {

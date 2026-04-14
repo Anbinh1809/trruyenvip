@@ -16,7 +16,7 @@ export async function POST() {
         const ONE_DAY = 24 * 60 * 60;
 
         if (tokenAge > ONE_DAY) {
-            console.log(`[Auth] Session sliding: Refreshing token for ${session.username} (Age: ${tokenAge}s)`);
+            console.log(`[TITAN INFO] Session sliding: Refreshing token for ${session.username} (Age: ${tokenAge}s)`);
             const freshToken = await signToken({ 
                 uuid: session.uuid, 
                 username: session.username, 

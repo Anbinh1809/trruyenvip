@@ -1,0 +1,82 @@
+/* ==========================================================================
+   TITAN INDUSTRIAL - SEARCH & DISCOVERY
+   Dynamic Filtering & Result Architectures
+   ========================================================================== */
+
+.search-results-container {
+    padding-top: 140px;
+    padding-bottom: 100px;
+}
+
+.search-header-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 50px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.search-icon-box {
+    color: var(--accent);
+    background: rgba(255, 62, 62, 0.1);
+    padding: 20px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-title-industrial {
+    font-size: 2.8rem;
+    font-weight: 950;
+    color: white;
+    letter-spacing: -2px;
+}
+
+.search-stats-industrial {
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 800;
+    margin-top: 5px;
+    font-size: 1.1rem;
+    letter-spacing: -0.3px;
+}
+
+.search-empty-state-industrial {
+    margin-top: 40px;
+}
+
+.pagination-container-industrial {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 80px;
+}
+
+.pagination-node-industrial {
+    padding: 12px 25px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    color: white;
+    font-weight: 850;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.pagination-node-industrial:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--accent);
+}
+
+.pagination-node-industrial.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 10px 20px rgba(255, 62, 62, 0.2);
+}
+
+@media (max-width: 768px) {
+    .search-header-row { flex-direction: column; align-items: center; text-align: center; }
+    .search-title-industrial { font-size: 2rem; }
+    .search-results-container { padding-top: 100px; }
+}

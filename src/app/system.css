@@ -1,0 +1,31 @@
+/* ==========================================================================
+   TITAN INDUSTRIAL - SYSTEM PAGES
+   Professional 404 & Global Error Boundaries
+   ========================================================================== */
+
+.center-icon-titan { margin-bottom: 40px; display: flex; justify-content: center; }
+.system-title-industrial { font-size: clamp(2rem, 5vw, 4rem); font-weight: 950; letter-spacing: -2px; color: white; margin-bottom: 15px; text-align: center; }
+.system-desc-industrial { font-size: 1.1rem; color: rgba(255,255,255,0.4); max-width: 600px; margin: 0 auto 50px; text-align: center; font-weight: 700; line-height: 1.6; }
+
+.rotate-3d-titan { animation: rotate3d-titan 10s infinite linear; }
+@keyframes rotate3d-titan { 0% { transform: perspective(1000px) rotateY(0deg); } 100% { transform: perspective(1000px) rotateY(360deg); } }
+
+.system-error-stack {
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 30px auto;
+    max-width: 600px;
+    text-align: left;
+    font-family: monospace;
+    font-size: 0.85rem;
+    color: rgba(255, 62, 62, 0.8);
+    overflow-x: auto;
+}
+
+.error-digest-tag { font-family: monospace; font-size: 0.7rem; color: rgba(255,255,255,0.2); margin: 0 auto 30px; letter-spacing: 1px; background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); width: fit-content; }
+
+.system-action-group { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 350px; margin: 0 auto; }
+.err-action-btn-titan { height: 60px; font-weight: 950; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 12px; border-radius: 12px; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+.err-action-btn-titan:hover { transform: translateY(-5px); }

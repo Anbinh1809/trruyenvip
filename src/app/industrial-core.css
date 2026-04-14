@@ -1,0 +1,112 @@
+/* ==========================================================================
+   TITAN INDUSTRIAL CORE ARCHITECTURE
+   Shared Layout Utilities & Global UI Foundations
+   ========================================================================== */
+
+* { box-sizing: border-box; }
+
+html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  margin: 0;
+}
+
+.container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+}
+
+@media (max-width: 768px) {
+    .container { padding: 0 20px; }
+}
+
+/* SHARED TYPOGRAPHY & TAGS */
+.truncate-1 { display: -webkit-box; -webkit-line-clamp: 1; line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; }
+.truncate-2 { display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; }
+
+/* SHARED INDUSTRIAL GRIDS */
+.manga-grid-titan {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 30px;
+}
+
+@media (max-width: 768px) {
+    .manga-grid-titan { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+}
+
+/* SYSTEM TOASTS */
+.toast-container-titan {
+    position: fixed;
+    top: 100px;
+    right: 30px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    pointer-events: none;
+}
+
+.toast-titan {
+    min-width: 320px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    pointer-events: auto;
+    transition: var(--transition);
+}
+
+.toast-titan.success { border-left: 4px solid #10b981; }
+.toast-titan.error { border-left: 4px solid var(--accent); }
+
+/* TITAN GENERIC BUTTONS */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 850;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid transparent;
+    text-decoration: none;
+    gap: 10px;
+}
+
+.btn-primary {
+    background: var(--accent-gradient);
+    color: white;
+    box-shadow: 0 10px 20px rgba(255, 62, 62, 0.2);
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(255, 62, 62, 0.4);
+}
+
+.btn-glass {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    color: white;
+    backdrop-filter: blur(10px);
+}
+
+.btn-glass:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-3px);
+}

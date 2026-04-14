@@ -44,7 +44,7 @@ export async function POST(req) {
         const chapter = chapData.recordset[0];
         const source = chapter.source_url?.includes('nettruyen') ? 'nettruyen' : 'truyenqq';
 
-        console.log(`[JIT-TELEMETRY] Start: ${chapterId}`);
+        console.log(`[TITAN INFO] JIT Sync Triggered: ${chapterId}`);
 
         // Execution with race timeout
         const CRAWL_TIMEOUT = 45000;
@@ -57,7 +57,7 @@ export async function POST(req) {
             crawlResult = await Promise.race([crawlPromise, timeoutPromise]);
         } catch (err) {
             errorStatus = err.code || err.message;
-            console.error(`[JIT-TELEMETRY] Phase failed: ${errorStatus}`);
+            console.error(`[TITAN WARN] JIT Phase failed: ${errorStatus}`);
         }
 
         // Verification

@@ -3,6 +3,7 @@ import MangaCard from '@/components/MangaCard';
 import { query, MANGA_CARD_FIELDS } from '@/lib/db';
 import Footer from '@/components/Footer';
 import GuardianBeastEmptyState from '@/components/GuardianBeastEmptyState';
+import "@/app/search.css";
 import { Search } from 'lucide-react';
 
 async function searchManga(q, page = 1) {

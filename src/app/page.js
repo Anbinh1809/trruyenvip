@@ -3,6 +3,7 @@ import RecentlyRead from '@/components/RecentlyRead';
 import MangaCard from '@/components/MangaCard';
 import Footer from '@/components/Footer';
 import { query, MANGA_CARD_FIELDS } from '@/lib/db';
+import "./home.css";
 import Link from 'next/link';
 import { Suspense } from 'react';
 import { Sparkles, Zap, ChevronRight } from 'lucide-react';

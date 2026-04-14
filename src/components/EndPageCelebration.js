@@ -13,7 +13,7 @@ export default function EndPageCelebration() {
                 <Link href="/" className="btn btn-primary btn-large-titan">
                     <Home size={20} /> QUAY VỀ TRANG CHỦ
                 </Link>
-                <Link href="/bookmarks" className="btn btn-glass btn-large-titan">
+                <Link href="/favorites" className="btn btn-glass btn-large-titan">
                     <Bookmark size={20} /> VÀO KHO TRUYỆN CÁ NHÂN
                 </Link>
                 <Link href="/genres" className="btn btn-outline-clear-industrial btn-large-titan">

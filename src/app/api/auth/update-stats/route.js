@@ -32,7 +32,11 @@ export async function POST(request) {
             return NextResponse.json({ success: true });
         }
 
-        // 3. Sanity Check: Prevent massive injections (Hardened for Production)
+        // 3. Security Hardening: Prevent negative XP and suspicious injections
+        if (deltaXp < 0) {
+            return NextResponse.json({ error: 'Dữ liệu bất thường (XP cannot be negative)' }, { status: 400 });
+        }
+
         if (Math.abs(deltaXp) > 2000 || Math.abs(deltaCoins) > 10000) {
             return NextResponse.json({ error: 'Dữ liệu bất thường (Deltas excessive)' }, { status: 400 });
         }
@@ -42,7 +46,7 @@ export async function POST(request) {
         const lastUpdate = userRes.recordset[0]?.last_stats_update;
         const now = new Date();
 
-        if (lastUpdate && (now - new Date(lastUpdate)) < 3000) { // Slight reduction to 3s for better UX
+        if (lastUpdate && (now - new Date(lastUpdate)) < 3000) { 
             return NextResponse.json({ 
               error: 'Hệ thống đang bận',
               nextAvailable: 3000 - (now - new Date(lastUpdate))
@@ -65,7 +69,7 @@ export async function POST(request) {
         return NextResponse.json({ success: true });
 
     } catch (e) {
-        console.error('Update stats error', e);
+        console.error('[TITAN ERROR] Update stats failed:', e.message);
         return NextResponse.json({ error: 'Lỗi đồng bộ dữ liệu' }, { status: 500 });
     }
 }

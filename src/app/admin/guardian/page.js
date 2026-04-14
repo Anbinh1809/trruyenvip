@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useTransition, useCallback } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useAuth } from '@/context/AuthContext';
@@ -10,8 +10,9 @@ export default function AdminGuardianPage() {
   const { user, isAuthenticated, loading } = useAuth();
   const [data, setData] = useState({ metrics: {}, history: [] });
   const [fetching, setFetching] = useState(true);
+  const [isPending, startTransition] = useTransition();
 
-  const fetchHistory = async () => {
+  const fetchHistory = useCallback(async () => {
     setFetching(true);
     try {
         const res = await fetch('/api/admin/guardian/history');
@@ -32,13 +33,15 @@ export default function AdminGuardianPage() {
         console.error('Failed to fetch guardian history', e);
     }
     setFetching(false);
-  };
+  }, []);
 
   useEffect(() => {
     if (isAuthenticated && user?.role === 'admin') {
-        fetchHistory();
+        startTransition(() => {
+            fetchHistory();
+        });
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, fetchHistory]);
 
   if (loading || fetching && data.history.length === 0) {
     return (

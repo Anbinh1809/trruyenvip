@@ -1,5 +1,8 @@
+import "./tokens.css";
+import "./industrial-core.css";
+import "./titan-components.css";
 import "./globals.css";
-import { Inter, Outfit } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import { ThemeProvider } from "@/context/ThemeContext";
 import { HistoryProvider } from "@/context/HistoryContext";
 import { FavoritesProvider } from "@/context/FavoritesContext";
@@ -13,12 +16,6 @@ const inter = Inter({
   subsets: ['latin', 'vietnamese'],
   display: 'swap',
   variable: '--font-inter',
-});
-
-const outfit = Outfit({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-outfit',
 });
 
 export const metadata = {
@@ -63,7 +60,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="vi" className={`${inter.variable} ${outfit.variable}`} suppressHydrationWarning>
+    <html lang="vi" className={`${inter.variable}`} suppressHydrationWarning>
       <body suppressHydrationWarning>
         <AuthProvider>
           <ThemeProvider>

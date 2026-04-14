@@ -3,6 +3,7 @@ import Footer from '@/components/Footer';
 import ChapterContent from '@/components/ChapterContent';
 import ReaderSettings from '@/components/ReaderSettings';
 import { query } from '@/lib/db';
+import "@/app/reader.css";
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { ChevronLeft, ChevronRight, Home, BookOpen, AlertTriangle } from 'lucide-react';

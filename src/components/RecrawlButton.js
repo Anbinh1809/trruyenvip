@@ -38,7 +38,7 @@ export default function RecrawlButton({ chapterId }) {
       </div>
       <h2 className="empty-title">Chương này chưa có nội dung</h2>
       <p className="empty-sub">
-        Dữ liệu có thể chưa được đồng bộ từ nguồn gốc. Hãy bấm nút dưới đây để hệ thống ưu tiên "quét" lại chương này ngay lập tức.
+        Dữ liệu có thể chưa được đồng bộ từ nguồn gốc. Hãy bấm nút dưới đây để hệ thống ưu tiên &quot;quét&quot; lại chương này ngay lập tức.
       </p>
       
       <button 

@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import "@/app/system.css";
 
 export default function Error({ error, reset }) {
   useEffect(() => {

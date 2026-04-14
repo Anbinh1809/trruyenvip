@@ -1,0 +1,119 @@
+/* ==========================================================================
+   TITAN INDUSTRIAL - READER SYSTEM
+   High-Fidelity HUD & Performance-Tuned Layouts
+   ========================================================================== */
+
+.reader-industrial-layout {
+    background: #000;
+    min-height: 100vh;
+}
+
+/* READER HUD */
+.reader-hud-titan {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background: rgba(2, 6, 23, 0.9);
+    backdrop-filter: blur(30px);
+    border-bottom: 1px solid var(--glass-border);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+}
+
+.reader-nav-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.reader-back-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: white;
+    text-decoration: none;
+    font-weight: 850;
+    font-size: 0.9rem;
+}
+
+.current-chapter-pill {
+    background: var(--accent);
+    color: white;
+    font-weight: 950;
+    font-size: 0.8rem;
+    padding: 6px 18px;
+    border-radius: 30px;
+    letter-spacing: 1px;
+}
+
+.reader-nav-actions-industrial {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.nav-step-group { display: flex; gap: 8px; }
+.nav-btn-reader {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--glass-border);
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    transition: all 0.3s;
+}
+
+.nav-btn-reader:hover { background: var(--accent); border-color: var(--accent); }
+
+.v-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.1); }
+
+/* READER CONTENT */
+.reader-content-industrial {
+    padding-top: 70px;
+}
+
+/* CELEBRATION FOOTER */
+.reader-footer-industrial {
+    padding: 100px 0;
+    background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.8));
+    text-align: center;
+}
+
+.reader-footer-container-titan { max-width: 850px; margin: 0 auto; }
+.finish-label-titan { font-size: 0.75rem; font-weight: 950; color: var(--accent); letter-spacing: 3px; display: block; margin-bottom: 20px; }
+.finish-title-titan { font-size: 3rem; font-weight: 950; color: white; margin-bottom: 60px; letter-spacing: -2px; }
+
+.next-chapter-card-titan {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+    margin-bottom: 60px;
+    backdrop-filter: blur(20px);
+}
+
+.next-up-tag { font-size: 0.7rem; font-weight: 950; color: rgba(255,255,255,0.3); letter-spacing: 2px; margin-bottom: 8px; }
+.next-chapter-title-titan { font-size: 1.8rem; font-weight: 950; color: white; margin: 0; }
+
+.next-btn-industrial { padding: 0 40px; height: 60px; font-weight: 950; }
+
+.all-caught-up-industrial { padding: 60px; text-align: center; }
+.caught-up-title { font-size: 2rem; font-weight: 950; color: white; }
+.caught-up-desc { color: rgba(255,255,255,0.4); font-weight: 700; margin-top: 10px; }
+
+.reader-footer-actions { display: flex; justify-content: center; gap: 15px; margin-bottom: 80px; }
+.footer-action-btn { padding: 14px 25px; border-radius: 12px; }
+
+.reader-comments-section { margin-top: 100px; text-align: left; }
+.loading-dots-industrial { padding: 60px; text-align: center; color: rgba(255,255,255,0.4); font-weight: 800; }

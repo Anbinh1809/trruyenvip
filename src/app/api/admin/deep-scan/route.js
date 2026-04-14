@@ -15,7 +15,7 @@ export async function GET(request) {
     }
 
     try {
-        console.log(`[Admin] Manual Deep Scan Triggered: ${source}, ${pages} pages starting from ${start}`);
+        console.log(`[TITAN INFO] Manual Deep Scan Triggered: ${source}, ${pages} pages starting from ${start}`);
         
         // Split large scans into multiple smaller tasks for the worker to pick up
         // Max 50 pages per batch to keep task size reasonable
@@ -35,6 +35,7 @@ export async function GET(request) {
             message: `Queued ${pages} pages for deep scan in ${batches} high-priority batches.` 
         });
     } catch (err) {
-        return NextResponse.json({ error: err.message }, { status: 500 });
+        console.error('[TITAN ERROR] Deep Scan trigger failed:', err.message);
+        return NextResponse.json({ error: 'Failed to queue deep scan tasks' }, { status: 500 });
     }
 }

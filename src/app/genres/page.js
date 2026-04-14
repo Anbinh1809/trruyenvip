@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { headers } from 'next/headers';
 import Footer from '@/components/Footer';
 import GuardianBeastEmptyState from '@/components/GuardianBeastEmptyState';
+import "@/app/genres.css";
 
 export const revalidate = 600; // ISR: Revalidate every 10 minutes
 
@@ -152,7 +153,7 @@ export default async function GenresPage({ searchParams }) {
                 ) : (
                     <GuardianBeastEmptyState 
                         title="DỮ LIỆU ĐANG CẬP NHẬT"
-                        message={`Hiện tại thư viện <span class="accent-text-titan">${activeGenre?.name || 'này'}</span> chưa có bản ghi nào được lưu trữ. Vui lòng quay lại sau.`}
+                        message={`Hiện tại thư viện <span class="text-accent-titan">${activeGenre?.name || 'này'}</span> chưa có bản ghi nào được lưu trữ. Vui lòng quay lại sau.`}
                         buttonText="Quay Lại Trang Chủ"
                     />
                 )}

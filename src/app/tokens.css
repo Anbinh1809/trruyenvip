@@ -1,0 +1,57 @@
+/* ==========================================================================
+   TITAN INDUSTRIAL DESIGN TOKENS
+   Core Variables & Global Kinetic Constants
+   ========================================================================== */
+
+:root {
+  /* Premium Dark Theme Core */
+  --bg-primary: #020617;
+  --bg-secondary: #0a0a0a;
+  --bg-tertiary: #111827;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --accent: #ff3e3e;
+  --accent-gradient: linear-gradient(135deg, #ff3e3e 0%, #b91c1c 100%);
+  --glass-bg: #111827;
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --glass-blur: blur(20px);
+  --header-height: 60px;
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  --border-radius: 12px;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Inter', system-ui, -apple-system, sans-serif;
+  
+  /* Z-Index Architecture */
+  --z-header: 1000;
+  --z-search: 3500;
+  --z-progress: 4000;
+  --z-modal: 6000;
+  --z-mobile-nav: 9999;
+
+  /* Nebula Design Tokens */
+  --nebula-blue: #4dc6e8;
+  --nebula-orange: #ffb400;
+  --nebula-red: #ff4757;
+  --nebula-glass: rgba(255, 255, 255, 0.1);
+  --focal-mask: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.85) 100%);
+
+  /* Ranking Colors */
+  --rank-gold: #fbbf24;
+  --rank-silver: #94a3b8;
+  --rank-bronze: #b45309;
+}
+
+/* GLOBAL KINETIC CONSTANTS */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+
+.fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.titan-spin { animation: spin 1s linear infinite; }
+.skeleton-shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite linear;
+}

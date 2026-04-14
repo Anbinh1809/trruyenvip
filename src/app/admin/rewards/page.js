@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useTransition, useCallback } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useAuth } from '@/context/AuthContext';
@@ -10,11 +10,12 @@ import { CheckCircle, XCircle, Clock, User, Landmark, CreditCard, ChevronRight, 
 export default function AdminRewardsPage() {
   const { user, isAuthenticated, loading } = useAuth();
   const { addToast } = useToast();
+  const [isPending, startTransition] = useTransition();
   const [requests, setRequests] = useState([]);
   const [statusFilter, setStatusFilter] = useState('pending');
   const [fetching, setFetching] = useState(true);
 
-  const fetchRequests = async () => {
+  const fetchRequests = useCallback(async () => {
     setFetching(true);
     try {
       const res = await fetch(`/api/admin/rewards?status=${statusFilter}`);
@@ -26,13 +27,15 @@ export default function AdminRewardsPage() {
       addToast('Lỗi khi lấy danh sách yêu cầu.', 'error');
     }
     setFetching(false);
-  };
+  }, [statusFilter, addToast]);
 
   useEffect(() => {
     if (isAuthenticated && user?.role === 'admin') {
-      fetchRequests();
+      startTransition(() => {
+        fetchRequests();
+      });
     }
-  }, [isAuthenticated, user, statusFilter]);
+  }, [isAuthenticated, user, statusFilter, fetchRequests]);
 
   const handleAction = async (requestId, action) => {
     try {

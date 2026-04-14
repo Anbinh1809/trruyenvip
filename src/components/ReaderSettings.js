@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import { Settings, Eye, EyeOff, Layout, Palette, Monitor } from 'lucide-react';
 
 export default function ReaderSettings() {
@@ -9,6 +9,7 @@ export default function ReaderSettings() {
   const [isWebtoon, setIsWebtoon] = useState(true);
   const [filter, setFilter] = useState('none');
   const [isHiFi, setIsHiFi] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     const incog = localStorage.getItem('truyenvip_incognito') === 'true';
@@ -16,10 +17,12 @@ export default function ReaderSettings() {
     const filt = localStorage.getItem('truyenvip_filter') || 'none';
     const hifi = localStorage.getItem('truyenvip_hifi') === 'true';
 
-    setIncognito(incog);
-    setIsWebtoon(mode === 'webtoon');
-    setFilter(filt);
-    setIsHiFi(hifi);
+    startTransition(() => {
+        setIncognito(incog);
+        setIsWebtoon(mode === 'webtoon');
+        setFilter(filt);
+        setIsHiFi(hifi);
+    });
   }, []);
 
   const toggleIncognito = () => {

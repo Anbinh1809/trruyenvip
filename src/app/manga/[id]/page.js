@@ -3,6 +3,7 @@ import Footer from '@/components/Footer';
 import ChapterList from '@/components/ChapterList';
 import DetailCover from '@/components/DetailCover';
 import { query, MANGA_CARD_FIELDS } from '@/lib/db';
+import "@/app/manga-detail.css";
 import Link from 'next/link';
 import { BookOpen, User, Star, Calendar, Share2, Heart, AlertOctagon } from 'lucide-react';
 

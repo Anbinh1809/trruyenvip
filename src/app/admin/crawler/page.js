@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useTransition, useCallback } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useAuth } from '@/context/AuthContext';
@@ -23,9 +23,10 @@ export default function AdminCrawlerPage() {
   const [telemetry, setTelemetry] = useState(null);
   const [ramUsage, setRamUsage] = useState(0);
   const [fetching, setFetching] = useState(true);
+  const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setFetching(true);
     try {
         const res = await fetch('/api/admin/crawler/telemetry');
@@ -38,15 +39,17 @@ export default function AdminCrawlerPage() {
         console.error('Failed to fetch crawler telemetry', e);
     }
     setFetching(false);
-  };
+  }, []);
 
   useEffect(() => {
     if (isAuthenticated && user?.role === 'admin') {
-        fetchData();
+        startTransition(() => {
+            fetchData();
+        });
         const timer = setInterval(fetchData, 10000);
         return () => clearInterval(timer);
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, fetchData]);
 
   const triggerDeepScan = async (pages) => {
     try {

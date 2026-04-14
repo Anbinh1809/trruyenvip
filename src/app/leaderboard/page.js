@@ -10,9 +10,9 @@ import { Trophy, Crown, Medal, Shield, User } from 'lucide-react';
 export const dynamic = "force-dynamic";
 
 const RankingIcon = ({ index }) => {
-    if (index === 0) return <Crown size={32} color="#fbbf24" />;
-    if (index === 1) return <Trophy size={28} color="#94a3b8" />;
-    if (index === 2) return <Medal size={28} color="#b45309" />;
+    if (index === 0) return <Crown size={32} color="var(--rank-gold)" />;
+    if (index === 1) return <Trophy size={28} color="var(--rank-silver)" />;
+    if (index === 2) return <Medal size={28} color="var(--rank-bronze)" />;
     return <span className="rank-number-industrial">#{index + 1}</span>;
 }
 
