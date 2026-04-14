@@ -17,8 +17,8 @@ export async function GET() {
     const { payload } = await jwtVerify(token, JWT_SECRET);
     
     // FETCH FULL RECORD TO BE ABSOLUTELY SURE
-    const res = await query('SELECT uuid, username, email, role, avatar, xp, vipCoins FROM Users WHERE uuid = @uuid', { uuid: payload.uuid });
-    const user = res.recordset[0];
+    const res = await query('SELECT uuid, username, email, role, avatar, xp, "vipCoins" FROM "Users" WHERE uuid = @uuid', { uuid: payload.uuid });
+    const user = res.recordset?.[0];
 
     if (!user) {
         return NextResponse.json({ authenticated: false, error: 'User not found' }, { status: 200 });

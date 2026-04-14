@@ -2,35 +2,43 @@ import { query } from '@/lib/db';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
+    // 1. PROD GUARD: Strict security lock
+    if (process.env.NODE_ENV === 'production') {
+        return NextResponse.json({ error: 'Tính năng này không được phép trên môi trường thực tế.' }, { status: 403 });
+    }
+
     try {
-        // List all tables
+        // 2. LIST TABLES (PostgreSQL compliant)
         const tables = await query(`
-            SELECT TABLE_NAME 
-            FROM INFORMATION_SCHEMA.TABLES 
-            WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_CATALOG = 'TruyenVip'
+            SELECT table_name 
+            FROM information_schema.tables 
+            WHERE table_schema = 'public'
         `);
         
-        // List columns for key tables
+        // 3. LIST COLUMNS (PostgreSQL compliant)
         const columns = await query(`
-            SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH
-            FROM INFORMATION_SCHEMA.COLUMNS
-            WHERE TABLE_NAME IN ('Users', 'Manga', 'Chapters', 'Favorites')
-            ORDER BY TABLE_NAME, ORDINAL_POSITION
+            SELECT table_name, column_name, data_type, character_maximum_length
+            FROM information_schema.columns
+            WHERE table_name IN ('users', 'manga', 'chapters', 'favorites')
+            AND table_schema = 'public'
+            ORDER BY table_name, ordinal_position
         `);
 
-        // Check data counts
+        // 4. DATA COUNTS (Null-safe)
         const counts = {
-            users: (await query("SELECT COUNT(*) as c FROM Users")).recordset[0].c,
-            manga: (await query("SELECT COUNT(*) as c FROM Manga")).recordset[0].c,
-            chapters: (await query("SELECT COUNT(*) as c FROM Chapters")).recordset[0].c
+            users: (await query('SELECT COUNT(*) as c FROM "Users"')).recordset?.[0]?.c || 0,
+            manga: (await query('SELECT COUNT(*) as c FROM "Manga"')).recordset?.[0]?.c || 0,
+            chapters: (await query('SELECT COUNT(*) as c FROM "Chapters"')).recordset?.[0]?.c || 0
         };
 
         return NextResponse.json({
-            tables: tables.recordset.map(t => t.TABLE_NAME),
-            columns: columns.recordset,
+            success: true,
+            tables: (tables.recordset || []).map(t => t.table_name),
+            columns: columns.recordset || [],
             counts
         });
     } catch (e) {
-        return NextResponse.json({ error: e.message, stack: e.stack }, { status: 500 });
+        console.error('Debug Schema Error:', e);
+        return NextResponse.json({ error: 'Lỗi truy xuất sơ đồ dữ liệu' }, { status: 500 });
     }
 }

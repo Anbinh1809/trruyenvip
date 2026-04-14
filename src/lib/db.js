@@ -115,6 +115,17 @@ function translateSql(sql, params) {
     translatedSql = translatedSql.replace(/(?:\[dbo\]|"dbo"|dbo)\./gi, ''); 
     translatedSql = translatedSql.replace(/\[([^\]]+)\]/g, '"$1"'); 
 
+    // 8. TITAN AUTO-QUOTE: Protect mixed-case table names from PostgreSQL folder-case folding
+    const CORE_TABLES = [
+        'manga', 'chapters', 'chapterimages', 'users', 
+        'crawlertasks', 'crawllogs', 'guardianreports', 
+        'favorites', 'comments', 'engagement', 'missions', 
+        'redemptionrequests', 'genres', 'mangagenres'
+    ];
+    for (const table of CORE_TABLES) {
+        const regex = new RegExp(`(\\s)${table}\\b(?![".])`, 'gi');
+        translatedSql = translatedSql.replace(regex, `$1"${table}"`);
+    }
     // Cache the result for future identical queries
     if (translationCache.size < MAX_CACHE_SIZE) {
         translationCache.set(sql, { translatedSql, paramOrder });
@@ -131,11 +142,12 @@ export async function query(sqlString, params = {}, client = null) {
         const result = await executor.query(psql, values);
         
         // Emulate mssql .recordset and .recordsets for backward compatibility
+        const rows = result.rows || [];
         return {
-            recordset: result.rows,
-            recordsets: [result.rows],
-            rowsAffected: [result.rowCount],
-            rowCount: result.rowCount
+            recordset: rows,
+            recordsets: [rows],
+            rowsAffected: [result.rowCount || 0],
+            rowCount: result.rowCount || 0
         };
     } catch (err) {
         // Always log translated SQL on error to assist production debugging

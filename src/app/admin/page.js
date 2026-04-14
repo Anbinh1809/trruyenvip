@@ -16,7 +16,7 @@ export default function AdminDashboard() {
     if (isAuthenticated && user?.role === 'admin') {
       fetch('/api/admin/stats')
         .then(res => {
-          if (!res.ok) throw new Error('Cấm chế ngăn cản việc truy xuất số liệu');
+          if (!res.ok) throw new Error('Không thể truy xuất dữ liệu hệ thống');
           return res.json();
         })
         .then(setStats)
@@ -32,7 +32,7 @@ export default function AdminDashboard() {
         let secret = localStorage.getItem('TRUYENVIP_CRON_SECRET') || '';
         
         if (!secret) {
-            secret = window.prompt('Nhập mã cấm chế (CRON_SECRET) để kích hoạt:');
+            secret = window.prompt('Nhập mã xác thực (CRON_SECRET) để kích hoạt:');
             if (secret) localStorage.setItem('TRUYENVIP_CRON_SECRET', secret);
         }
 
@@ -84,8 +84,8 @@ export default function AdminDashboard() {
             <div className="container" style={{ paddingTop: '120px' }}>
                 <header style={{ marginBottom: '50px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                     <div>
-                        <h1 style={{ fontSize: '3rem', fontWeight: 950, marginBottom: '10px' }}>🏰 Bảng Điều Khiển Quản Trị</h1>
-                        <p style={{ color: 'rgba(255,255,255,0.5)', fontWeight: 600 }}>Chi tiết các chỉ số vận hành & hiệu suất của Titan Engine</p>
+                        <h1 style={{ fontSize: '3rem', fontWeight: 950, marginBottom: '10px' }}>Dashboard Quản Trị</h1>
+                        <p style={{ color: 'rgba(255,255,255,0.5)', fontWeight: 600 }}>Chi tiết các chỉ số vận hành & hiệu suất hệ thống</p>
                     </div>
                 </header>
 
@@ -180,7 +180,7 @@ export default function AdminDashboard() {
                                     <div key={f.id} style={{ marginBottom: '4px', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '2px' }}>
                                         <span style={{ color: 'var(--accent)' }}>[{f.type}]</span> {f.last_error?.substring(0, 40)}...
                                     </div>
-                                )) : <div style={{ opacity: 0.3 }}>Hệ thống thanh tịnh.</div>}
+                                )) : <div style={{ opacity: 0.3 }}>Hoạt động bình thường.</div>}
                             </div>
 
                             {stats?.heatmap?.length > 0 && (

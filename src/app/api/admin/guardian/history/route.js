@@ -14,27 +14,27 @@ export async function GET(req) {
 
         const reports = await query(`
             SELECT gr.*, m.title as manga_name, m.cover, c.retry_count
-            FROM GuardianReports gr
-            JOIN Manga m ON gr.manga_id = m.id
-            LEFT JOIN Chapters c ON gr.chapter_title = c.title AND gr.manga_id = c.manga_id
+            FROM "GuardianReports" gr
+            JOIN "Manga" m ON gr.manga_id = m.id
+            LEFT JOIN "Chapters" c ON gr.chapter_title = c.title AND gr.manga_id = c.manga_id
             ORDER BY gr.created_at DESC
             LIMIT @limit
         `, { limit });
 
         // Get daily metrics
-        const metrics = await query(`
+        const metricsArr = await query(`
             SELECT 
                 COUNT(*) as total_fixes,
                 SUM(CASE WHEN event_type = 'FIX_GAP' THEN 1 ELSE 0 END) as gaps_filled,
                 SUM(CASE WHEN event_type = 'FIX_IMAGE' THEN 1 ELSE 0 END) as images_rescued
-            FROM GuardianReports
+            FROM "GuardianReports"
             WHERE created_at > NOW() - INTERVAL '1 day'
         `);
 
         return NextResponse.json({
             success: true,
-            reports: reports.recordset,
-            metrics: metrics.recordset[0]
+            reports: reports.recordset || [],
+            metrics: metricsArr.recordset?.[0] || { total_fixes: 0, gaps_filled: 0, images_rescued: 0 }
         });
     } catch (err) {
         return NextResponse.json({ error: err.message }, { status: 500 });

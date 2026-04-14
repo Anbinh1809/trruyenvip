@@ -8,20 +8,20 @@ import { useAuth } from './AuthContext';
 const EngagementContext = createContext();
 
 export const RANKS = [
-  { lv: 1, title: 'Cấp 1 (Phổ thông)', chest: 'Wood' },
-  { lv: 6, title: 'Cấp 2 (Trung cấp)', chest: 'Stone' },
-  { lv: 11, title: 'Cấp 3 (Cao cấp)', chest: 'Bronze' },
-  { lv: 21, title: 'Cấp 4 (Chuyên gia)', chest: 'Silver' },
-  { lv: 36, title: 'Cấp 5 (Bậc thầy)', chest: 'Gold' },
-  { lv: 51, title: 'Cấp 6 (Huyền thoại)', chest: 'Platinum' },
-  { lv: 100, title: 'Cấp 7 (Vô song)', chest: 'Diamond' },
-  { lv: 150, title: 'Cấp 8 (Tối thượng)', chest: 'Supreme' }
+  { lv: 1, title: 'Thành viên mới', chest: 'Wood' },
+  { lv: 6, title: 'Thành viên tích cực', chest: 'Stone' },
+  { lv: 11, title: 'Độc giả trung thành', chest: 'Bronze' },
+  { lv: 21, title: 'Độc giả gạo cội', chest: 'Silver' },
+  { lv: 36, title: 'Chuyên gia đọc truyện', chest: 'Gold' },
+  { lv: 51, title: 'Hội viên cao cấp', chest: 'Platinum' },
+  { lv: 100, title: 'Thành viên danh dự', chest: 'Diamond' },
+  { lv: 150, title: 'Thành viên tinh anh', chest: 'Supreme' }
 ];
 
 export const calculateRank = (xp) => {
     const level = Math.floor(xp / 100) + 1;
     const rank = [...RANKS].reverse().find(r => level >= r.lv);
-    return { level, title: rank ? rank.title : 'Cấp 1' };
+    return { level, title: rank ? rank.title : 'Thành viên mới' };
 };
 
 const MISSION_TYPES = {
@@ -84,7 +84,7 @@ function engagementReducer(state, action) {
          vipCoins,
          userUuid: uuid,
          level,
-         rankTitle: rank ? rank.title : 'Phàm Nhân'
+         rankTitle: rank ? rank.title : 'Thành viên mới'
         };
     }
     case 'ADD_XP': {
@@ -96,7 +96,7 @@ function engagementReducer(state, action) {
         ...state,
         xp: nextXp,
         level: nextLevel,
-        rankTitle: rank ? rank.title : 'Phàm Nhân'
+        rankTitle: rank ? rank.title : 'Thành viên mới'
       };
     }
     case 'ADD_COINS': {
@@ -156,6 +156,7 @@ export function EngagementProvider({ children }) {
   
   const lastSyncRef = useRef({ xp: -1, coins: -1 });
   const hasCelebratedLevelRef = useRef(1);
+  const isFirstSyncRef = useRef(true);
   const pendingDeltasRef = useRef({ xp: 0, coins: 0 });
   const isSyncingRef = useRef(false);
   const lastXpGainTimeRef = useRef(0); // TITAN THROTTLE
@@ -271,6 +272,16 @@ export function EngagementProvider({ children }) {
         const adjustedCoins = uCoins + pendingDeltasRef.current.coins;
 
         if (adjustedXp !== lastSyncRef.current.xp || adjustedCoins !== lastSyncRef.current.coins) {
+            const nextLevel = Math.floor(adjustedXp / 100) + 1;
+            
+            // TITAN LOGIN FIX: If this is the first server sync, align the celebration ref
+            // to the current level to prevent back-filling a queue of fireworks for levels 
+            // the user already earned in previous sessions.
+            if (isFirstSyncRef.current) {
+                hasCelebratedLevelRef.current = nextLevel;
+                isFirstSyncRef.current = false;
+            }
+
             dispatch({ type: 'SYNC_USER', payload: { 
                 xp: adjustedXp, 
                 vipCoins: adjustedCoins, 
@@ -420,7 +431,7 @@ export function EngagementProvider({ children }) {
 
   const getRankInfo = useCallback((currentXp) => {
     const calculatedLevel = Math.floor(currentXp / 100) + 1;
-    return [...RANKS].reverse().find(r => calculatedLevel >= r.lv) || { title: 'Phàm Nhân', chest: 'Wood' };
+    return [...RANKS].reverse().find(r => calculatedLevel >= r.lv) || { title: 'Thành viên mới', chest: 'Wood' };
   }, []);
 
   const memoValue = useMemo(() => ({

@@ -1,9 +1,15 @@
 import { query } from '@/lib/db';
 import { NextResponse } from 'next/server';
-import { crawlFullMangaChapters } from '@/lib/crawler';
+import { crawlFullMangaChapters, queueMangaSync } from '@/lib/crawler';
+import { getSession } from '@/lib/auth';
 
 export async function POST(req) {
     try {
+        const session = await getSession();
+        if (!session || session.role !== 'admin') {
+            return NextResponse.json({ error: 'Bạn không có quyền thực hiện hành động này.' }, { status: 401 });
+        }
+
         const { url } = await req.json();
         if (!url) return NextResponse.json({ error: 'Missing URL' }, { status: 400 });
 
@@ -75,14 +81,14 @@ export async function POST(req) {
 
         // 2. Lookup or Initialize Manga (Hardened lookup with Postgres-native concatenation)
         let manga = await query(`
-            SELECT id FROM Manga 
+            SELECT id FROM "Manga" 
             WHERE id = @mangaId 
             OR source_url = @url
             OR source_url LIKE '%/' || @mangaId
             OR source_url LIKE '%/' || @mangaId || '.html'
         `, { mangaId, url });
         
-        if (manga.recordset.length === 0) {
+        if (!manga.recordset?.[0]) {
             console.log(`[Migration] New manga detected: ${mangaId}. Queueing background sync...`);
             
             let detailUrl = parsedUrl.origin;
@@ -102,8 +108,8 @@ export async function POST(req) {
         let redirectUrl = `/manga/${mangaId}`;
 
         if (internalChapterId) {
-            const chap = await query("SELECT id FROM Chapters WHERE id = @chapId", { chapId: internalChapterId });
-            if (chap.recordset.length > 0) {
+            const chap = await query('SELECT id FROM "Chapters" WHERE id = @chapId', { chapId: internalChapterId });
+            if (chap.recordset?.[0]) {
                 redirectUrl = `/manga/${mangaId}/chapter/${internalChapterId}`;
             }
         }

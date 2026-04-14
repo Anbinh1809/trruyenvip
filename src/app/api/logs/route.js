@@ -9,8 +9,8 @@ export async function GET(request) {
     }
 
     try {
-        const res = await query("SELECT * FROM CrawlLogs ORDER BY created_at DESC LIMIT 50");
-        return Response.json(res.recordset);
+        const res = await query('SELECT * FROM "CrawlLogs" ORDER BY created_at DESC LIMIT 50');
+        return Response.json(res.recordset || []);
     } catch (err) {
         return new Response('Database error', { status: 500 });
     }

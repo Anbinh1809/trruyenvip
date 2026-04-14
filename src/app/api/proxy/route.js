@@ -1,8 +1,8 @@
 import sharp from 'sharp';
 import { query } from '@/lib/db';
 
-// RAM OPTIMIZATION: Disable internal cache to prevent memory buildup in long-running processes
-sharp.cache(false);
+// RAM OPTIMIZATION: Enable Sharp cache with a 50MB limit to balance speed vs memory
+sharp.cache({ memory: 50, items: 100, files: 20 });
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -87,116 +87,115 @@ export async function GET(request) {
         'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Mobile Safari/537.36',
     ];
 
-    let lastError = null;
-    for (const strategy of strategies) {
+    // HIGH-SPEED RACING ENGINE: Fire all strategies concurrently
+    // We use a custom racing logic that takes the first SUCCESSFUL (ok) response
+    const fetchWithStrategy = async (strategy) => {
+        const headers = { 
+            'User-Agent': userAgents[Math.floor(Math.random() * userAgents.length)],
+            'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+            'Accept-Language': 'vi,en-US;q=0.9,en;q=0.8',
+            'Cache-Control': 'no-cache'
+        };
+        if (strategy.referer) headers['Referer'] = strategy.referer;
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 4000); // Tight 4s per strategy
+
         try {
-            const headers = { 
-                'User-Agent': userAgents[Math.floor(Math.random() * userAgents.length)],
-                'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
-                'Accept-Language': 'vi,en-US;q=0.9,en;q=0.8',
-                'Cache-Control': 'no-cache'
-            };
-            if (strategy.referer) headers['Referer'] = strategy.referer;
-
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 3000); // 3s fast-fail per strategy
-
-            const response = await fetch(imageUrl, { 
-                headers, 
-                signal: controller.signal,
-                next: { revalidate: 3600 } 
-            });
-            
+            const response = await fetch(imageUrl, { headers, signal: controller.signal, next: { revalidate: 86400 } });
             clearTimeout(timeoutId);
-
-            if (response.ok) {
-                const buffer = await response.arrayBuffer();
-                const contentType = response.headers.get('content-type') || 'image/jpeg';
-                
-                // --- OOM PROTECTION: 10MB Limit ---
-                if (buffer.byteLength > 10 * 1024 * 1024) {
-                    return new Response(buffer, {
-                        headers: {
-                            'Content-Type': contentType,
-                            'Cache-Control': 'public, max-age=31536000, stale-while-revalidate=86400, immutable',
-                            'Access-Control-Allow-Origin': '*',
-                            'X-Optimization': 'skipped-too-large'
-                        },
-                    });
-                }
-                
-                // --- Smart Image Optimization ---
-                // Skip Sharp for GIFs (to preserve animation) or if Sharp fails
-                if (contentType.includes('gif')) {
-                    return new Response(buffer, {
-                        headers: {
-                            'Content-Type': 'image/gif',
-                            'Cache-Control': 'public, max-age=31536000, stale-while-revalidate=86400, s-maxage=31536000, immutable',
-                            'Access-Control-Allow-Origin': '*',
-                        },
-                    });
-                }
-
-                try {
-                    const accept = request.headers.get('accept') || '';
-                    const supportsAvif = accept.includes('image/avif');
-                    
-                    let transformer = sharp(Buffer.from(buffer));
-                    
-                    if (width > 0) {
-                        transformer = transformer.resize({ 
-                            width: Math.min(width, 2000), 
-                            withoutEnlargement: true 
-                        });
-                    }
-
-                    let processedBuffer;
-                    let finalMime = 'image/webp';
-                    let optTag = 'sharp-webp';
-
-                    if (supportsAvif) {
-                        processedBuffer = await transformer
-                            .avif({ quality: Math.min(quality, 65), effort: 2 }) // AVIF is better at lower quality
-                            .toBuffer();
-                        finalMime = 'image/avif';
-                        optTag = 'sharp-avif';
-                    } else {
-                        processedBuffer = await transformer
-                            .webp({ quality: quality, effort: 4 })
-                            .toBuffer();
-                    }
-
-                    return new Response(processedBuffer, {
-                        headers: {
-                            'Content-Type': finalMime,
-                            'Cache-Control': 'public, max-age=31536000, stale-while-revalidate=604800, s-maxage=31536000, immutable',
-                            'Vary': 'Accept', // CRITICAL: Tell CDNs that response varies by Accept header
-                            'Access-Control-Allow-Origin': '*',
-                            'X-Robots-Tag': 'noindex, nofollow',
-                            'Referrer-Policy': 'no-referrer',
-                            'X-Optimization': optTag
-                        },
-                    });
-                } catch (sharpError) {
-                    console.error('Sharp optimization failed, falling back to original:', sharpError.message);
-                    return new Response(buffer, {
-                        headers: {
-                            'Content-Type': response.headers.get('content-type') || 'image/jpeg',
-                            'Cache-Control': 'public, max-age=31536000, stale-while-revalidate=86400, immutable',
-                            'Access-Control-Allow-Origin': '*',
-                            'X-Robots-Tag': 'noindex, nofollow',
-                            'Referrer-Policy': 'no-referrer'
-                        },
-                    });
-                }
-            }
-            lastError = `Status ${response.status} via ${strategy.name}`;
+            if (response.ok) return { response, strategy: strategy.name };
+            throw new Error(`Status ${response.status}`);
         } catch (e) {
-            lastError = e.message;
+            clearTimeout(timeoutId);
+            throw e;
         }
-    }
+    };
 
-    throw new Error(`Exhausted all strategies. Last: ${lastError}`);
+    try {
+        // Race the most likely strategies first, but concurrently
+        const { response, strategy: winningStrategy } = await Promise.any(
+            strategies.map(s => fetchWithStrategy(s))
+        ).catch(() => { throw new Error('All strategies failed to fetch image'); });
+
+        const buffer = await response.arrayBuffer();
+        const contentType = response.headers.get('content-type') || 'image/jpeg';
+        
+        // --- OOM PROTECTION: 10MB Limit ---
+        if (buffer.byteLength > 10 * 1024 * 1024) {
+            return new Response(buffer, {
+                headers: {
+                    'Content-Type': contentType,
+                    'Cache-Control': 'public, max-age=31536000, immutable',
+                    'Access-Control-Allow-Origin': '*',
+                    'X-Optimization': 'skipped-too-large'
+                },
+            });
+        }
+        
+        // --- Smart Image Optimization ---
+        if (contentType.includes('gif')) {
+            return new Response(buffer, {
+                headers: {
+                    'Content-Type': 'image/gif',
+                    'Cache-Control': 'public, max-age=31536000, immutable',
+                    'Access-Control-Allow-Origin': '*',
+                },
+            });
+        }
+
+        try {
+            const accept = request.headers.get('accept') || '';
+            const supportsAvif = accept.includes('image/avif');
+            
+            let transformer = sharp(Buffer.from(buffer));
+            
+            if (width > 0) {
+                transformer = transformer.resize({ 
+                    width: Math.min(width, 2500), // Increased cap for 4K
+                    withoutEnlargement: true 
+                });
+            }
+
+            let processedBuffer;
+            let finalMime = 'image/webp';
+            let optTag = `sharp-webp-${winningStrategy}`;
+
+            if (supportsAvif) {
+                processedBuffer = await transformer
+                    .avif({ quality: Math.min(quality, 70), effort: 2 }) // Quality boost
+                    .toBuffer();
+                finalMime = 'image/avif';
+                optTag = `sharp-avif-${winningStrategy}`;
+            } else {
+                processedBuffer = await transformer
+                    .webp({ quality: Math.max(quality, 85), effort: 4 }) // Quality boost
+                    .toBuffer();
+            }
+
+            return new Response(processedBuffer, {
+                headers: {
+                    'Content-Type': finalMime,
+                    'Cache-Control': 'public, max-age=31536000, stale-while-revalidate=604800, immutable',
+                    'Vary': 'Accept',
+                    'Access-Control-Allow-Origin': '*',
+                    'Timing-Allow-Origin': '*',
+                    'X-Optimization': optTag
+                },
+            });
+        } catch (sharpError) {
+            return new Response(buffer, {
+                headers: {
+                    'Content-Type': response.headers.get('content-type') || 'image/jpeg',
+                    'Cache-Control': 'public, max-age=31536000, immutable',
+                    'Access-Control-Allow-Origin': '*',
+                    'Timing-Allow-Origin': '*'
+                },
+            });
+        }
+    } catch (raceError) {
+        throw new Error(`Racing Exhausted: ${raceError.message}`);
+    }
 
   } catch (error) {
     console.error('Ultimate Proxy Error:', error.message, imageUrl);

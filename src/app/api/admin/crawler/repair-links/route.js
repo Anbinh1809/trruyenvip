@@ -1,5 +1,6 @@
 import { getSession } from '@/lib/auth';
 import { query } from '@/lib/db';
+import { NextResponse } from 'next/server';
 
 /**
  * Maintenance tool to repair 404/Relative links in the database.
@@ -16,12 +17,13 @@ export async function GET() {
         
         // 1. Repair relative Chapter URLs
         const relativeChapters = await query(`
-            SELECT id, source_url FROM Chapters 
+            SELECT id, source_url FROM "Chapters" 
             WHERE source_url LIKE '/%'
         `);
         
         let repairedCount = 0;
-        for (const chap of relativeChapters.recordset) {
+        const taskRows = relativeChapters.recordset || [];
+        for (const chap of taskRows) {
             let newUrl = '';
             // Majority of relative links are from TruyenQQ in this DB state
             if (chap.source_url.includes('chap')) {
@@ -30,13 +32,13 @@ export async function GET() {
                 newUrl = 'https://nettruyennew.com' + chap.source_url;
             }
             
-            await query("UPDATE Chapters SET source_url = @newUrl WHERE id = @id", { newUrl, id: chap.id });
+            await query('UPDATE "Chapters" SET source_url = @newUrl WHERE id = @id', { newUrl, id: chap.id });
             repairedCount++;
         }
 
         // 2. Clear images for 404 logs so they can be re-crawled with fixed links
         // (Simplified: Just delete logs and let the scheduler retry)
-        await query("DELETE FROM CrawlLogs WHERE status = 'error'");
+        await query('DELETE FROM "CrawlLogs" WHERE status = \'error\'');
 
         return NextResponse.json({
             status: 'success',

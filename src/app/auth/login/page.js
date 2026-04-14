@@ -20,11 +20,14 @@ export default function LoginPage() {
     setLoading(true);
 
     const res = await login(username, password);
+    setLoading(false);
+    
     if (res.success) {
         router.push('/');
     } else {
-        setError(res.error || 'Đăng nhập thất bại');
-        setLoading(false);
+        // Detailed Error Handling for Industrial Polish
+        const errorMsg = res.error || 'Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản.';
+        setError(errorMsg);
     }
   };
 

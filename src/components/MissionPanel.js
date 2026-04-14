@@ -123,7 +123,7 @@ export default function MissionPanel() {
                                     }}
                                 >
                                     {m.claimed ? <CheckCircle2 size={16} /> : <Gem size={16} />}
-                                    {m.claimed ? 'Đã nhận thưởng' : 'Mở rương báu'}
+                                    {m.claimed ? 'Đã nhận thưởng' : 'Nhận phần thưởng'}
                                 </button>
                             )}
                         </div>
@@ -146,7 +146,7 @@ export default function MissionPanel() {
                             </div>
                             <h2 style={{ fontSize: '3.5rem', fontWeight: 950, color: 'white', marginBottom: '10px', letterSpacing: '-2px' }}>+{claimedPrize.amount}</h2>
                             <p style={{ color: 'var(--accent)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', fontSize: '0.9rem' }}>{claimedPrize.type.toUpperCase()} THƯỞNG</p>
-                            <p style={{ color: 'rgba(255,255,255,0.4)', marginTop: '20px', maxWidth: '300px' }}>Chúc mừng bạn đã mở khóa {openingChest.prize.chestName}</p>
+                            <p style={{ color: 'rgba(255,255,255,0.4)', marginTop: '20px', maxWidth: '300px' }}>Chúc mừng bạn đã hoàn thành nhiệm vụ và nhận được phần quà này.</p>
                             <button className="btn btn-primary" onClick={closeCelebration} style={{ marginTop: '35px', padding: '14px 50px' }}>ĐÓNG</button>
                         </div>
                     ) : (
@@ -154,7 +154,7 @@ export default function MissionPanel() {
                             <div style={{ color: 'var(--accent)', animation: 'pulse 1s infinite' }}>
                                 <Package size={120} strokeWidth={1} />
                             </div>
-                            <h3 style={{ marginTop: '30px', color: 'white', fontWeight: 900, fontSize: '1.4rem' }}>ĐANG CHI TRẢ THƯỞNG...</h3>
+                            <h3 style={{ marginTop: '30px', color: 'white', fontWeight: 900, fontSize: '1.4rem' }}>ĐANG XỬ LÝ PHẦN THƯỞNG...</h3>
                             <div style={{ width: '100px', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', marginTop: '20px', overflow: 'hidden' }}>
                                 <div className="skeleton-shimmer" style={{ width: '100%', height: '100%' }}></div>
                             </div>

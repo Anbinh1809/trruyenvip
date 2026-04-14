@@ -15,43 +15,54 @@ export async function GET() {
 
         const statsRes = await query(`
             SELECT 
-                (SELECT COUNT(*) FROM Users) as "totalUsers",
-                (SELECT COUNT(*) FROM Manga) as "totalManga",
-                (SELECT COUNT(*) FROM Chapters) as "totalChapters",
-                (SELECT COUNT(*) FROM RedemptionRequests WHERE status = 'Pending') as "pendingRewards",
-                (SELECT COUNT(*) FROM CrawlerTasks WHERE status = 'pending') as "taskPending",
-                (SELECT COUNT(*) FROM CrawlerTasks WHERE status = 'failed') as "taskFailed",
-                (SELECT COUNT(*) FROM Chapters WHERE created_at > NOW() - INTERVAL '1 hour') as "syncsLastHour",
-                (SELECT created_at FROM CrawlLogs ORDER BY created_at DESC LIMIT 1) as "lastCrawl"
+                (SELECT COUNT(*) FROM "Users") as "totalUsers",
+                (SELECT COUNT(*) FROM "Manga") as "totalManga",
+                (SELECT COUNT(*) FROM "Chapters") as "totalChapters",
+                (SELECT COUNT(*) FROM "RedemptionRequests" WHERE status = 'Pending') as "pendingRewards",
+                (SELECT COUNT(*) FROM "CrawlerTasks" WHERE "status" = 'pending') as "taskPending",
+                (SELECT COUNT(*) FROM "CrawlerTasks" WHERE "status" = 'failed') as "taskFailed",
+                (SELECT COUNT(*) FROM "Chapters" WHERE created_at > NOW() - INTERVAL '1 hour') as "syncsLastHour",
+                COALESCE((SELECT created_at FROM "CrawlLogs" ORDER BY created_at DESC LIMIT 1), NOW()) as "lastCrawl"
         `);
  
         const recentFailures = await query(`
             SELECT id, type, last_error 
-            FROM CrawlerTasks 
-            WHERE status = 'failed' 
+            FROM "CrawlerTasks" 
+            WHERE "status" = 'failed' 
             ORDER BY updated_at DESC 
             LIMIT 5
         `);
  
         const heatmap = await query(`
             SELECT SUBSTRING(last_error, 1, 50) as signature, COUNT(*) as count
-            FROM CrawlerTasks
-            WHERE status = 'failed' AND updated_at > NOW() - INTERVAL '24 hours'
+            FROM "CrawlerTasks"
+            WHERE "status" = 'failed' AND updated_at > NOW() - INTERVAL '24 hours'
             GROUP BY signature
             ORDER BY count DESC
             LIMIT 5
         `);
- 
+
+        if (!statsRes.recordset?.[0]) {
+            throw new Error('Could not retrieve base statistics');
+        }
+
         const data = {
             ...statsRes.recordset[0],
-            recentFailures: recentFailures.recordset,
-            heatmap: heatmap.recordset
+            recentFailures: recentFailures.recordset || [],
+            heatmap: heatmap.recordset || []
         };
         global.adminStatsCache = { data, time: Date.now() };
 
         return Response.json(data);
     } catch (err) {
         console.error('Admin Stats Error:', err);
-        return Response.json({ error: 'Error fetching stats', details: err.message }, { status: 500 });
+        return new Response(JSON.stringify({ 
+            error: 'Lỗi truy xuất dữ liệu hệ thống', 
+            details: err.message,
+            timestamp: new Date().toISOString()
+        }), { 
+            status: 500,
+            headers: { 'Content-Type': 'application/json' }
+        });
     }
 }

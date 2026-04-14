@@ -51,7 +51,14 @@ export default function AdminRewardsPage() {
     }
   };
 
-  if (authLoading) return <div className="loading">Checking authority...</div>;
+  if (authLoading) {
+      return (
+          <main className="main-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
+              <div className="loader-ring"></div>
+              <p style={{ marginTop: '20px', fontWeight: 700 }}>Đang xác thực quyền hạn...</p>
+          </main>
+      );
+  }
   if (!isAuthenticated || user?.role !== 'admin') {
       return (
           <main className="main-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', flexDirection: 'column', gap: '20px' }}>
@@ -68,7 +75,7 @@ export default function AdminRewardsPage() {
       <Header />
       
       <div className="container fade-in" style={{ marginTop: '120px' }}>
-        <h1 style={{ marginBottom: '40px' }}>💵 Quản lý Đổi Thẻ</h1>
+        <h1 style={{ marginBottom: '40px', fontWeight: 950, fontSize: '2.5rem' }}>Quản lý Giao dịch</h1>
         
         <div className="glass" style={{ padding: '25px', borderRadius: 'var(--border-radius)', overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>

@@ -9,12 +9,13 @@ export async function GET(request) {
     // 1. Fetch top 100 most popular manga for the sitemap
     const mangaRes = await query(`
       SELECT id, last_crawled 
-      FROM Manga 
+      FROM "Manga" 
       ORDER BY views_at_source DESC 
       LIMIT 100
     `);
 
-    const mangaEntries = mangaRes.recordset.map(m => `
+    const tasks = mangaRes.recordset || [];
+    const mangaEntries = tasks.map(m => `
   <url>
     <loc>${origin}/manga/${m.id}</loc>
     <lastmod>${new Date(m.last_crawled || Date.now()).toISOString()}</lastmod>

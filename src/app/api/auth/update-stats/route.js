@@ -24,14 +24,14 @@ export async function POST(request) {
         }
 
         // 2. High-Frequency Check (Rate Limiting)
-        const userRes = await query("SELECT last_stats_update FROM Users WHERE uuid = @uuid", { uuid: session.uuid });
+        const userRes = await query(`SELECT last_stats_update FROM "Users" WHERE uuid = @uuid`, { uuid: session.uuid });
         const lastUpdate = userRes.recordset[0]?.last_stats_update;
         const now = new Date();
 
         if (lastUpdate && (now - new Date(lastUpdate)) < 5000) { // Strict 5s cooldown
             const waitTime = Math.ceil((5000 - (now - new Date(lastUpdate))) / 1000);
             return NextResponse.json({ 
-              error: `Cảnh giới chưa ổn định, vui lòng đợi thêm ${waitTime} giây để tiếp tục tu hành.`,
+              error: `Hệ thống đang bận, vui lòng đợi thêm ${waitTime} giây để cập nhật lại.`,
               nextAvailable: 5000 - (now - new Date(lastUpdate))
             }, { status: 429 });
         }
@@ -39,10 +39,10 @@ export async function POST(request) {
 
         // 3. Apply Update
         await query(`
-            UPDATE Users 
+            UPDATE "Users" 
             SET xp = xp + @xp, 
-                vipCoins = vipCoins + @coins,
-                last_stats_update = GETDATE()
+                "vipCoins" = "vipCoins" + @coins,
+                last_stats_update = NOW()
             WHERE uuid = @uuid
         `, {
             xp: parseInt(xpDelta || 0),

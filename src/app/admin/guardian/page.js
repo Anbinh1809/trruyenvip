@@ -33,8 +33,9 @@ export default function GuardianHub() {
 
     if (authLoading || (loading && !data)) {
         return (
-          <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0a0a0a' }}>
-            <div className="titan-loader-pulse"></div>
+          <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#0a0a0a', color: 'white' }}>
+            <div className="loader-ring"></div>
+            <p style={{ marginTop: '20px', fontWeight: 800 }}>Đang đồng bộ hóa dữ liệu...</p>
           </div>
         );
     }
@@ -50,31 +51,31 @@ export default function GuardianHub() {
                     <div>
                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '4px 12px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: 'var(--border-radius)', marginBottom: '15px' }}>
                             <span style={{ width: '7px', height: '7px', background: '#10b981', borderRadius: '50%' }}></span>
-                            <span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#10b981', letterSpacing: '1px' }}>TỰ ĐỘNG ĐANG CHẠY</span>
+                            <span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#10b981', letterSpacing: '1px' }}>HỆ THỐNG ĐANG HOẠT ĐỘNG</span>
                         </div>
-                        <h1 style={{ fontSize: '2.2rem', fontWeight: 900, marginBottom: '10px' }}>Trung Tâm Điều Khiển</h1>
-                        <p style={{ color: 'rgba(255,255,255,0.5)', fontWeight: 600 }}>Chi tiết lịch sử vá lỗi và phục hồi dữ liệu tự động</p>
+                        <h1 style={{ fontSize: '2.5rem', fontWeight: 950, marginBottom: '10px' }}>Trung Tâm Phục Hồi</h1>
+                        <p style={{ color: 'rgba(255,255,255,0.5)', fontWeight: 600 }}>Chi tiết lịch sử xử lý và khắc phục sự cố dữ liệu tự động</p>
                     </div>
                     <button className="btn btn-outline" style={{ padding: '8px 20px' }} onClick={fetchHistory}>
-                        Làm mới danh sách
+                        Làm mới báo cáo
                     </button>
                 </div>
 
                 {/* Dashboard Metrics */}
                 <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', marginBottom: '40px' }}>
                     <div className="glass-card" style={{ padding: '25px', background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--border-radius)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                        <div style={{ fontSize: '0.75rem', opacity: 0.5, marginBottom: '5px', fontWeight: 700 }}>TỔNG LẦN PHỤC HỒI (24H)</div>
+                        <div style={{ fontSize: '0.75rem', opacity: 0.5, marginBottom: '5px', fontWeight: 700 }}>TỔNG SỰ CỐ ĐÃ XỬ LÝ (24H)</div>
                         <div style={{ fontSize: '2.2rem', fontWeight: 900, color: 'var(--accent)' }}>{data?.metrics?.total_fixes || 0}</div>
-                        <div style={{ fontSize: '0.8rem', marginTop: '10px', color: 'rgba(255,255,255,0.4)' }}>Hệ thống đã tự động phục hồi dữ liệu thành công.</div>
+                        <div style={{ fontSize: '0.8rem', marginTop: '10px', color: 'rgba(255,255,255,0.4)' }}>Dữ liệu được hệ thống tự động nhận diện và khắc phục.</div>
                     </div>
                     <div className="glass-card" style={{ padding: '25px', background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--border-radius)', border: '1px solid rgba(255,255,255,0.05)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
                             <div>
-                                <div style={{ fontSize: '0.7rem', opacity: 0.5, fontWeight: 700 }}>VÁ CHƯƠNG THIẾU</div>
+                                <div style={{ fontSize: '0.7rem', opacity: 0.5, fontWeight: 700 }}>VÁ CHƯƠNG TRỐNG</div>
                                 <div style={{ fontSize: '1.5rem', fontWeight: 900 }}>{data?.metrics?.gaps_filled || 0}</div>
                             </div>
                             <div style={{ textAlign: 'right' }}>
-                                <div style={{ fontSize: '0.7rem', opacity: 0.5, fontWeight: 700 }}>PHỤC HỒI HÌNH ẢNH</div>
+                                <div style={{ fontSize: '0.7rem', opacity: 0.5, fontWeight: 700 }}>IMAGE OPTIMIZATION</div>
                                 <div style={{ fontSize: '1.5rem', fontWeight: 900 }}>{data?.metrics?.images_rescued || 0}</div>
                             </div>
                         </div>
@@ -87,10 +88,10 @@ export default function GuardianHub() {
                 {/* Detailed History List */}
                 <div className="glass-card" style={{ borderRadius: 'var(--border-radius)', overflow: 'hidden', background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.08)' }}>
                     <div style={{ padding: '25px 30px', borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)' }}>
-                        <h3 style={{ fontWeight: 900, fontSize: '1.2rem' }}>📜 Nhật Ký Hệ Thống Chi Tiết</h3>
+                        <h3 style={{ fontWeight: 950, fontSize: '1.2rem' }}>📂 Nhật Ký Hoạt Động Chi Tiết</h3>
                     </div>
                     
-                    {data?.reports.length > 0 ? (
+                    {data?.reports && data.reports.length > 0 ? (
                         <div style={{ overflowX: 'auto' }}>
                             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                 <thead>
@@ -98,9 +99,9 @@ export default function GuardianHub() {
                                         <th style={{ padding: '20px 30px', fontSize: '0.7rem', opacity: 0.4 }}>THỜI GIAN</th>
                                         <th style={{ padding: '20px', fontSize: '0.7rem', opacity: 0.4 }}>BỘ TRUYỆN</th>
                                         <th style={{ padding: '20px', fontSize: '0.7rem', opacity: 0.4 }}>CHƯƠNG</th>
-                                        <th style={{ padding: '20px', fontSize: '0.7rem', opacity: 0.4 }}>LOẠI SỰ CỐ</th>
-                                        <th style={{ padding: '20px', fontSize: '0.7rem', opacity: 0.4 }}>CỐ GẮNG</th>
-                                        <th style={{ padding: '20px', fontSize: '0.7rem', opacity: 0.4 }}>CHI TIẾT</th>
+                                        <th style={{ padding: '20px', fontSize: '0.7rem', opacity: 0.4 }}>PHÂN LOẠI</th>
+                                        <th style={{ padding: '20px', fontSize: '0.7rem', opacity: 0.4 }}>RETRY</th>
+                                        <th style={{ padding: '20px', fontSize: '0.7rem', opacity: 0.4 }}>CHI TIẾT XỬ LÝ</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -111,10 +112,10 @@ export default function GuardianHub() {
                                             </td>
                                             <td style={{ padding: '20px' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                                    <div style={{ width: '32px', height: '42px', position: 'relative', borderRadius: '4px', overflow: 'hidden' }}>
-                                                        <Image src={report.cover.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(report.cover)}` : report.cover} alt="" fill style={{ objectFit: 'cover' }} />
+                                                    <div style={{ width: '32px', height: '42px', position: 'relative', borderRadius: '4px', overflow: 'hidden', background: 'rgba(255,255,255,0.05)' }}>
+                                                        {report.cover && <Image src={report.cover.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(report.cover)}` : report.cover} alt="" fill style={{ objectFit: 'cover' }} />}
                                                     </div>
-                                                    <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{report.manga_name}</span>
+                                                    <span style={{ fontWeight: 800, fontSize: '0.9rem' }}>{report.manga_name}</span>
                                                 </div>
                                             </td>
                                             <td style={{ padding: '20px', fontWeight: 600, fontSize: '0.85rem' }}>
@@ -127,7 +128,7 @@ export default function GuardianHub() {
                                                     color: report.event_type === 'FIX_IMAGE' ? '#ef4444' : '#10b981',
                                                     border: `1px solid ${report.event_type === 'FIX_IMAGE' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)'}`
                                                 }}>
-                                                    {report.event_type === 'FIX_IMAGE' ? '📸 PHỤC HỒI ẢNH' : '🔧 VÁ DỮ LIỆU'}
+                                                    {report.event_type === 'FIX_IMAGE' ? 'IMAGE REPAIR' : 'DATA HEALING'}
                                                 </span>
                                             </td>
                                             <td style={{ padding: '20px', textAlign: 'center' }}>
@@ -144,7 +145,7 @@ export default function GuardianHub() {
                     ) : (
                         <div style={{ padding: '100px', textAlign: 'center' }}>
                             <div style={{ fontSize: '4rem', marginBottom: '20px', opacity: 0.2 }}>🔍</div>
-                            <h3 style={{ opacity: 0.5 }}>Hệ thống ổn định. Không có bản ghi sự cố.</h3>
+                            <h3 style={{ opacity: 0.5 }}>Hệ thống ổn định. Không có báo cáo sự cố ghi nhận.</h3>
                         </div>
                     )}
                 </div>

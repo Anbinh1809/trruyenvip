@@ -96,11 +96,11 @@ export default function CrawlerDashboard() {
                     <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
                         {telemetry?.guardianActive && (
                             <div className="titan-admin-status" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', borderColor: 'rgba(56, 189, 248, 0.2)' }}>
-                                <span className="dot-pulse" style={{ background: '#38bdf8' }}></span> Tự động cào: Đang chạy
+                                <span className="dot-pulse" style={{ background: '#38bdf8' }}></span> Auto-Crawl: ACTIVE
                             </div>
                         )}
                         <div className={`titan-admin-status ${telemetry?.status !== 'idle' ? 'active' : ''}`}>
-                            <span className="dot-pulse"></span> {telemetry?.status === 'idle' ? 'Sẵn sàng' : 'Đang xử lý'}
+                            <span className="dot-pulse"></span> {telemetry?.status === 'idle' ? 'IDLE' : 'PROCESSING'}
                         </div>
                         <div className={`titan-admin-status ${ramUsage > 500 ? 'warning' : 'active'}`} style={{ marginLeft: '10px' }}>
                             <span className="dot-pulse" style={{ background: ramUsage > 500 ? '#f59e0b' : '#10b981' }}></span> 

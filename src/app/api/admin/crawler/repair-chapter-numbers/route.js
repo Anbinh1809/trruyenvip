@@ -10,18 +10,19 @@ export async function GET() {
         console.log('[Maintenance] Starting Chapter Number Repair...');
         
         const chapters = await query(`
-            SELECT id, title FROM Chapters 
+            SELECT id, title FROM "Chapters" 
             WHERE chapter_number IS NULL
         `);
         
         let repairedCount = 0;
         const numberRegex = /(\d+(\.\d+)?)/; // Match integers and decimals
 
-        for (const chap of chapters.recordset) {
+        const tasks = chapters.recordset || [];
+        for (const chap of tasks) {
             const match = chap.title.match(numberRegex);
             if (match) {
                 const num = parseFloat(match[1]);
-                await query("UPDATE Chapters SET chapter_number = @num WHERE id = @id", { num, id: chap.id });
+                await query('UPDATE "Chapters" SET chapter_number = @num WHERE id = @id', { num, id: chap.id });
                 repairedCount++;
             }
         }
@@ -29,7 +30,7 @@ export async function GET() {
         return NextResponse.json({
             status: 'success',
             repairedChapters: repairedCount,
-            totalChecked: chapters.recordset.length,
+            totalChecked: chapters.recordset?.length || 0,
             message: `Successfully repaired ${repairedCount} chapter numbers from titles.`
         });
     } catch (e) {

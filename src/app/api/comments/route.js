@@ -13,12 +13,12 @@ export async function GET(request) {
         const res = await query(`
             SELECT c.id, c.chapter_id, c.username as user_name, c.content, c.parent_id, c.likes, c.created_at,
                    u.xp as user_xp, u.role as user_role
-            FROM Comments c
-            LEFT JOIN Users u ON c.user_uuid = u.uuid
+            FROM "Comments" c
+            LEFT JOIN "Users" u ON c.user_uuid = u.uuid
             WHERE c.chapter_id = @chapterId 
             ORDER BY c.created_at DESC
         `, { chapterId });
-        return Response.json(res.recordset);
+        return Response.json(res.recordset || []);
     } catch (err) {
         return Response.json({ error: 'Database error' }, { status: 500 });
     }
@@ -32,7 +32,7 @@ export async function PATCH(request) {
         const { id, action } = body;
 
         if (action === 'like') {
-            await query("UPDATE Comments SET likes = likes + 1 WHERE id = @id", { id });
+            await query(`UPDATE "Comments" SET likes = likes + 1 WHERE id = @id`, { id });
             return Response.json({ success: true });
         }
         return Response.json({ error: 'Invalid action' }, { status: 400 });
@@ -52,8 +52,8 @@ export async function DELETE(request) {
         if (!id) return new Response('Missing ID', { status: 400 });
 
         // Authenticate permission: Only owner or admin can delete
-        const comment = await query("SELECT user_uuid FROM Comments WHERE id = @id", { id });
-        if (comment.recordset.length === 0) return new Response('Bình luận không tồn tại', { status: 404 });
+        const comment = await query(`SELECT user_uuid FROM "Comments" WHERE id = @id`, { id });
+        if (!comment.recordset || comment.recordset.length === 0) return new Response('Bình luận không tồn tại', { status: 404 });
 
         const isOwner = comment.recordset[0].user_uuid === session.uuid;
         const isAdmin = session.role === 'admin';
@@ -62,7 +62,7 @@ export async function DELETE(request) {
             return new Response('Bạn không có quyền xóa bình luận này', { status: 403 });
         }
 
-        await query("DELETE FROM Comments WHERE id = @id OR parent_id = @id", { id });
+        await query(`DELETE FROM "Comments" WHERE id = @id OR parent_id = @id`, { id });
         return new Response('Đã xóa bình luận', { status: 200 });
     } catch (err) {
         console.error('Delete error', err);
@@ -91,18 +91,18 @@ export async function POST(request) {
         // --- RATE LIMITING (HARDENED) ---
         // Check if user recently commented (within 10 seconds) by UUID to prevent name-change bypass
         const recentCheck = await query(`
-            SELECT created_at FROM Comments 
+            SELECT created_at FROM "Comments" 
             WHERE user_uuid = @userUuid 
             AND created_at > NOW() - INTERVAL '10 seconds'
             LIMIT 1
         `, { userUuid });
 
-        if (recentCheck.recordset.length > 0) {
+        if (recentCheck.recordset && recentCheck.recordset.length > 0) {
             return Response.json({ error: 'Yêu cầu bình luận quá nhanh. Vui lòng đợi 10 giây.' }, { status: 429 });
         }
 
         await query(`
-            INSERT INTO Comments (chapter_id, username, content, parent_id, user_uuid)
+            INSERT INTO "Comments" (chapter_id, username, content, parent_id, user_uuid)
             VALUES (@chapterId, @userName, @content, @parentId, @userUuid)
         `, { chapterId, userName, content, parentId, userUuid });
 

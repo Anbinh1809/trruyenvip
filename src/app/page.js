@@ -18,12 +18,12 @@ async function getManga() {
   try {
         const result = await query(`
             SELECT ${MANGA_CARD_FIELDS}
-            FROM Manga 
+            FROM "Manga" 
             ORDER BY last_crawled DESC
             LIMIT 60
         `);
 
-    return result.recordset.map(m => ({
+    return (result.recordset || []).map(m => ({
       ...m,
       cover: m.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : (m.cover || '/placeholder-manga.svg'),
     }));

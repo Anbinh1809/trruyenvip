@@ -39,12 +39,13 @@ export default function RegisterPage() {
         xp,
         vipCoins: coins
     });
+    setLoading(false);
 
     if (res.success) {
         router.push('/');
     } else {
-        setError(res.error || 'Đăng ký thất bại');
-        setLoading(false);
+        const errorMsg = res.error || 'Đăng ký thất bại. Vui lòng thử lại với thông tin khác.';
+        setError(errorMsg);
     }
   };
 

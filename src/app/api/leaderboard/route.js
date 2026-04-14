@@ -7,21 +7,19 @@ export async function GET() {
     try {
         const result = await query(`
             SELECT id, username, level, xp, avatar, contribution_points, badge_ids
-            FROM Users
+            FROM "Users"
             ORDER BY level DESC, xp DESC
             LIMIT 50
         `);
 
         // Compute rank in JS instead of dbo.calculateRank
-        const usersWithRank = result.recordset.map(u => {
-            let rankStr = 'Tân Binh';
-            if (u.level >= 100) rankStr = 'Thần Thoại';
-            else if (u.level >= 75) rankStr = 'Truyền Thuyết';
-            else if (u.level >= 50) rankStr = 'Tông Sư';
-            else if (u.level >= 30) rankStr = 'Đại Cao Thủ';
-            else if (u.level >= 20) rankStr = 'Cao Thủ';
-            else if (u.level >= 10) rankStr = 'Tinh Anh';
-            else if (u.level >= 5) rankStr = 'Sơ Cấp';
+        const usersWithRank = (result.recordset || []).map(u => {
+            let rankStr = 'Thành viên mới';
+            if (u.level >= 100) rankStr = 'Thành viên danh dự';
+            else if (u.level >= 75) rankStr = 'Hội viên kim cương';
+            else if (u.level >= 50) rankStr = 'Hội viên vàng';
+            else if (u.level >= 30) rankStr = 'Độc giả cao cấp';
+            else if (u.level >= 10) rankStr = 'Độc giả trung thành';
             
             return {
                 ...u,

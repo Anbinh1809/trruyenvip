@@ -19,8 +19,8 @@ const stripHtml = (html) => {
 
 export async function generateMetadata({ params }) {
   const { id } = await params;
-  const mangaResult = await query("SELECT title, description, cover, author FROM Manga WHERE id = @id", { id });
-  if (mangaResult.recordset.length === 0) return { title: 'TruyenVip' };
+  const mangaResult = await query('SELECT title, description, cover, author FROM "Manga" WHERE id = @id', { id });
+  if (!mangaResult.recordset || mangaResult.recordset.length === 0) return { title: 'TruyenVip' };
   
   const manga = mangaResult.recordset[0];
   const cleanDescription = stripHtml(manga.description).substring(0, 160);
@@ -56,28 +56,28 @@ export async function generateMetadata({ params }) {
 }
 
 async function getMangaDetail(id) {
-  const mangaResult = await query("SELECT id, title, author, status, description, cover, views, views_at_source, rating, alternative_titles, last_chap_num FROM Manga WHERE id = @id", { id });
+  const mangaResult = await query('SELECT id, title, author, status, description, cover, views, views_at_source, rating, alternative_titles, last_chap_num FROM "Manga" WHERE id = @id', { id });
 
-  if (mangaResult.recordset.length === 0) return null;
+  if (!mangaResult.recordset || mangaResult.recordset.length === 0) return null;
   
   const manga = mangaResult.recordset[0];
 
   try {
-    await query("UPDATE Manga SET views = views + 1 WHERE id = @id", { id: manga.id });
+    await query('UPDATE "Manga" SET views = views + 1 WHERE id = @id', { id: manga.id });
   } catch (e) {
     console.error('Failed to increment views', e);
   }
   
   const genresRes = await query(`
     SELECT g.id, g.name, g.slug 
-    FROM Genres g
-    JOIN MangaGenres mg ON g.id = mg.genre_id
+    FROM "Genres" g
+    JOIN "MangaGenres" mg ON g.id = mg.genre_id
     WHERE mg.manga_id = @id
   `, { id });
 
   const chaptersResult = await query(`
     SELECT id, title, chapter_number, updated_at 
-    FROM Chapters 
+    FROM "Chapters" 
     WHERE manga_id = @id 
     ORDER BY 
         CASE WHEN chapter_number IS NULL THEN 0 ELSE 1 END DESC,
@@ -98,7 +98,7 @@ async function getMangaDetail(id) {
             LIMIT 6
         `, { genreId: firstGenreId, id });
 
-        related = relatedRes.recordset.map(m => ({
+        related = (relatedRes.recordset || []).map(m => ({
             ...m,
             cover: m.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : (m.cover || '/placeholder-manga.svg'),
         }));
@@ -110,9 +110,9 @@ async function getMangaDetail(id) {
   return {
     ...manga,
     cover: (manga.cover && manga.cover.startsWith('http')) ? `/api/proxy?url=${encodeURIComponent(manga.cover)}` : (manga.cover || '/placeholder-manga.svg'),
-    genres: genresRes.recordset,
-    chapters: chaptersResult.recordset,
-    related
+    genres: genresRes.recordset || [],
+    chapters: chaptersResult.recordset || [],
+    related: related || []
   };
 }
 

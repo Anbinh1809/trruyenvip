@@ -1735,14 +1735,8 @@ nextjs-portal, #nextjs-portal { display: none !important; }
 }
 
 /* RANK AURAS - removed glow effects for minimalist UI */
-.rank-aura-phàm-nhân { }
-.rank-aura-luyện-khí { }
-.rank-aura-trúc-cơ { }
-.rank-aura-kim-đan { }
-.rank-aura-nguyên-anh { }
-.rank-aura-hóa-thần { }
-.rank-aura-đại-thánh { }
-.rank-aura-tiên-đế { }
+/* RANK AURAS - removed for minimalist UI */
+.rank-aura-premium { }
 
 /* ERGONOMIC BRIGHTNESS ENGINE */
 :root {

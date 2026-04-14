@@ -36,7 +36,7 @@ export async function POST(request) {
         // Create user (Hardened: Atomic insertion with unique violation catch)
         try {
             await query(`
-                INSERT INTO Users (uuid, username, email, password_hash, xp, vipCoins, role)
+                INSERT INTO "Users" (uuid, username, email, password_hash, xp, "vipCoins", role)
                 VALUES (@uuid, @username, @email, @password_hash, 0, 0, 'user')
             `, {
                 uuid: uuid,

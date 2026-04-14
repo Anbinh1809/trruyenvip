@@ -11,8 +11,8 @@ export async function GET(request) {
     const userUuid = searchParams.get('userUuid') || session.uuid;
 
     // DB-First Identity Check
-    const userRes = await query('SELECT role, uuid FROM Users WHERE uuid = @uuid', { uuid: session.uuid });
-    const userIdent = userRes.recordset[0];
+    const userRes = await query('SELECT role, uuid FROM "Users" WHERE uuid = @uuid', { uuid: session.uuid });
+    const userIdent = userRes.recordset?.[0];
     if (!userIdent) return new Response('User not found', { status: 404 });
 
     // Admin access
@@ -20,10 +20,10 @@ export async function GET(request) {
         try {
             const res = await query(`
                 SELECT id, user_uuid as user_uuid, user_name, card_type, card_value, phone_number, status, created_at 
-                FROM RedemptionRequests 
+                FROM "RedemptionRequests" 
                 ORDER BY created_at DESC
             `);
-            return Response.json(res.recordset);
+            return Response.json(res.recordset || []);
         } catch (err) {
             return new Response('Database error', { status: 500 });
         }
@@ -32,8 +32,8 @@ export async function GET(request) {
     // Personal history access (Ensuring uuid matches session)
     if (userUuid && userUuid === userIdent.uuid) {
         try {
-            const res = await query("SELECT * FROM RedemptionRequests WHERE user_uuid = @userUuid ORDER BY created_at DESC", { userUuid });
-            return Response.json(res.recordset);
+            const res = await query(`SELECT * FROM "RedemptionRequests" WHERE user_uuid = @userUuid ORDER BY created_at DESC`, { userUuid });
+            return Response.json(res.recordset || []);
         } catch (err) {
             return new Response('Database error', { status: 500 });
         }
@@ -48,8 +48,8 @@ export async function POST(request) {
         if (!session) return new Response('Unauthorized', { status: 401 });
 
         // DB-First Identity Check and Balance verification prep
-        const userRes = await query('SELECT uuid, username, vipCoins FROM Users WHERE uuid = @uuid', { uuid: session.uuid });
-        const userIdent = userRes.recordset[0];
+        const userRes = await query('SELECT uuid, username, "vipCoins" FROM "Users" WHERE uuid = @uuid', { uuid: session.uuid });
+        const userIdent = userRes.recordset?.[0];
         if (!userIdent) return new Response('User Record Missing', { status: 404 });
 
         const body = await request.json();
@@ -74,7 +74,7 @@ export async function POST(request) {
             await withTransaction(async (client) => {
                 // In Postgres, we use standard SQL and check rowCount on the client
                 const updateRes = await client.query(
-                    'UPDATE Users SET "vipCoins" = "vipCoins" - $1 WHERE uuid = $2 AND "vipCoins" >= $1',
+                    'UPDATE "Users" SET "vipCoins" = "vipCoins" - $1 WHERE uuid = $2 AND "vipCoins" >= $1',
                     [cost, session.uuid]
                 );
 
@@ -117,7 +117,7 @@ export async function PATCH(request) {
         const body = await request.json();
         const { id, status } = body;
 
-        const res = await query("UPDATE RedemptionRequests SET status = @status WHERE id = @id", { id, status });
+        const res = await query(`UPDATE "RedemptionRequests" SET status = @status WHERE id = @id`, { id, status });
         
         if (res.rowCount === 0) {
             return new Response('Không tìm thấy yêu cầu đổi quà', { status: 404 });

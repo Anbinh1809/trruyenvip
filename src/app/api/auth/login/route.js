@@ -19,10 +19,10 @@ export async function POST(request) {
         // Fetch user: Universal login (Username or Email)
         const idLower = username.toString().trim().toLowerCase();
         const res = await query(`
-            SELECT * FROM Users 
+            SELECT * FROM "Users" 
             WHERE LOWER(username) = @id OR LOWER(email) = @id
         `, { id: idLower });
-        const user = res.recordset[0];
+        const user = res.recordset?.[0];
 
         if (!user) {
             // IRONCLAD DEFENSE: 1s delay to deter brute force

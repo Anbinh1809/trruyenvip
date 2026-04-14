@@ -8,14 +8,14 @@ export async function GET() {
         // OR just top 5 with most chapters as a proxy for 'active/popular'
         const trending = await query(`
             SELECT m.id, m.title, m.cover
-            FROM Manga m
-            JOIN Chapters c ON m.id = c.manga_id
+            FROM "Manga" m
+            JOIN "Chapters" c ON m.id = c.manga_id
             GROUP BY m.id, m.title, m.cover
             ORDER BY COUNT(c.id) DESC
             LIMIT 5
         `);
 
-        const optimized = trending.recordset.map(m => ({
+        const optimized = (trending.recordset || []).map(m => ({
             ...m,
             cover: m.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : (m.cover || '/placeholder-manga.svg')
         }));

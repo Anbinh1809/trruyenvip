@@ -18,12 +18,12 @@ const CommentSection = dynamic(() => import('@/components/CommentSection'), {
 export async function generateMetadata({ params }) {
   const { id, chapterId } = await params;
   const [mangaRes, chapRes] = await Promise.all([
-    query("SELECT title FROM Manga WHERE id = @id", { id }),
-    query("SELECT title FROM Chapters WHERE id = @id", { id: chapterId })
+    query('SELECT title FROM "Manga" WHERE id = @id', { id }),
+    query('SELECT title FROM "Chapters" WHERE id = @id', { id: chapterId })
   ]);
  
-  const manga = mangaRes.recordset[0];
-  const chapter = chapRes.recordset[0];
+  const manga = mangaRes.recordset?.[0];
+  const chapter = chapRes.recordset?.[0];
  
   if (!manga || !chapter) return { title: 'Đang tải chương... - TruyenVip' };
  
@@ -35,40 +35,40 @@ export async function generateMetadata({ params }) {
 
 async function getChapterData(mangaId, chapterId) {
   const [mangaResult, chapResult, imgResult] = await Promise.all([
-    query("SELECT id, title, cover FROM Manga WHERE id = @id", { id: mangaId }),
-    query("SELECT id, title, source_url, chapter_number FROM Chapters WHERE id = @id", { id: chapterId }),
-    query('SELECT image_url FROM ChapterImages WHERE chapter_id = @id ORDER BY "order" ASC', { id: chapterId })
+    query('SELECT id, title, cover FROM "Manga" WHERE id = @id', { id: mangaId }),
+    query('SELECT id, title, source_url, chapter_number FROM "Chapters" WHERE id = @id', { id: chapterId }),
+    query('SELECT image_url FROM "ChapterImages" WHERE chapter_id = @id ORDER BY "order" ASC', { id: chapterId })
   ]);
 
-  if (mangaResult.recordset.length === 0 || chapResult.recordset.length === 0) return null;
+  if (!mangaResult.recordset || mangaResult.recordset.length === 0 || !chapResult.recordset || chapResult.recordset.length === 0) return null;
   const chapter = chapResult.recordset[0];
   const currentNum = chapter.chapter_number;
 
   // Targeted Next/Prev Queries for performance
   const [prevChapRes, nextChapRes] = await Promise.all([
-    query(`SELECT id, title, chapter_number FROM Chapters 
+    query(`SELECT id, title, chapter_number FROM "Chapters" 
            WHERE manga_id = @mangaId AND chapter_number < @num 
            ORDER BY chapter_number DESC LIMIT 1`, { mangaId, num: currentNum }),
-    query(`SELECT id, title, chapter_number FROM Chapters 
+    query(`SELECT id, title, chapter_number FROM "Chapters" 
            WHERE manga_id = @mangaId AND chapter_number > @num 
            ORDER BY chapter_number ASC LIMIT 1`, { mangaId, num: currentNum })
   ]);
 
-  const prevChapter = prevChapRes.recordset[0] || null;
-  const nextChapterId = nextChapRes.recordset[0]?.id || null;
+  const prevChapter = prevChapRes.recordset?.[0] || null;
+  const nextChapterId = nextChapRes.recordset?.[0]?.id || null;
 
   let nextChapterImages = [];
   if (nextChapterId) {
-      const nextImgRes = await query('SELECT image_url FROM ChapterImages WHERE chapter_id = @id ORDER BY "order" ASC', { id: nextChapterId });
-      nextChapterImages = nextImgRes.recordset;
+      const nextImgRes = await query('SELECT image_url FROM "ChapterImages" WHERE chapter_id = @id ORDER BY "order" ASC', { id: nextChapterId });
+      nextChapterImages = nextImgRes.recordset || [];
   }
 
   return {
     manga: mangaResult.recordset[0],
     chapter,
-    images: imgResult.recordset.map(img => `/api/proxy?url=${encodeURIComponent(img.image_url)}&w=1200`),
+    images: (imgResult.recordset || []).map(img => `/api/proxy?url=${encodeURIComponent(img.image_url)}&w=1200`),
     prevChapter,
-    nextChapter: { id: nextChapterId, title: nextChapRes.recordset[0]?.title, images: nextChapterImages }
+    nextChapter: { id: nextChapterId, title: nextChapRes.recordset?.[0]?.title, images: nextChapterImages }
   };
 }
 

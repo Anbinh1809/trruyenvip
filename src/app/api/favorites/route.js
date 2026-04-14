@@ -9,14 +9,14 @@ export async function GET() {
 
         const results = await query(`
             SELECT m.id, m.title, m.cover,
-                   (SELECT MAX(chapter_number) FROM Chapters WHERE manga_id = m.id) as latest_chapter_number
-            FROM Favorites f
-            JOIN Manga m ON f.manga_id = m.id
+                   (SELECT MAX(chapter_number) FROM "Chapters" WHERE manga_id = m.id) as latest_chapter_number
+            FROM "Favorites" f
+            JOIN "Manga" m ON f.manga_id = m.id
             WHERE f.user_uuid = @uuid
             ORDER BY f.created_at DESC
         `, { uuid: session.uuid });
 
-        return NextResponse.json(results.recordset);
+        return NextResponse.json(results.recordset || []);
     } catch (e) {
         return NextResponse.json({ error: e.message }, { status: 500 });
     }
@@ -31,21 +31,21 @@ export async function POST(req) {
         
         // Toggle logic
         const exists = await query(`
-            SELECT id FROM Favorites 
+            SELECT id FROM "Favorites" 
             WHERE user_uuid = @uuid 
             AND manga_id = @mangaId
         `, { uuid: session.uuid, mangaId });
 
-        if (exists.recordset.length > 0) {
+        if (exists.recordset && exists.recordset.length > 0) {
             await query(`
-                DELETE FROM Favorites 
+                DELETE FROM "Favorites" 
                 WHERE user_uuid = @uuid 
                 AND manga_id = @mangaId
             `, { uuid: session.uuid, mangaId });
             return NextResponse.json({ message: 'Removed', status: 'removed' });
         } else {
             await query(`
-                INSERT INTO Favorites (user_uuid, manga_id) 
+                INSERT INTO "Favorites" (user_uuid, manga_id) 
                 VALUES (@uuid, @mangaId)
             `, { uuid: session.uuid, mangaId });
             return NextResponse.json({ message: 'Added', status: 'added' });

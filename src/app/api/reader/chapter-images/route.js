@@ -7,11 +7,11 @@ export async function GET(req) {
         const id = searchParams.get('id');
         if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 });
 
-        const result = await query('SELECT image_url FROM ChapterImages WHERE chapter_id = @id ORDER BY "order" ASC', { id });
+        const result = await query('SELECT image_url FROM "ChapterImages" WHERE chapter_id = @id ORDER BY "order" ASC', { id });
         
         return NextResponse.json({ 
             success: true, 
-            images: result.recordset
+            images: result.recordset || []
         });
     } catch (err) {
         return NextResponse.json({ error: err.message }, { status: 500 });

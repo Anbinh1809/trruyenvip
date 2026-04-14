@@ -15,8 +15,8 @@ export async function generateMetadata({ searchParams }) {
   let genreName = 'Thể loại';
   
   if (type) {
-    const genreRes = await query("SELECT name FROM Genres WHERE slug = @slug", { slug: type });
-    if (genreRes.recordset.length > 0) genreName = genreRes.recordset[0].name;
+    const genreRes = await query('SELECT name FROM "Genres" WHERE slug = @slug', { slug: type });
+    if (genreRes.recordset && genreRes.recordset.length > 0) genreName = genreRes.recordset[0].name;
   }
 
   return {
@@ -26,8 +26,8 @@ export async function generateMetadata({ searchParams }) {
 }
 
 async function getData(currentSlug) {
-    const genresRes = await query("SELECT name, slug FROM Genres ORDER BY name ASC");
-    const allGenres = genresRes.recordset;
+    const genresRes = await query('SELECT name, slug FROM "Genres" ORDER BY name ASC');
+    const allGenres = genresRes.recordset || [];
 
     let manga = [];
     let activeGenre = null;
@@ -36,25 +36,25 @@ async function getData(currentSlug) {
         // Optimized for Scale: TOP 36 instead of all
         const mangaRes = await query(`
             SELECT DISTINCT m.${MANGA_CARD_FIELDS.replace(/, /g, ', m.')}
-            FROM Manga m
-            JOIN MangaGenres mg ON m.id = mg.manga_id
-            JOIN Genres g ON mg.genre_id = g.id
+            FROM "Manga" m
+            JOIN "MangaGenres" mg ON m.id = mg.manga_id
+            JOIN "Genres" g ON mg.genre_id = g.id
             WHERE g.slug = @slug
             ORDER BY m.views_at_source DESC, m.last_crawled DESC
             LIMIT 36
         `, { slug: currentSlug });
 
-        manga = mangaRes.recordset.map(item => ({
+        manga = (mangaRes.recordset || []).map(item => ({
             ...item,
-            cover: item.cover.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(item.cover)}` : item.cover
+            cover: item.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(item.cover)}` : (item.cover || '/placeholder-manga.svg')
         }));
 
         activeGenre = allGenres.find(g => g.slug === currentSlug);
     } else {
-        const mangaRes = await query(`SELECT ${MANGA_CARD_FIELDS} FROM Manga ORDER BY last_crawled DESC LIMIT 36`);
-        manga = mangaRes.recordset.map(item => ({
+        const mangaRes = await query(`SELECT ${MANGA_CARD_FIELDS} FROM "Manga" ORDER BY last_crawled DESC LIMIT 36`);
+        manga = (mangaRes.recordset || []).map(item => ({
             ...item,
-            cover: item.cover.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(item.cover)}` : item.cover
+            cover: item.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(item.cover)}` : (item.cover || '/placeholder-manga.svg')
         }));
     }
 

@@ -9,13 +9,12 @@ export async function GET() {
     try {
         const password_hash = await bcrypt.hash('password123', 10);
         
-        // Try to create the admin user
+        // Setup Admin (Postgres-native ON CONFLICT)
         await query(`
-            IF NOT EXISTS (SELECT * FROM Users WHERE username = 'admin')
-            INSERT INTO Users (uuid, username, password_hash, role, vipCoins, xp)
+            INSERT INTO "Users" (uuid, username, password_hash, role, "vipCoins", xp)
             VALUES ('admin-dev-device', 'admin', @hash, 'admin', 999999, 50000)
-            ELSE
-            UPDATE Users SET role = 'admin', password_hash = @hash WHERE username = 'admin'
+            ON CONFLICT (username) DO UPDATE 
+            SET role = 'admin', password_hash = EXCLUDED.password_hash;
         `, { hash: password_hash });
 
         return NextResponse.json({
@@ -24,16 +23,13 @@ export async function GET() {
             credentials: {
                 username: 'admin',
                 password: 'password123'
-            },
-            note: 'Nếu bạn đã đăng ký tài khoản khác, hãy đổi role trong DB hoặc đổi tên admin trong script này.'
+            }
         });
     } catch (e) {
         console.error('Debug Setup Error:', e);
         return NextResponse.json({
             success: false,
-            error: e.message,
-            stack: e.stack,
-            env_db_user: process.env.DB_USER
+            error: 'Lỗi thiết lập hệ thống'
         }, { status: 500 });
     }
 }

@@ -42,9 +42,9 @@ export default function ChapterContent({ chapterId, initialImages = [] }) {
                 if (res.ok) {
                     const data = await res.json();
                     if (data.images && data.images.length > 0) {
-                        const optimizedWidth = window.innerWidth < 768 ? 800 : 1200;
+                        const optimizedWidth = window.innerWidth < 768 ? 1000 : 1600;
                         setImages(data.images.map(img => 
-                            `/api/proxy?url=${encodeURIComponent(img.image_url)}&w=${optimizedWidth}`
+                            `/api/proxy?url=${encodeURIComponent(img.image_url)}&w=${optimizedWidth}&q=85`
                         ));
                         setIsSyncing(false);
                         stopPolling();
@@ -75,9 +75,9 @@ export default function ChapterContent({ chapterId, initialImages = [] }) {
                     if (imgRes.ok) {
                         const imgData = await imgRes.json();
                         if (imgData.images?.length > 0) {
-                            const optimizedWidth = window.innerWidth < 768 ? 800 : 1200;
+                            const optimizedWidth = window.innerWidth < 768 ? 1000 : 1600;
                             setImages(imgData.images.map(img =>
-                                `/api/proxy?url=${encodeURIComponent(img.image_url)}&w=${optimizedWidth}`
+                                `/api/proxy?url=${encodeURIComponent(img.image_url)}&w=${optimizedWidth}&q=85`
                             ));
                             setIsSyncing(false);
                             return;
@@ -163,9 +163,9 @@ export default function ChapterContent({ chapterId, initialImages = [] }) {
 function ReaderImage({ src, idx }) {
     const [error, setError] = useState(false);
     const [loaded, setLoaded] = useState(false);
-    const [shouldLoad, setShouldLoad] = useState(idx < 3); // Load first 3 immediately
+    const [shouldLoad, setShouldLoad] = useState(idx < 5); // Load first 5 immediately
     const [retryCount, setRetryCount] = useState(0);
-    const [imgWidth, setImgWidth] = useState(1200);
+    const [imgWidth, setImgWidth] = useState(1600);
     const containerRef = useRef(null);
 
     useEffect(() => {
@@ -185,7 +185,7 @@ function ReaderImage({ src, idx }) {
                     observer.disconnect();
                 }
             });
-        }, { rootMargin: '600px' }); // Increased rootMargin for better prefetching
+        }, { rootMargin: '1200px' }); // Aggressive prefetching for zero-wait scrolling
 
         if (containerRef.current) observer.observe(containerRef.current);
         return () => observer.disconnect();
@@ -217,10 +217,10 @@ function ReaderImage({ src, idx }) {
             )}
             {shouldLoad && (
                 <img 
-                    src={`${src}${src.includes('?') ? '&' : '?'}v=${retryCount}&w=${imgWidth}`} 
+                    src={`${src}${src.includes('?') ? '&' : '?'}v=${retryCount}&w=${imgWidth}&q=85`} 
                     alt={`page ${idx + 1}`} 
                     className={`reader-img-titan ${loaded ? 'reader-img-loaded' : ''}`}
-                    loading={idx < 3 ? "eager" : "lazy"} 
+                    loading={idx < 5 ? "eager" : "lazy"} 
                     decoding="async"
                     fetchPriority={idx === 0 ? "high" : "auto"}
                     onLoad={() => setLoaded(true)}

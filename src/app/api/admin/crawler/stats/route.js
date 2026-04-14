@@ -15,27 +15,27 @@ export async function GET(req) {
         // 1. Get Latest Logs
         const logs = await query(`
             SELECT id, message, status, created_at 
-            FROM CrawlLogs 
+            FROM "CrawlLogs" 
             ORDER BY created_at DESC
             LIMIT @limit
         `, { limit });
 
         // 2. Get Today's Summary
-        const summary = await query(`
+        const summaryArr = await query(`
             SELECT 
                 COUNT(*) as total_logs,
                 SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as success_logs,
                 SUM(CASE WHEN status = 'error' THEN 1 ELSE 0 END) as error_logs
-            FROM CrawlLogs
+            FROM "CrawlLogs"
             WHERE CAST(created_at AS DATE) = CURRENT_DATE
         `);
 
         // 3. Get Manga Stats
-        const counts = await query(`
+        const countsArr = await query(`
             SELECT 
-                (SELECT COUNT(*) FROM Manga) as total_manga,
-                (SELECT COUNT(*) FROM Chapters) as total_chapters,
-                (SELECT COUNT(*) FROM CrawlLogs WHERE status = 'error') as total_reports
+                (SELECT COUNT(*) FROM "Manga") as total_manga,
+                (SELECT COUNT(*) FROM "Chapters") as total_chapters,
+                (SELECT COUNT(*) FROM "CrawlLogs" WHERE status = 'error') as total_reports
         `);
 
         // Only expose true NetTruyen mirrors, not polluted individual chapter URLs
@@ -47,9 +47,9 @@ export async function GET(req) {
 
         return NextResponse.json({
             success: true,
-            logs: logs.recordset,
-            summary: summary.recordset[0],
-            counts: counts.recordset[0],
+            logs: logs.recordset || [],
+            summary: summaryArr.recordset?.[0] || { total_logs: 0, success_logs: 0, error_logs: 0 },
+            counts: countsArr.recordset?.[0] || { total_manga: 0, total_chapters: 0, total_reports: 0 },
             mirrorHealth: cleanMirrorHealth
         });
     } catch (err) {

@@ -2,6 +2,11 @@ import { query } from '@/lib/db';
 import { NextResponse } from 'next/server';
 
 export async function GET(request) {
+    // 1. PROD GUARD: Strict security lock
+    if (process.env.NODE_ENV === 'production') {
+        return NextResponse.json({ error: 'Tính năng này không được phép trên môi trường thực tế.' }, { status: 403 });
+    }
+
     try {
         const { searchParams } = new URL(request.url);
         console.log('--- Starting Schema Repair ---');

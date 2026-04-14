@@ -5,7 +5,7 @@ import { useEngagement } from '@/context/EngagementContext';
 
 /**
  * XPRewarder (Tối giản)
- * Thưởng một lượng linh khí nhỏ khi đọc xong chương.
+ * Thưởng một lượng kinh nghiệm nhỏ khi đọc xong chương.
  */
 export default function XPRewarder({ chapterId }) {
   const { addXp } = useEngagement();
