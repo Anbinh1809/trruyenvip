@@ -66,8 +66,6 @@ export default function Header() {
           <nav className={`nav-titan ${isMenuOpen ? 'nav-open' : ''}`}>
             <div className="mobile-only-header">
                 <HeaderLogo />
-            <div className="mobile-only-header">
-                <HeaderLogo />
                 <button 
                   className="titan-icon-btn" 
                   onClick={() => setIsMenuOpen(false)}

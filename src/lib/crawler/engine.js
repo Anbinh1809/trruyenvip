@@ -424,71 +424,67 @@ export async function queueChapterScrape(chapId, url, source, force = false, pri
     processQueue();
 }
 
-/**export async function runGuardianAutopilot() {
-    if (global.guardianActive) return;
-    global.guardianActive = true;
-    
-    console.log('[Titan] Autonomous Guardian Activated (Adaptive Recovery Mode)...');
-    
-    // RECOVERY: Load last known state from DB
-    const state = await loadSystemState('crawler_state');
-    if (state) {
-        if (state.discoveryPage) global.discoveryPage = state.discoveryPage;
-        if (state.isArchivalPulse !== undefined) global.isArchivalPulse = state.isArchivalPulse;
-        console.log(`[Guardian] State Recovered: Page ${global.discoveryPage}, Archival: ${global.isArchivalPulse}`);
-    }
-
-    let nothingNewStreak = 0;
-
-    while (true) {
-        try {
-            updateTelemetry({ 
-                status: 'guardian_discovery',
-                discoveryPage: global.discoveryPage % 500 + 1,
-                isArchivalPulse: global.isArchivalPulse,
-                peakAwareLimit: getConcurrentLimit()
-            });
-            
-            // source rotation
-            const source = Math.random() > 0.3 ? 'nettruyen' : 'truyenqq';
-            let newFound = 0;
-
-            if (!global.isArchivalPulse) {
-                newFound = await crawlLatest(source, 1);
-                global.isArchivalPulse = true;
-            } else {
-                const archivePage = global.discoveryPage % 500 + 1;
-                newFound = await crawlLatest(source, 1, archivePage);
-                global.discoveryPage++;
-                global.isArchivalPulse = false;
-            }
-
-            if (newFound === 0) {
-                nothingNewStreak = Math.min(nothingNewStreak + 1, 9);
-            } else {
-                nothingNewStreak = 0;
-            }
-
-            await rescueBrokenImages(15);
-            await healChapterGaps(10);
-            
-            // TITAN BREATHE: Adaptive Heartbeat (60s to 600s)
-            const waitTime = Math.max(60000, 60000 * (nothingNewStreak + 1));
-            if (nothingNewStreak > 0) {
-                console.log(`[Guardian] Nothing new found (${nothingNewStreak}). Breathing for ${waitTime/1000}s...`);
-            }
-            
-            await new Promise(r => setTimeout(r, waitTime));
-        } catch (e) {
-            console.error('[Guardian] Engine Stalled:', e.message);
-            await new Promise(r => setTimeout(r, 60000));
-        }
-    }
-}
-30000));
-        }
-    }
-}
+// export async function runGuardianAutopilot() {
+//     if (global.guardianActive) return;
+//     global.guardianActive = true;
+//     
+//     console.log('[Titan] Autonomous Guardian Activated (Adaptive Recovery Mode)...');
+//     
+//     // RECOVERY: Load last known state from DB
+//     const state = await loadSystemState('crawler_state');
+//     if (state) {
+//         if (state.discoveryPage) global.discoveryPage = state.discoveryPage;
+//         if (state.isArchivalPulse !== undefined) global.isArchivalPulse = state.isArchivalPulse;
+//         console.log(`[Guardian] State Recovered: Page ${global.discoveryPage}, Archival: ${global.isArchivalPulse}`);
+//     }
+// 
+//     let nothingNewStreak = 0;
+// 
+//     while (true) {
+//         try {
+//             updateTelemetry({ 
+//                 status: 'guardian_discovery',
+//                 discoveryPage: global.discoveryPage % 500 + 1,
+//                 isArchivalPulse: global.isArchivalPulse,
+//                 peakAwareLimit: getConcurrentLimit()
+//             });
+//             
+//             // source rotation
+//             const source = Math.random() > 0.3 ? 'nettruyen' : 'truyenqq';
+//             let newFound = 0;
+// 
+//             if (!global.isArchivalPulse) {
+//                 newFound = await crawlLatest(source, 1);
+//                 global.isArchivalPulse = true;
+//             } else {
+//                 const archivePage = global.discoveryPage % 500 + 1;
+//                 newFound = await crawlLatest(source, 1, archivePage);
+//                 global.discoveryPage++;
+//                 global.isArchivalPulse = false;
+//             }
+// 
+//             if (newFound === 0) {
+//                 nothingNewStreak = Math.min(nothingNewStreak + 1, 9);
+//             } else {
+//                 nothingNewStreak = 0;
+//             }
+// 
+//             await rescueBrokenImages(15);
+//             await healChapterGaps(10);
+//             
+//             // TITAN BREATHE: Adaptive Heartbeat (60s to 600s)
+//             const waitTime = Math.max(60000, 60000 * (nothingNewStreak + 1));
+//             if (nothingNewStreak > 0) {
+//                 console.log(`[Guardian] Nothing new found (${nothingNewStreak}). Breathing for ${waitTime/1000}s...`);
+//             }
+//             
+//             await new Promise(r => setTimeout(r, waitTime));
+//         } catch (e) {
+//             console.error('[Guardian] Engine Stalled:', e.message);
+//             await new Promise(r => setTimeout(r, 60000));
+//         }
+//     }
+// }
 
 export async function healChapterGaps(batchSize = 20) {
     const candidates = await query(`
