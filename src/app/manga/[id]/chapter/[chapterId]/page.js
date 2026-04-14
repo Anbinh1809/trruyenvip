@@ -8,8 +8,7 @@ import dynamic from 'next/dynamic';
 import { ChevronLeft, ChevronRight, Home, BookOpen, AlertTriangle } from 'lucide-react';
 
 // Lazy load comments to prevent hydration mismatches
-const Comments = dynamic(() => import('@/components/Comments'), { 
-  ssr: false,
+const Comments = dynamic(() => import('@/components/CommentSection'), { 
   loading: () => <div className="loading-dots-industrial">Đang tải bình luận...</div>
 });
 
@@ -48,12 +47,6 @@ export default async function ChapterPage({ params }) {
             <h2 className="error-title-industrial">LỖI TRUY XUẤT NỘI DUNG</h2>
             <p className="error-desc-industrial">Không thể tìm thấy chương truyện này. Có thể liên kết đã hết hạn hoặc bị gỡ bỏ.</p>
             <Link href="/" className="btn btn-primary err-btn-titan">QUAY LẠI TRANG CHỦ</Link>
-            <style jsx>{`
-                .fullscreen-error-industrial { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
-                .error-title-industrial { font-size: 2rem; font-weight: 950; margin: 20px 0 10px; color: white; }
-                .error-desc-industrial { color: rgba(255,255,255,0.4); max-width: 400px; margin-bottom: 30px; font-weight: 700; }
-                .err-btn-titan { padding: 14px 40px; font-weight: 950; }
-            `}</style>
         </div>
     );
   }
@@ -140,22 +133,6 @@ export default async function ChapterPage({ params }) {
         </div>
       </footer>
 
-      <style jsx>{`
-        .reader-industrial-layout { color: white; }
-        .current-chapter-pill { background: var(--accent); color: white; font-weight: 950; font-size: 0.8rem; padding: 6px 18px; border-radius: 30px; letter-spacing: 1px; }
-        .reader-nav-actions-industrial { display: flex; align-items: center; gap: 20px; }
-        .nav-step-group { display: flex; gap: 8px; }
-        .nav-btn-reader { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); }
-        .v-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.1); }
-        .reader-content-industrial { padding-top: 70px; }
-        .reader-footer-container-titan { max-width: 850px; margin: 0 auto; }
-        .next-btn-industrial { padding: 0 40px; height: 60px; font-weight: 950; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; border-radius: 12px; }
-        .caught-up-desc { color: rgba(255,255,255,0.4); font-weight: 700; margin-top: 10px; }
-        .reader-footer-actions { display: flex; justify-content: center; gap: 15px; margin-bottom: 80px; }
-        .footer-action-btn { padding: 14px 25px; display: flex; align-items: center; gap: 10px; font-weight: 850; border-radius: 12px; }
-        .reader-comments-section { margin-top: 100px; text-align: left; }
-        .loading-dots-industrial { padding: 60px; text-align: center; color: rgba(255,255,255,0.4); font-weight: 800; letter-spacing: 1px; opacity: 0.5; }
-      `}</style>
     </main>
   );
 }

@@ -20,15 +20,6 @@ export default function NotFound() {
           </Link>
       </div>
       <Footer />
-      <style jsx>{`
-        .center-icon-titan { margin-bottom: 40px; }
-        .rotate-3d-titan { animation: rotate3d 10s infinite linear; }
-        .err-btn-titan { padding: 18px 60px; font-weight: 950; letter-spacing: 1px; }
-        @keyframes rotate3d { 
-            0% { transform: perspective(1000px) rotateY(0deg); }
-            100% { transform: perspective(1000px) rotateY(360deg); }
-        }
-      `}</style>
     </main>
   );
 }

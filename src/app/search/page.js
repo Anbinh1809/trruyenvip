@@ -113,41 +113,6 @@ export default async function SearchPage({ searchParams }) {
       </div>
 
       <Footer />
-      <style jsx>{`
-        .search-results-container {
-            padding-top: 140px;
-            padding-bottom: 100px;
-        }
-        .search-icon-box {
-            color: var(--accent);
-            background: rgba(255, 62, 62, 0.1);
-            padding: 20px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .search-stats-industrial {
-            color: rgba(255, 255, 255, 0.4); 
-            font-weight: 800; 
-            margin-top: 5px;
-            font-size: 1.1rem;
-            letter-spacing: -0.3px;
-        }
-        .search-empty-state-industrial {
-            margin-top: 40px;
-        }
-        @media (max-width: 768px) {
-            .search-header-row {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-            }
-            .search-results-container {
-                padding-top: 100px;
-            }
-        }
-      `}</style>
     </main>
   );
 }

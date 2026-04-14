@@ -97,13 +97,6 @@ export default async function Home() {
       </div>
 
       <Footer />
-      <style jsx>{`
-        .center-content-titan { text-align: center; position: relative; z-index: 10; }
-        .accent-text-titan { color: var(--accent); }
-        .relative-z-100 { position: relative; z-index: 100; }
-        .skeleton-loader-industrial { height: 300px; background: rgba(255,255,255,0.02); border-radius: 24px; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 0.8; } 100% { opacity: 0.5; } }
-      `}</style>
     </main>
   );
 }

@@ -161,9 +161,6 @@ export default async function GenresPage({ searchParams }) {
       </div>
 
       <Footer />
-      <style jsx>{`
-        .accent-text-titan { color: var(--accent); font-weight: 950; }
-      `}</style>
     </main>
   );
 }
