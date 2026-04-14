@@ -215,6 +215,28 @@ export async function queueDiscovery(source, pageCount = 3, startPage = 1, prior
 }
 
 /**
+ * TITAN ON-DEMAND INGESTION: Resolves slug to URL and triggers sync
+ */
+export async function ingestMangaBySlug(slug, source = 'nettruyen') {
+    let url = '';
+    if (source === 'nettruyen') {
+        url = `https://www.nettruyenus.com/truyen-tranh/${slug}`;
+    } else {
+        url = `https://truyenqqno.com/truyen-tranh/${slug}.html`;
+    }
+
+    // Upsert skeleton manga if not exists
+    await query(`
+        INSERT INTO manga (id, title, status, normalized_title)
+        VALUES (@slug, @slug, 'Chờ đồng bộ', @slug)
+        ON CONFLICT (id) DO NOTHING
+    `, { slug });
+
+    await queueMangaSync(slug, url, source, false, 10); // Highest priority
+    return slug;
+}
+
+/**
  * Core Ingestion Logic: Full Manga Sync
  */
 export async function crawlFullMangaChapters(mangaId, url, source, earlyExit = false) {

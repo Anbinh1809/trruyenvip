@@ -7,7 +7,15 @@ import { query, MANGA_CARD_FIELDS } from '@/lib/db';
 import { getSignedProxyUrl } from '@/lib/crypto';
 import "@/app/manga-detail.css";
 import Link from 'next/link';
-import { BookOpen, User, Star, Calendar, Share2, Heart, AlertOctagon } from 'lucide-react';
+import { BookOpen, User, Star, Calendar, Share2, Heart, AlertOctagon, Sparkles } from 'lucide-react';
+import DiscoveryTrigger from '@/components/DiscoveryTrigger';
+
+// Helper to determine if a slug is a potential new ingestion target
+function isDiscoveryCandidate(slug) {
+    if (!slug) return false;
+    // Check for NetTruyen pattern (e.g. name-12345) or unusually long slugs
+    return /-[0-9]+$/.test(slug) || slug.length > 20;
+}
 
 export async function generateMetadata({ params }) {
   const { id } = await params;
@@ -103,16 +111,27 @@ export default async function MangaDetailPage({ params }) {
   const manga = await getManga(id);
 
   if (!manga) {
+    const isCandidate = isDiscoveryCandidate(id);
+
     return (
       <main className="main-wrapper titan-bg">
         <Header />
         <div className="container auth-required-industrial fade-up">
             <div className="center-icon-titan">
-                <AlertOctagon size={80} color="var(--accent)" />
+                {isCandidate ? <Sparkles size={80} color="var(--accent)" /> : <AlertOctagon size={80} color="var(--accent)" />}
             </div>
-            <h1 className="auth-required-title">KHÔNG TÌM THẤY</h1>
-            <p className="auth-required-subtitle">Bộ truyện bạn yêu cầu không tồn tại hoặc đã bị gỡ bỏ khỏi hệ thống.</p>
-            <Link href="/" className="btn btn-primary login-trigger-titan">QUAY LẠI TRANG CHỦ</Link>
+            <h1 className="auth-required-title">{isCandidate ? 'KHÁM PHÁ DỮ LIỆU' : 'KHÔNG TÌM THẤY'}</h1>
+            <p className="auth-required-subtitle">
+                {isCandidate 
+                   ? 'Bộ truyện này chưa xuất hiện trong thư viện. Titan Engine đang cố gắng tham chiếu thực tế...' 
+                   : 'Bộ truyện bạn yêu cầu không tồn tại hoặc đã bị gỡ bỏ khỏi hệ thống.'}
+            </p>
+            
+            {isCandidate ? (
+                <DiscoveryTrigger slug={id} />
+            ) : (
+                <Link href="/" className="btn btn-primary login-trigger-titan">QUAY LẠI TRANG CHỦ</Link>
+            )}
         </div>
         <Footer />
       </main>

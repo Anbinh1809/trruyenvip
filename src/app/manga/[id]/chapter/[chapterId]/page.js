@@ -7,9 +7,16 @@ import { generateProxySignature } from '@/lib/crypto';
 import "@/app/reader.css";
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { ChevronLeft, ChevronRight, Home, BookOpen, AlertTriangle } from 'lucide-react';
-
+import { Sparkles, ChevronLeft, ChevronRight, Home, BookOpen, AlertTriangle } from 'lucide-react';
 import ChapterSelector from '@/components/ChapterSelector';
+import DiscoveryTrigger from '@/components/DiscoveryTrigger';
+
+// Helper to determine if a slug is a potential new ingestion target
+function isDiscoveryCandidate(slug) {
+    if (!slug) return false;
+    // Check for NetTruyen pattern (e.g. name-12345) or unusually long slugs
+    return /-[0-9]+$/.test(slug) || slug.length > 20;
+}
 
 // Lazy load comments to prevent hydration mismatches
 const Comments = dynamic(() => import('@/components/CommentSection'), { 
@@ -99,12 +106,29 @@ export default async function ChapterPage({ params }) {
   const data = await getChapterData(id, chapterId);
 
   if (!data) {
+    const isCandidate = isDiscoveryCandidate(id);
     return (
         <div className="fullscreen-error-industrial titan-bg">
-            <AlertTriangle size={60} color="var(--accent)" />
-            <h2 className="error-title-industrial">LỖI TRUY XUẤT NỘI DUNG</h2>
-            <p className="error-desc-industrial">Không thể tìm thấy chương truyện này. Có thể liên kết đã hết hạn hoặc bị gỡ bỏ.</p>
-            <Link href="/" className="btn btn-primary err-btn-titan">QUAY LẠI TRANG CHỦ</Link>
+            <Header />
+            <div className="center-icon-titan" style={{ marginTop: '15vh' }}>
+                {isCandidate ? <Sparkles size={80} color="var(--accent)" className="spin-titan" /> : <AlertTriangle size={80} color="var(--accent)" />}
+            </div>
+            <h2 className="error-title-industrial" style={{ textAlign: 'center' }}>
+                {isCandidate ? 'ĐANG KHOI TẠO NỘI DUNG' : 'LỖI TRUY XUẤT NỘI DUNG'}
+            </h2>
+            <p className="error-desc-industrial" style={{ textAlign: 'center', opacity: 0.7 }}>
+                {isCandidate 
+                    ? 'Chương truyện này thuộc về một bộ truyện đang được Titan Discovery đồng bộ hóa...' 
+                    : 'Không thể tìm thấy chương truyện này. Có thể liên kết đã hết hạn hoặc bị gỡ bỏ.'}
+            </p>
+            
+            {isCandidate ? (
+                <DiscoveryTrigger slug={id} />
+            ) : (
+                <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+                    <Link href="/" className="btn btn-primary err-btn-titan">QUAY LẠI TRANG CHỦ</Link>
+                </div>
+            )}
         </div>
     );
   }
