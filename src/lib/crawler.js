@@ -248,22 +248,47 @@ async function fetchWithRetry(url, options = {}, retries = 2) {
         const isTruyenQQ = url.includes('truyenqq');
         const headers = { 
             'User-Agent': options.headers?.['User-Agent'] || ua,
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-            'Accept-Language': 'vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7',
-            'Referer': options.headers?.Referer || (isTruyenQQ ? 'https://truyenqqno.com/' : searchReferer),
-            ...options.headers 
         };
 
-        const response = await axios.get(finalUrl, { timeout: options.timeout || defaultTimeout, headers });
-        
-        // Cloudflare Sentinel
-        if (response.data && typeof response.data === 'string') {
-            const lowerData = response.data.toLowerCase();
-            if (lowerData.includes('checking your browser') || lowerData.includes('ray id:') || lowerData.includes('captcha')) {
-                throw { code: 'CHALLENGE_DETECTED', mirror: mirrorUrl };
+        if (!isTruyenQQ) {
+            headers['Accept'] = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8';
+            headers['Accept-Language'] = 'vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7';
+            headers['Referer'] = options.headers?.Referer || searchReferer;
+        } else {
+            // TruyenQQ is very sensitive. Using minimal headers derived from successful manual tests.
+            if (options.headers?.Referer) {
+                headers['Referer'] = options.headers.Referer;
             }
         }
-        return { response, mirror: mirrorUrl };
+        
+        // Merge remaining custom headers
+        Object.assign(headers, options.headers || {});
+
+        try {
+            const response = await axiosAgent.get(finalUrl, { timeout: options.timeout || defaultTimeout, headers });
+            
+            // Cloudflare / Bot Protection Sentinel
+            if (response.data && typeof response.data === 'string') {
+                const lowerData = response.data.toLowerCase();
+                // Real challenge pages usually have these specific strings and NOT the real title
+                const hasChallengeMarkers = lowerData.includes('checking your browser') || 
+                                          lowerData.includes('captcha') ||
+                                          lowerData.includes('just a moment');
+                
+                // If it has a marker, check if it's missing a normal title element (challenge pages have unique titles)
+                const isChallenge = hasChallengeMarkers && 
+                                   (lowerData.includes('<title>just a moment') || lowerData.includes('<title>please wait'));
+                                    
+                if (isChallenge) {
+                    throw { code: 'CHALLENGE_DETECTED', mirror: mirrorUrl };
+                }
+            }
+            return { response, mirror: mirrorUrl };
+        } catch (err) {
+            // Standardize error mirror for downstream quarantine
+            err.mirror = mirrorUrl;
+            throw err;
+        }
     };
 
     // Racing Strategy: Start 1st, then 2nd after 2s if 1st hasn't finished
@@ -1006,7 +1031,9 @@ export async function crawlFullMangaChapters(mangaId, detailUrl, source = 'nettr
                 console.log(`[NetTruyen] Fallback to DOM: Found ${chapterRows.length} items.`);
             }
         } else if (source === 'truyenqq') {
-            chapterRows = $('.list-chapters li, .chapter-list li, .list_chapter li, .works-chapter-item, .list01 li');
+            chapterRows = $('.list-chapters li, .chapter-list li, .list_chapter li, .works-chapter-item').filter((i, el) => {
+                return $(el).find('a').length > 0;
+            });
         } else {
             throw new Error(`Unsupported source for deep crawl: ${source}`);
         }
@@ -1403,7 +1430,8 @@ export async function crawlChapterImages(chapId, url, source = 'nettruyen', forc
             #chapter_content .page-chapter img, .chapter_content img, 
             #chapter_content img, .chapter-content img, .read-content img,
             .box-chap img, img.lazy, img[data-src], img[data-original], 
-            img[data-cdn], img[data-index]
+            img[data-cdn], img[data-index], .story-see-content img,
+            .chapter-images img, .viewer-image img
         `);
         
         if (imgElements.length < MIN_IMAGE_COUNT) throw new Error('NOT_ENOUGH_IMAGES');
@@ -1589,6 +1617,32 @@ export async function runGuardianAutopilot() {
             await logCrawl(`[System:Error] Titan Stream Error: ${e.message}`, 'error');
             await new Promise(r => setTimeout(r, 30000)); // Quick 30s reset
         }
+    }
+}
+
+/**
+ * runTitanWorker: Version of Guardian for GitHub Actions
+ * Performs a single dense cycle of work.
+ */
+export async function runTitanWorker() {
+    console.log('[Titan Worker] Autonomous Cycle Starting...');
+    try {
+        // Step 1: Rapid Discovery (Latest manga)
+        await crawlLatest(false, false);
+        
+        // Step 2: Discovery from other sources
+        await queueDiscovery('nettruyen', 2, 5);
+        await queueDiscovery('truyenqq', 2, 5);
+
+        // Step 3: Global Healing
+        await healChapterGaps(5);
+
+        // Step 4: Batch Rescue
+        await rescueBrokenImages(10);
+        
+        console.log('[Titan Worker] Autonomous Cycle Complete.');
+    } catch (e) {
+        console.error('[Titan Worker] Error:', e.message);
     }
 }
 

@@ -10,6 +10,16 @@ async function main() {
     const start = Date.now();
     let cycles = 0;
 
+    // --- PRE-FLIGHT CHECK ---
+    try {
+        const { query } = await import('../src/lib/db.js');
+        await query('SELECT 1');
+        console.log('[Titan Worker] Database connection verified.');
+    } catch (err) {
+        console.error('[Titan Worker] Pre-flight DB check failed:', err.message);
+        process.exit(1);
+    }
+
     while (Date.now() - start < WORKER_TIMEOUT_MS) {
         cycles++;
         console.log(`\n[Titan Worker] === Cycle ${cycles} | Elapsed: ${Math.floor((Date.now() - start) / 1000)}s ===`);

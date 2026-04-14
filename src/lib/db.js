@@ -113,19 +113,15 @@ function translateSql(sql, params) {
     // 7. Schema & Identifier Cleanup
     // More aggressive dbo removal to handle [dbo]. / "dbo". / dbo. prefixes
     translatedSql = translatedSql.replace(/(?:\[dbo\]|"dbo"|dbo)\./gi, ''); 
-    translatedSql = translatedSql.replace(/\[([^\]]+)\]/g, '"$1"'); 
 
-    // 8. TITAN AUTO-QUOTE: Protect mixed-case table names from PostgreSQL folder-case folding
-    const CORE_TABLES = [
-        'manga', 'chapters', 'chapterimages', 'users', 
-        'crawlertasks', 'crawllogs', 'guardianreports', 
-        'favorites', 'comments', 'engagement', 'missions', 
-        'redemptionrequests', 'genres', 'mangagenres'
-    ];
-    for (const table of CORE_TABLES) {
-        const regex = new RegExp(`(\\s)${table}\\b(?![".])`, 'gi');
-        translatedSql = translatedSql.replace(regex, `$1"${table}"`);
-    }
+    // PostgreSQL requires exact case match for quoted identifiers. 
+    // Since our Neon tables/columns are entirely lowercase, we forcefully lowercase any bracketed or quoted identifiers.
+    // [vipCoins] -> "vipcoins"
+    translatedSql = translatedSql.replace(/\[([^\]]+)\]/g, (match, p1) => `"${p1.toLowerCase()}"`);
+    
+    // "Manga" -> "manga"
+    translatedSql = translatedSql.replace(/"([^"]+)"/g, (match, p1) => `"${p1.toLowerCase()}"`);
+
     // Cache the result for future identical queries
     if (translationCache.size < MAX_CACHE_SIZE) {
         translationCache.set(sql, { translatedSql, paramOrder });
