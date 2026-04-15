@@ -21,6 +21,13 @@
     z-index: 1000;
     display: flex;
     align-items: center;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+}
+
+.reader-hud-titan.hud-hidden {
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none;
 }
 
 .reader-nav-wrapper {
@@ -79,6 +86,13 @@
     padding-top: 70px;
 }
 
+.reader-img-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #000;
+}
+
 /* CELEBRATION FOOTER */
 .reader-footer-industrial {
     padding: 100px 0;
@@ -86,9 +100,22 @@
     text-align: center;
 }
 
-.reader-footer-container-titan { max-width: 850px; margin: 0 auto; }
+.reader-footer-container-titan { max-width: 850px; margin: 0 auto; padding: 0 20px; }
 .finish-label-titan { font-size: 0.75rem; font-weight: 950; color: var(--accent); letter-spacing: 3px; display: block; margin-bottom: 20px; }
 .finish-title-titan { font-size: 3rem; font-weight: 950; color: white; margin-bottom: 60px; letter-spacing: -2px; }
+
+@media (max-width: 768px) {
+    .finish-title-titan { font-size: 1.8rem; margin-bottom: 40px; }
+    .reader-hud-titan { height: 60px; }
+    .reader-content-industrial { padding-top: 60px; }
+    .next-chapter-card-titan { 
+        flex-direction: column; 
+        text-align: center; 
+        gap: 30px; 
+        padding: 30px 20px;
+    }
+    .next-btn-industrial { width: 100%; }
+}
 
 .next-chapter-card-titan {
     background: rgba(15, 23, 42, 0.6);

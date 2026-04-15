@@ -159,6 +159,7 @@ CREATE INDEX IF NOT EXISTS idx_images_chap ON chapterimages(chapter_id);
 CREATE INDEX IF NOT EXISTS idx_fav_user ON favorites(user_uuid);
 CREATE INDEX IF NOT EXISTS idx_history_user ON readhistory(user_uuid);
 CREATE INDEX IF NOT EXISTS idx_tasks_status ON crawlertasks(status, priority);
+CREATE INDEX IF NOT EXISTS idx_tasks_manga_id ON crawlertasks(manga_id);
 
 -- High-Performance Scaling Indexes
 CREATE INDEX IF NOT EXISTS idx_crawllogs_created_at ON crawllogs(created_at DESC);

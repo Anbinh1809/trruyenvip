@@ -16,11 +16,14 @@ import {
     Rocket, 
     ShieldQuestion,
     ChevronRight,
-    AlertCircle
+    AlertCircle,
+    Database
 } from 'lucide-react';
+import { useToast } from '@/components/ToastProvider';
 
 export default function AdminCrawlerPage() {
   const { user, isAuthenticated, loading } = useAuth();
+  const { addToast } = useToast();
   const [telemetry, setTelemetry] = useState(null);
   const [ramUsage, setRamUsage] = useState(0);
   const [fetching, setFetching] = useState(true);
@@ -59,9 +62,9 @@ export default function AdminCrawlerPage() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ pages })
         });
-        alert(`Đã kích hoạt deep scan ${pages} trang!`);
+        addToast(`Đã kích hoạt deep scan ${pages} trang!`, 'success');
     } catch (e) {
-        alert('Lỗi khi kích hoạt deep scan.');
+        addToast('Lỗi khi kích hoạt deep scan.', 'error');
     }
   };
 
@@ -74,13 +77,13 @@ export default function AdminCrawlerPage() {
         });
         const data = await res.json();
         if (res.ok) {
-            alert(data.message || 'Lệnh đã được gửi thành công!');
+            addToast(data.message || 'Lệnh đã được gửi thành công!', 'success');
             fetchData();
         } else {
-            alert('Lỗi: ' + (data.error || 'Yêu cầu không thể hoàn thành.'));
+            addToast('Lỗi: ' + (data.error || 'Yêu cầu không thể hoàn thành.'), 'error');
         }
     } catch (e) {
-        alert('Lỗi kết nối máy chủ.');
+        addToast('Lỗi kết nối máy chủ.', 'error');
     }
   };
 
@@ -126,7 +129,7 @@ export default function AdminCrawlerPage() {
                     AUTOPILOT: {telemetry?.status?.toUpperCase() || 'IDLE'}
                 </div>
                 <div className={`status-badge-titan shadow-titan ${ramUsage > 1000 ? 'warning' : 'active'}`}>
-                    <Cpu size={14} /> RAM: {ramUsage}MB
+                    <Database size={14} /> RAM: {ramUsage}MB
                 </div>
                 <button className="btn btn-outline rotate-hover-titan" onClick={fetchData}>
                     <RefreshCcw size={16} />
@@ -196,10 +199,10 @@ export default function AdminCrawlerPage() {
                 <div className="telemetry-flex">
                     <div className="telemetry-value-industrial">
                         <span className="accent">{telemetry?.activeWorkers || 0}</span>
-                        <span className="limit-tag">/ {telemetry?.concurrencyLimit || 35}</span>
+                        <span className="limit-tag">/ {telemetry?.concurrencyLimit || 128}</span>
                     </div>
                     <div className="worker-load-indicator">
-                        <div className="load-fill" style={{ width: `${Math.min(100, ((telemetry?.activeWorkers || 0) / (telemetry?.concurrencyLimit || 35)) * 100)}%` }}></div>
+                        <div className="load-fill" style={{ width: `${Math.min(100, ((telemetry?.activeWorkers || 0) / (telemetry?.concurrencyLimit || 128)) * 100)}%` }}></div>
                     </div>
                 </div>
                 <div className="pulse-banner-titan">
@@ -217,7 +220,7 @@ export default function AdminCrawlerPage() {
                 </div>
                 <div className="config-item-titan">
                     <div className="config-label-titan">ADAPTIVE_LIMIT</div>
-                    <div className="config-value-titan">{telemetry?.concurrencyLimit || 35} Weight Units</div>
+                    <div className="config-value-titan">{telemetry?.concurrencyLimit || 128} Weight Units</div>
                 </div>
                 <div className="config-item-titan">
                     <div className="config-label-titan">HEARTBEAT</div>

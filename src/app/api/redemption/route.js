@@ -43,6 +43,9 @@ export const POST = withTitan({
         }
 
         const val = parseInt(amount);
+        if (val < 10) {
+            throw { status: 400, message: 'Số tiền rút tối thiểu là 10.000đ' };
+        }
         const cost = val * 1000;
 
         return await withTransaction(async (client) => {

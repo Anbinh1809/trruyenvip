@@ -17,6 +17,7 @@ export default function CommentSection({ chapterId }) {
   const { addToast } = useToast();
   const { user, isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -54,7 +55,7 @@ export default function CommentSection({ chapterId }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!newComment.trim() || !userName.trim()) return;
+    if (submitting || !newComment.trim() || !userName.trim()) return;
 
     const content = newComment;
     setNewComment('');
@@ -73,8 +74,7 @@ export default function CommentSection({ chapterId }) {
     };
 
     setComments(prev => [optimisticComment, ...prev]);
-    addXp(10);
-    updateMission('COMMENT', 1);
+    setSubmitting(true);
 
     try {
       const res = await fetch('/api/comments', {
@@ -85,6 +85,8 @@ export default function CommentSection({ chapterId }) {
 
       if (res.ok) {
         if (!isAuthenticated) localStorage.setItem('truyenvip_username', userName);
+        addXp(10);
+        updateMission('COMMENT', 1);
         fetchComments();
       } else {
           setComments(prev => prev.filter(c => c.id !== tempId));
@@ -93,6 +95,8 @@ export default function CommentSection({ chapterId }) {
     } catch (e) {
       console.error('Comment error', e);
       setComments(prev => prev.filter(c => c.id !== tempId));
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -152,8 +156,8 @@ export default function CommentSection({ chapterId }) {
                 required
             />
             <div className="form-actions-industrial">
-               <button type="submit" className="btn btn-primary submit-btn-titan">
-                    <Send size={18} /> GỬI BÌNH LUẬN
+               <button type="submit" className="btn btn-primary submit-btn-titan" disabled={submitting}>
+                    <Send size={18} /> {submitting ? 'ĐANG GỬI...' : 'GỬI BÌNH LUẬN'}
                </button>
             </div>
         </form>

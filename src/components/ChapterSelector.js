@@ -45,7 +45,7 @@ export default function ChapterSelector({ mangaId, chapters, currentId }) {
                     border-color: var(--accent);
                 }
                 @media (max-width: 768px) {
-                    .select-titan-industrial { max-width: 100px; font-size: 0.75rem; }
+                    .select-titan-industrial { max-width: 140px; font-size: 0.75rem; padding: 6px 10px; }
                 }
             `}</style>
         </div>

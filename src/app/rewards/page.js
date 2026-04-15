@@ -23,7 +23,7 @@ const BANK_LIST = [
 
 export default function RewardsPage() {
   const { isAuthenticated, loading: authLoading } = useAuth();
-  const { vipCoins, mounted } = useEngagement();
+  const { vipCoins, mounted, deductCoins } = useEngagement();
   const { addToast } = useToast();
   
   const [bankName, setBankName] = useState(BANK_LIST[0]);
@@ -55,6 +55,13 @@ export default function RewardsPage() {
     }
   }, [isAuthenticated, fetchHistory]);
 
+  const removeAccents = (str) => {
+    return str.normalize('NFD')
+              .replace(/[\u0300-\u036f]/g, '')
+              .replace(/đ/g, 'd').replace(/Đ/g, 'D')
+              .toUpperCase();
+  };
+
   const handleRedeem = async (item) => {
     if (vipCoins < item.cost) {
       setMsg('Số dư VipCoins không đủ để rút tiền.');
@@ -76,13 +83,14 @@ export default function RewardsPage() {
         body: JSON.stringify({ 
           bankName, 
           accountNo, 
-          accountHolder, 
+          accountHolder: removeAccents(accountHolder), 
           amount: item.value
         })
       });
 
       if (res.ok) {
         addToast('Yêu cầu rút tiền thành công!', 'success');
+        deductCoins(item.cost); // TITAN SYNC: Immediate local balance update
         setMsg(`Yêu cầu rút ${item.value}k về ${bankName} đã được gửi. Chúng tôi sẽ xử lý trong vòng 24 giờ.`);
         setMsgType('success');
         setAccountNo('');

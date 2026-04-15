@@ -12,14 +12,18 @@ export const SOURCES = {
         'https://www.nettruyentv.com/',
         'https://www.nettruyenv.com/',
         'https://www.nettruyenmax.com/',
-        'https://www.nettruyenpro.com/'
+        'https://www.nettruyenpro.com/',
+        'https://www.nettruyenco.vn/',
+        'https://www.nettruyenio.com/'
     ],
     TRUYENQQ: 'https://truyenqqno.com/',
     TRUYENQQ_MIRRORS: [
         'https://truyenqqno.com/',
         'https://truyenqq.top/',
         'https://truyenqq.info/',
-        'https://truyenqq.nu/'
+        'https://truyenqq.nu/',
+        'https://truyenqqvn.com/',
+        'https://truyenqqio.com/'
     ]
 };
 

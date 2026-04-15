@@ -61,7 +61,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="vi" className={`${inter.variable}`} suppressHydrationWarning>
+    <html lang="vi" className={`${inter.variable}`} data-scroll-smooth="true" suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{

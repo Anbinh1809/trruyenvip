@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useTransition } from 'react';
 import { Settings, Eye, EyeOff, Layout, Palette, Monitor } from 'lucide-react';
+import { useToast } from './ToastProvider';
 
 export default function ReaderSettings() {
+  const { addToast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [incognito, setIncognito] = useState(false);
   const [isWebtoon, setIsWebtoon] = useState(true);
@@ -39,7 +41,8 @@ export default function ReaderSettings() {
     setIsTurbo(newVal);
     localStorage.setItem('truyenvip_turbo', newVal.toString());
     if (newVal) localStorage.setItem('truyenvip_hifi', 'false'); // Disable HiFi if Turbo is on
-    window.location.reload();
+    addToast(newVal ? 'Đã kích hoạt Turbo Boost!' : 'Đã tắt Turbo', 'success');
+    setTimeout(() => window.location.reload(), 1000);
   };
 
   const toggleWebtoon = (val) => {
@@ -56,7 +59,8 @@ export default function ReaderSettings() {
     const newVal = !isHiFi;
     setIsHiFi(newVal);
     localStorage.setItem('truyenvip_hifi', newVal.toString());
-    window.location.reload(); 
+    addToast(newVal ? 'Đã bật chế độ Siêu nét 4K!' : 'Đã tắt 4K', 'success');
+    setTimeout(() => window.location.reload(), 1000);
   };
 
   return (

@@ -36,7 +36,7 @@ export default function AdminDashboard() {
         if (res.ok) {
             const data = await res.json();
             startTransition(() => {
-                setStats(data);
+                setStats({ ...data, lastFetched: new Date() });
             });
         }
     } catch (err) {
@@ -107,7 +107,15 @@ export default function AdminDashboard() {
             <div className="header-left">
                 <div className="library-badge-titan">SYSTEM OVERWATCH</div>
                 <h1 className="admin-title-industrial">DASHBOARD QUẢN TRỊ</h1>
-                <p className="admin-subtitle">Chi tiết các chỉ số vận hành & hiệu suất hệ thống thời gian thực.</p>
+                <div className="admin-meta-info-titan">
+                    <p className="admin-subtitle">Chỉ số vận hành hệ thống thời gian thực.</p>
+                    {stats?.lastFetched && (
+                        <div className="last-sync-tag-titan fade-in">
+                            <Database size={12} className="opacity-0-5" />
+                            Dữ liệu vừa cập nhật: {stats.lastFetched.toLocaleTimeString('vi-VN')}
+                        </div>
+                    )}
+                </div>
             </div>
             <div className="header-right">
                 <button 

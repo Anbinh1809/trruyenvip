@@ -1,4 +1,4 @@
-import { query } from '@/lib/db';
+import { query, MANGA_CARD_FIELDS } from '@/lib/db';
 import { generateProxySignature } from '@/lib/crypto';
 
 export async function GET(request) {

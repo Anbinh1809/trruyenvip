@@ -7,7 +7,7 @@ import { query, MANGA_CARD_FIELDS } from '@/lib/db';
 import { getSignedProxyUrl } from '@/lib/crypto';
 import "@/app/manga-detail.css";
 import Link from 'next/link';
-import { BookOpen, User, Star, Calendar, Share2, Heart, AlertOctagon, Sparkles } from 'lucide-react';
+import { BookOpen, User, Star, Calendar, Share2, Heart, AlertOctagon, Sparkles, Eye } from 'lucide-react';
 import DiscoveryTrigger from '@/components/DiscoveryTrigger';
 
 // Helper to determine if a slug is a potential new ingestion target
@@ -26,8 +26,8 @@ export async function generateMetadata({ params }) {
   if (!manga) return { title: 'Manga Not Found | TruyenVip' };
 
   const ogImage = manga.cover 
-    ? getSignedProxyUrl(manga.cover, 1200, 75) 
-    : '/placeholder-manga.svg';
+    ? `https://truyenvip.com${getSignedProxyUrl(manga.cover, 1200, 75)}` 
+    : 'https://truyenvip.com/placeholder-manga.svg';
 
   return {
     title: `${manga.title} [Full] - Đọc Truyện Tranh Online | TruyenVip`,
@@ -228,7 +228,7 @@ export default async function MangaDetailPage({ params }) {
                         </div>
                         <div className="info-row">
                             <span className="info-label"><Calendar size={14} className="info-icon" /> Ngày tạo</span>
-                            <span className="info-value">{new Date(manga.last_crawled || Date.now()).toLocaleDateString('vi-VN')}</span>
+                            <span className="info-value">{manga.last_crawled ? new Date(manga.last_crawled).toLocaleDateString('vi-VN') : 'Mới cập nhật'}</span>
                         </div>
                         <div className="info-row">
                             <span className="info-label"><BookOpen size={14} className="info-icon" /> Tổng số chap</span>
@@ -273,10 +273,8 @@ export default async function MangaDetailPage({ params }) {
                     {manga.description || 'Chưa có tóm tắt nội dung cho bộ truyện này. Chúng tôi sẽ cập nhật trong thời gian sớm nhất.'}
                 </p>
             </div>
-                    mangaCover={manga.cover}
-                />
 
-                <section className="chapters-section-industrial">
+            <section className="chapters-section-industrial">
                     <div className="section-header-titan">
                         <h2 className="title-titan section-title-industrial">DANH SÁCH CHƯƠNG</h2>
                         <span className="chapter-count-titan">{manga.chapters.length} CHAPTERS</span>
@@ -285,7 +283,6 @@ export default async function MangaDetailPage({ params }) {
                 </section>
             </div>
         </div>
-      </div>
 
       <Footer />
     </main>

@@ -2,12 +2,14 @@
 
 import { useState, useRef, useMemo } from 'react';
 import Link from 'next/link';
-import { BookOpen, Share2, Play } from 'lucide-react';
+import { BookOpen, Share2, Play, Heart } from 'lucide-react';
 import FavoriteButton from './FavoriteButton';
 import { getSignedProxyUrl } from '@/lib/crypto';
 import { useHistory } from '@/context/HistoryContext';
+import { useToast } from '@/components/ToastProvider';
 
 export default function DetailActions({ mangaId, firstChapterId, mangaTitle, mangaCover }) {
+    const { addToast } = useToast();
     const [preloaded, setPreloaded] = useState(false);
     const hoverTimer = useRef(null);
     const { history, mounted } = useHistory();
@@ -61,7 +63,7 @@ export default function DetailActions({ mangaId, firstChapterId, mangaTitle, man
             }).catch(() => {});
         } else {
             navigator.clipboard.writeText(window.location.href);
-            alert('Đã sao chép liên kết vào bộ nhớ tạm!');
+            addToast('Đã sao chép liên kết vào bộ nhớ tạm!', 'success');
         }
     };
 
@@ -92,11 +94,9 @@ export default function DetailActions({ mangaId, firstChapterId, mangaTitle, man
                 <FavoriteButton manga={{ id: mangaId, title: mangaTitle, cover: mangaCover }} />
             </div>
 
-            <div className="action-row-sub">
-                <button className="btn-mirror btn-purple shadow-titan" onClick={() => alert('Đã thích truyện!')}>
-                    <Heart size={18} fill="currentColor" /> Thích
-                </button>
-            </div>
+            <button className="btn-mirror btn-purple shadow-titan" style={{ width: '100%', marginTop: '15px' }} onClick={handleShare}>
+                <Share2 size={18} /> Chia sẻ truyện
+            </button>
 
             <style jsx>{`
                 .detail-actions-traditional {

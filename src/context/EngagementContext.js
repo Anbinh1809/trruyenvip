@@ -171,7 +171,7 @@ export function EngagementProvider({ children }) {
     } finally {
         isSyncingRef.current = false;
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, state.dailyMissions]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -271,7 +271,7 @@ export function EngagementProvider({ children }) {
             lastSyncRef.current = { xp: adjustedXp, coins: adjustedCoins };
         }
     }
-  }, [isAuthenticated, uXp, uCoins, uUuid]);
+  }, [isAuthenticated, uXp, uCoins, uUuid, user?.missionData]);
 
   // DAILY MISSION AUTO-RESET (Midnight Guardian - Server Powered)
   useEffect(() => {

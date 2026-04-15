@@ -16,7 +16,7 @@ global.crawlerState = global.crawlerState || {
     failCount: 0,
     imagesScrapedToday: 0,
     activeWorkers: 0,
-    concurrencyLimit: 15,
+    concurrencyLimit: 128,
     startTime: Date.now(),
     lastAction: Date.now(),
     mirrorHealth: {} // { 'nettruyen.com': { failCount: 0, lastFail: Date.now(), status: 'ok' } }

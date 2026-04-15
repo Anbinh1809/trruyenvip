@@ -16,6 +16,7 @@ export async function GET() {
             currentImage: null,
             successCount: 0,
             failCount: 0,
+            concurrencyLimit: 128,
             lastAction: Date.now()
         };
 

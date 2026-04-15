@@ -39,8 +39,12 @@ html, body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.6;
-  scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
+}
+
+/* TITAN SMOOTH SCROLL: Applied via data-attribute to avoid Next.js core warnings */
+html[data-scroll-smooth="true"] {
+  scroll-behavior: smooth;
 }
 
 h1, h2, h3, h4, .title-titan, .hero-title-titan { 
@@ -413,6 +417,14 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan {
     .title-titan { font-size: 1.6rem; }
     .nav-titan { gap: 15px; }
     .desktop-only { display: none !important; }
+    
+    .card-title-centered {
+        font-size: 0.85rem;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        height: 2.4em; /* Ensure consistent height for grid alignment */
+        margin-top: 8px;
+    }
 }
 
 .mobile-hide { display: none !important; }

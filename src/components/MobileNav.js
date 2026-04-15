@@ -9,7 +9,7 @@ import { Home, LayoutGrid, Bookmark, User, LogIn } from 'lucide-react';
 
 export default function MobileNav() {
     const pathname = usePathname();
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, loading } = useAuth();
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -23,9 +23,9 @@ export default function MobileNav() {
         { label: 'Thể loại', icon: LayoutGrid, path: '/genres' },
         { label: 'Yêu thích', icon: Bookmark, path: '/favorites' },
         { 
-            label: isAuthenticated ? 'Cá nhân' : 'Đăng nhập', 
-            icon: isAuthenticated ? User : LogIn, 
-            path: isAuthenticated ? '/profile' : '/auth/login' 
+            label: loading ? '...' : (isAuthenticated ? 'Cá nhân' : 'Đăng nhập'), 
+            icon: loading ? User : (isAuthenticated ? User : LogIn), 
+            path: loading ? '#' : (isAuthenticated ? '/profile' : '/auth/login') 
         }
     ];
 

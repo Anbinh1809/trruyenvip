@@ -8,7 +8,7 @@ import { SOURCES } from './mirrors.js';
 
 // Concurrency State
 let activeWorkers = 0;
-const BASE_CONCURRENCY = 35; // Total "weight" limit
+const BASE_CONCURRENCY = 128; // TITAN-GRADE: Process over 100 chapters in parallel
 const inProgressManga = new Map(); // mangaId -> timestamp
 const inProgressChapters = new Map(); // chapId -> timestamp
 
@@ -140,7 +140,7 @@ async function executeTask(taskRow) {
 export async function processQueue() {
     const mem = process.memoryUsage().heapUsed / 1024 / 1024;
     const dynamicLimit = getConcurrentLimit();
-    const currentLimit = mem > 1100 ? 5 : dynamicLimit;
+    const currentLimit = mem > 4096 ? 2 : dynamicLimit; // TITAN-CAPACITY: 4GB Threshold for 16GB RAM server
     
     if (activeWorkers >= currentLimit) return;
     
@@ -173,11 +173,12 @@ export async function processQueue() {
     updateTelemetry({ 
         activeWorkers, 
         concurrencyLimit: currentLimit,
+        loadFactor: Math.round((activeWorkers / currentLimit) * 100),
         status: tasks.length > 0 ? undefined : 'idle' 
     });
 
     if (tasks.length === 0) {
-        setTimeout(processQueue, 1500); // Backoff a bit
+        setTimeout(processQueue, 500); // TITAN HYPER-PULSE: Reduced from 1500ms
         return;
     }
 
@@ -487,8 +488,9 @@ export async function queueChapterScrape(chapId, url, source, force = false, pri
         INSERT INTO crawlertasks (type, target, priority) 
         SELECT 'chapter_scrape', @target, @priority
         WHERE EXISTS (SELECT 1 FROM chapters WHERE id = @chapId)
-        ON CONFLICT (target) DO UPDATE SET priority = GREATEST(crawlertasks.priority, @priority)
-        WHERE crawlertasks.status = 'pending'
+        ON CONFLICT (target) DO UPDATE SET 
+            priority = GREATEST(crawlertasks.priority, @priority),
+            status = CASE WHEN crawlertasks.status = 'failed' THEN 'pending' ELSE crawlertasks.status END
     `, { target, priority, chapId });
     processQueue();
 }
@@ -542,8 +544,8 @@ export async function runGuardianAutopilot() {
             await rescueBrokenImages(15);
             await healChapterGaps(10);
             
-            // TITAN BREATHE: Adaptive Heartbeat (60s to 600s)
-            const waitTime = Math.max(60000, 60000 * (nothingNewStreak + 1));
+            // TITAN STEALTH: Adaptive Heartbeat (60s to 600s) to prevent mirror bans
+            const waitTime = Math.max(10000, 60000 * (nothingNewStreak + 1));
             
             // Sync health periodically
             if (global.discoveryPage % 10 === 0) {
@@ -553,7 +555,7 @@ export async function runGuardianAutopilot() {
             await new Promise(r => setTimeout(r, waitTime));
         } catch (e) {
             console.error('[Guardian] Engine Stalled:', e.message);
-            await new Promise(r => setTimeout(r, 60000));
+            await new Promise(r => setTimeout(r, 60000)); // Safer rescue wait
         }
     }
 }

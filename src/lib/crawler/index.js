@@ -5,13 +5,13 @@ import axios from 'axios';
 import http from 'http';
 import https from 'https';
 import { query, withTransaction, bulkInsert } from '../db.js';
-import { safeJoinUrl, normalizeTitle, parseChapterNumber, cleanTitleForSearch } from './utils.js';
+import { safeJoinUrl, normalizeTitle, parseChapterNumber, cleanTitleForSearch, inferAlternativeMirrors } from './utils.js';
 import { getOptimizedMirrors, quarantineMirror, rewardMirror, USER_AGENTS, SEARCH_REFERERS } from './mirrors.js';
 import { updateTelemetry, logGuardianEvent } from './telemetry.js';
 
 const axiosAgent = axios.create({
-    httpAgent: new http.Agent({ keepAlive: true, maxSockets: 50 }),
-    httpsAgent: new https.Agent({ keepAlive: true, maxSockets: 50, rejectUnauthorized: false }),
+    httpAgent: new http.Agent({ keepAlive: true, maxSockets: 160 }),
+    httpsAgent: new https.Agent({ keepAlive: true, maxSockets: 160, rejectUnauthorized: false }),
     timeout: 30000
 });
 

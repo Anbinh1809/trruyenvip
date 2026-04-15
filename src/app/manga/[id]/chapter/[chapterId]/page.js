@@ -10,6 +10,7 @@ import dynamic from 'next/dynamic';
 import { Sparkles, ChevronLeft, ChevronRight, Home, BookOpen, AlertTriangle } from 'lucide-react';
 import ChapterSelector from '@/components/ChapterSelector';
 import DiscoveryTrigger from '@/components/DiscoveryTrigger';
+import ReaderHud from '@/components/ReaderHud';
 
 // Helper to determine if a slug is a potential new ingestion target
 function isDiscoveryCandidate(slug) {
@@ -145,7 +146,7 @@ export default async function ChapterPage({ params }) {
 
     return (
         <main className="main-wrapper titan-bg reader-industrial-layout">
-            <div className="reader-hud-titan shadow-titan">
+            <ReaderHud>
                 <div className="container reader-nav-wrapper">
                     <Link href={`/manga/${id}`} className="reader-back-btn">
                         <ChevronLeft size={24} />
@@ -173,7 +174,7 @@ export default async function ChapterPage({ params }) {
                         <ReaderSettings />
                     </div>
                 </div>
-            </div>
+            </ReaderHud>
 
             <div className="reader-content-industrial">
                 <ChapterContent 

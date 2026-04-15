@@ -20,15 +20,21 @@ export async function POST(req) {
             }, { status: 429 });
         }
 
-        const source = url.includes('nettruyen') ? 'nettruyen' : (url.includes('truyenqq') ? 'truyenqq' : null);
-        if (!source) return NextResponse.json({ error: 'Nguồn không hỗ trợ' }, { status: 400 });
+        const host = new URL(url).hostname.toLowerCase();
+        const source = host.includes('nettruyen') ? 'nettruyen' : 
+                       host.includes('truyenqq') ? 'truyenqq' : 
+                       host.includes('blogtruyen') ? 'blogtruyen' : 
+                       host.includes('cmanga') ? 'cmanga' : 
+                       host.includes('nhattruyen') ? 'nhattruyen' : null;
+                       
+        if (!source) return NextResponse.json({ error: 'Nguồn không hỗ trợ. Chỉ hỗ trợ NetTruyen, TruyenQQ, BlogTruyen, CManga, NhatTruyen.' }, { status: 400 });
 
         // Robust Parsing Logic
         const parts = url.split('/');
         let mangaSlug = '';
         let chapterSlug = '';
 
-        if (source === 'nettruyen') {
+        if (source === 'nettruyen' || source === 'nhattruyen') {
             const mangaIdx = parts.indexOf('truyen-tranh');
             if (mangaIdx !== -1) {
                 mangaSlug = parts[mangaIdx + 1];
@@ -36,8 +42,7 @@ export async function POST(req) {
                     chapterSlug = parts[mangaIdx + 2];
                 }
             }
-        } else {
-            // TruyenQQ
+        } else if (source === 'truyenqq') {
             const mangaIdx = parts.indexOf('truyen-tranh');
             if (mangaIdx !== -1) {
                 mangaSlug = parts[mangaIdx + 1]?.replace('.html', '');
@@ -45,6 +50,14 @@ export async function POST(req) {
                     chapterSlug = parts[mangaIdx + 2]?.split('.')[0];
                 }
             }
+        } else if (source === 'blogtruyen') {
+            // blogtruyen.vn/12345/slug
+            const idPart = parts.find(p => /^\d+$/.test(p));
+            if (idPart) mangaSlug = `bt_${idPart}`;
+        } else if (source === 'cmanga') {
+            // cmanga.com/manga/slug
+            const mangaIdx = parts.indexOf('manga');
+            if (mangaIdx !== -1) mangaSlug = parts[mangaIdx + 1];
         }
 
         if (!mangaSlug) return NextResponse.json({ error: 'Không thể nhận diện mã truyện' }, { status: 400 });

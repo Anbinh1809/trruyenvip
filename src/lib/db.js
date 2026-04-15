@@ -253,6 +253,7 @@ export async function cleanLegacyEncoding() {
         console.log('[DB_MAINTENANCE] Starting Titan Sanitization Cycle...');
 
         // 0. SCHEMA HARDENING (PostgreSQL Optimization)
+        await query('CREATE EXTENSION IF NOT EXISTS pg_trgm');
         await query('CREATE INDEX IF NOT EXISTS idx_manga_normalized_title ON manga (normalized_title)');
         await query('CREATE INDEX IF NOT EXISTS idx_chapters_manga_id ON chapters (manga_id)');
         await query('CREATE INDEX IF NOT EXISTS idx_readhistory_uuid ON readhistory (user_uuid)');
@@ -262,6 +263,9 @@ export async function cleanLegacyEncoding() {
         await query("UPDATE manga SET author = 'Đang cập nhật' WHERE author = '??'");
         await query("UPDATE manga SET description = REPLACE(description, '??', '') WHERE description LIKE '%??%'");
         await query("UPDATE manga SET title = REPLACE(title, '??', '') WHERE title LIKE '%??%'");
+        
+        // CHAPTERS TABLE HARDENING
+        await query("ALTER TABLE chapters ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active'");
 
         // TITAN-SLUG RECONSTRUCTION: Move to JS for robust transliteration
         const rawManga = await query("SELECT id, title FROM manga WHERE normalized_title IS NULL OR normalized_title = '' LIMIT 500");

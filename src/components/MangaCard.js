@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useState, memo } from 'react';
 import { useFavorites } from '@/context/FavoritesContext';
 import { Bookmark, Star, Eye } from 'lucide-react';
+import { useIsMounted } from '@/hooks/useIsMounted';
 
 import { getSignedProxyUrl } from '@/lib/crypto';
 
@@ -15,6 +16,7 @@ function MangaCard({ manga, isNew = false, priority = false }) {
     
   const [imgSrc, setImgSrc] = useState(coverUrl);
   const [isLoaded, setIsLoaded] = useState(false);
+  const isMounted = useIsMounted();
   const { toggleFavorite, isFavorite } = useFavorites();
   const favorited = isFavorite(manga.id);
   const views = manga.views || 0;
@@ -53,7 +55,7 @@ function MangaCard({ manga, isNew = false, priority = false }) {
       itemScope 
       itemType="http://schema.org/CreativeWork"
     >
-      <meta itemprop="url" content={`/manga/${manga.normalized_title || manga.id}`} />
+      <meta itemProp="url" content={`https://truyenvip.com/manga/${manga.normalized_title || manga.id}`} />
       <div className={`card-media-titan ${!isLoaded ? 'skeleton-shimmer' : ''}`}>
         <Image 
           src={imgSrc} 
@@ -70,7 +72,7 @@ function MangaCard({ manga, isNew = false, priority = false }) {
         
         <div className="manga-badge-container">
             <span className="manga-tag badge-time">
-                {formatTimeAgo(manga.last_crawled)}
+                {isMounted ? formatTimeAgo(manga.last_crawled) : '...'}
             </span>
             {(isNew || manga.trending) && (
                 <span className={`manga-tag ${manga.trending ? 'badge-hot' : 'badge-status'}`}>

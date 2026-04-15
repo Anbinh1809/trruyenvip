@@ -4,8 +4,8 @@ import { withTitan } from '@/lib/api-handler';
 export const GET = withTitan({
     admin: true,
     handler: async () => {
-        // TITAN CACHE: 5-minute statistical caching
-        if (global.adminStatsCache && Date.now() - global.adminStatsCache.time < 300000) {
+        // TITAN CACHE: 10-second statistical caching for high-fidelity accuracy
+        if (global.adminStatsCache && Date.now() - global.adminStatsCache.time < 10000) {
             return global.adminStatsCache.data;
         }
 
@@ -14,9 +14,9 @@ export const GET = withTitan({
             const tablesRes = await query(`
                 SELECT table_name 
                 FROM information_schema.tables 
-                WHERE table_name IN ('users', 'redemptionrequests')
+                WHERE LOWER(table_name) IN ('users', 'redemptionrequests')
             `);
-            const existingTables = (tablesRes.recordset || []).map(t => t.table_name || t.TABLE_NAME);
+            const existingTables = (tablesRes.recordset || []).map(t => (t.table_name || t.TABLE_NAME || '').toLowerCase());
             const hasUsers = existingTables.includes('users');
             const hasRewards = existingTables.includes('redemptionrequests');
 
