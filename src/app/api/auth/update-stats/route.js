@@ -1,4 +1,4 @@
-import { query } from '@/lib/db';
+import { query, checkRateLimit } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 
@@ -41,15 +41,12 @@ export async function POST(request) {
             return NextResponse.json({ error: 'Dữ liệu bất thường (Deltas excessive)' }, { status: 400 });
         }
 
-        // 4. High-Frequency Check (Rate Limiting)
-        const userRes = await query(`SELECT last_stats_update FROM users WHERE uuid = @uuid`, { uuid: session.uuid });
-        const lastUpdate = userRes.recordset[0]?.last_stats_update;
-        const now = new Date();
-
-        if (lastUpdate && (now - new Date(lastUpdate)) < 3000) { 
+        // 4. TITAN RATE LIMIT: Unify with core system infrastructure
+        const limiter = await checkRateLimit(`stats_${session.uuid}`, 1, 3); // 1 update / 3s
+        if (!limiter.success) {
             return NextResponse.json({ 
               error: 'Hệ thống đang bận',
-              nextAvailable: 3000 - (now - new Date(lastUpdate))
+              nextAvailable: limiter.reset - Date.now()
             }, { status: 429 });
         }
 

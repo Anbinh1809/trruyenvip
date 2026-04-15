@@ -1,12 +1,12 @@
 import { query } from '@/lib/db';
-import { getSession } from '@/lib/auth';
-import { NextResponse } from 'next/server';
+import { withTitan } from '@/lib/api-handler';
 
-export async function GET() {
-    try {
-        const session = await getSession();
-        if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
+/**
+ * GET: Retrieve user favorites
+ */
+export const GET = withTitan({
+    authenticated: true,
+    handler: async (req, session) => {
         const results = await query(`
             SELECT m.id, m.title, m.cover,
                    (SELECT MAX(chapter_number) FROM chapters WHERE manga_id = m.id) as latest_chapter_number
@@ -16,17 +16,16 @@ export async function GET() {
             ORDER BY f.created_at DESC
         `, { uuid: session.uuid });
 
-        return NextResponse.json(results.recordset || []);
-    } catch (e) {
-        return NextResponse.json({ error: e.message }, { status: 500 });
+        return results.recordset || [];
     }
-}
+});
 
-export async function POST(req) {
-    try {
-        const session = await getSession();
-        if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
+/**
+ * POST: Toggle favorite status
+ */
+export const POST = withTitan({
+    authenticated: true,
+    handler: async (req, session) => {
         const { mangaId } = await req.json();
         
         // Toggle logic
@@ -42,15 +41,13 @@ export async function POST(req) {
                 WHERE user_uuid = @uuid 
                 AND manga_id = @mangaId
             `, { uuid: session.uuid, mangaId });
-            return NextResponse.json({ message: 'Removed', status: 'removed' });
+            return { message: 'Removed', status: 'removed' };
         } else {
             await query(`
                 INSERT INTO favorites (user_uuid, manga_id) 
                 VALUES (@uuid, @mangaId)
             `, { uuid: session.uuid, mangaId });
-            return NextResponse.json({ message: 'Added', status: 'added' });
+            return { message: 'Added', status: 'added' };
         }
-    } catch (e) {
-        return NextResponse.json({ error: e.message }, { status: 500 });
     }
-}
+});

@@ -1,4 +1,4 @@
-import { query } from '@/lib/db';
+import { query, checkRateLimit } from '@/lib/db';
 import { withTitan } from '@/lib/api-handler';
 
 export const GET = withTitan({
@@ -27,13 +27,17 @@ export const GET = withTitan({
 });
 
 /**
- * Basic HTML/XSS Sanitizer
+ * TITAN XSS SHIELD: Encodes HTML characters to prevent script injection.
+ * Industrial grade protection: Treats all user input as plain text.
  */
 function sanitizeContent(text) {
     if (!text) return '';
     return text
-        .replace(/<script[^>]*>([\S\s]*?)<\/script>/gim, '')
-        .replace(/<\/?\w(?:[^"'>]|"[^"]*"|'[^']*')*>/gim, '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;')
         .trim();
 }
 
@@ -55,16 +59,10 @@ export const POST = withTitan({
         const userUuid = session.uuid;
         const userName = session.username || 'Khách ẩn danh';
 
-        // RATE LIMIT: 10s between comments
-        const recentCheck = await query(`
-            SELECT created_at FROM comments 
-            WHERE user_uuid = @userUuid 
-            AND created_at > NOW() - INTERVAL '10 seconds'
-            LIMIT 1
-        `, { userUuid });
-
-        if (recentCheck.recordset?.length > 0) {
-            throw { status: 429, message: 'Yêu cầu bình luận quá nhanh. Vui lòng đợi 10 giây.' };
+        // TITAN RATE LIMIT: Unify with core system infrastructure
+        const limiter = await checkRateLimit(`comment_${userUuid}`, 2, 30); // 2 comments / 30s
+        if (!limiter.success) {
+            throw { status: 429, message: 'Yêu cầu bình luận quá nhanh. Vui lòng đợi thêm giây lát.' };
         }
 
         await query(`

@@ -131,17 +131,22 @@ export default function DetailActions({ mangaId, firstChapterId, mangaTitle, man
                     text-transform: none;
                 }
                 .btn-green {
-                    background-color: #8bc34a;
+                    background-color: var(--accent); /* TITAN: Unified with brand primary */
+                    box-shadow: 0 4px 15px rgba(255, 62, 62, 0.2);
                 }
                 .btn-green:hover {
-                    background-color: #7cb342;
+                    background-color: var(--accent);
+                    filter: brightness(1.1);
                     transform: translateY(-2px);
+                    box-shadow: 0 8px 25px rgba(255, 62, 62, 0.3);
                 }
                 .btn-purple {
-                    background-color: #bc00e0;
+                    background-color: var(--bg-secondary);
+                    color: var(--text-primary);
+                    border: 1px solid var(--glass-border);
                 }
                 .btn-purple:hover {
-                    background-color: #a300c2;
+                    background-color: rgba(255, 255, 255, 0.05);
                     transform: translateY(-2px);
                 }
                 .disabled-mirror {

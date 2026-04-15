@@ -138,13 +138,14 @@ async function executeTask(taskRow) {
  * Queue Processor
  */
 export async function processQueue() {
-    const mem = process.memoryUsage().heapUsed / 1024 / 1024;
-    const dynamicLimit = getConcurrentLimit();
-    const currentLimit = mem > 4096 ? 2 : dynamicLimit; // TITAN-CAPACITY: 4GB Threshold for 16GB RAM server
+    const limit = getConcurrentLimit();
+    const mAdjustedWorkers = Math.max(0, activeWorkers); // DRAGONYNE: Safety guard against negative drift
+    if (mAdjustedWorkers >= limit) return;
     
-    if (activeWorkers >= currentLimit) return;
-    
-    const needed = Math.max(1, Math.floor((currentLimit - activeWorkers) / 1)); // Heuristic for count
+    // HEALING: If workers are stuck at zero but tasks exist, force a pulse
+    if (mAdjustedWorkers === 0 && activeWorkers < 0) activeWorkers = 0;
+
+    const needed = Math.max(1, Math.floor((currentLimit - mAdjustedWorkers) / 1));
     
     const pickRes = await query(`
         WITH favorite_counts AS (
@@ -221,9 +222,9 @@ export async function queueDiscovery(source, pageCount = 3, startPage = 1, prior
 export async function ingestMangaBySlug(slug, source = 'nettruyen') {
     let url = '';
     if (source === 'nettruyen') {
-        url = `https://www.nettruyenus.com/truyen-tranh/${slug}`;
+        url = safeJoinUrl(SOURCES.NETTRUYEN, `/truyen-tranh/${slug}`);
     } else {
-        url = `https://truyenqqno.com/truyen-tranh/${slug}.html`;
+        url = safeJoinUrl(SOURCES.TRUYENQQ, `/truyen-tranh/${slug}.html`);
     }
 
     // Upsert skeleton manga if not exists
@@ -485,9 +486,10 @@ export async function crawlChapterImages(chapId, url, source = 'nettruyen', forc
 export async function queueChapterScrape(chapId, url, source, force = false, priority = 1) {
     const target = stringifySorted({ chapId, url, source, force });
     await query(`
-        INSERT INTO crawlertasks (type, target, priority) 
-        SELECT 'chapter_scrape', @target, @priority
-        WHERE EXISTS (SELECT 1 FROM chapters WHERE id = @chapId)
+        INSERT INTO crawlertasks (type, target, priority, manga_id) 
+        SELECT 'chapter_scrape', @target, @priority, manga_id
+        FROM chapters 
+        WHERE id = @chapId
         ON CONFLICT (target) DO UPDATE SET 
             priority = GREATEST(crawlertasks.priority, @priority),
             status = CASE WHEN crawlertasks.status = 'failed' THEN 'pending' ELSE crawlertasks.status END
@@ -495,8 +497,8 @@ export async function queueChapterScrape(chapId, url, source, force = false, pri
     processQueue();
 }
 
-export async function runGuardianAutopilot() {
-    if (global.guardianActive) return;
+export async function runGuardianAutopilot(oneShot = false) {
+    if (global.guardianActive && !oneShot) return;
     global.guardianActive = true;
     
     console.log('[Titan] Autonomous Guardian Activated (Adaptive Recovery Mode)...');
@@ -552,6 +554,11 @@ export async function runGuardianAutopilot() {
                 updateTelemetry({ syncHealth: true });
             }
 
+            if (oneShot) {
+                console.log('[Guardian] Pulse Complete. Exiting One-Shot mode.');
+                return;
+            }
+
             await new Promise(r => setTimeout(r, waitTime));
         } catch (e) {
             console.error('[Guardian] Engine Stalled:', e.message);
@@ -602,9 +609,13 @@ export async function bootstrapCrawler() {
     processQueue();
 }
 
-export async function runTitanWorker() {
-    console.log('[Titan] Initializing Background Worker...');
+export async function runTitanWorker(oneShot = true) {
+    console.log(`[Titan] Initializing Background Worker (${oneShot ? 'Pulse' : 'Daemon'} Mode)...`);
     await bootstrapCrawler();
-    runGuardianAutopilot().catch(e => console.error('[Titan] Autopilot failure:', e.message));
+    if (oneShot) {
+        await runGuardianAutopilot(true);
+    } else {
+        runGuardianAutopilot().catch(e => console.error('[Titan] Autopilot failure:', e.message));
+    }
 }
 

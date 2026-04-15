@@ -1,41 +1,58 @@
 import { queueDiscovery } from '@/lib/crawler';
-import { NextResponse } from 'next/server';
+import { withTitan } from '@/lib/api-handler';
 
-export async function GET(request) {
-    const { searchParams } = new URL(request.url);
-    const pages = parseInt(searchParams.get('pages') || '20');
-    const start = parseInt(searchParams.get('start') || '1');
-    const source = searchParams.get('source') || 'nettruyen';
-    
-    const authHeader = request.headers.get('authorization');
-    const secret = process.env.CRON_SECRET;
-
-    if (!secret || authHeader !== `Bearer ${secret}`) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    try {
-        console.log(`[TITAN INFO] Manual Deep Scan Triggered: ${source}, ${pages} pages starting from ${start}`);
+/**
+ * POST: Manual/Cron Deep Scan Trigger
+ * Hardened: 
+ * 1. Switched from GET to POST to prevent URL parameter leakage in logs.
+ * 2. Wrapped in withTitan for global security headers.
+ * 3. Maintains CRON_SECRET check for industrial task automation.
+ */
+export const POST = withTitan({
+    handler: async (request) => {
+        // Auth check for CRON_SECRET or Admin Session
+        const authHeader = request.headers.get('authorization');
+        const secret = process.env.CRON_SECRET;
         
-        // Split large scans into multiple smaller tasks for the worker to pick up
-        // Max 50 pages per batch to keep task size reasonable
-        const batchSize = 10;
-        const batches = Math.ceil(pages / batchSize);
+        // Allow if CRON_SECRET matches OR if it's an authenticated Admin session
+        // (withTitan already provides the session if available)
+        const isCron = secret && authHeader === `Bearer ${secret}`;
         
-        for (let i = 0; i < batches; i++) {
-            const batchStart = start + (i * batchSize);
-            const batchCount = Math.min(batchSize, pages - (i * batchSize));
-            
-            // Priority 8 for manual admin triggers (Standard latest is 3)
-            await queueDiscovery(source, batchCount, batchStart, 8);
+        // Note: we don't set 'admin: true' in withTitan because we want to allow 
+        // the machine-to-machine CRON_SECRET bypass. We handle authorization manually inside.
+        const session = await (require('@/lib/auth').getSession());
+        const isAdmin = session?.role === 'admin';
+
+        if (!isCron && !isAdmin) {
+            throw { status: 401, message: 'Unauthorized' };
         }
 
-        return NextResponse.json({ 
-            success: true, 
-            message: `Queued ${pages} pages for deep scan in ${batches} high-priority batches.` 
-        });
-    } catch (err) {
-        console.error('[TITAN ERROR] Deep Scan trigger failed:', err.message);
-        return NextResponse.json({ error: 'Failed to queue deep scan tasks' }, { status: 500 });
+        const body = await request.json().catch(() => ({}));
+        const pages = parseInt(body.pages || '20');
+        const start = parseInt(body.start || '1');
+        const source = body.source || 'nettruyen';
+        
+        try {
+            console.log(`[TITAN INFO] Deep Scan Triggered: ${source}, ${pages} pages from ${start}`);
+            
+            const batchSize = 10;
+            const batches = Math.ceil(pages / batchSize);
+            
+            for (let i = 0; i < batches; i++) {
+                const batchStart = start + (i * batchSize);
+                const batchCount = Math.min(batchSize, pages - (i * batchSize));
+                
+                // Priority 8 for manual/cron admin triggers
+                await queueDiscovery(source, batchCount, batchStart, 8);
+            }
+
+            return { 
+                success: true, 
+                message: `Queued ${pages} pages for deep scan in ${batches} high-priority batches.` 
+            };
+        } catch (err) {
+            console.error('[TITAN ERROR] Deep Scan trigger failed:', err.message);
+            throw { status: 500, message: 'Failed to queue deep scan tasks' };
+        }
     }
-}
+});

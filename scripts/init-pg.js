@@ -105,7 +105,7 @@ async function init() {
             CREATE TABLE IF NOT EXISTS comments (
                 id SERIAL PRIMARY KEY,
                 chapter_id VARCHAR(255) REFERENCES chapters(id) ON DELETE CASCADE,
-                user_uuid VARCHAR(255) REFERENCES users(uuid) NULL,
+                user_uuid VARCHAR(255) REFERENCES users(uuid) ON DELETE SET NULL,
                 user_name VARCHAR(100) NOT NULL,
                 content TEXT NOT NULL,
                 parent_id INT REFERENCES comments(id) NULL,
@@ -151,6 +151,7 @@ async function init() {
                 status VARCHAR(20) DEFAULT 'pending',
                 priority INT DEFAULT 1,
                 attempts INT DEFAULT 0,
+                manga_id VARCHAR(255) REFERENCES manga(id) ON DELETE SET NULL,
                 last_error TEXT,
                 created_at TIMESTAMPTZ DEFAULT NOW(),
                 updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -248,6 +249,9 @@ async function init() {
         await query('CREATE INDEX IF NOT EXISTS idx_users_vipcoins ON users(vipcoins DESC);');
         await query('CREATE INDEX IF NOT EXISTS idx_manga_views_rating ON manga(views DESC, rating DESC);');
         await query('CREATE INDEX IF NOT EXISTS idx_crawlertasks_status ON crawlertasks(status, priority DESC);');
+        await query('CREATE INDEX IF NOT EXISTS idx_crawlertasks_manga_id ON crawlertasks(manga_id);');
+        await query('CREATE INDEX IF NOT EXISTS idx_comments_chapter_id ON comments(chapter_id);');
+        await query('CREATE INDEX IF NOT EXISTS idx_readhistory_composite ON readhistory(user_uuid, manga_id);');
         
         // Time-based Indexes for Scaling
         await query('CREATE INDEX IF NOT EXISTS idx_crawllogs_created_at ON crawllogs(created_at DESC);');

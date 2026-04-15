@@ -3,7 +3,7 @@ import MangaCard from '@/components/MangaCard';
 import { query, MANGA_CARD_FIELDS } from '@/lib/db';
 import { generateProxySignature } from '@/lib/crypto';
 import Footer from '@/components/Footer';
-import GuardianBeastEmptyState from '@/components/GuardianBeastEmptyState';
+import IndustrialEmptyState from '@/components/IndustrialEmptyState';
 import { Search } from 'lucide-react';
 
 async function searchManga(q, page = 1) {
@@ -124,7 +124,10 @@ export default async function SearchPage({ searchParams }) {
             </>
           ) : (
             <div className="search-empty-state-industrial">
-                <GuardianBeastEmptyState keyword={q} />
+                <IndustrialEmptyState 
+                    keyword={q} 
+                    title="KHÔNG TÌM THẤY TRUYỆN" 
+                />
             </div>
           )}
         </section>

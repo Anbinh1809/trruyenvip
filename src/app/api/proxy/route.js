@@ -4,7 +4,7 @@ import { query } from '@/lib/db';
 // RAM OPTIMIZATION: Enable Sharp cache with a 50MB limit to balance speed vs memory
 sharp.cache({ memory: 50, items: 100, files: 20 });
 
-import { generateProxySignature } from '@/lib/crypto';
+import { generateProxySignature, simpleHash } from '@/lib/crypto';
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -20,19 +20,6 @@ export async function GET(request) {
   // TITAN SECURITY: Dual-mode Signature Verification
   // - 16-char HMAC: generated server-side via generateProxySignature()
   // - 8-char simpleHash: generated client-side via getSignedProxyUrl() in MangaCard etc.
-  function simpleHash(str) {
-      let hash = 5381;
-      for (let i = 0; i < str.length; i++) {
-          hash = ((hash << 5) + hash) ^ str.charCodeAt(i);
-          hash = hash >>> 0;
-      }
-      const secret = 'titan-default-9381-secret-kjsd8';
-      for (let i = 0; i < secret.length; i++) {
-          hash = ((hash << 3) + hash) ^ secret.charCodeAt(i);
-          hash = hash >>> 0;
-      }
-      return hash.toString(16).padStart(8, '0');
-  }
 
   const expectedHmac = generateProxySignature(imageUrl, width, quality);
   const expectedSimple = simpleHash(`${imageUrl}|${width}|${quality}`);
@@ -42,20 +29,16 @@ export async function GET(request) {
 
 
   const allowedDomains = [
-    'nettruyen.work', 'truyenqqno.com', 'kcgsbok.com', 'nettruyennew.com', 
-    'nettruyen.com', 'nettryuen.com', 'nettruyenmax.com', 'nettruyenon.com',
-    'image.nettruyen.com', 'st.nettruyennew.com', 'st.nettruyen.com',
-    'nettruyen.cc', 'nettruyenhay.com', 'truyen-qq.com', 'truyenqq.com',
-    'hinhhinh.com', 'truyenvua.com', 'cmanga.com', 'cmanga.nu', 'cmanga.io',
-    'nt-cdn.xyz', 'nt-cdn.com', 'imagetruyen.com', 'blogtruyen.vn',
-    'nettruyenco.vn', 'nettruyenco.com', 'nhattruyento.com', 'nhattruyen.com', 
-    'nhattruyenmax.com', 'nhattruyenmin.com', 'st.nhattruyen.com', 'animez.com', 
-    'manga-tx.com', 'manhuavn.com', 'nhattruyenfree.com', 'nhattruyencovn.com',
-    'st.nhattruyennew.com', 'st.nhattruyencovn.com', 'nettruyenme.com',
-    'nettruyenpro.com', 'nettruyenking.com', 'nettruyenvi.com', 'ttquu.com',
-    'tintruyen.net', 'nettruyenone.com', 'nt-cdn1.xyz', 'nt-cdn2.xyz',
-    'nettruyeninfo.com', 'nettruyenus.com', 'nettruyen.asia', 'nettruyen.tv',
-    'hentaivn.one', 'hentaivn.tv', 'cuutruyen.net', 'saytruyen.io', 'saytruyen.net'
+    // PRIMARY MIRRORS & CDN
+    'nettruyen.us.com', 'nettruyenus.com', 'nettruyennew.com', 'nettruyenon.com',
+    'nettruyentv.com', 'nettruyenv.com', 'nettruyenmax.com', 'nettruyenpro.com',
+    'nettruyenco.vn', 'nettruyenio.com', 'truyenqqno.com', 'truyenqq.top',
+    'truyenqq.info', 'truyenqq.nu', 'truyenqqvn.com', 'truyenqqio.com',
+    
+    // IMAGE SERVERS & CDNs
+    'nt-cdn.xyz', 'nt-cdn.com', 'nt-cdn1.xyz', 'nt-cdn2.xyz',
+    'imagetruyen.com', 'st.nettruyen.com', 'st.nettruyennew.com',
+    'st.nhattruyen.com', 'hinhhinh.com', 'truyenvua.com'
   ];
   
   try {

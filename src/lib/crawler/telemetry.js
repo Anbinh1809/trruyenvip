@@ -40,6 +40,11 @@ export function updateMirrorHealth(domain, isSuccess, error = '') {
     }
     
     global.crawlerState.mirrorHealth[domain] = health;
+    
+    // TITAN PERSISTENCE: Trigger a sync if health status just changed
+    if (health.status !== 'ok') {
+        updateTelemetry({ syncHealth: true });
+    }
 }
 
 export function updateTelemetry(data) {

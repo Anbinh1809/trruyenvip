@@ -1,21 +1,23 @@
-import { query, withTransaction } from '@/lib/db';
-import { getSession } from '@/lib/auth';
+import { query, withTransaction, checkRateLimit } from '@/lib/db';
+import { withTitan } from '@/lib/api-handler';
 import { NextResponse } from 'next/server';
 
 /**
  * TITAN REWARD SYSTEM: Daily Check-in API
  * Logic: 10 coins base reward + 100 coins bonus on 7-day streak milestone.
  */
-export async function POST(request) {
-    try {
-        const session = await getSession();
-        if (!session) {
-            return NextResponse.json({ error: 'Vui lòng đăng nhập' }, { status: 401 });
-        }
-
+export const POST = withTitan({
+    authenticated: true,
+    handler: async (request, session) => {
         const userUuid = session.uuid;
         const today = new Date().toISOString().split('T')[0];
         const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+
+        // TITAN RATE LIMIT: Prevent rapid clicking / duplicate trigger bypass attempts
+        const limiter = await checkRateLimit(`checkin_${userUuid}`, 1, 10); // 1 request / 10s
+        if (!limiter.success) {
+            throw { status: 429, message: 'Yêu cầu điểm danh quá nhanh. Vui lòng thử lại sau.' };
+        }
 
         try {
             const result = await withTransaction(async (tx) => {
@@ -65,31 +67,22 @@ export async function POST(request) {
                 return { reward, streak: newStreak, message };
             });
 
-            return NextResponse.json({ 
+            return { 
                 success: true, 
                 message: result.message,
                 reward: result.reward,
                 streak: result.streak
-            });
+            };
 
         } catch (innerErr) {
-            if (innerErr.message.includes('điểm danh')) {
-                return NextResponse.json({ error: innerErr.message }, { status: 400 });
-            }
-            throw innerErr;
+            throw { status: 400, message: innerErr.message };
         }
-
-    } catch (e) {
-        console.error('[Checkin API] Error:', e.message);
-        return NextResponse.json({ error: 'Lỗi hệ thống khi điểm danh' }, { status: 500 });
     }
-}
+});
 
-export async function GET(request) {
-    try {
-        const session = await getSession();
-        if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
+export const GET = withTitan({
+    authenticated: true,
+    handler: async (request, session) => {
         const today = new Date().toISOString().split('T')[0];
         const res = await query(`
             SELECT streak, 
@@ -101,11 +94,9 @@ export async function GET(request) {
         `, { uuid: session.uuid, today });
 
         const stats = res.recordset[0] || { streak: 0, done_today: 0 };
-        return NextResponse.json({
+        return {
             streak: stats.streak,
             doneToday: stats.done_today > 0
-        });
-    } catch (e) {
-        return NextResponse.json({ error: 'Error fetching stats' }, { status: 500 });
+        };
     }
-}
+});

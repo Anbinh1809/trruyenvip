@@ -1,20 +1,23 @@
 import { query } from '@/lib/db';
-import { NextResponse } from 'next/server';
+import { withTitan } from '@/lib/api-handler';
 
 export const revalidate = 300; // Cache for 5 minutes
 
-export async function GET() {
-    try {
+/**
+ * GET: Leaderboard retrieval
+ * Hardened: Hidden sensitive user fields (vipcoins, role) to ensure privacy.
+ * Wrapped in withTitan for global security headers.
+ */
+export const GET = withTitan({
+    handler: async () => {
+        // SELECT only public-safe fields
         const result = await query(`
-            SELECT username, xp, vipcoins, avatar, role
+            SELECT username, xp, avatar
             FROM users
             ORDER BY xp DESC
             LIMIT 100
         `);
 
-        return NextResponse.json(result.recordset || []);
-    } catch (e) {
-        console.error('Leaderboard API Error:', e);
-        return NextResponse.json({ error: 'Không thể tải bảng xếp hạng' }, { status: 500 });
+        return result.recordset || [];
     }
-}
+});

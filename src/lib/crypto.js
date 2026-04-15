@@ -8,7 +8,13 @@
  */
 
 // ── Server-only functions (Node.js crypto) ────────────────────────────────── 
-const PROXY_SECRET = process.env.PROXY_SECRET || 'titan-default-9381-secret-kjsd8';
+const PROXY_SECRET = process.env.PROXY_SECRET;
+if (!PROXY_SECRET && process.env.NODE_ENV === 'production') {
+  throw new Error('FATAL: PROXY_SECRET environment variable is missing in production!');
+}
+
+const FALLBACK_SECRET = 'titan-industrial-fallback-9381-secret-kjsd8';
+const ACTIVE_SECRET = PROXY_SECRET || FALLBACK_SECRET;
 
 /**
  * Server-side: Generates a deterministic HMAC signature.
@@ -18,8 +24,8 @@ export function generateProxySignature(url, w, q) {
     // Dynamic import so this file can be imported by client components
     // without crashing — the function itself will throw if called client-side.
     const crypto = require('crypto');
-    const data = `${url}|${w}|${q}`;
-    return crypto.createHmac('sha256', PROXY_SECRET)
+    const data = `${url}|${w}|${q}`; // Consistency check
+    return crypto.createHmac('sha256', ACTIVE_SECRET)
                  .update(data)
                  .digest('hex')
                  .substring(0, 16);
@@ -44,16 +50,16 @@ export function verifyProxySignature(url, w, q, sig) {
  * Simple djb2-like hash — deterministic, no Node APIs, works in browsers.
  * Produces a 8-char hex string used as the proxy sig when called client-side.
  */
-function simpleHash(str) {
+export function simpleHash(str) {
     let hash = 5381;
     for (let i = 0; i < str.length; i++) {
         hash = ((hash << 5) + hash) ^ str.charCodeAt(i);
         hash = hash >>> 0; // Keep unsigned 32-bit
     }
-    // XOR with secret chars for minimal tamper-resistance
-    const secret = 'titan-default-9381-secret-kjsd8';
-    for (let i = 0; i < secret.length; i++) {
-        hash = ((hash << 3) + hash) ^ secret.charCodeAt(i);
+    // XOR with ACTIVE_SECRET chars for TAMPER RESISTANCE
+    // If PROXY_SECRET is set, client-side hash is still deterministic but secret-aware.
+    for (let i = 0; i < ACTIVE_SECRET.length; i++) {
+        hash = ((hash << 3) + hash) ^ ACTIVE_SECRET.charCodeAt(i);
         hash = hash >>> 0;
     }
     return hash.toString(16).padStart(8, '0');

@@ -1,4 +1,5 @@
 import { query } from '@/lib/db';
+import { getSignedProxyUrl } from '@/lib/crypto';
 
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
@@ -14,7 +15,7 @@ export async function GET(request) {
             `);
             return Response.json(trending.recordset.map(m => ({
                 ...m,
-                cover: m.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : (m.cover || '/placeholder-manga.svg')
+                cover: m.cover?.startsWith('http') ? getSignedProxyUrl(m.cover, 300, 75) : (m.cover || '/placeholder-manga.svg')
             })));
         }
 
@@ -28,7 +29,7 @@ export async function GET(request) {
             const trending = await query("SELECT * FROM Manga ORDER BY last_crawled DESC LIMIT 4");
             return Response.json(trending.recordset.map(m => ({
                 ...m,
-                cover: m.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : (m.cover || '/placeholder-manga.svg')
+                cover: m.cover?.startsWith('http') ? getSignedProxyUrl(m.cover, 300, 75) : (m.cover || '/placeholder-manga.svg')
             })));
         }
 
@@ -45,7 +46,7 @@ export async function GET(request) {
 
         return Response.json(recommendationRes.recordset.map(m => ({
             ...m,
-            cover: m.cover?.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(m.cover)}` : (m.cover || '/placeholder-manga.svg')
+            cover: m.cover?.startsWith('http') ? getSignedProxyUrl(m.cover, 300, 75) : (m.cover || '/placeholder-manga.svg')
         })));
     } catch (err) {
         console.error('Recommendations API Error:', err);

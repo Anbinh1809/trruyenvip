@@ -3,7 +3,7 @@
 import NextLink from 'next/link';
 import { Ghost } from 'lucide-react';
 
-export default function GuardianBeastEmptyState({ 
+export default function IndustrialEmptyState({ 
     keyword = '', 
     title = 'KHÔNG CÓ KẾT QUẢ', 
     message = '',

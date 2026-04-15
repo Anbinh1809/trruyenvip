@@ -1,17 +1,14 @@
 import { query } from '@/lib/db';
-import { getSession } from '@/lib/auth';
+import { withTitan } from '@/lib/api-handler';
 
-export async function GET(request) {
-    const session = await getSession();
-    
-    if (!session || session.role !== 'admin') {
-        return new Response('Unauthorized', { status: 401 });
-    }
-
-    try {
+/**
+ * GET: Retrieve crawler logs
+ * Hardened: Wrapped in withTitan for global security headers.
+ */
+export const GET = withTitan({
+    admin: true,
+    handler: async () => {
         const res = await query('SELECT * FROM crawllogs ORDER BY created_at DESC LIMIT 50');
-        return Response.json(res.recordset || []);
-    } catch (err) {
-        return new Response('Database error', { status: 500 });
+        return res.recordset || [];
     }
-}
+});

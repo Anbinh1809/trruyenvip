@@ -5,7 +5,7 @@ import { query, MANGA_CARD_FIELDS } from '@/lib/db';
 import Link from 'next/link';
 import { headers } from 'next/headers';
 import Footer from '@/components/Footer';
-import GuardianBeastEmptyState from '@/components/GuardianBeastEmptyState';
+import IndustrialEmptyState from '@/components/IndustrialEmptyState';
 
 export const revalidate = 600; // ISR: Revalidate every 10 minutes
 
@@ -150,7 +150,7 @@ export default async function GenresPage({ searchParams }) {
                         ))}
                     </div>
                 ) : (
-                    <GuardianBeastEmptyState 
+                    <IndustrialEmptyState 
                         title="DỮ LIỆU ĐANG CẬP NHẬT"
                         message={`Hiện tại thư viện <span class="text-accent-titan">${activeGenre?.name || 'này'}</span> chưa có bản ghi nào được lưu trữ. Vui lòng quay lại sau.`}
                         buttonText="Quay Lại Trang Chủ"

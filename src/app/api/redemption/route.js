@@ -1,4 +1,4 @@
-import { query, withTransaction } from '@/lib/db';
+import { query, withTransaction, checkRateLimit } from '@/lib/db';
 import { withTitan } from '@/lib/api-handler';
 
 export const GET = withTitan({
@@ -48,23 +48,26 @@ export const POST = withTitan({
         }
         const cost = val * 1000;
 
+        // TITAN RATE LIMIT: Prevent withdrawal spamming
+        const limiter = await checkRateLimit(`redemption_${session.uuid}`, 1, 60); // 1 request / minute
+        if (!limiter.success) {
+            throw { status: 429, message: 'Yêu cầu của bạn đang được xử lý hoặc quá nhanh. Vui lòng đợi 1 phút.' };
+        }
+
         return await withTransaction(async (client) => {
-            // DB check to handle race conditions
-            const userRes = await query('SELECT vipcoins FROM users WHERE uuid = @uuid', { uuid: session.uuid }, client);
-            const userCoins = userRes.recordset?.[0]?.vipcoins || 0;
-
-            if (userCoins < cost) {
-                throw new Error('Số dư VipCoins không đủ.');
-            }
-
+            // TITAN ATOMICITY: Check and Deduct in one operation to prevent double-spending race conditions
             const updateRes = await query(
-                'UPDATE users SET vipcoins = vipcoins - @cost WHERE uuid = @uuid',
+                'UPDATE users SET vipcoins = vipcoins - @cost WHERE uuid = @uuid AND vipcoins >= @cost',
                 { cost, uuid: session.uuid },
                 client
             );
-
+ 
             if (updateRes.rowCount === 0) {
-                throw new Error('Cập nhật số dư thất bại.');
+                // If update failed, it's either user not found or insufficient balance
+                // We re-query only to provide a specific error message, but the safety is in the WHERE clause above.
+                const userRes = await query('SELECT vipcoins FROM users WHERE uuid = @uuid', { uuid: session.uuid }, client);
+                if (!userRes.recordset?.[0]) throw new Error('Người dùng không tồn tại.');
+                throw new Error('Số dư VipCoins không đủ.');
             }
 
             await query(

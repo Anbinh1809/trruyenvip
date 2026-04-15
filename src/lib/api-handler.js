@@ -26,12 +26,17 @@ export function withTitan(options) {
       // 3. Execute Handler
       const result = await options.handler(request, session, context);
 
-      // 4. Transform to NextResponse if needed
-      if (result instanceof Response || result instanceof NextResponse) {
-        return result;
-      }
+      const response = result instanceof Response || result instanceof NextResponse 
+        ? result 
+        : NextResponse.json(result || { success: true });
 
-      return NextResponse.json(result || { success: true });
+      // TITAN SECURITY HEADERS: Industrial protection suite
+      response.headers.set('X-Content-Type-Options', 'nosniff');
+      response.headers.set('X-Frame-Options', 'DENY');
+      response.headers.set('X-XSS-Protection', '1; mode=block');
+      response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+      
+      return response;
     } catch (error) {
       console.error(`[API ERROR] ${options.handler.name || 'Anonymous'}:`, error);
       

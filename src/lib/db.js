@@ -126,8 +126,11 @@ function translateSql(sql, params) {
 
     // 7. Schema & Identifier Cleanup
     translatedSql = translatedSql.replace(/(?:\[dbo\]|"dbo"|dbo)\./gi, ''); 
-    translatedSql = translatedSql.replace(/\[([^\]]+)\]/g, (match, p1) => `"${p1.toLowerCase()}"`);
-    // NOTE: Removed forceful lowercase of quoted identifiers to support CamelCase aliases needed for stats
+    translatedSql = translatedSql.replace(/\[([^\]]+)\]/g, (match, p1) => {
+        // Only lowercase if it doesn't contain uppercase already (basic heuristic)
+        // or just keep it as is but quoted for PG.
+        return `"${p1}"`;
+    }); 
 
     if (translationCache.size < MAX_CACHE_SIZE) {
         translationCache.set(sql, { translatedSql, paramOrder });
@@ -222,9 +225,15 @@ export async function bulkInsert(tableName, rows, client = null) {
     const columns = Object.keys(rows[0]);
     const dbClient = client || await pool.connect();
     try {
-        // Force lowercase and unquote table/column names to avoid case-sensitivity issues in PG
-        const cleanTable = tableName.replace(/[\[\]"]/g, '').toLowerCase();
-        const colNames = columns.map(c => `"${c.toLowerCase()}"`).join(', ');
+    // TITAN SECURITY: Strict Table Allow-list for Bulk Operations
+    const tableWhitelist = ['notifications', 'chapterimages', 'crawlertasks', 'mangagenres', 'users'];
+    const cleanTable = tableName.replace(/[\[\]"]/g, '').toLowerCase();
+    
+    if (!tableWhitelist.includes(cleanTable)) {
+        throw new Error(`SECURITY ALERT: Bulk insert attempted on non-whitelisted table: ${cleanTable}`);
+    }
+
+    const colNames = columns.map(c => `"${c.toLowerCase()}"`).join(', ');
         
         const flatValues = [];
         const placeholders = rows.map((_, i) => 
@@ -266,6 +275,30 @@ export async function cleanLegacyEncoding() {
         
         // CHAPTERS TABLE HARDENING
         await query("ALTER TABLE chapters ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active'");
+        await query("ALTER TABLE chapters ADD COLUMN IF NOT EXISTS fail_count INTEGER DEFAULT 0");
+        await query("ALTER TABLE crawlertasks ADD COLUMN IF NOT EXISTS manga_id VARCHAR(255)");
+
+        // TITAN-PERSISTENCE: Ensure critical configuration and notification tables exist
+        await query(`
+            CREATE TABLE IF NOT EXISTS system_config (
+                key VARCHAR(255) PRIMARY KEY,
+                value TEXT,
+                updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+            )
+        `);
+
+        await query(`
+            CREATE TABLE IF NOT EXISTS notifications (
+                id SERIAL PRIMARY KEY,
+                user_uuid VARCHAR(255) REFERENCES users(uuid) ON DELETE CASCADE,
+                manga_id VARCHAR(255) REFERENCES manga(id) ON DELETE SET NULL,
+                title VARCHAR(255),
+                message TEXT,
+                type VARCHAR(50),
+                is_read BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+            )
+        `);
 
         // TITAN-SLUG RECONSTRUCTION: Move to JS for robust transliteration
         const rawManga = await query("SELECT id, title FROM manga WHERE normalized_title IS NULL OR normalized_title = '' LIMIT 500");
