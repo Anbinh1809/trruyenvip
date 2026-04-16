@@ -2,7 +2,7 @@ import { loadSystemState } from '@/lib/db';
 import { withTitan } from '@/lib/api-handler';
 
 export const GET = withTitan({
-    authenticated: true,
+    auth: true,
     handler: async (req, session) => {
         if (session.role !== 'admin') {
             throw { status: 403, message: 'Forbidden' };

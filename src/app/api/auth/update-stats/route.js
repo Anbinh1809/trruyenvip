@@ -32,12 +32,9 @@ export async function POST(request) {
             return NextResponse.json({ success: true });
         }
 
-        // 3. Security Hardening: Prevent negative XP and suspicious injections
-        if (deltaXp < 0) {
-            return NextResponse.json({ error: 'Dữ liệu bất thường (XP cannot be negative)' }, { status: 400 });
-        }
-
-        if (Math.abs(deltaXp) > 2000 || Math.abs(deltaCoins) > 10000) {
+        // TITAN-GRADE SANITY CHECK: Max 500 XP and 100 Coins per heart-beat (3s)
+        // This makes it virtually impossible to farm massive amounts without triggering rate limits.
+        if (deltaXp > 500 || deltaCoins > 100) {
             return NextResponse.json({ error: 'Dữ liệu bất thường (Deltas excessive)' }, { status: 400 });
         }
 

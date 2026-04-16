@@ -25,7 +25,7 @@ export async function POST() {
             await setSessionCookie(freshToken);
         }
 
-        return NextResponse.json({ authenticated: true, user: session });
+        return NextResponse.json({ auth: true, user: session });
     } catch (e) {
         return NextResponse.json({ authenticated: false }, { status: 500 });
     }

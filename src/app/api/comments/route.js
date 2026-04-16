@@ -42,7 +42,7 @@ function sanitizeContent(text) {
 }
 
 export const POST = withTitan({
-    authenticated: true,
+    auth: true,
     handler: async (req, session) => {
         const body = await req.json();
         const { chapterId, content, parentId } = body;
@@ -75,7 +75,7 @@ export const POST = withTitan({
 });
 
 export const PATCH = withTitan({
-    authenticated: true,
+    auth: true,
     handler: async (req, session) => {
         const { id, action } = await req.json();
         const userUuid = session.uuid;
@@ -101,7 +101,7 @@ export const PATCH = withTitan({
 });
 
 export const DELETE = withTitan({
-    authenticated: true,
+    auth: true,
     handler: async (req, session) => {
         const { searchParams } = new URL(req.url);
         const id = searchParams.get('id');
@@ -119,6 +119,10 @@ export const DELETE = withTitan({
             throw { status: 403, message: 'Bạn không có quyền xóa bình luận này' };
         }
 
+        // TITAN INTEGRITY: Clean up orphan likes before deleting the comment
+        await query(`DELETE FROM comment_likes WHERE comment_id = @id`, { id });
+        
+        // Delete comment and its replies
         await query(`DELETE FROM comments WHERE id = @id OR parent_id = @id`, { id });
         return { success: true, message: 'Đã xóa bình luận' };
     }

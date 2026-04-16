@@ -2,7 +2,7 @@ import { query, checkRateLimit } from '@/lib/db';
 import { withTitan } from '@/lib/api-handler';
 
 export const PATCH = withTitan({
-    authenticated: true,
+    auth: true,
     handler: async (request, session) => {
         const body = await request.json();
         const { avatar } = body;

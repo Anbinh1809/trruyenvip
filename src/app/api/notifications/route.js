@@ -6,7 +6,7 @@ import { withTitan } from '@/lib/api-handler';
  * Hardened: Wrapped in withTitan for secure headers and atomic error handling.
  */
 export const GET = withTitan({
-    authenticated: true,
+    auth: true,
     handler: async (req, session) => {
         const res = await query(`
             SELECT n.*, m.cover 
@@ -25,7 +25,7 @@ export const GET = withTitan({
  * PATCH: Mark notifications as read
  */
 export const PATCH = withTitan({
-    authenticated: true,
+    auth: true,
     handler: async (req, session) => {
         const { id, all } = await req.json();
 

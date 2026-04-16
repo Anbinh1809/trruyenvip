@@ -94,8 +94,17 @@ async function executeTask(taskRow) {
     const weight = TASK_WEIGHTS[taskRow.type] || 1;
     activeWorkers += weight;
     
+    let payload;
     try {
-        const payload = JSON.parse(taskRow.target);
+        payload = JSON.parse(taskRow.target);
+    } catch (parseErr) {
+        console.error(`[Titan:Fatal] Task ${taskRow.id} has malformed payload:`, taskRow.target);
+        await query("UPDATE crawlertasks SET status = 'failed', last_error = 'MALFORMED_JSON' WHERE id = @id", { id: taskRow.id });
+        activeWorkers -= weight;
+        return;
+    }
+    
+    try {
         const source = payload.source || 'nettruyen';
         
         switch (taskRow.type) {

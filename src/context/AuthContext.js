@@ -14,7 +14,7 @@ export function AuthProvider({ children }) {
             const res = await fetch('/api/auth/me', { cache: 'no-store' });
             if (res.ok) {
                 const data = await res.json();
-                if (data.authenticated) {
+                if (data.auth || data.authenticated) {
                     // Identity verified; silent for production
                     setUser(data.user);
                     setIsAuthenticated(true);

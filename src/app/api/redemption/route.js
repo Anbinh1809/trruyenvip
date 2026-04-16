@@ -2,7 +2,7 @@ import { query, withTransaction, checkRateLimit } from '@/lib/db';
 import { withTitan } from '@/lib/api-handler';
 
 export const GET = withTitan({
-    authenticated: true,
+    auth: true,
     handler: async (req, session) => {
         const { searchParams } = new URL(req.url);
         const userUuid = searchParams.get('userUuid') || session.uuid;
@@ -34,7 +34,7 @@ export const GET = withTitan({
 });
 
 export const POST = withTitan({
-    authenticated: true,
+    auth: true,
     handler: async (req, session) => {
         const { bankName, accountNo, accountHolder, amount } = await req.json();
 

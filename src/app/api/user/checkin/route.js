@@ -7,7 +7,7 @@ import { NextResponse } from 'next/server';
  * Logic: 10 coins base reward + 100 coins bonus on 7-day streak milestone.
  */
 export const POST = withTitan({
-    authenticated: true,
+    auth: true,
     handler: async (request, session) => {
         const userUuid = session.uuid;
         const today = new Date().toISOString().split('T')[0];
@@ -81,7 +81,7 @@ export const POST = withTitan({
 });
 
 export const GET = withTitan({
-    authenticated: true,
+    auth: true,
     handler: async (request, session) => {
         const today = new Date().toISOString().split('T')[0];
         const res = await query(`

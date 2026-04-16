@@ -2,7 +2,7 @@ import { query } from '@/lib/db';
 import { withTitan } from '@/lib/api-handler';
 
 export const POST = withTitan({
-    authenticated: true,
+    auth: true,
     handler: async (req, session) => {
         const { commentId, reason } = await req.json();
 

@@ -5,7 +5,7 @@ import { withTitan } from '@/lib/api-handler';
  * GET: Retrieve user favorites
  */
 export const GET = withTitan({
-    authenticated: true,
+    auth: true,
     handler: async (req, session) => {
         const results = await query(`
             SELECT m.id, m.title, m.cover,
@@ -24,7 +24,7 @@ export const GET = withTitan({
  * POST: Toggle favorite status
  */
 export const POST = withTitan({
-    authenticated: true,
+    auth: true,
     handler: async (req, session) => {
         const { mangaId } = await req.json();
         

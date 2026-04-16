@@ -26,6 +26,7 @@ export const GET = withTitan({
       }
 
       return {
+        auth: true,
         authenticated: true,
         user: {
           uuid: user.uuid,

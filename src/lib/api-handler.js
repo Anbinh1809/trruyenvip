@@ -11,13 +11,18 @@ import { NextResponse } from 'next/server';
 export function withTitan(options) {
   return async (request, context) => {
     try {
+      // TITAN FAIL-SAFE: Handle the 'authenticated' vs 'auth' typo seen in legacy/drifted routes
+      const isAuthRequired = options.auth || options.authenticated;
+      if (options.authenticated && process.env.NODE_ENV !== 'production') {
+        console.warn('[Titan:Guard] WARNING: Route uses legacy "authenticated" key. Update to "auth: true".');
+      }
+
       // TITAN-GRADE ISOLATION: 
       // We ONLY call getSession if this endpoint explicitly requires auth or admin privileges.
-      // This is critical to allow public endpoints (like Leaderboard) to be statically pre-rendered.
-      const session = (options.auth || options.admin) ? await getSession() : null;
+      const session = (isAuthRequired || options.admin) ? await getSession() : null;
 
-      // 1. Auth Guard
-      if (options.auth && !session) {
+      // 1. Auth Guard (Robust check)
+      if (isAuthRequired && !session) {
         return new Response('Unauthorized', { status: 401 });
       }
 
