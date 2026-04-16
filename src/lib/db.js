@@ -288,17 +288,32 @@ export async function cleanLegacyEncoding() {
         `);
 
         await query(`
+            CREATE TABLE IF NOT EXISTS readhistory (
+                id SERIAL PRIMARY KEY,
+                user_uuid VARCHAR(255) REFERENCES users(uuid) ON DELETE CASCADE,
+                manga_id VARCHAR(255) REFERENCES manga(id) ON DELETE CASCADE,
+                chapter_id VARCHAR(255) REFERENCES chapters(id) ON DELETE CASCADE,
+                updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+            )
+        `);
+
+        await query(`
             CREATE TABLE IF NOT EXISTS notifications (
                 id SERIAL PRIMARY KEY,
                 user_uuid VARCHAR(255) REFERENCES users(uuid) ON DELETE CASCADE,
                 manga_id VARCHAR(255) REFERENCES manga(id) ON DELETE SET NULL,
-                title VARCHAR(255),
+                title TEXT NOT NULL,
                 message TEXT,
-                type VARCHAR(50),
+                link TEXT,
+                type VARCHAR(50) DEFAULT 'info',
                 is_read BOOLEAN DEFAULT FALSE,
                 created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
             )
         `);
+
+        // TITAN-GRADE MIGRATION: Ensure existing notifications table has the link column
+        await query('ALTER TABLE notifications ADD COLUMN IF NOT EXISTS link TEXT');
+        await query("ALTER TABLE notifications ALTER COLUMN type SET DEFAULT 'info'");
 
         // TITAN-SLUG RECONSTRUCTION: Move to JS for robust transliteration
         const rawManga = await query("SELECT id, title FROM manga WHERE normalized_title IS NULL OR normalized_title = '' LIMIT 500");

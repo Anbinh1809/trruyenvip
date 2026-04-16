@@ -5,11 +5,13 @@ import * as cheerio from 'cheerio';
 
 function sanitize(text) {
     if (!text) return '';
-    return text.trim()
-        .replace(/\?\?/g, '') // Remove legacy encoding artifacts
-        .replace(/[\u0000-\u001F\u007F-\u009F]/g, "") // Remove non-printable control characters
-        .replace(/\u200B/g, '') // Remove zero-width space
-        .replace(/\s+/g, ' ');
+    return text
+        .normalize('NFC')
+        .replace(/\?\?/g, '')
+        .replace(/[\u0000-\u001F\u007F-\u009F]/g, "")
+        .replace(/\u200B/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
 }
 
 function resolveUrl(relative, base) {

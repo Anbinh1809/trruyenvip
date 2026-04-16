@@ -399,7 +399,8 @@ export async function triggerChapterNotifications(mangaId, chapTitle, chapId) {
         await bulkInsert('notifications', notificationData);
         console.log(`[Notification] Dispatched alerts to ${subscribers.recordset.length} subscribers for ${mangaId}`);
     } catch (e) {
-        console.error('[Notification Error] Failed to dispatch alerts:', e.message);
+        // SILENT FAIL for notifications: We don't want a notification glitch to kill the entire crawler pulse
+        console.warn(`[Notification Warning] Failed to dispatch alerts for ${mangaId}:`, e.message);
     }
 }
 
@@ -493,7 +494,9 @@ export async function crawlChapterImages(chapId, url, source = 'nettruyen', forc
             }));
 
             await bulkInsert('chapterimages', batchImages, tx);
-            await query("UPDATE chapters SET updated_at = NOW(), status = 'active', fail_count = 0 WHERE id = @chapId", { chapId }, tx);
+            // TITAN STATUS UPDATE: Only mark as active if we actually found images
+            const finalStatus = images.length > 0 ? 'active' : 'pending';
+            await query("UPDATE chapters SET updated_at = NOW(), status = @status, fail_count = 0 WHERE id = @chapId", { chapId, status: finalStatus }, tx);
         });
 
         updateTelemetry({ successCount: 1, imagesFound: images.length });
