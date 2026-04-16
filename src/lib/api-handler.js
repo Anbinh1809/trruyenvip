@@ -11,7 +11,12 @@ import { NextResponse } from 'next/server';
 export function withTitan(options) {
   return async (request, context) => {
     try {
-      const session = await getSession();
+      // TITAN OPTIMIZATION: Only fetch session if auth/admin is required.
+      // This prevents 'Dynamic server usage' errors during static generation of public APIs.
+      let session = null;
+      if (options.auth || options.admin) {
+        session = await getSession();
+      }
 
       // 1. Auth Guard
       if (options.auth && !session) {

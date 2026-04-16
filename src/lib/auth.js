@@ -30,10 +30,15 @@ export async function verifyToken(token) {
 }
  
 export const getSession = cache(async () => {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('token')?.value;
-  if (!token) return null;
-  return await verifyToken(token);
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    if (!token) return null;
+    return await verifyToken(token);
+  } catch (e) {
+    // Return null if cookies() is inaccessible (e.g. during static generation)
+    return null;
+  }
 });
 
 export async function setSessionCookie(token) {
