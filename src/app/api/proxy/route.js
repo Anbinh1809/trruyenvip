@@ -30,10 +30,10 @@ export async function GET(request) {
 
   const allowedDomains = [
     // PRIMARY MIRRORS & CDN
-    'nettruyen.us.com', 'nettruyenus.com', 'nettruyennew.com', 'nettruyenon.com',
+    'nettruyenplus.com', 'nettruyenfull.com', 'nettruyentop.com', 'nettruyenviet.com', 'nettruyen.us.com', 'nettruyenus.com', 'nettruyennew.com', 'nettruyenon.com',
     'nettruyentv.com', 'nettruyenv.com', 'nettruyenmax.com', 'nettruyenpro.com',
-    'nettruyenco.vn', 'nettruyenio.com', 'truyenqqno.com', 'truyenqq.top',
-    'truyenqq.info', 'truyenqq.nu', 'truyenqqvn.com', 'truyenqqio.com',
+    'nettruyenco.vn', 'nettruyenio.com', 'truyenqqplus.com', 'truyenqqno.com', 'truyenqq.top',
+    'truyenqq.info', 'truyenqq.nu', 'truyenqqvn.com', 'truyenqqio.com', 'truyenqqq.com',
     
     // IMAGE SERVERS & CDNs
     'nt-cdn.xyz', 'nt-cdn.com', 'nt-cdn1.xyz', 'nt-cdn2.xyz',

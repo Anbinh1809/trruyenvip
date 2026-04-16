@@ -545,6 +545,7 @@ export async function runGuardianAutopilot(oneShot = false) {
     if (state) {
         if (state.discoveryPage) global.discoveryPage = state.discoveryPage;
         if (state.isArchivalPulse !== undefined) global.isArchivalPulse = state.isArchivalPulse;
+        if (state.mirrorScores) global.mirrorScores = { ...global.mirrorScores, ...state.mirrorScores }; // TITAN: Load persistent intelligence
         console.log(`[Guardian] State Recovered: Page ${global.discoveryPage}, Archival: ${global.isArchivalPulse}`);
     }
 
@@ -561,16 +562,25 @@ export async function runGuardianAutopilot(oneShot = false) {
                 concurrencyLimit: currentLimit
             });
             
-            const source = Math.random() > 0.3 ? 'nettruyen' : 'truyenqq';
+            // TITAN V3: Multi-Source Discovery (Check BOTH Nettruyen and TruyenQQ in one pulse)
+            const sources = ['nettruyen', 'truyenqq'];
             let newFound = 0;
 
+            for (const source of sources) {
+                if (!global.isArchivalPulse) {
+                    // Latest Pulse: Scrape 3 pages per source for high freshness
+                    newFound += await crawlLatest(source, 3);
+                } else {
+                    // Archival Pulse: Scrape 2 pages from the history streak
+                    const archivePage = global.discoveryPage % 500 + 1;
+                    newFound += await crawlLatest(source, 2, archivePage);
+                }
+            }
+
             if (!global.isArchivalPulse) {
-                newFound = await crawlLatest(source, 1);
                 global.isArchivalPulse = true;
             } else {
-                const archivePage = global.discoveryPage % 500 + 1;
-                newFound = await crawlLatest(source, 1, archivePage);
-                global.discoveryPage++;
+                global.discoveryPage += 2;
                 global.isArchivalPulse = false;
             }
 
@@ -580,8 +590,9 @@ export async function runGuardianAutopilot(oneShot = false) {
                 nothingNewStreak = 0;
             }
 
-            await rescueBrokenImages(15);
-            await healChapterGaps(10);
+            // TITAN V3: Aggressive Self-Healing (Scales rescue throughput)
+            await rescueBrokenImages(50);
+            await healChapterGaps(30);
             
             // TITAN STEALTH: Adaptive Heartbeat (60s to 600s) to prevent mirror bans
             const waitTime = Math.max(10000, 60000 * (nothingNewStreak + 1));

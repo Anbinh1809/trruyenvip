@@ -4,7 +4,7 @@ import { runTitanWorker } from '../src/lib/crawler/index.js';
 const WORKER_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes (Allowing more time for pulse completion)
 
 async function main() {
-    console.log('[Titan Worker] Starting autonomous crawl pulse...');
+    console.log('[Titan Worker] Starting autonomous crawl pulse (Autonomy V3: Active Ingestion)...');
     
     // SAFETY TIMER: Ensure graceful exit if the pulse hangs
     const safetyTimeout = setTimeout(() => {

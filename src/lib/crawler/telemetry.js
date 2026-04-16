@@ -19,7 +19,8 @@ global.crawlerState = global.crawlerState || {
     concurrencyLimit: 128,
     startTime: Date.now(),
     lastAction: Date.now(),
-    mirrorHealth: {} // { 'nettruyen.com': { failCount: 0, lastFail: Date.now(), status: 'ok' } }
+    mirrorHealth: {}, // { 'nettruyen.com': { failCount: 0, lastFail: Date.now(), status: 'ok' } },
+    mirrorScores: {}
 };
 
 export const getTelemetry = () => global.crawlerState;
@@ -86,6 +87,7 @@ export function updateTelemetry(data) {
                 discoveryPage: global.crawlerState.discoveryPage,
                 isArchivalPulse: global.crawlerState.isArchivalPulse,
                 mirrorHealth: global.crawlerState.mirrorHealth,
+                mirrorScores: global.mirrorScores,
                 lastSeen: now
             });
             if (data.syncHealth) console.log('[Telemetry] Force-Sync completed.');
