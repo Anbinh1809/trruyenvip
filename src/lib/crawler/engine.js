@@ -301,6 +301,7 @@ export async function crawlFullMangaChapters(mangaId, url, source, earlyExit = f
 
         await query(`
             UPDATE manga SET 
+                title = @title,
                 author = @author,
                 status = @status, 
                 description = @description,
@@ -308,6 +309,7 @@ export async function crawlFullMangaChapters(mangaId, url, source, earlyExit = f
             WHERE id = @mangaId
         `, { 
             mangaId, 
+            title: metadata.title || mangaId,
             author: metadata.author || 'Đang cập nhật', 
             status: metadata.status || 'Đang cập nhật', 
             description: metadata.description || 'Nội dung đang được cập nhật.',
@@ -327,45 +329,43 @@ export async function crawlFullMangaChapters(mangaId, url, source, earlyExit = f
             existingUrls.add(r.source_url);
         });
 
-        let existingInARow = 0;
-        
-        for (let i = 0; i < chapterRows.length; i++) {
-            try {
-                const el = chapterRows[i];
-                const a = $(el).is('a') ? $(el) : $(el).find('a').first();
-                let chapUrl = a.attr('href');
-                if (!chapUrl) continue;
-                
-                if (chapUrl.startsWith('/')) {
-                    const base = source === 'nettruyen' ? SOURCES.NETTRUYEN : SOURCES.TRUYENQQ;
-                    chapUrl = safeJoinUrl(base, chapUrl);
+        // TITAN PARALLEL INGESTION: Process in batches of 15 to balance speed and DB pool stability
+        const CHUNK_SIZE = 15;
+        for (let i = 0; i < chapterRows.length; i += CHUNK_SIZE) {
+            const chunk = chapterRows.slice(i, i + CHUNK_SIZE);
+            await Promise.all(chunk.map(async (el) => {
+                try {
+                    const a = $(el).is('a') ? $(el) : $(el).find('a').first();
+                    let chapUrl = a.attr('href');
+                    if (!chapUrl) return;
+                    
+                    if (chapUrl.startsWith('/')) {
+                        const base = source === 'nettruyen' ? SOURCES.NETTRUYEN : SOURCES.TRUYENQQ;
+                        chapUrl = safeJoinUrl(base, chapUrl);
+                    }
+                    
+                    const chapTitle = a.text().trim() || $(el).find('.chapter-name').text().trim();
+                    const chapSlug = chapUrl.split('/').pop()?.split('?')[0];
+                    const chapId = `${mangaId}_${chapSlug}`;
+                    const chapNum = parseChapterNumber(chapTitle);
+
+                    if (existingIds.has(chapId) || existingUrls.has(chapUrl)) {
+                        return;
+                    }
+
+                    await query(`
+                        INSERT INTO chapters (id, manga_id, title, source_url, chapter_number) 
+                        VALUES (@chapId, @mangaId, @title, @url, @chapNum)
+                        ON CONFLICT (id) DO NOTHING
+                    `, { chapId, mangaId, title: chapTitle, url: chapUrl, chapNum });
+
+                    // TITAN ASYNC TASKING: Notifications and scraping don't block the main sync loop
+                    triggerChapterNotifications(mangaId, chapTitle, chapId).catch(() => {});
+                    queueChapterScrape(chapId, chapUrl, source).catch(() => {});
+                } catch (chapterErr) {
+                    // Silent fail for single chapter to prevent entire manga sync from crashing
                 }
-                
-                processedUrls.add(chapUrl);
-                const chapTitle = a.text().trim() || $(el).find('.chapter-name').text().trim();
-                const chapSlug = chapUrl.split('/').pop()?.split('?')[0];
-                const chapId = `${mangaId}_${chapSlug}`;
-                const chapNum = parseChapterNumber(chapTitle);
-
-                if (existingIds.has(chapId) || existingUrls.has(chapUrl)) {
-                    // Early exit logic removed for Cycle 1 Hardening. 
-                    // We sync everything found on the page to ensure zero gaps.
-                    continue;
-                }
-                existingInARow = 0;
-
-                await query(`
-                    INSERT INTO chapters (id, manga_id, title, source_url, chapter_number) 
-                    VALUES (@chapId, @mangaId, @title, @url, @chapNum)
-                `, { chapId, mangaId, title: chapTitle, url: chapUrl, chapNum });
-
-                // TITAN NOTIFICATION: Alert favorite subscribers
-                triggerChapterNotifications(mangaId, chapTitle, chapId).catch(() => {});
-
-                queueChapterScrape(chapId, chapUrl, source).catch(() => {});
-            } catch (chapterErr) {
-                console.error(`[Crawler][Error] Failed to process chapter:`, chapterErr.message);
-            }
+            }));
         }
 
         // TITAN INTEGRITY: Only update last_crawled after successfully reaching the end of chapter processing
@@ -439,18 +439,35 @@ export async function crawlLatest(source = 'nettruyen', pageCount = 1, startPage
                 if (!mangaUrl) continue;
                 if (mangaUrl.startsWith('/')) mangaUrl = safeJoinUrl(base, mangaUrl);
                 
-                const slug = mangaUrl.split('/').pop()?.split('?')[0];
-                const title = $(link).attr('title') || $(link).find('img').attr('alt') || slug;
+                const rawSlug = mangaUrl.split('/').pop()?.split('?')[0];
+                const title = $(link).attr('title') || $(link).find('img').attr('alt') || rawSlug;
                 
-                const res = await query(`
-                    INSERT INTO manga (id, title, source_url) 
-                    VALUES (@slug, @title, @mangaUrl)
-                    ON CONFLICT (source_url) DO NOTHING
-                    ON CONFLICT (id) DO NOTHING
-                    RETURNING id
-                `, { slug, title, mangaUrl });
+                // TITAN DE-DUPLICATION: Normalize title for cross-source matching
+                const normalizedTitle = title.toLowerCase()
+                    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                    .replace(/[đĐ]/g, 'd')
+                    .replace(/[^a-z0-9]/g, '-')
+                    .replace(/-+/g, '-')
+                    .replace(/^-|-$/g, '');
 
-                if (res.rowCount > 0) newMangaCount++;
+                // Check for existing record with same normalized title (Merge logic)
+                const existing = await query("SELECT id FROM manga WHERE normalized_title = @normalizedTitle OR id = @rawSlug LIMIT 1", { 
+                    normalizedTitle, 
+                    rawSlug 
+                });
+
+                let slug = rawSlug;
+                if (existing.recordset?.length > 0) {
+                    slug = existing.recordset[0].id; // Use established ID to merge sources
+                } else {
+                    // New manga: Insert skeleton
+                    await query(`
+                        INSERT INTO manga (id, title, source_url, normalized_title) 
+                        VALUES (@slug, @title, @mangaUrl, @normalizedTitle)
+                        ON CONFLICT (id) DO NOTHING
+                    `, { slug, title, mangaUrl, normalizedTitle });
+                    newMangaCount++;
+                }
                 
                 await queueMangaSync(slug, mangaUrl, source, true, 4);
             }

@@ -1,10 +1,11 @@
 import { getSession, setSessionCookie, signToken, verifyToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
+import { withTitan } from '@/lib/api-handler';
 
-export async function POST() {
-    try {
-        const session = await getSession();
+export const POST = withTitan({
+    allowOptional: true,
+    handler: async (req, session) => {
         if (!session) {
             return NextResponse.json({ authenticated: false }, { status: 401 });
         }
@@ -26,7 +27,5 @@ export async function POST() {
         }
 
         return NextResponse.json({ auth: true, user: session });
-    } catch (e) {
-        return NextResponse.json({ authenticated: false }, { status: 500 });
     }
-}
+});

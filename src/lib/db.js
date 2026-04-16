@@ -226,7 +226,7 @@ export async function bulkInsert(tableName, rows, client = null) {
     const dbClient = client || await pool.connect();
     try {
     // TITAN SECURITY: Strict Table Allow-list for Bulk Operations
-    const tableWhitelist = ['notifications', 'chapterimages', 'crawlertasks', 'mangagenres', 'users'];
+    const tableWhitelist = ['notifications', 'chapterimages', 'crawlertasks', 'mangagenres'];
     const cleanTable = tableName.replace(/[\[\]"]/g, '').toLowerCase();
     
     if (!tableWhitelist.includes(cleanTable)) {
@@ -255,7 +255,7 @@ export async function bulkInsert(tableName, rows, client = null) {
     }
 }
 
-export const MANGA_CARD_FIELDS = `id, title, cover, last_chap_num, rating, views, author, status, last_crawled, normalized_title`;
+export const MANGA_CARD_FIELDS = `id, title, cover, last_chap_num, rating, views, views_at_source, author, status, last_crawled, normalized_title`;
 
 export async function cleanLegacyEncoding() {
     try {
@@ -372,6 +372,10 @@ export async function cleanLegacyEncoding() {
         // 5. INDEX HARDENING
         await query("CREATE INDEX IF NOT EXISTS idx_manga_normalized_title_gin ON manga USING gin(normalized_title gin_trgm_ops)");
         await query("CREATE INDEX IF NOT EXISTS idx_manga_alternative_titles_gin ON manga USING gin(alternative_titles gin_trgm_ops)");
+        await query("CREATE INDEX IF NOT EXISTS idx_notifications_user_uuid ON notifications (user_uuid)");
+        await query("CREATE INDEX IF NOT EXISTS idx_readhistory_manga_id ON readhistory (manga_id)");
+        await query("CREATE INDEX IF NOT EXISTS idx_comment_likes_comment_id ON comment_likes (comment_id)");
+        await query("CREATE INDEX IF NOT EXISTS idx_comment_likes_user_uuid ON comment_likes (user_uuid)");
         
         console.log('[TITAN INFO] Project SANITIZED: Log pruning and orphaned record cleanup completed.');
     } catch (e) {

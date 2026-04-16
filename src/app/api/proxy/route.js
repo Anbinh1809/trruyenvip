@@ -21,8 +21,12 @@ export async function GET(request) {
   // - 16-char HMAC: generated server-side via generateProxySignature()
   // - 8-char simpleHash: generated client-side via getSignedProxyUrl() in MangaCard etc.
 
-  const expectedHmac = generateProxySignature(imageUrl, width, quality);
-  const expectedSimple = simpleHash(`${imageUrl}|${width}|${quality}`);
+  const q = parseInt(quality);
+  const w = parseInt(width);
+
+  const expectedHmac = generateProxySignature(imageUrl, w, q);
+  const expectedSimple = simpleHash(`${imageUrl}|${w}|${q}`);
+  
   if (!sig || (sig !== expectedHmac && sig !== expectedSimple)) {
     return new Response('Forbidden: Invalid Signature', { status: 403 });
   }

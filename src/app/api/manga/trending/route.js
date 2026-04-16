@@ -1,9 +1,9 @@
 import { query } from '@/lib/db';
 import { generateProxySignature } from '@/lib/crypto';
-import { NextResponse } from 'next/server';
+import { withTitan } from '@/lib/api-handler';
 
-export async function GET() {
-    try {
+export const GET = withTitan({
+    handler: async () => {
         const trending = await query(`
             SELECT m.id, m.title, m.cover, m.normalized_title
             FROM manga m
@@ -13,10 +13,10 @@ export async function GET() {
             LIMIT 5
         `);
 
-        const optimized = (trending.recordset || []).map(m => {
+        return (trending.recordset || []).map(m => {
             const coverUrl = m.cover || '/placeholder-manga.svg';
             const w = 100;
-            const q = 70;
+            const q = 75; // Standardized quality
             let finalCover = coverUrl;
 
             if (coverUrl.startsWith('http')) {
@@ -29,9 +29,5 @@ export async function GET() {
                 cover: finalCover
             };
         });
-
-        return NextResponse.json(optimized);
-    } catch (err) {
-        return new Response('Error', { status: 500 });
     }
-}
+});

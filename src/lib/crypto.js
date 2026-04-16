@@ -7,15 +7,13 @@
  * getSignedProxyUrl is CLIENT-SAFE: uses a simple hash that works in browsers.
  */
 
-// ── Server-only functions (Node.js crypto) ────────────────────────────────── 
-// ── Server-only functions (Node.js crypto) ────────────────────────────────── 
+import crypto from 'crypto';
+
 const PROXY_SECRET = process.env.PROXY_SECRET;
 const FALLBACK_SECRET = 'titan-industrial-fallback-9381-secret-kjsd8';
 const ACTIVE_SECRET = PROXY_SECRET || FALLBACK_SECRET;
 
 if (!PROXY_SECRET && process.env.NODE_ENV === 'production') {
-  // We log a warning instead of a fatal throw at the module level to prevent 
-  // build-time crashes (since secrets are often missing in build environments).
   console.warn('[Titan:Crypto] WARNING: PROXY_SECRET is missing. Security is using fallback. Ensure secrets are set in your production environment!');
 }
 
@@ -24,10 +22,7 @@ if (!PROXY_SECRET && process.env.NODE_ENV === 'production') {
  * Only call from API routes / server components.
  */
 export function generateProxySignature(url, w, q) {
-    // Dynamic import so this file can be imported by client components
-    // without crashing — the function itself will throw if called client-side.
-    const crypto = require('crypto');
-    const data = `${url}|${w}|${q}`; // Consistency check
+    const data = `${url}|${w}|${q}`;
     return crypto.createHmac('sha256', ACTIVE_SECRET)
                  .update(data)
                  .digest('hex')
@@ -59,10 +54,10 @@ export function simpleHash(str) {
         hash = ((hash << 5) + hash) ^ str.charCodeAt(i);
         hash = hash >>> 0; // Keep unsigned 32-bit
     }
-    // XOR with ACTIVE_SECRET chars for TAMPER RESISTANCE
-    // If PROXY_SECRET is set, client-side hash is still deterministic but secret-aware.
-    for (let i = 0; i < ACTIVE_SECRET.length; i++) {
-        hash = ((hash << 3) + hash) ^ ACTIVE_SECRET.charCodeAt(i);
+    // TITAN PUBLIC SALT: Standardized for client/server consistency
+    const PUBLIC_SALT = 'titan-proxy-public-salt-8822';
+    for (let i = 0; i < PUBLIC_SALT.length; i++) {
+        hash = ((hash << 3) + hash) ^ PUBLIC_SALT.charCodeAt(i);
         hash = hash >>> 0;
     }
     return hash.toString(16).padStart(8, '0');

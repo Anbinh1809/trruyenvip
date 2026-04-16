@@ -1,19 +1,27 @@
 import { query } from '@/lib/db';
-import { NextResponse } from 'next/server';
+import { withTitan } from '@/lib/api-handler';
+import { generateProxySignature } from '@/lib/crypto';
 
-export async function GET(req) {
-    try {
+export const GET = withTitan({
+    handler: async (req) => {
         const { searchParams } = new URL(req.url);
         const id = searchParams.get('id');
-        if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 });
+        if (!id) {
+            throw { status: 400, message: 'Missing id' };
+        }
 
         const result = await query('SELECT image_url FROM chapterimages WHERE chapter_id = @id ORDER BY "order" ASC', { id });
-        
-        return NextResponse.json({ 
-            success: true, 
-            images: result.recordset || []
+        const images = (result.recordset || []).map(img => {
+            const url = img.image_url;
+            const w = 1200;
+            const q = 80;
+            const sig = generateProxySignature(url, w, q);
+            return `/api/proxy?url=${encodeURIComponent(url)}&w=${w}&q=${q}&sig=${sig}`;
         });
-    } catch (err) {
-        return NextResponse.json({ error: err.message }, { status: 500 });
+
+        return { 
+            success: true, 
+            images
+        };
     }
-}
+});

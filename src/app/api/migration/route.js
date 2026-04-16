@@ -1,23 +1,23 @@
 import { query, checkRateLimit } from '@/lib/db';
 import { queueMangaSync, queueChapterScrape } from '@/lib/crawler/engine';
 import { parseChapterNumber } from '@/lib/crawler/utils';
-import { getSession } from '@/lib/auth';
-import { NextResponse } from 'next/server';
+import { withTitan } from '@/lib/api-handler';
 
-export async function POST(req) {
-    try {
-        const session = await getSession();
-        if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
+export const POST = withTitan({
+    auth: true,
+    handler: async (req, session) => {
         const { url } = await req.json();
-        if (!url) return NextResponse.json({ error: 'Missing URL' }, { status: 400 });
+        if (!url) {
+            throw { status: 400, message: 'Missing URL' };
+        }
 
         // TITAN RATE LIMIT: Prevent migration abuse
         const limiter = await checkRateLimit(`migration_${session.uuid}`, 5, 60);
         if (!limiter.success) {
-            return NextResponse.json({ 
-                error: 'Bạn đang thực hiện quá nhiều yêu cầu dịch chuyển. Vui lòng đợi trong giây lát.' 
-            }, { status: 429 });
+            throw {  
+                status: 429,
+                message: 'Bạn đang thực hiện quá nhiều yêu cầu dịch chuyển. Vui lòng đợi trong giây lát.' 
+            };
         }
 
         const host = new URL(url).hostname.toLowerCase();
@@ -27,7 +27,9 @@ export async function POST(req) {
                        host.includes('cmanga') ? 'cmanga' : 
                        host.includes('nhattruyen') ? 'nhattruyen' : null;
                        
-        if (!source) return NextResponse.json({ error: 'Nguồn không hỗ trợ. Chỉ hỗ trợ NetTruyen, TruyenQQ, BlogTruyen, CManga, NhatTruyen.' }, { status: 400 });
+        if (!source) {
+            throw { status: 400, message: 'Nguồn không hỗ trợ. Chỉ hỗ trợ NetTruyen, TruyenQQ, BlogTruyen, CManga, NhatTruyen.' };
+        }
 
         // Robust Parsing Logic
         const parts = url.split('/');
@@ -51,16 +53,16 @@ export async function POST(req) {
                 }
             }
         } else if (source === 'blogtruyen') {
-            // blogtruyen.vn/12345/slug
             const idPart = parts.find(p => /^\d+$/.test(p));
             if (idPart) mangaSlug = `bt_${idPart}`;
         } else if (source === 'cmanga') {
-            // cmanga.com/manga/slug
             const mangaIdx = parts.indexOf('manga');
             if (mangaIdx !== -1) mangaSlug = parts[mangaIdx + 1];
         }
 
-        if (!mangaSlug) return NextResponse.json({ error: 'Không thể nhận diện mã truyện' }, { status: 400 });
+        if (!mangaSlug) {
+            throw { status: 400, message: 'Không thể nhận diện mã truyện' };
+        }
 
         // 1. Ensure Manga exists
         const mangaCheck = await query('SELECT id FROM manga WHERE id = @id', { id: mangaSlug });
@@ -85,15 +87,11 @@ export async function POST(req) {
             queueChapterScrape(chapterId, url, source, true, 10); // High priority
         }
 
-        return NextResponse.json({
+        return {
             success: true,
             mangaId: mangaSlug,
             chapterId: chapterId,
             redirectUrl: chapterId ? `/manga/${mangaSlug}/chapter/${chapterId}` : `/manga/${mangaSlug}`
-        });
-
-    } catch (err) {
-        console.error('[Migration Error]', err);
-        return NextResponse.json({ error: err.message }, { status: 500 });
+        };
     }
-}
+});

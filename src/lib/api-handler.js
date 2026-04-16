@@ -13,13 +13,12 @@ export function withTitan(options) {
     try {
       // TITAN FAIL-SAFE: Handle the 'authenticated' vs 'auth' typo seen in legacy/drifted routes
       const isAuthRequired = options.auth || options.authenticated;
-      if (options.authenticated && process.env.NODE_ENV !== 'production') {
-        console.warn('[Titan:Guard] WARNING: Route uses legacy "authenticated" key. Update to "auth: true".');
-      }
 
       // TITAN-GRADE ISOLATION: 
-      // We ONLY call getSession if this endpoint explicitly requires auth or admin privileges.
-      const session = (isAuthRequired || options.admin) ? await getSession() : null;
+      // We ONLY call getSession if this endpoint explicitly requires auth, admin, 
+      // or allows optional identification (e.g. Identity API).
+      const shouldFetchSession = isAuthRequired || options.admin || options.allowOptional;
+      const session = shouldFetchSession ? await getSession() : null;
 
       // 1. Auth Guard (Robust check)
       if (isAuthRequired && !session) {
@@ -46,7 +45,8 @@ export function withTitan(options) {
       
       return response;
     } catch (error) {
-      console.error(`[API ERROR] ${options.handler.name || 'Anonymous'}:`, error);
+      const url = new URL(request.url).pathname;
+      console.error(`[API ERROR] ${url} (${options.handler.name || 'Anonymous'}):`, error);
       
       const status = error.status || 500;
       const message = error.message || 'Lỗi hệ thống';

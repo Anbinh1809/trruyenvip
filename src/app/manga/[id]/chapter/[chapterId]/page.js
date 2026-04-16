@@ -15,8 +15,8 @@ import ReaderHud from '@/components/ReaderHud';
 // Helper to determine if a slug is a potential new ingestion target
 function isDiscoveryCandidate(slug) {
     if (!slug) return false;
-    // Check for NetTruyen pattern (e.g. name-12345) or unusually long slugs
-    return /-[0-9]+$/.test(slug) || slug.length > 20;
+    // Strictly check for mirror patterns (e.g. name-12345)
+    return /-[0-9]+$/.test(slug);
 }
 
 // Lazy load comments to prevent hydration mismatches
@@ -26,20 +26,28 @@ const Comments = dynamic(() => import('@/components/CommentSection'), {
 
 async function getChapterData(mangaId, chapterId) {
   try {
-    // TITAN SMART LOOKUP 2.0: Check both id and normalized_title simultaneously (Case-Insensitive)
     const cleanMangaId = mangaId?.toString().trim();
-    let mangaRes = await query('SELECT id, title, cover FROM manga WHERE id = @id OR normalized_title ILIKE @id LIMIT 1', { id: cleanMangaId });
-    let manga = mangaRes.recordset[0];
+    if (!cleanMangaId) return null;
+
+    // TITAN SMART LOOKUP 2.0: Check both id and normalized_title simultaneously
+    let mangaRes = await query(`
+        SELECT id, title, cover 
+        FROM manga 
+        WHERE id = @id OR normalized_title = @id OR normalized_title ILIKE @id 
+        LIMIT 1
+    `, { id: cleanMangaId });
+    
+    let manga = mangaRes.recordset?.[0];
 
     // TITAN SMART LOOKUP 3.0: Fallback to Title match if slug fails
     if (!manga) {
-        const cleanId = mangaId.replace(/-/g, '%');
+        const pattern = `%${mangaId.replace(/-/g, '%')}%`;
         mangaRes = await query(`
             SELECT id, title FROM manga 
-            WHERE title ILIKE @cleanId OR alternative_titles ILIKE @cleanId
+            WHERE title ILIKE @pattern OR alternative_titles ILIKE @pattern
             LIMIT 1
-        `, { cleanId: `%${cleanId}%` });
-        manga = mangaRes.recordset[0];
+        `, { pattern });
+        manga = mangaRes.recordset?.[0];
     }
     
     if (!manga) {

@@ -1,14 +1,14 @@
 import { query } from '@/lib/db';
-import { NextResponse } from 'next/server';
+import { withTitan } from '@/lib/api-handler';
 
-export async function GET() {
-    try {
+export const GET = withTitan({
+    handler: async () => {
         // Test database connection with a simple query
         const result = await query('SELECT 1 as status');
         
         const mem = process.memoryUsage();
         if (result.recordset.length > 0) {
-            return NextResponse.json({
+            return {
                 status: 'ok',
                 timestamp: new Date().toISOString(),
                 database: 'connected',
@@ -18,16 +18,8 @@ export async function GET() {
                    heapUsed: `${Math.round(mem.heapUsed / 1024 / 1024)}MB`
                 },
                 uptime: `${Math.round(process.uptime())}s`
-            });
+            };
         }
-        
-    } catch (e) {
-        return NextResponse.json({
-            status: 'degraded',
-            timestamp: new Date().toISOString(),
-            database: 'error',
-            // IRONCLAD DEFENSE: Never leak raw error messages in production
-            error: process.env.NODE_ENV === 'production' ? 'Database connection failed' : e.message
-        }, { status: 503 });
+        throw new Error('Database connection failed');
     }
-}
+});

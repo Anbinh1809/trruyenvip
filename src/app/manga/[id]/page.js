@@ -13,8 +13,8 @@ import DiscoveryTrigger from '@/components/DiscoveryTrigger';
 // Helper to determine if a slug is a potential new ingestion target
 function isDiscoveryCandidate(slug) {
     if (!slug) return false;
-    // Check for NetTruyen pattern (e.g. name-12345) or unusually long slugs
-    return /-[0-9]+$/.test(slug) || slug.length > 20;
+    // Strictly check for mirror patterns (e.g. name-12345)
+    return /-[0-9]+$/.test(slug);
 }
 
 export async function generateMetadata({ params }) {
@@ -52,27 +52,29 @@ export async function generateMetadata({ params }) {
 
 async function getManga(id) {
   try {
-    // TITAN SMART LOOKUP 2.0: Check both id and normalized_title simultaneously (Case-Insensitive)
     const cleanId = id?.toString().trim();
+    if (!cleanId) return null;
+
+    // TITAN SMART LOOKUP 2.0: Check both id and normalized_title simultaneously
     let res = await query(`
         SELECT ${MANGA_CARD_FIELDS}, description
         FROM manga 
-        WHERE id = @id OR normalized_title ILIKE @id
+        WHERE id = @id OR normalized_title = @id OR normalized_title ILIKE @id
         LIMIT 1
     `, { id: cleanId });
 
-    let manga = res.recordset[0];
+    let manga = res.recordset?.[0];
 
-    // TITAN SMART LOOKUP 3.0: Fallback to Title match if slug fails (handle accented discrepancies)
+    // TITAN SMART LOOKUP 3.0: Fallback to Title match if slug fails
     if (!manga) {
-        const cleanId = id.replace(/-/g, '%');
+        const pattern = `%${cleanId.replace(/-/g, '%')}%`;
         res = await query(`
             SELECT ${MANGA_CARD_FIELDS}, description
             FROM manga 
-            WHERE title ILIKE @cleanId OR alternative_titles ILIKE @cleanId
+            WHERE title ILIKE @pattern OR alternative_titles ILIKE @pattern
             LIMIT 1
-        `, { cleanId: `%${cleanId}%` });
-        manga = res.recordset[0];
+        `, { pattern });
+        manga = res.recordset?.[0];
     }
 
     if (!manga) return null;
