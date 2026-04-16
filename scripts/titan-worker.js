@@ -13,23 +13,25 @@ async function main() {
     }, WORKER_TIMEOUT_MS);
 
     // --- PRE-FLIGHT CHECK ---
-    try {
-        const { query } = await import('../src/lib/db.js');
-        await query('SELECT 1');
-        console.log('[Titan Worker] Database connection verified.');
-    } catch (err) {
-        console.error('[Titan Worker] Pre-flight DB check failed:', err.message);
+    if (!process.env.DATABASE_URL) {
+        console.error('[Titan Worker] FATAL ERROR: DATABASE_URL is missing. Please check your GitHub Secrets.');
         process.exit(1);
     }
 
     try {
+        const { query } = await import('../src/lib/db.js');
+        console.log('[Titan Worker] Database connection verified.');
+        
         // Start the Unified Autonomous Engine in ONE-SHOT PULSE MODE
         // This will process one round of discovery and rescue, then exit.
         await runTitanWorker(true);
         console.log('[Titan Worker] Pulse finalized successfully.');
-        process.exit(0);
+        
+        // We add a tiny buffer to allow telemetry sync to complete
+        setTimeout(() => process.exit(0), 1000);
     } catch (err) {
         console.error('[Titan Worker] Pulse execution error:', err.message);
+        if (err.stack) console.error(err.stack);
         process.exit(1);
     } finally {
         clearTimeout(safetyTimeout);

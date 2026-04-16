@@ -51,11 +51,15 @@ export async function POST(request) {
         }
 
         // 5. Apply Update (ATOMIC RECONCILIATION)
+        // We Use the last_stats_update to protect against out-of-order beacon syncs
         await query(`
             UPDATE users 
             SET xp = xp + @xp, 
                 vipcoins = vipcoins + @coins,
-                mission_data = COALESCE(@missionData, mission_data),
+                mission_data = CASE 
+                    WHEN @missionData IS NOT NULL THEN @missionData::jsonb
+                    ELSE mission_data 
+                END,
                 last_stats_update = NOW()
             WHERE uuid = @uuid
         `, {

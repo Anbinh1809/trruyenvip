@@ -104,7 +104,12 @@ export function parseChapterImages(html, sourceName, sourceUrl) {
                        $(el).attr('data-cdn') || 
                        $(el).attr('src');
             
-            if (src && !src.includes('proxy') && !src.includes('logo') && !src.includes('banner')) {
+            // TITAN-GRADE FILTER: Only exclude obvious common UI/AD elements, not pages with "logo" in filename
+            const isUIMark = src.includes('/logo/') || src.includes('/banners/') || 
+                            src.includes('logo_nettruyen') || src.includes('favicon') ||
+                            src.includes('ads_') || src.includes('pixel');
+            
+            if (src && !isUIMark) {
                 images.add(resolveUrl(src, sourceUrl));
             }
         });

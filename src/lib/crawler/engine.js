@@ -11,6 +11,19 @@ let activeWorkers = 0;
 const BASE_CONCURRENCY = 128; // TITAN-GRADE: Process over 100 chapters in parallel
 const inProgressManga = new Map(); // mangaId -> timestamp
 const inProgressChapters = new Map(); // chapId -> timestamp
+ 
+/**
+ * TITAN WORKER DRAIN: Waits for background workers to finish
+ */
+export async function waitForWorkers(timeoutMs = 60000) {
+    const start = Date.now();
+    while (activeWorkers > 0 && Date.now() - start < timeoutMs) {
+        process.stdout.write(`\r[Titan:Drain] Waiting for ${activeWorkers} units of work to complete...`);
+        await new Promise(r => setTimeout(r, 500));
+    }
+    process.stdout.write('\n');
+}
+
 
 /**
  * TITAN PEAK-AWARE CONCURRENCY
@@ -130,7 +143,10 @@ async function executeTask(taskRow) {
     } finally {
         activeWorkers -= weight;
         updateTelemetry({ activeWorkers });
-        setTimeout(processQueue, 10);
+        // HEALING: Only queue more if we are NOT in one-shot mode or if workers are still active
+        if (!global.isOneShotExitRequested || activeWorkers > 0) {
+            setTimeout(processQueue, 10);
+        }
     }
 }
 
@@ -145,7 +161,7 @@ export async function processQueue() {
     // HEALING: If workers are stuck at zero but tasks exist, force a pulse
     if (mAdjustedWorkers === 0 && activeWorkers < 0) activeWorkers = 0;
 
-    const needed = Math.max(1, Math.floor((currentLimit - mAdjustedWorkers) / 1));
+    const needed = Math.max(1, Math.floor((limit - mAdjustedWorkers) / 1));
     
     const pickRes = await query(`
         WITH favorite_counts AS (
@@ -173,13 +189,15 @@ export async function processQueue() {
     
     updateTelemetry({ 
         activeWorkers, 
-        concurrencyLimit: currentLimit,
-        loadFactor: Math.round((activeWorkers / currentLimit) * 100),
+        concurrencyLimit: limit,
+        loadFactor: Math.round((activeWorkers / limit) * 100),
         status: tasks.length > 0 ? undefined : 'idle' 
     });
 
     if (tasks.length === 0) {
-        setTimeout(processQueue, 500); // TITAN HYPER-PULSE: Reduced from 1500ms
+        if (!global.isOneShotExitRequested) {
+            setTimeout(processQueue, 500); // TITAN HYPER-PULSE
+        }
         return;
     }
 
@@ -193,13 +211,27 @@ function stringifySorted(obj) {
     return JSON.stringify(Object.keys(obj).sort().reduce((acc, k) => ({ ...acc, [k]: obj[k] }), {}));
 }
 
-export async function queueMangaSync(mangaId, url, source, earlyExit = false, priority = 5) {
+export async function queueMangaSync(mangaId, url, source, earlyExit = false, priority = 5, force = false) {
+    // TITAN SMART SYNC: Prevent redundant syncing if already processed within the last 6 hours
+    if (!force) {
+        const lastSyncRes = await query(
+            "SELECT last_crawled FROM manga WHERE id = @mangaId AND last_crawled > NOW() - INTERVAL '6 hours'",
+            { mangaId }
+        );
+        if (lastSyncRes.rowCount > 0) {
+            // Already synced recently, skip this discovery pulse for this manga
+            return;
+        }
+    }
+
     const target = stringifySorted({ mangaId, url, source, earlyExit });
     await query(`
         INSERT INTO crawlertasks (type, target, priority, manga_id) 
         VALUES ('manga_sync', @target, @priority, @mangaId)
-        ON CONFLICT (target) DO UPDATE SET priority = GREATEST(crawlertasks.priority, @priority)
-        WHERE crawlertasks.status = 'pending'
+        ON CONFLICT (target) DO UPDATE SET 
+            priority = GREATEST(crawlertasks.priority, @priority),
+            status = CASE WHEN crawlertasks.status = 'failed' THEN 'pending' ELSE crawlertasks.status END
+        WHERE crawlertasks.status = 'pending' OR crawlertasks.status = 'failed'
     `, { target, priority, mangaId });
     processQueue();
 }
@@ -260,11 +292,10 @@ export async function crawlFullMangaChapters(mangaId, url, source, earlyExit = f
 
         await query(`
             UPDATE manga SET 
-                author = @author, 
+                author = @author,
                 status = @status, 
                 description = @description,
-                normalized_title = @normalizedTitle,
-                last_crawled = NOW()
+                normalized_title = @normalizedTitle
             WHERE id = @mangaId
         `, { 
             mangaId, 
@@ -327,6 +358,9 @@ export async function crawlFullMangaChapters(mangaId, url, source, earlyExit = f
                 console.error(`[Crawler][Error] Failed to process chapter:`, chapterErr.message);
             }
         }
+
+        // TITAN INTEGRITY: Only update last_crawled after successfully reaching the end of chapter processing
+        await query('UPDATE manga SET last_crawled = NOW() WHERE id = @mangaId', { mangaId });
     } catch (err) {
         console.error(`Error in crawlFullMangaChapters for ${mangaId}:`, err.message);
         try {
@@ -555,7 +589,8 @@ export async function runGuardianAutopilot(oneShot = false) {
             }
 
             if (oneShot) {
-                console.log('[Guardian] Pulse Complete. Exiting One-Shot mode.');
+                console.log('[Guardian] Pulse Complete. Synchronizing final state...');
+                updateTelemetry({ syncHealth: true }); // FORCE PERSISTENCE BEFORE EXIT
                 return;
             }
 
@@ -611,9 +646,12 @@ export async function bootstrapCrawler() {
 
 export async function runTitanWorker(oneShot = true) {
     console.log(`[Titan] Initializing Background Worker (${oneShot ? 'Pulse' : 'Daemon'} Mode)...`);
+    if (oneShot) global.isOneShotExitRequested = true;
+    
     await bootstrapCrawler();
     if (oneShot) {
         await runGuardianAutopilot(true);
+        await waitForWorkers();
     } else {
         runGuardianAutopilot().catch(e => console.error('[Titan] Autopilot failure:', e.message));
     }

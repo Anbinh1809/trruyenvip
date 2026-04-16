@@ -79,13 +79,16 @@ export function updateTelemetry(data) {
         if (data.isArchivalPulse !== undefined) global.crawlerState.isArchivalPulse = data.isArchivalPulse;
         
         const now = Date.now();
-        if (now - (global.lastStateSync || 0) > 60000 || data.syncHealth) { // Sync every 60s or on force health sync
+        // TITAN-GRADE SYNC: Sync every 60s OR if forced (syncHealth)
+        if (data.syncHealth || now - (global.lastStateSync || 0) > 60000) {
             global.lastStateSync = now;
             saveSystemState('crawler_state', {
                 discoveryPage: global.crawlerState.discoveryPage,
                 isArchivalPulse: global.crawlerState.isArchivalPulse,
-                mirrorHealth: global.crawlerState.mirrorHealth
+                mirrorHealth: global.crawlerState.mirrorHealth,
+                lastSeen: now
             });
+            if (data.syncHealth) console.log('[Telemetry] Force-Sync completed.');
         }
     }
     
