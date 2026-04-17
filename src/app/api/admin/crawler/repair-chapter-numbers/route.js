@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
-import { query } from '@/lib/db';
-import { parseChapterNumber } from '@/lib/crawler';
+﻿import { NextResponse } from 'next/server';
+import { query } from '@/HeThong/Database/CoSoDuLieu';
+import { parseChapterNumber } from '@/HeThong/CaoDuLieu';
 
 /**
  * Maintenance tool to repair NULL 'chapter_number' values by parsing titles.
@@ -37,3 +37,4 @@ export async function GET() {
         return NextResponse.json({ error: e.message }, { status: 500 });
     }
 }
+

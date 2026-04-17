@@ -1,6 +1,6 @@
-import { query } from '@/lib/db';
-import { generateProxySignature } from '@/lib/crypto';
-import { withTitan } from '@/lib/api-handler';
+﻿import { query } from '@/HeThong/Database/CoSoDuLieu';
+import { generateProxySignature } from '@/HeThong/BaoMat/crypto';
+import { withTitan } from '@/HeThong/API/XuLyAPI';
 
 export const GET = withTitan({
     handler: async () => {
@@ -31,3 +31,4 @@ export const GET = withTitan({
         });
     }
 });
+

@@ -1,5 +1,5 @@
-import { query, checkRateLimit } from '@/lib/db';
-import { withTitan } from '@/lib/api-handler';
+﻿import { query, checkRateLimit } from '@/HeThong/Database/CoSoDuLieu';
+import { withTitan } from '@/HeThong/API/XuLyAPI';
 
 export const PATCH = withTitan({
     auth: true,
@@ -15,7 +15,7 @@ export const PATCH = withTitan({
         // TITAN RATE LIMIT: Prevent profile spamming
         const limiter = await checkRateLimit(`profile_${session.uuid}`, 2, 60); // 2 updates / minute
         if (!limiter.success) {
-            throw { status: 429, message: 'Bạn đang cập nhật quá nhanh. Vui lòng đợi 1 phút.' };
+            throw { status: 429, message: 'Bạn Ä‘ang cập nhật quá nhanh. Vui lòng Ä‘o£i 1 phàºt.' };
         }
 
         await query('UPDATE users SET avatar = @avatar WHERE uuid = @uuid', { 
@@ -26,3 +26,4 @@ export const PATCH = withTitan({
         return { success: true, message: 'Profile updated' };
     }
 });
+

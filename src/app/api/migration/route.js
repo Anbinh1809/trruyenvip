@@ -1,7 +1,7 @@
-import { query, checkRateLimit } from '@/lib/db';
-import { queueMangaSync, queueChapterScrape } from '@/lib/crawler/engine';
-import { parseChapterNumber } from '@/lib/crawler/utils';
-import { withTitan } from '@/lib/api-handler';
+﻿import { query, checkRateLimit } from '@/HeThong/Database/CoSoDuLieu';
+import { queueMangaSync, queueChapterScrape } from '@/HeThong/CaoDuLieu/engine';
+import { parseChapterNumber } from '@/HeThong/CaoDuLieu/utils';
+import { withTitan } from '@/HeThong/API/XuLyAPI';
 
 export const POST = withTitan({
     auth: true,
@@ -16,7 +16,7 @@ export const POST = withTitan({
         if (!limiter.success) {
             throw {  
                 status: 429,
-                message: 'Bạn đang thực hiện quá nhiều yêu cầu dịch chuyển. Vui lòng đợi trong giây lát.' 
+                message: 'Bạn Ä‘ang thựcc hiện quá nhiou yêu cáº§u do‹ch chuyoƒn. Vui lòng Ä‘o£i trong giây lát.' 
             };
         }
 
@@ -28,7 +28,7 @@ export const POST = withTitan({
                        host.includes('nhattruyen') ? 'nhattruyen' : null;
                        
         if (!source) {
-            throw { status: 400, message: 'Nguồn không hỗ trợ. Chỉ hỗ trợ NetTruyen, TruyenQQ, BlogTruyen, CManga, NhatTruyen.' };
+            throw { status: 400, message: 'Nguồnn không ho— tro£. Cho‰ ho— tro£ NetTruyen, TruyenQQ, BlogTruyen, CManga, NhatTruyen.' };
         }
 
         // Robust Parsing Logic
@@ -61,7 +61,7 @@ export const POST = withTitan({
         }
 
         if (!mangaSlug) {
-            throw { status: 400, message: 'Không thể nhận diện mã truyện' };
+            throw { status: 400, message: 'Khà´ng thoƒ nháº­n diện mà£ truyện' };
         }
 
         // 1. Ensure Manga exists
@@ -95,3 +95,4 @@ export const POST = withTitan({
         };
     }
 });
+

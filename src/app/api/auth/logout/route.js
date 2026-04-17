@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server';
-import { clearSessionCookie } from '@/lib/auth';
+﻿import { NextResponse } from 'next/server';
+import { clearSessionCookie } from '@/HeThong/BaoMat/XacThuc';
 
 export async function POST() {
     await clearSessionCookie();
-    return NextResponse.json({ message: 'Đã đăng xuất' });
+    return NextResponse.json({ message: 'Äà£ Ä‘Äƒng xuáº¥t' });
 }
+

@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth';
-import { healChapterGaps } from '@/lib/crawler';
+﻿import { NextResponse } from 'next/server';
+import { getSession } from '@/HeThong/BaoMat/XacThuc';
+import { healChapterGaps } from '@/HeThong/CaoDuLieu';
 
 export async function POST(req) {
     try {
@@ -14,9 +14,10 @@ export async function POST(req) {
 
         return NextResponse.json({ 
             success: true, 
-            message: 'Quy trình vá lỗi (Gap Healing) đã được kích hoạt thành công!' 
+            message: 'Quy trà¬nh vá lo—i (Gap Healing) đã Ä‘ưo£c kà­ch hoáº¡t thành công!' 
         });
     } catch (err) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
+

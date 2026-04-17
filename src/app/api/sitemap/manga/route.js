@@ -1,4 +1,4 @@
-import { query } from '@/lib/db';
+﻿import { query } from '@/HeThong/Database/CoSoDuLieu';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,3 +40,4 @@ export async function GET(request) {
     return new Response('Error generating sitemap', { status: 500 });
   }
 }
+

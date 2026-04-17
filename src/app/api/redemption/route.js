@@ -1,5 +1,5 @@
-import { query, withTransaction, checkRateLimit } from '@/lib/db';
-import { withTitan } from '@/lib/api-handler';
+import { query, withTransaction, checkRateLimit } from '@/HeThong/Database/CoSoDuLieu';
+import { withTitan } from '@/HeThong/API/XuLyAPI';
 
 export const GET = withTitan({
     auth: true,
@@ -63,8 +63,6 @@ export const POST = withTitan({
             );
  
             if (updateRes.rowCount === 0) {
-                // If update failed, it's either user not found or insufficient balance
-                // We re-query only to provide a specific error message, but the safety is in the WHERE clause above.
                 const userRes = await query('SELECT vipcoins FROM users WHERE uuid = @uuid', { uuid: session.uuid }, client);
                 if (!userRes.recordset?.[0]) throw new Error('Người dùng không tồn tại.');
                 throw new Error('Số dư VipCoins không đủ.');
@@ -112,3 +110,5 @@ export const PATCH = withTitan({
         return { success: true, message: 'Updated' };
     }
 });
+
+

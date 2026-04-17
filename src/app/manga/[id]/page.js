@@ -1,14 +1,14 @@
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import ChapterList from '@/components/ChapterList';
-import DetailCover from '@/components/DetailCover';
-import DetailActions from '@/components/DetailActions';
-import { query, MANGA_CARD_FIELDS } from '@/lib/db';
-import { getSignedProxyUrl } from '@/lib/crypto';
-import "@/app/manga-detail.css";
+import Header from '@/GiaoDien/BoCuc/Header';
+import Footer from '@/GiaoDien/BoCuc/Footer';
+import ChapterList from '@/GiaoDien/TrinhDoc/ChapterList';
+import DetailCover from '@/GiaoDien/ThanhPhan/DetailCover';
+import DetailActions from '@/GiaoDien/ThanhPhan/DetailActions';
+import { query, MANGA_CARD_FIELDS } from '@/HeThong/Database/CoSoDuLieu';
+import { getSignedProxyUrl } from '@/HeThong/BaoMat/crypto';
+import "@/GiaoDien/ThanhPhan/Styles/manga-detail.css";
 import Link from 'next/link';
 import { BookOpen, User, Star, Calendar, Share2, Heart, AlertOctagon, Sparkles, Eye } from 'lucide-react';
-import DiscoveryTrigger from '@/components/DiscoveryTrigger';
+import DiscoveryTrigger from '@/GiaoDien/BoCuc/DiscoveryTrigger';
 
 // Helper to determine if a slug is a potential new ingestion target
 function isDiscoveryCandidate(slug) {
@@ -59,15 +59,15 @@ async function getManga(id) {
     let res = await query(`
         SELECT ${MANGA_CARD_FIELDS}, description
         FROM manga 
-        WHERE id = @id OR normalized_title = @id OR normalized_title ILIKE @id
+        WHERE id = @id OR LOWER(id) = LOWER(@id) OR LOWER(normalized_title) = LOWER(@id)
         LIMIT 1
     `, { id: cleanId });
 
     let manga = res.recordset?.[0];
 
-    // TITAN SMART LOOKUP 3.0: Fallback to Title match if slug fails
+    // TITAN SMART LOOKUP 3.0: Fallback to Title match if slug fails (e.g. searching by Title in URL)
     if (!manga) {
-        const pattern = `%${cleanId.replace(/-/g, '%')}%`;
+        const pattern = `%${cleanId.replace(/-/g, ' ')}%`;
         res = await query(`
             SELECT ${MANGA_CARD_FIELDS}, description
             FROM manga 
@@ -82,10 +82,11 @@ async function getManga(id) {
     // Fetch chapters (Always use the internal primary ID for sub-queries)
     const internalId = manga.id;
     const chaptersRes = await query(`
-        SELECT id, chapter_number, title, created_at, updated_at, status 
-        FROM chapters WHERE manga_id = @internalId 
-        ORDER BY NULLIF(regexp_replace(chapter_number, '[^0-9.]', '', 'g'), '')::numeric DESC, created_at DESC
-    `, { internalId });
+        SELECT id, chapter_number, title 
+        FROM chapters 
+        WHERE manga_id = @internalMangaId 
+        ORDER BY chapter_number ASC
+    `, { internalMangaId: internalId });
 
     // Fetch genres via junction table
     const genresRes = await query(`
@@ -186,107 +187,107 @@ export default async function MangaDetailPage({ params }) {
     ]
   };
 
-  return (
-    <main className="main-wrapper titan-bg">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <Header />
-      
-      <div 
-        className="detail-hero-titan" 
-        style={{ '--bg-cover': `url(${manga.cover})` }} 
-      />
+    return (
+        <main className="main-wrapper titan-bg">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
+            <Header />
+            
+            <div 
+                className="detail-hero-titan" 
+                style={{ '--bg-cover': `url(${manga.cover})` }} 
+            />
 
-      <div className="container detail-content-wrapper fade-in">
-        {/* TRADITIONAL BREADCRUMBS */}
-        <nav className="breadcrumb-traditional">
-            <Link href="/" className="bread-node">Trang Chủ</Link>
-            <span className="bread-sep">/</span>
-            <Link href="/genres" className="bread-node">Manga</Link>
-            <span className="bread-sep">/</span>
-            <span className="bread-current">{manga.title}</span>
-        </nav>
+            <div className="container detail-content-wrapper fade-in">
+                {/* TRADITIONAL BREADCRUMBS */}
+                <nav className="breadcrumb-traditional">
+                    <Link href="/" className="bread-node">Trang Chủ</Link>
+                    <span className="bread-sep">/</span>
+                    <Link href="/genres" className="bread-node">Manga</Link>
+                    <span className="bread-sep">/</span>
+                    <span className="bread-current">{manga.title}</span>
+                </nav>
 
-        <div className="manga-detail-traditional">
-            <div className="detail-top-section">
-                <div className="detail-left-cover">
-                    <DetailCover src={manga.cover} alt={manga.title} />
+                <div className="manga-detail-traditional">
+                    <div className="detail-top-section">
+                        <div className="detail-left-cover">
+                            <DetailCover src={manga.cover} alt={manga.title} />
+                        </div>
+                        
+                        <div className="detail-right-info">
+                            <h1 className="traditional-title" itemProp="name">{manga.title}</h1>
+                            
+                            {/* TRADITIONAL INFO TABLE */}
+                            <div className="info-table-titan">
+                                <div className="info-row">
+                                    <span className="info-label"><User size={14} className="info-icon" /> Tên khác</span>
+                                    <span className="info-value">{manga.alternative_titles || manga.title}</span>
+                                </div>
+                                <div className="info-row">
+                                    <span className="info-label"><User size={14} className="info-icon" /> Tác giả</span>
+                                    <span className="info-value text-accent">{manga.author || 'Đang cập nhật'}</span>
+                                </div>
+                                <div className="info-row">
+                                    <span className="info-label"><Calendar size={14} className="info-icon" /> Ngày tạo</span>
+                                    <span className="info-value">{manga.last_crawled ? new Date(manga.last_crawled).toLocaleDateString('vi-VN') : 'Mới cập nhật'}</span>
+                                </div>
+                                <div className="info-row">
+                                    <span className="info-label"><BookOpen size={14} className="info-icon" /> Tổng số chap</span>
+                                    <span className="info-value">{manga.chapters?.length || 0}</span>
+                                </div>
+                                <div className="info-row">
+                                    <span className="info-label"><Star size={14} className="info-icon" /> Tình trạng</span>
+                                    <span className="info-value">{manga.status || 'Đang tiến hành'}</span>
+                                </div>
+                                <div className="info-row">
+                                    <span className="info-label"><Star size={14} className="info-icon" /> Đánh giá</span>
+                                    <span className="info-value">{manga.rating || '4.9'} / 5.0</span>
+                                </div>
+                                <div className="info-row">
+                                    <span className="info-label"><Heart size={14} className="info-icon" /> Lượt theo dõi</span>
+                                    <span className="info-value">12.5k</span>
+                                </div>
+                                <div className="info-row">
+                                    <span className="info-label"><Eye size={14} className="info-icon" /> Lượt xem</span>
+                                    <span className="info-value">{manga.views || '125,000'}</span>
+                                </div>
+                            </div>
+
+                            <div className="genre-cloud-traditional">
+                                {manga.genres.map((g, idx) => (
+                                    <Link key={idx} href={`/genres/${g.slug}`} className="genre-pill-traditional">{g.name}</Link>
+                                ))}
+                            </div>
+
+                            <DetailActions 
+                                mangaId={id} 
+                                firstChapterId={manga.chapters?.length > 0 ? manga.chapters[manga.chapters.length - 1]?.id : null} 
+                                mangaTitle={manga.title}
+                                mangaCover={manga.rawCover || manga.cover}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="detail-description-traditional">
+                        <h3 className="desc-title-traditional">Nội dung truyện</h3>
+                        <p className="desc-content-traditional" itemProp="description">
+                            {manga.description || 'Chưa cố tóm tắt nội dung cho bộ truyện này. Chúng tôi sẽ cập nhật trong thời gian sớm nhất.'}
+                        </p>
+                    </div>
+
+                    <section className="chapters-section-industrial">
+                        <div className="section-header-titan">
+                            <h2 className="title-titan section-title-industrial">DANH SÁCH CHƯƠNG</h2>
+                            <span className="chapter-count-titan">{manga.chapters.length} CHAPTERS</span>
+                        </div>
+                        <ChapterList chapters={manga.chapters} mangaId={id} />
+                    </section>
                 </div>
-                
-                <div className="detail-right-info">
-                    <h1 className="traditional-title" itemProp="name">{manga.title}</h1>
-                    
-                    {/* TRADITIONAL INFO TABLE */}
-                    <div className="info-table-titan">
-                        <div className="info-row">
-                            <span className="info-label"><User size={14} className="info-icon" /> Tên khác</span>
-                            <span className="info-value">{manga.alternative_titles || manga.title}</span>
-                        </div>
-                        <div className="info-row">
-                            <span className="info-label"><User size={14} className="info-icon" /> Tác giả</span>
-                            <span className="info-value text-accent">{manga.author || 'Đang cập nhật'}</span>
-                        </div>
-                        <div className="info-row">
-                            <span className="info-label"><Calendar size={14} className="info-icon" /> Ngày tạo</span>
-                            <span className="info-value">{manga.last_crawled ? new Date(manga.last_crawled).toLocaleDateString('vi-VN') : 'Mới cập nhật'}</span>
-                        </div>
-                        <div className="info-row">
-                            <span className="info-label"><BookOpen size={14} className="info-icon" /> Tổng số chap</span>
-                            <span className="info-value">{manga.chapters?.length || 0}</span>
-                        </div>
-                        <div className="info-row">
-                            <span className="info-label"><Star size={14} className="info-icon" /> Tình trạng</span>
-                            <span className="info-value">{manga.status || 'Đang tiến hành'}</span>
-                        </div>
-                        <div className="info-row">
-                            <span className="info-label"><Star size={14} className="info-icon" /> Đánh giá</span>
-                            <span className="info-value">{manga.rating || '4.9'} / 5.0</span>
-                        </div>
-                        <div className="info-row">
-                            <span className="info-label"><Heart size={14} className="info-icon" /> Lượt theo dõi</span>
-                            <span className="info-value">12.5k</span>
-                        </div>
-                        <div className="info-row">
-                            <span className="info-label"><Eye size={14} className="info-icon" /> Lượt xem</span>
-                            <span className="info-value">{manga.views || '125,000'}</span>
-                        </div>
-                    </div>
-
-                    <div className="genre-cloud-traditional">
-                        {manga.genres.map((g, idx) => (
-                            <Link key={idx} href={`/genres/${g.slug}`} className="genre-pill-traditional">{g.name}</Link>
-                        ))}
-                    </div>
-
-                    <DetailActions 
-                        mangaId={id} 
-                        firstChapterId={manga.chapters?.length > 0 ? manga.chapters[manga.chapters.length - 1]?.id : null} 
-                        mangaTitle={manga.title}
-                        mangaCover={manga.rawCover || manga.cover}
-                    />
-                </div>
             </div>
+            <Footer />
+        </main>
+    );
 
-            <div className="detail-description-traditional">
-                <h3 className="desc-title-traditional">Nội dung truyện</h3>
-                <p className="desc-content-traditional" itemProp="description">
-                    {manga.description || 'Chưa có tóm tắt nội dung cho bộ truyện này. Chúng tôi sẽ cập nhật trong thời gian sớm nhất.'}
-                </p>
-            </div>
-
-            <section className="chapters-section-industrial">
-                    <div className="section-header-titan">
-                        <h2 className="title-titan section-title-industrial">DANH SÁCH CHƯƠNG</h2>
-                        <span className="chapter-count-titan">{manga.chapters.length} CHAPTERS</span>
-                    </div>
-                    <ChapterList chapters={manga.chapters} mangaId={id} />
-                </section>
-            </div>
-        </div>
-
-      <Footer />
-    </main>
-  );
 }

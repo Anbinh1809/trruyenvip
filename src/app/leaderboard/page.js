@@ -1,9 +1,9 @@
-'use client';
+﻿'use client';
 
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import { calculateRank } from '@/context/EngagementContext';
-import { useAuth } from '@/context/AuthContext';
+import Header from '@/GiaoDien/BoCuc/Header';
+import Footer from '@/GiaoDien/BoCuc/Footer';
+import { calculateRank } from '@/NguCanh/EngagementContext';
+import { useAuth } from '@/NguCanh/AuthContext';
 import { useState, useEffect, useMemo } from 'react';
 import { Trophy, Crown, Medal, Shield, User } from 'lucide-react';
 
@@ -61,17 +61,17 @@ export default function LeaderboardPage() {
             <div className="container leaderboard-container fade-in">
                 <section className="leaderboard-header fade-up">
                     <div className="leaderboard-badge-titan">
-                        <Trophy size={14} /> BẢNG VINH DANH
+                        <Trophy size={14} /> Báº¢NG VINH DANH
                     </div>
-                    <h1 className="leaderboard-title-industrial">BẢNG XẾP HẠNG</h1>
-                    <p className="leaderboard-subtitle">Vinh danh những thành viên có hoạt động tích cực nhất trên hệ thống.</p>
+                    <h1 className="leaderboard-title-industrial">Báº¢NG Xáº¾P Háº NG</h1>
+                    <p className="leaderboard-subtitle">Vinh danh những thà nh viên cà³ hoáº¡t Ä‘o™ng tà­ch cựcc nháº¥t trên hệ thống.</p>
                 </section>
 
                 <div className="leaderboard-list-industrial">
                     {loading ? (
                         <div className="leaderboard-loading-industrial">
                             <div className="titan-loader-pulse"></div>
-                            <p className="loading-text-industrial">Đang truy xuất bảng xếp hạng...</p>
+                            <p className="loading-text-industrial">Äang truy xuáº¥t bảng xáº¿p háº¡ng...</p>
                         </div>
                     ) : processedLeaders.map((player, idx) => (
                         <div 
@@ -99,12 +99,12 @@ export default function LeaderboardPage() {
                                 <h4 className="rank-user-title">
                                     {player.name}
                                     <div className="user-tags-wrapper-titan">
-                                        {player.isUser && <span className="self-tag-titan">BẠN</span>}
+                                        {player.isUser && <span className="self-tag-titan">Báº N</span>}
                                         {player.role === 'admin' && <span className="admin-tag-titan">ADMIN</span>}
                                     </div>
                                 </h4>
                                 <div className="rank-stats-industrial">
-                                    <span className="rank-stat-node"><span className="label">Cấp:</span> <span className="value">{player.level}</span></span>
+                                    <span className="rank-stat-node"><span className="label">Cáº¥p:</span> <span className="value">{player.level}</span></span>
                                     <span className="rank-title-tag">{player.rankTitle}</span>
                                 </div>
                             </div>
@@ -112,7 +112,7 @@ export default function LeaderboardPage() {
                             <div className="rank-values-group-titan">
                                 <div className="rank-xp-industrial">
                                     <div className="xp-value-industrial">{new Intl.NumberFormat().format(player.xp)}</div>
-                                    <div className="xp-label-industrial">TỔNG XP</div>
+                                    <div className="xp-label-industrial">To”NG XP</div>
                                 </div>
                                 <div className="v-divider-titan" />
                                 <div className="rank-coins-industrial">
@@ -156,3 +156,4 @@ export default function LeaderboardPage() {
         </main>
     );
 }
+

@@ -1,13 +1,13 @@
-'use client';
+﻿'use client';
 
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import MangaCard from '@/components/MangaCard';
-import { useFavorites } from '@/context/FavoritesContext';
-import { useAuth } from '@/context/AuthContext';
-import { useHistory } from '@/context/HistoryContext';
+import Header from '@/GiaoDien/BoCuc/Header';
+import Footer from '@/GiaoDien/BoCuc/Footer';
+import MangaCard from '@/GiaoDien/ThanhPhan/MangaCard';
+import { useFavorites } from '@/NguCanh/FavoritesContext';
+import { useAuth } from '@/NguCanh/AuthContext';
+import { useHistory } from '@/NguCanh/HistoryContext';
 import Link from 'next/link';
-import EmptyState from '@/components/EmptyState';
+import EmptyState from '@/GiaoDien/ThanhPhan/EmptyState';
 import { Gem, Lock } from 'lucide-react';
 
 export default function FavoritesPage() {
@@ -23,19 +23,19 @@ export default function FavoritesPage() {
         <section className="favorites-content-industrial">
           <header className="favorites-header-industrial fade-up">
             <div className="header-left-industrial">
-              <div className="library-badge-titan">BỘ SƯU TẬP CỦA BẠN</div>
-              <h1 className="favorites-title-industrial">TRUYỆN YÊU THÍCH</h1>
+              <div className="library-badge-titan">Bộ SÆ¯U Táº¬P Co¦A Báº N</div>
+              <h1 className="favorites-title-industrial">TRUYộN YàŠU THàCH</h1>
               <p className="favorites-subtitle">
                 {!mounted 
-                    ? 'Đang truy xuất dữ liệu bộ sưu tập...' 
+                    ? 'Äang truy xuáº¥t dữ liệu bo™ sưu táº­p...' 
                     : favorites.length > 0 
                         ? `Lưu giữ ${favorites.length} tuyệt phẩm tinh hoa` 
-                        : 'Bắt đầu xây dựng danh bạ truyện của riêng bạn.'}
+                        : 'Bắt đầu xây dựng danh báº¡ truyện của riêng báº¡n.'}
               </p>
             </div>
             {!isAuthenticated && mounted && (
                 <div className="login-prompt-titan shadow-titan">
-                    <Lock size={16} /> Đăng nhập để đồng bộ vĩnh viễn
+                    <Lock size={16} /> ÄÄƒng nháº­p Ä‘oƒ Ä‘ồnng bo™ vĩnh viễn
                 </div>
             )}
           </header>
@@ -57,9 +57,9 @@ export default function FavoritesPage() {
             </div>
           ) : (
             <EmptyState 
-              title="KHO TRUYỆN CÒN TRỐNG"
-              subtitle="Hãy cùng khám phá hàng ngàn bộ truyện hấp dẫn tại trang chủ ngay!"
-              actionText="KHÁM PHÁ NGAY"
+              title="KHO TRUYỆN Cà’N TRoNG"
+              subtitle="Hà£y cà¹ng khám phá hà ng ngà n bo™ truyện háº¥p dáº«n táº¡i trang chủ ngay!"
+              actionText="KHàM PHà NGAY"
               actionUrl="/"
             />
           )}
@@ -75,3 +75,4 @@ export default function FavoritesPage() {
     </main>
   );
 }
+

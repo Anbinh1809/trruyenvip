@@ -1,4 +1,4 @@
-import { query } from '@/lib/db';
+import { query } from '@/HeThong/Database/CoSoDuLieu';
 
 export async function GET(request, { params }) {
     const { chapterId } = await params;

@@ -1,5 +1,5 @@
-import { query } from '@/lib/db';
-import { getSession } from '@/lib/auth';
+﻿import { query } from '@/HeThong/Database/CoSoDuLieu';
+import { getSession } from '@/HeThong/BaoMat/XacThuc';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
@@ -75,3 +75,4 @@ export async function POST(request) {
         return new Response('Error', { status: 500 });
     }
 }
+

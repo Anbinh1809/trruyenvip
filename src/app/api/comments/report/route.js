@@ -1,5 +1,5 @@
-import { query } from '@/lib/db';
-import { withTitan } from '@/lib/api-handler';
+﻿import { query } from '@/HeThong/Database/CoSoDuLieu';
+import { withTitan } from '@/HeThong/API/XuLyAPI';
 
 export const POST = withTitan({
     auth: true,
@@ -19,7 +19,7 @@ export const POST = withTitan({
         `, { userUuid, commentId });
 
         if (check.recordset?.length > 0) {
-            return { success: true, message: 'Bạn đã báo cáo bình luận này rồi.' };
+            return { success: true, message: 'Bạn đã báo cáo bà¬nh luáº­n nà y rồni.' };
         }
 
         await query(`
@@ -27,6 +27,7 @@ export const POST = withTitan({
             VALUES (@userUuid, @commentId, @reason)
         `, { userUuid, commentId, reason });
 
-        return { success: true, message: 'Đã gửi báo cáo. Chúng tôi sẽ xử lý sớm nhất có thể.' };
+        return { success: true, message: 'Äà£ gửi báo cáo. Chàºng tà´i sáº½ xử là½ so›m nháº¥t cà³ thoƒ.' };
     }
 });
+

@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth';
-import { queueDiscovery } from '@/lib/crawler';
+﻿import { NextResponse } from 'next/server';
+import { getSession } from '@/HeThong/BaoMat/XacThuc';
+import { queueDiscovery } from '@/HeThong/CaoDuLieu';
 
 /**
  * Titan Deep Scan API
@@ -26,10 +26,11 @@ export async function POST(req) {
 
         return NextResponse.json({ 
             success: true, 
-            message: `Quy trình 'Đào sâu' (Deep Scan) đã được kích hoạt cho ${pages} trang của nguồn ${source}. Kết quả sẽ dần xuất hiện trong Bảng điều khiển.` 
+            message: `Quy trà¬nh 'Äà o sà¢u' (Deep Scan) đã Ä‘ưo£c kà­ch hoáº¡t cho ${pages} trang của nguồn ${source}. Káº¿t quả sáº½ dáº§n xuáº¥t hiện trong Bảng Ä‘iou khioƒn.` 
         });
     } catch (err) {
         console.error('[DeepScan API] Error:', err.message);
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
+

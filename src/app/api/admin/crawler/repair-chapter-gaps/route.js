@@ -1,6 +1,6 @@
-import { crawlFullMangaChapters } from '@/lib/crawler';
-import { query } from '@/lib/db';
-import { getSession } from '@/lib/auth';
+﻿import { crawlFullMangaChapters } from '@/HeThong/CaoDuLieu';
+import { query } from '@/HeThong/Database/CoSoDuLieu';
+import { getSession } from '@/HeThong/BaoMat/XacThuc';
 import { NextResponse } from 'next/server';
 
 export async function POST(req) {
@@ -32,3 +32,4 @@ export async function POST(req) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
+

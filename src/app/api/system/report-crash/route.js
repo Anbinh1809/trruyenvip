@@ -1,4 +1,4 @@
-import { query } from '@/lib/db';
+﻿import { query } from '@/HeThong/Database/CoSoDuLieu';
 import { NextResponse } from 'next/server';
 
 export async function POST(request) {
@@ -30,3 +30,4 @@ export async function POST(request) {
         return NextResponse.json({ success: false }, { status: 500 });
     }
 }
+

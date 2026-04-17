@@ -18,8 +18,8 @@ async function init() {
                 username VARCHAR(50) UNIQUE NOT NULL,
                 email VARCHAR(100),
                 password_hash TEXT NOT NULL,
-                xp INT DEFAULT 0,
-                vipcoins INT DEFAULT 0,
+                xp BIGINT DEFAULT 0,
+                vipcoins BIGINT DEFAULT 0,
                 mission_data JSONB DEFAULT '{}',
                 last_mission_reset TIMESTAMPTZ DEFAULT NOW(),
                 role VARCHAR(20) DEFAULT 'user',
@@ -179,6 +179,17 @@ async function init() {
         `);
 
         await query(`
+            CREATE TABLE IF NOT EXISTS dailycheckins (
+                id SERIAL PRIMARY KEY,
+                user_uuid VARCHAR(255) REFERENCES users(uuid) ON DELETE CASCADE,
+                checkin_date DATE NOT NULL,
+                streak INT DEFAULT 1,
+                created_at TIMESTAMPTZ DEFAULT NOW(),
+                UNIQUE(user_uuid, checkin_date)
+            );
+        `);
+
+        await query(`
             CREATE TABLE IF NOT EXISTS redemptionrequests (
                 id SERIAL PRIMARY KEY,
                 user_uuid VARCHAR(255) REFERENCES users(uuid) ON DELETE CASCADE,
@@ -187,7 +198,7 @@ async function init() {
                 bank_name VARCHAR(255),
                 account_no VARCHAR(100),
                 account_holder VARCHAR(255),
-                card_value INT,
+                card_value BIGINT,
                 phone_number VARCHAR(100),
                 status VARCHAR(50) DEFAULT 'pending',
                 created_at TIMESTAMPTZ DEFAULT NOW()

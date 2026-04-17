@@ -1,6 +1,6 @@
-import { crawlChapterImages } from '@/lib/crawler';
-import { query } from '@/lib/db';
-import { withTitan } from '@/lib/api-handler';
+﻿import { crawlChapterImages } from '@/HeThong/CaoDuLieu';
+import { query } from '@/HeThong/Database/CoSoDuLieu';
+import { withTitan } from '@/HeThong/API/XuLyAPI';
 
 // In-memory telemetry for real-time debugging
 const jitTelemetry = new Map();
@@ -26,7 +26,7 @@ export const POST = withTitan({
             const remaining = Math.ceil((cooldown - (Date.now() - lastSync)) / 1000);
             throw {  
                 status: 429,
-                message: `Hệ thống đang xử lý, vui lòng chờ ${remaining}s...`,
+                message: `Hệ thống đang xử lý, vui là²ng cho ${remaining}s...`,
                 isCooldown: true
             };
         }
@@ -77,7 +77,7 @@ export const POST = withTitan({
 
         throw {  
             status: 503,
-            message: 'Nguồn ảnh bị chặn hoặc không phản hồi. Đang thử kích hoạt Aegis Auto-Repair...',
+            message: 'Nguồnn ảnh bo‹ cháº·n hoáº·c không phản hồi. Äang thử kà­ch hoáº¡t Aegis Auto-Repair...',
             telemetry: {
                 chapterId,
                 source,
@@ -88,3 +88,4 @@ export const POST = withTitan({
         };
     }
 });
+

@@ -1,5 +1,5 @@
-import { withTitan } from '@/lib/api-handler';
-import { query } from '@/lib/db';
+﻿import { withTitan } from '@/HeThong/API/XuLyAPI';
+import { query } from '@/HeThong/Database/CoSoDuLieu';
 
 /**
  * GET: Standardized User Identity Retrieval
@@ -41,3 +41,4 @@ export const GET = withTitan({
     };
   }
 });
+

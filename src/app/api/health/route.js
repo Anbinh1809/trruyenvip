@@ -1,5 +1,5 @@
-import { query } from '@/lib/db';
-import { withTitan } from '@/lib/api-handler';
+﻿import { query } from '@/HeThong/Database/CoSoDuLieu';
+import { withTitan } from '@/HeThong/API/XuLyAPI';
 
 export const GET = withTitan({
     handler: async () => {
@@ -23,3 +23,4 @@ export const GET = withTitan({
         throw new Error('Database connection failed');
     }
 });
+

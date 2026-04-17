@@ -1,5 +1,5 @@
-import { loadSystemState } from '@/lib/db';
-import { withTitan } from '@/lib/api-handler';
+﻿import { loadSystemState } from '@/HeThong/Database/CoSoDuLieu';
+import { withTitan } from '@/HeThong/API/XuLyAPI';
 
 export const GET = withTitan({
     auth: true,
@@ -18,3 +18,4 @@ export const GET = withTitan({
         };
     }
 });
+

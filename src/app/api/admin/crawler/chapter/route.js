@@ -1,7 +1,7 @@
-import { crawlChapterImages } from '@/lib/crawler';
-import { query } from '@/lib/db';
+﻿import { crawlChapterImages } from '@/HeThong/CaoDuLieu';
+import { query } from '@/HeThong/Database/CoSoDuLieu';
 import { NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth';
+import { getSession } from '@/HeThong/BaoMat/XacThuc';
 
 export async function POST(req) {
   try {
@@ -37,10 +37,11 @@ export async function POST(req) {
     return NextResponse.json({ 
         success: true, 
         count: count,
-        message: `Đã cào xong ${count} ảnh.` 
+        message: `Äà£ cào xong ${count} ảnh.` 
     });
   } catch (err) {
     console.error('Manual Crawl Error:', err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
+

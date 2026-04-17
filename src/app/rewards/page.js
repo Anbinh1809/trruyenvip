@@ -1,18 +1,18 @@
-'use client';
+﻿'use client';
 
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import Header from '@/GiaoDien/BoCuc/Header';
+import Footer from '@/GiaoDien/BoCuc/Footer';
 import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '@/context/AuthContext';
-import { useEngagement } from '@/context/EngagementContext';
-import { useToast } from '@/components/ToastProvider';
+import { useAuth } from '@/NguCanh/AuthContext';
+import { useEngagement } from '@/NguCanh/EngagementContext';
+import { useToast } from '@/GiaoDien/TienIch/ToastProvider';
 import { Coins, Landmark, CheckCircle, Clock, AlertTriangle, XCircle, CreditCard } from 'lucide-react';
 
 const REWARDS_CATALOG = [
-    { label: 'Rút 10.000đ', value: 10, cost: 10000, color: '#ff3e3e' },
-    { label: 'Rút 20.000đ', value: 20, cost: 20000, color: '#3b82f6' },
-    { label: 'Rút 50.000đ', value: 50, cost: 50000, color: '#10b981' },
-    { label: 'Rút 100.000đ', value: 100, cost: 100000, color: '#f59e0b' },
+    { label: 'Ràºt 10.000Ä‘', value: 10, cost: 10000, color: '#ff3e3e' },
+    { label: 'Ràºt 20.000Ä‘', value: 20, cost: 20000, color: '#3b82f6' },
+    { label: 'Ràºt 50.000Ä‘', value: 50, cost: 50000, color: '#10b981' },
+    { label: 'Ràºt 100.000Ä‘', value: 100, cost: 100000, color: '#f59e0b' },
 ];
 
 const BANK_LIST = [
@@ -58,18 +58,18 @@ export default function RewardsPage() {
   const removeAccents = (str) => {
     return str.normalize('NFD')
               .replace(/[\u0300-\u036f]/g, '')
-              .replace(/đ/g, 'd').replace(/Đ/g, 'D')
+              .replace(/Ä‘/g, 'd').replace(/Ä/g, 'D')
               .toUpperCase();
   };
 
   const handleRedeem = async (item) => {
     if (vipCoins < item.cost) {
-      setMsg('Số dư VipCoins không đủ để rút tiền.');
+      setMsg('So‘ dư VipCoins không Ä‘ủ Ä‘oƒ ràºt tion.');
       setMsgType('error');
       return;
     }
     if (!accountNo || !accountHolder) {
-      setMsg('Vui lòng cung cấp STK và Tên chủ tài khoản.');
+      setMsg('Vui lòng cung cấp STK và  Tên chủ tà i khoản.');
       setMsgType('error');
       return;
     }
@@ -89,16 +89,16 @@ export default function RewardsPage() {
       });
 
       if (res.ok) {
-        addToast('Yêu cầu rút tiền thành công!', 'success');
+        addToast('Yêu cáº§u ràºt tion thành công!', 'success');
         deductCoins(item.cost); // TITAN SYNC: Immediate local balance update
-        setMsg(`Yêu cầu rút ${item.value}k về ${bankName} đã được gửi. Chúng tôi sẽ xử lý trong vòng 24 giờ.`);
+        setMsg(`Yêu cáº§u ràºt ${item.value}k vo ${bankName} đã Ä‘ưo£c gửi. Chàºng tà´i sáº½ xử là½ trong và²ng 24 gio.`);
         setMsgType('success');
         setAccountNo('');
         setAccountHolder('');
         fetchHistory();
       } else {
         const errText = await res.text();
-        setMsg('Rút tiền thất bại: ' + errText);
+        setMsg('Ràºt tion tháº¥t báº¡i: ' + errText);
         setMsgType('error');
       }
     } catch (e) {
@@ -130,13 +130,13 @@ export default function RewardsPage() {
       
       <div className="container rewards-container fade-in">
         <div className="rewards-header-box">
-               <h1 className="rewards-title-industrial">Rút Tiền Tài Khoản</h1>
-               <p className="rewards-subtitle-industrial">Cày truyện nhận thưởng. Chuyển tiền trực tiếp về ngân hàng của bạn. Tỷ lệ quy đổi: 1 VipCoin = 1 VNĐ.</p>
+               <h1 className="rewards-title-industrial">Ràºt Tion Tà i Khoản</h1>
+               <p className="rewards-subtitle-industrial">Cà y truyện nháº­n thưoŸng. Chuyoƒn tion trựcc tiáº¿p vo ngà¢n hà ng của báº¡n. To· lệ quy Ä‘o•i: 1 VipCoin = 1 VNÄ.</p>
                
                <div className="coins-display-industrial">
                   <Coins size={40} color="#fbbf24" strokeWidth={1.5} />
                   <div className="coins-meta-industrial">
-                      <span className="coins-label-industrial">VipCoins hiện có</span>
+                      <span className="coins-label-industrial">VipCoins hiện cà³</span>
                       <div className="coins-amount-industrial">{vipCoins.toLocaleString()}</div>
                   </div>
                </div>
@@ -146,23 +146,23 @@ export default function RewardsPage() {
           {/* FORM SECTION */}
           <div className="redemption-form-card shadow-titan">
                 <h3 className="form-title-industrial">
-                    <Landmark size={24} color="var(--accent)" /> THÔNG TIN THỤ HƯỞNG
+                    <Landmark size={24} color="var(--accent)" /> THà”NG TIN THo¤ HÆ¯ožNG
                 </h3>
                 
                 <div className="input-field-industrial">
-                        <label className="field-label-titan">NGÂN HÀNG / VÍ ĐIỆN TỬ</label>
+                        <label className="field-label-titan">NGà‚N Hà€NG / Và ÄIộN To¬</label>
                         <select className="select-titan-industrial" value={bankName} onChange={(e) => setBankName(e.target.value)}>
                             {BANK_LIST.map(b => <option key={b} value={b}>{b}</option>)}
                         </select>
                 </div>
                 
                 <div className="input-field-industrial">
-                        <label className="field-label-titan">SỐ TÀI KHOẢN</label>
-                        <input className="input-titan-industrial" type="text" placeholder="Nhập số tài khoản..." value={accountNo} onChange={(e) => setAccountNo(e.target.value)} />
+                        <label className="field-label-titan">So Tà€I KHOáº¢N</label>
+                        <input className="input-titan-industrial" type="text" placeholder="Nháº­p so‘ tà i khoản..." value={accountNo} onChange={(e) => setAccountNo(e.target.value)} />
                 </div>
 
                 <div className="input-field-industrial">
-                        <label className="field-label-titan">TÊN CHỦ TÀI KHOẢN (KHÔNG DẤU)</label>
+                        <label className="field-label-titan">TàŠN CHo¦ Tà€I KHOáº¢N (KHà”NG Dáº¤U)</label>
                         <input className="input-titan-industrial uppercase-text" type="text" placeholder="NGUYEN VAN A..." value={accountHolder} onChange={(e) => setAccountHolder(e.target.value)} />
                 </div>
 
@@ -175,13 +175,13 @@ export default function RewardsPage() {
                 
                 <div className="form-safety-hint">
                     <CheckCircle size={14} className="text-secondary" />
-                    Bảo mật 256-bit SSL. Giao dịch an toàn tuyệt đối.
+                    Bảo máº­t 256-bit SSL. Giao do‹ch an toà n tuyệt Ä‘o‘i.
                 </div>
           </div>
 
           {/* CATALOG SECTION */}
           <div className="redemption-catalog-industrial">
-                <h3 className="catalog-title-industrial">CHỌN MỆNH GIÁ RÚT</h3>
+                <h3 className="catalog-title-industrial">CHoŒN MộNH GIà RàšT</h3>
                 <div className="redeem-grid-titan">
                     {REWARDS_CATALOG.map(item => (
                         <div key={item.value} className="redeem-card-titan">
@@ -189,14 +189,14 @@ export default function RewardsPage() {
                                 <CreditCard size={48} strokeWidth={1.5} />
                             </div>
                             <h4 className="card-label-industrial">{item.label}</h4>
-                            <p className="card-cost-industrial">Tốn {item.cost.toLocaleString()} Coins</p>
+                            <p className="card-cost-industrial">To‘n {item.cost.toLocaleString()} Coins</p>
                             <button 
                                 className="btn btn-primary redeem-btn-titan" 
                                 disabled={loading || vipCoins < item.cost}
                                 onClick={() => handleRedeem(item)}
                                 style={{ background: vipCoins < item.cost ? 'rgba(255,255,255,0.05)' : item.color }}
                             >
-                                {loading ? '...' : (vipCoins < item.cost ? 'Chưa đủ Coins' : 'Rút ngay')}
+                                {loading ? '...' : (vipCoins < item.cost ? 'Chưa Ä‘ủ Coins' : 'Ràºt ngay')}
                             </button>
                         </div>
                     ))}
@@ -204,22 +204,22 @@ export default function RewardsPage() {
 
                 <div className="redemption-history-section">
                         <h3 className="history-title-industrial">
-                            <Clock size={24} color="#60a5fa" /> LỊCH SỬ GIAO DỊCH
+                            <Clock size={24} color="#60a5fa" /> LoŠCH So¬ GIAO DoŠCH
                         </h3>
                         <div className="history-list-industrial glass-scrollbar">
                             {history.map(req => (
                                 <div key={req.id} className="history-item-industrial">
                                     <div className="history-main-info">
-                                        <div className="history-value-row">{req.card_value}k → <span className="bank-name-industrial">{req.bank_name || 'Legacy'}</span></div>
+                                        <div className="history-value-row">{req.card_value}k â†’ <span className="bank-name-industrial">{req.bank_name || 'Legacy'}</span></div>
                                         <div className="history-time-industrial">{new Date(req.created_at).toLocaleString('vi-VN')}</div>
                                     </div>
                                     <div className={`status-pill-industrial ${req.status.toLowerCase()}`}>
                                         <div className="status-dot" />
-                                        <span>{req.status === 'Pending' ? 'CHỜ DUYỆT' : (req.status === 'Done' ? 'HOÀN TẤT' : 'TỪ CHỐI')}</span>
+                                        <span>{req.status === 'Pending' ? 'CHoœ DUYộT' : (req.status === 'Done' ? 'HOà€N Táº¤T' : 'Toª CHoI')}</span>
                                     </div>
                                 </div>
                             ))}
-                            {history.length === 0 && <div className="history-empty-state">Chưa có giao dịch nào được thực hiện.</div>}
+                            {history.length === 0 && <div className="history-empty-state">Chưa cà³ giao do‹ch nà o Ä‘ưo£c thựcc hiện.</div>}
                         </div>
                 </div>
           </div>
@@ -410,3 +410,4 @@ export default function RewardsPage() {
     </main>
   );
 }
+

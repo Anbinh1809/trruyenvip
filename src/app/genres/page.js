@@ -1,17 +1,17 @@
-import Header from '@/components/Header';
-import MangaCard from '@/components/MangaCard';
-import MobileGenreNav from '@/components/MobileGenreNav';
-import { query, MANGA_CARD_FIELDS } from '@/lib/db';
+﻿import Header from '@/GiaoDien/BoCuc/Header';
+import MangaCard from '@/GiaoDien/ThanhPhan/MangaCard';
+import MobileGenreNav from '@/GiaoDien/BoCuc/MobileGenreNav';
+import { query, MANGA_CARD_FIELDS } from '@/HeThong/Database/CoSoDuLieu';
 import Link from 'next/link';
 import { headers } from 'next/headers';
-import Footer from '@/components/Footer';
-import IndustrialEmptyState from '@/components/IndustrialEmptyState';
+import Footer from '@/GiaoDien/BoCuc/Footer';
+import IndustrialEmptyState from '@/GiaoDien/TienIch/IndustrialEmptyState';
 
 export const revalidate = 600; // ISR: Revalidate every 10 minutes
 
 export async function generateMetadata({ searchParams }) {
   const { type } = await searchParams;
-  let genreName = 'Thể loại';
+  let genreName = 'Thoƒ loáº¡i';
   
   if (type) {
     const genreRes = await query('SELECT name FROM genres WHERE slug = @slug', { slug: type });
@@ -19,8 +19,8 @@ export async function generateMetadata({ searchParams }) {
   }
 
   return {
-    title: `${genreName} - Khám phá truyện tranh tại TruyenVip`,
-    description: `Khám phá những bộ truyện tranh thuộc thể loại ${genreName} hay nhất, chất lượng cao nhất tại TruyenVip.`
+    title: `${genreName} - Khám phá truyện tranh táº¡i TruyenVip`,
+    description: `Khám phá những bo™ truyện tranh thuo™c thoƒ loáº¡i ${genreName} hay nháº¥t, cháº¥t lưo£ng cao nháº¥t táº¡i TruyenVip.`
   };
 }
 
@@ -81,7 +81,7 @@ export default async function GenresPage({ searchParams }) {
       {
         '@type': 'ListItem',
         'position': 2,
-        'name': 'Thể loại',
+        'name': 'Thoƒ loáº¡i',
         'item': `${origin}/genres`
       }
     ]
@@ -106,27 +106,27 @@ export default async function GenresPage({ searchParams }) {
       
       <div className="container genres-container fade-in">
         <header className="library-header-industrial fade-up">
-            <div className="library-badge-titan">THƯ VIỆN TRUYỆN TRANH</div>
+            <div className="library-badge-titan">THÆ¯ VIộN TRUYộN TRANH</div>
             <h1 className="library-title-industrial">
-                {activeGenre ? activeGenre.name : 'Khám Phá Tất Cả'}
+                {activeGenre ? activeGenre.name : 'Khám Phá Táº¥t Cả'}
             </h1>
             <p className="library-desc-industrial">
                 {activeGenre 
-                    ? `Danh sách các bộ truyện thuộc thể loại ${activeGenre.name} mới nhất.` 
-                    : 'Tìm kiếm tập hợp tinh hoa truyện tranh theo sở thích và thể loại bạn yêu thích.'}
+                    ? `Danh sách các bo™ truyện thuo™c thoƒ loáº¡i ${activeGenre.name} mo›i nháº¥t.` 
+                    : 'Tà¬m kiáº¿m táº­p ho£p tinh hoa truyện tranh theo soŸ thà­ch và  thoƒ loáº¡i báº¡n yêu thà­ch.'}
             </p>
         </header>
 
         <div className="titan-genres-layout">
             <aside className="titan-genres-sidebar">
                 <div className="titan-nav-card shadow-titan">
-                    <h3 className="sidebar-title-titan">THỂ LOẠI</h3>
+                    <h3 className="sidebar-title-titan">THo‚ LOáº I</h3>
                     <div className="titan-genre-scroll">
                         <Link 
                             href="/genres"
                             className={`titan-nav-item ${!type ? 'active' : ''}`}
                         >
-                            Tất cả nội dung
+                            Táº¥t cả nội dung
                         </Link>
                         {allGenres.map(g => (
                             <Link 
@@ -151,9 +151,9 @@ export default async function GenresPage({ searchParams }) {
                     </div>
                 ) : (
                     <IndustrialEmptyState 
-                        title="DỮ LIỆU ĐANG CẬP NHẬT"
-                        message={`Hiện tại thư viện <span class="text-accent-titan">${activeGenre?.name || 'này'}</span> chưa có bản ghi nào được lưu trữ. Vui lòng quay lại sau.`}
-                        buttonText="Quay Lại Trang Chủ"
+                        title="Do® LIộU ÄANG CẬP NHáº¬T"
+                        message={`Hiện táº¡i thư viện <span class="text-accent-titan">${activeGenre?.name || 'nà y'}</span> chưa cà³ bản ghi nà o Ä‘ưo£c lưu trữ. Vui lòng quay láº¡i sau.`}
+                        buttonText="Quay Láº¡i Trang Chủ"
                     />
                 )}
             </div>
@@ -164,3 +164,4 @@ export default async function GenresPage({ searchParams }) {
     </main>
   );
 }
+

@@ -1,4 +1,4 @@
-import { query } from '@/lib/db';
+﻿import { query } from '@/HeThong/Database/CoSoDuLieu';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,12 +20,12 @@ export async function GET(request) {
         const protocol = host.startsWith('localhost') ? 'http' : 'https';
         const origin = `${protocol}://${host}`;
 
-        // Fetch all manga IDs for the sitemap
-        const mangaRes = await query("SELECT id, last_crawled FROM Manga ORDER BY last_crawled DESC");
+        // POLARIS OPTIMIZATION: Fix case-sensitivity and add safety limit
+        const mangaRes = await query("SELECT id, last_crawled FROM manga ORDER BY last_crawled DESC LIMIT 10000");
         const mangaList = mangaRes.recordset;
 
         // Fetch all genres
-        const genreRes = await query("SELECT slug FROM Genres");
+        const genreRes = await query("SELECT slug FROM genres ORDER BY slug ASC");
         const genreList = genreRes.recordset;
 
         const staticPages = [
@@ -88,3 +88,4 @@ export async function GET(request) {
         return new Response('Error', { status: 500 });
     }
 }
+

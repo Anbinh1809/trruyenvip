@@ -1,16 +1,16 @@
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import ChapterContent from '@/components/ChapterContent';
-import ReaderSettings from '@/components/ReaderSettings';
-import { query } from '@/lib/db';
-import { generateProxySignature } from '@/lib/crypto';
-import "@/app/reader.css";
+import Header from '@/GiaoDien/BoCuc/Header';
+import Footer from '@/GiaoDien/BoCuc/Footer';
+import ChapterContent from '@/GiaoDien/TrinhDoc/ChapterContent';
+import ReaderSettings from '@/GiaoDien/TrinhDoc/ReaderSettings';
+import { query } from '@/HeThong/Database/CoSoDuLieu';
+import { generateProxySignature } from '@/HeThong/BaoMat/crypto';
+import "@/GiaoDien/ThanhPhan/Styles/reader.css";
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { Sparkles, ChevronLeft, ChevronRight, Home, BookOpen, AlertTriangle } from 'lucide-react';
-import ChapterSelector from '@/components/ChapterSelector';
-import DiscoveryTrigger from '@/components/DiscoveryTrigger';
-import ReaderHud from '@/components/ReaderHud';
+import ChapterSelector from '@/GiaoDien/TrinhDoc/ChapterSelector';
+import DiscoveryTrigger from '@/GiaoDien/BoCuc/DiscoveryTrigger';
+import ReaderHud from '@/GiaoDien/TrinhDoc/ReaderHud';
 
 // Helper to determine if a slug is a potential new ingestion target
 function isDiscoveryCandidate(slug) {
@@ -20,7 +20,7 @@ function isDiscoveryCandidate(slug) {
 }
 
 // Lazy load comments to prevent hydration mismatches
-const Comments = dynamic(() => import('@/components/CommentSection'), { 
+const Comments = dynamic(() => import('@/GiaoDien/ThanhPhan/CommentSection'), { 
   loading: () => <div className="loading-dots-industrial">Đang tải bình luận...</div>
 });
 
@@ -67,7 +67,7 @@ async function getChapterData(mangaId, chapterId) {
     let imagesRes = await query('SELECT image_url FROM chapterimages WHERE chapter_id = @id ORDER BY "order" ASC', { id: chapterId });
     if (!imagesRes.recordset || imagesRes.recordset.length === 0) {
         console.log(`[Aegis:Sync] No images for ${chapterId}. Triggering Hot-Sync...`);
-        const { crawlChapterImages } = await import('@/lib/crawler/engine');
+        const { crawlChapterImages } = await import('@/HeThong/CaoDuLieu/engine');
         // Infer source from URL or default to nettruyen style
         const source = chapter.source_url?.includes('truyenqq') ? 'truyenqq' : 'nettruyen';
         if (chapter.source_url) {
@@ -82,7 +82,7 @@ async function getChapterData(mangaId, chapterId) {
         SELECT id, chapter_number, title 
         FROM chapters 
         WHERE manga_id = @internalMangaId 
-        ORDER BY NULLIF(regexp_replace(chapter_number, '[^0-9.]', '', 'g'), '')::numeric ASC
+        ORDER BY chapter_number ASC
     `, { internalMangaId });
     const chapters = chaptersRes.recordset || [];
 
@@ -198,7 +198,7 @@ export default async function ChapterPage({ params }) {
       {/* Reader Footer: Finish Celebration */}
       <footer className="reader-footer-industrial">
         <div className="container reader-footer-container-titan">
-            <span className="finish-label-titan">BẠN ĐÃ HOÀN THÀNH CHƯƠNG NÀY</span>
+            <span className="finish-label-titan">BẠN Đã HOÀN THÀNH CHƯƠNG NÀY</span>
             <h2 className="finish-title-titan">{chapter.title || `Chương ${chapter.chapter_number}`}</h2>
 
             {nextChapter ? (
@@ -213,7 +213,7 @@ export default async function ChapterPage({ params }) {
                 </div>
             ) : (
                 <div className="all-caught-up-industrial fade-in">
-                    <h3 className="caught-up-title">BẠN ĐÃ THEO KỊP CHƯƠNG MỚI NHẤT! 🎉</h3>
+                    <h3 className="caught-up-title">BẠN Đã THEO KỊP CHƯƠNG MỚI NHẤT! 🎉</h3>
                     <p className="caught-up-desc">Hãy theo dõi bộ truyện để nhận thông báo khi có chương mới.</p>
                 </div>
             )}

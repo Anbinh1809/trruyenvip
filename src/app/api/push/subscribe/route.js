@@ -1,4 +1,4 @@
-import { query } from '@/lib/db';
+﻿import { query } from '@/HeThong/Database/CoSoDuLieu';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -34,3 +34,4 @@ export async function POST(req) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
+

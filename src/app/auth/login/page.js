@@ -1,10 +1,10 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/NguCanh/AuthContext';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import Header from '@/GiaoDien/BoCuc/Header';
+import Footer from '@/GiaoDien/BoCuc/Footer';
 import Link from 'next/link';
 import { LogIn, User, Lock, ArrowRight } from 'lucide-react';
 
@@ -26,10 +26,10 @@ export default function LoginPage() {
       if (success) {
         router.push('/');
       } else {
-        setError('Tên đăng nhập hoặc mật khẩu không chính xác.');
+        setError('Tên Ä‘Äƒng nháº­p hoáº·c máº­t kháº©u không chà­nh xác.');
       }
     } catch (err) {
-      setError('Đã xảy ra lỗi kết nối. Vui lòng thử lại.');
+      setError('Äà£ xảy ra lo—i kết nối. Vui lòng thử láº¡i.');
     } finally {
       setLoading(false);
     }
@@ -42,20 +42,20 @@ export default function LoginPage() {
       <div className="auth-wrapper-industrial">
         <div className="auth-card-titan shadow-titan fade-up">
             <div className="auth-badge-titan">TRUYENVIP SECURE LOGIN</div>
-            <h1 className="auth-title-industrial">ĐĂNG NHẬP</h1>
-            <p className="auth-subtitle-industrial">Truy cập vào thư viện và bộ sưu tập cá nhân của bạn.</p>
+            <h1 className="auth-title-industrial">ÄÄ‚NG NHáº¬P</h1>
+            <p className="auth-subtitle-industrial">Truy cập và o thư viện và  bo™ sưu táº­p cá nhà¢n của báº¡n.</p>
 
             <form className="auth-form-industrial" onSubmit={handleSubmit}>
                 {error && <div className="auth-error-banner fade-in">{error}</div>}
                 
                 <div className="auth-input-group">
-                    <label className="auth-label-titan">Tên đăng nhập</label>
+                    <label className="auth-label-titan">Tên Ä‘Äƒng nháº­p</label>
                     <div className="input-relative">
                         <User className="input-icon-titan" size={18} />
                         <input 
                             type="text" 
                             className="auth-input-titan with-icon"
-                            placeholder="Nhập tên đăng nhập..."
+                            placeholder="Nháº­p tên Ä‘Äƒng nháº­p..."
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             required
@@ -64,13 +64,13 @@ export default function LoginPage() {
                 </div>
 
                 <div className="auth-input-group">
-                    <label className="auth-label-titan">Mật khẩu</label>
+                    <label className="auth-label-titan">Máº­t kháº©u</label>
                     <div className="input-relative">
                         <Lock className="input-icon-titan" size={18} />
                         <input 
                             type="password" 
                             className="auth-input-titan with-icon"
-                            placeholder="Nhập mật khẩu..."
+                            placeholder="Nháº­p máº­t kháº©u..."
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
@@ -83,14 +83,14 @@ export default function LoginPage() {
                     className="btn btn-primary auth-submit-btn-titan shadow-titan"
                     disabled={loading}
                 >
-                    {loading ? 'ĐANG XỬ LÝ...' : 'ĐĂNG NHẬP HỆ THỐNG'} <LogIn size={20} />
+                    {loading ? 'ÄANG Xo¬ Là...' : 'ÄÄ‚NG NHáº¬P Hộ THoNG'} <LogIn size={20} />
                 </button>
             </form>
 
             <div className="auth-footer-industrial">
-                Chưa có tài khoản? 
+                Chưa cà³ tà i khoản? 
                 <Link href="/auth/register" className="auth-link-titan">
-                    Đăng ký ngay <ArrowRight size={16} />
+                    ÄÄƒng kà½ ngay <ArrowRight size={16} />
                 </Link>
             </div>
         </div>
@@ -106,3 +106,4 @@ export default function LoginPage() {
     </main>
   );
 }
+

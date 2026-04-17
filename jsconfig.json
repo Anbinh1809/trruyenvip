@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@hethong/*": ["./src/HeThong/*"],
+      "@giaodien/*": ["./src/GiaoDien/*"],
+      "@ngucanh/*": ["./src/NguCanh/*"],
+      "@trothu/*": ["./src/TroThu/*"]
     }
   }
 }

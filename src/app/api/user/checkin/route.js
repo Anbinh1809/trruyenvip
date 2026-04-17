@@ -1,5 +1,5 @@
-import { query, withTransaction, checkRateLimit } from '@/lib/db';
-import { withTitan } from '@/lib/api-handler';
+﻿import { query, withTransaction, checkRateLimit } from '@/HeThong/Database/CoSoDuLieu';
+import { withTitan } from '@/HeThong/API/XuLyAPI';
 import { NextResponse } from 'next/server';
 
 /**
@@ -19,12 +19,12 @@ export const POST = withTitan({
             throw { status: 429, message: 'Yêu cầu điểm danh quá nhanh. Vui lòng thử lại sau.' };
         }
 
-        try {
             const result = await withTransaction(async (tx) => {
                 // 1. Check if already checked in today
-                const todayCheck = await tx.query(
-                    'SELECT id FROM dailycheckins WHERE user_uuid = $1 AND checkin_date = $2',
-                    [userUuid, today]
+                const todayCheck = await query(
+                    'SELECT id FROM dailycheckins WHERE user_uuid = @userUuid AND checkin_date = @today',
+                    { userUuid, today },
+                    tx
                 );
 
                 if (todayCheck.rowCount > 0) {
@@ -32,36 +32,39 @@ export const POST = withTitan({
                 }
 
                 // 2. Check yesterday to calculate streak
-                const yesterdayCheck = await tx.query(
-                    'SELECT streak FROM dailycheckins WHERE user_uuid = $1 AND checkin_date = $2',
-                    [userUuid, yesterday]
+                const yesterdayCheck = await query(
+                    'SELECT streak FROM dailycheckins WHERE user_uuid = @userUuid AND checkin_date = @yesterday',
+                    { userUuid, yesterday },
+                    tx
                 );
 
                 let newStreak = 1;
                 if (yesterdayCheck.rowCount > 0) {
-                    newStreak = yesterdayCheck.rows[0].streak + 1;
+                    newStreak = parseInt(yesterdayCheck.recordset[0].streak) + 1;
                 }
 
                 // 3. Calculate Reward
                 let reward = 10;
-                let message = `Điểm danh thành công! Nhận được ${reward} xu. Chuỗi: ${newStreak} ngày.`;
+                let message = `Äioƒm danh thành công! Nháº­n Ä‘ưo£c ${reward} xu. Chuo—i: ${newStreak} ngà y.`;
                 
                 if (newStreak % 7 === 0) {
                     const bonus = 100;
                     reward += bonus;
-                    message = `Tuyệt vời! Bạn đã điểm danh liên tiếp 7 ngày. Nhận thưởng ${reward} xu!`;
+                    message = `Tuyệt voi! Bạn đã điểm danh liên tiếp 7 ngà y. Nhận thưởng ${reward} xu!`;
                 }
 
                 // 4. Record Check-in
-                await tx.query(
-                    'INSERT INTO dailycheckins (user_uuid, checkin_date, streak) VALUES ($1, $2, $3)',
-                    [userUuid, today, newStreak]
+                await query(
+                    'INSERT INTO dailycheckins (user_uuid, checkin_date, streak) VALUES (@userUuid, @today, @newStreak)',
+                    { userUuid, today, newStreak },
+                    tx
                 );
 
                 // 5. Grant Reward
-                await tx.query(
-                    'UPDATE users SET vipcoins = vipcoins + $1, xp = xp + 5 WHERE uuid = $2',
-                    [reward, userUuid]
+                await query(
+                    'UPDATE users SET vipcoins = vipcoins + @reward, xp = xp + 5 WHERE uuid = @userUuid',
+                    { reward, userUuid },
+                    tx
                 );
 
                 return { reward, streak: newStreak, message };
@@ -74,9 +77,6 @@ export const POST = withTitan({
                 streak: result.streak
             };
 
-        } catch (innerErr) {
-            throw { status: 400, message: innerErr.message };
-        }
     }
 });
 
@@ -100,3 +100,4 @@ export const GET = withTitan({
         };
     }
 });
+

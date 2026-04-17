@@ -1,5 +1,5 @@
-import { queueDiscovery } from '@/lib/crawler';
-import { cleanLegacyEncoding } from '@/lib/db';
+﻿import { queueDiscovery } from '@/HeThong/CaoDuLieu';
+import { runFullMaintenance } from '@/HeThong/Database/BaoTri';
 
 export async function GET(request) {
   const authHeader = request.headers.get('authorization');
@@ -11,7 +11,7 @@ export async function GET(request) {
  
   try {
     // 1. PERFORM SYSTEM MAINTENANCE FIRST (Unified Titan Engine)
-    await cleanLegacyEncoding();
+    await runFullMaintenance();
 
     // 2. TITAN ARCHITECTURE: Queue heavy discovery tasks
     // Page 1 is always the latest updates
@@ -31,3 +31,4 @@ export async function GET(request) {
     }, { status: 500 });
   }
 }
+

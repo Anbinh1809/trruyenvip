@@ -1,7 +1,7 @@
-import { getSession } from '@/lib/auth';
-import { query } from '@/lib/db';
+﻿import { getSession } from '@/HeThong/BaoMat/XacThuc';
+import { query } from '@/HeThong/Database/CoSoDuLieu';
 import { NextResponse } from 'next/server';
-import { SOURCES } from '@/lib/crawler/mirrors';
+import { SOURCES } from '@/HeThong/CaoDuLieu/mirrors';
 
 /**
  * Maintenance tool to repair 404/Relative links in the database.
@@ -51,3 +51,4 @@ export async function GET() {
         return NextResponse.json({ error: e.message }, { status: 500 });
     }
 }
+

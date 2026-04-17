@@ -1,10 +1,10 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/NguCanh/AuthContext';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import Header from '@/GiaoDien/BoCuc/Header';
+import Footer from '@/GiaoDien/BoCuc/Footer';
 import Link from 'next/link';
 import { UserPlus, User, Lock, Mail, ArrowRight } from 'lucide-react';
 
@@ -24,7 +24,7 @@ export default function RegisterPage() {
     setError('');
 
     if (password !== confirmPassword) {
-      setError('Mật khẩu xác nhận không khớp.');
+      setError('Máº­t kháº©u xác nháº­n không kho›p.');
       setLoading(false);
       return;
     }
@@ -41,10 +41,10 @@ export default function RegisterPage() {
       if (response.success) {
         router.push('/');
       } else {
-        setError(response.error || 'Tên đăng nhập đã tồn tại hoặc dữ liệu không hợp lệ.');
+        setError(response.error || 'Tên Ä‘Äƒng nháº­p đã tồnn táº¡i hoáº·c dữ liệu không ho£p lệ.');
       }
     } catch (err) {
-      setError('Đã xảy ra lỗi kết nối. Vui lòng thử lại.');
+      setError('Äà£ xảy ra lo—i kết nối. Vui lòng thử láº¡i.');
     } finally {
       setLoading(false);
     }
@@ -57,20 +57,20 @@ export default function RegisterPage() {
       <div className="auth-wrapper-industrial">
         <div className="auth-card-titan shadow-titan fade-up">
             <div className="auth-badge-titan">JOIN THE ELITE ELITE COMMUNITY</div>
-            <h1 className="auth-title-industrial">ĐĂNG KÝ</h1>
-            <p className="auth-subtitle-industrial">Khởi tạo hành trình đọc truyện không giới hạn của bạn.</p>
+            <h1 className="auth-title-industrial">ÄÄ‚NG Kà</h1>
+            <p className="auth-subtitle-industrial">KhoŸi táº¡o hà nh trà¬nh Ä‘oc truyện không gio›i háº¡n của báº¡n.</p>
 
             <form className="auth-form-industrial" onSubmit={handleSubmit}>
                 {error && <div className="auth-error-banner fade-in">{error}</div>}
                 
                 <div className="auth-input-group">
-                    <label className="auth-label-titan">Tên đăng nhập</label>
+                    <label className="auth-label-titan">Tên Ä‘Äƒng nháº­p</label>
                     <div className="input-relative">
                         <User className="input-icon-titan" size={18} />
                         <input 
                             type="text" 
                             className="auth-input-titan with-icon"
-                            placeholder="Nhập tên đăng nhập mong muốn..."
+                            placeholder="Nháº­p tên Ä‘Äƒng nháº­p mong muo‘n..."
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             required
@@ -79,13 +79,13 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="auth-input-group">
-                    <label className="auth-label-titan">Email (Tùy chọn)</label>
+                    <label className="auth-label-titan">Email (Tà¹y chon)</label>
                     <div className="input-relative">
                         <Mail className="input-icon-titan" size={18} />
                         <input 
                             type="email" 
                             className="auth-input-titan with-icon"
-                            placeholder="Nhập địa chỉ email của bạn..."
+                            placeholder="Nháº­p Ä‘o‹a cho‰ email của báº¡n..."
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                         />
@@ -93,13 +93,13 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="auth-input-group">
-                    <label className="auth-label-titan">Mật khẩu</label>
+                    <label className="auth-label-titan">Máº­t kháº©u</label>
                     <div className="input-relative">
                         <Lock className="input-icon-titan" size={18} />
                         <input 
                             type="password" 
                             className="auth-input-titan with-icon"
-                            placeholder="Nhập mật khẩu bí mật..."
+                            placeholder="Nháº­p máº­t kháº©u bà­ máº­t..."
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
@@ -108,13 +108,13 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="auth-input-group">
-                    <label className="auth-label-titan">Xác nhận mật khẩu</label>
+                    <label className="auth-label-titan">Xác nháº­n máº­t kháº©u</label>
                     <div className="input-relative">
                         <Lock className="input-icon-titan" size={18} />
                         <input 
                             type="password" 
                             className="auth-input-titan with-icon"
-                            placeholder="Nhập lại mật khẩu..."
+                            placeholder="Nháº­p láº¡i máº­t kháº©u..."
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             required
@@ -127,14 +127,14 @@ export default function RegisterPage() {
                     className="btn btn-primary auth-submit-btn-titan shadow-titan"
                     disabled={loading}
                 >
-                    {loading ? 'ĐANG KHỞI TẠO...' : 'TẠO TÀI KHOẢN NGAY'} <UserPlus size={20} />
+                    {loading ? 'ÄANG KHožI Táº O...' : 'Táº O Tà€I KHOáº¢N NGAY'} <UserPlus size={20} />
                 </button>
             </form>
 
             <div className="auth-footer-industrial">
-                Đã có tài khoản? 
+                Äà£ cà³ tà i khoản? 
                 <Link href="/auth/login" className="auth-link-titan">
-                    Đăng nhập ngay <ArrowRight size={16} />
+                    ÄÄƒng nháº­p ngay <ArrowRight size={16} />
                 </Link>
             </div>
         </div>
@@ -150,3 +150,4 @@ export default function RegisterPage() {
     </main>
   );
 }
+

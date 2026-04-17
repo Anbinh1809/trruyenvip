@@ -1,5 +1,5 @@
-import { query } from '@/lib/db';
-import { getSignedProxyUrl } from '@/lib/crypto';
+﻿import { query } from '@/HeThong/Database/CoSoDuLieu';
+import { getSignedProxyUrl } from '@/HeThong/BaoMat/crypto';
 
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
@@ -53,3 +53,4 @@ export async function GET(request) {
         return Response.json({ error: 'Database error' }, { status: 500 });
     }
 }
+

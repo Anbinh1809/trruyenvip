@@ -1,10 +1,10 @@
 import sharp from 'sharp';
-import { query } from '@/lib/db';
+import { query } from '@/HeThong/Database/CoSoDuLieu';
 
 // RAM OPTIMIZATION: Enable Sharp cache with a 50MB limit to balance speed vs memory
 sharp.cache({ memory: 50, items: 100, files: 20 });
 
-import { generateProxySignature, simpleHash } from '@/lib/crypto';
+import { generateProxySignature, simpleHash } from '@/HeThong/BaoMat/crypto';
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -109,15 +109,21 @@ export async function GET(request) {
             'User-Agent': userAgents[Math.floor(Math.random() * userAgents.length)],
             'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
             'Accept-Language': 'vi,en-US;q=0.9,en;q=0.8',
-            'Cache-Control': 'no-cache'
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
         };
         if (strategy.referer) headers['Referer'] = strategy.referer;
 
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s for slower CDNs
+        const timeoutId = setTimeout(() => controller.abort(), 6000); 
 
         try {
-            const response = await fetch(imageUrl, { headers, signal: controller.signal, next: { revalidate: 86400 } });
+            // TITAN HYBRID FETCH: Force Node.js level SSL bypass if needed (handled by process env in this context)
+            const response = await fetch(imageUrl, { 
+                headers, 
+                signal: controller.signal,
+                cache: 'force-cache'
+            });
             clearTimeout(timeoutId);
             if (response.ok) return { response, strategy: strategy.name };
             throw new Error(`Status ${response.status}`);
@@ -254,3 +260,4 @@ export async function GET(request) {
     });
   }
 }
+

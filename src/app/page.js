@@ -1,9 +1,9 @@
-import Header from '@/components/Header';
-import RecentlyRead from '@/components/RecentlyRead';
-import MangaCard from '@/components/MangaCard';
-import Footer from '@/components/Footer';
-import { query, MANGA_CARD_FIELDS } from '@/lib/db';
-import { getSignedProxyUrl } from '@/lib/crypto';
+﻿import Header from '@/GiaoDien/BoCuc/Header';
+import RecentlyRead from '@/GiaoDien/ThanhPhan/RecentlyRead';
+import MangaCard from '@/GiaoDien/ThanhPhan/MangaCard';
+import Footer from '@/GiaoDien/BoCuc/Footer';
+import { query, MANGA_CARD_FIELDS } from '@/HeThong/Database/CoSoDuLieu';
+import { getSignedProxyUrl } from '@/HeThong/BaoMat/crypto';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import { Sparkles, Zap, ChevronRight } from 'lucide-react';
@@ -11,9 +11,9 @@ import { Sparkles, Zap, ChevronRight } from 'lucide-react';
 export const revalidate = 300; // ISR: Revalidate every 5 minutes
 
 export const metadata = {
-  title: 'TruyenVip - Nền tảng Đọc Truyện Tranh Online Cao Cấp',
-  description: 'Trải nghiệm đọc truyện tranh đỉnh cao với tốc độ siêu nhanh, giao diện cinematic và kho truyện khổng lồ từ NetTruyen, TruyenQQ được cập nhật liên tục.',
-  keywords: ['đọc truyện tranh', 'nettruyen', 'truyenqq', 'manga online', 'truyenvip', 'truyện hot'],
+  title: 'TruyenVip - Non tảng Äoc Truyện Tranh Online Cao Cấp',
+  description: 'Trải nghiệm Ä‘oc truyện tranh đỉnh cao với tốc độ siêu nhanh, giao diện cinematic và  kho truyện khổng lồ từ NetTruyen, TruyenQQ Ä‘ưo£c cập nhật liên to¥c.',
+  keywords: ['Ä‘oc truyện tranh', 'nettruyen', 'truyenqq', 'manga online', 'truyenvip', 'truyện hot'],
 };
 
 async function getManga() {
@@ -49,10 +49,10 @@ export default async function Home() {
           <div className="container center-content-titan">
               <div className="hero-badge-titan">PREMIUM READING EXPERIENCE</div>
               <h1 className="home-title-industrial">
-                  TRUYÊN<span className="accent-text-titan">VIP</span>: THẾ GIỚI TRUYỆN TRANH <br/> ĐỈNH CAO
+                  TRUYỆN<span className="accent-text-titan">VIP</span>: THẾ GIỚI TRUYộN TRANH <br/> ÄốNH CAO
               </h1>
               <p className="home-subtitle-industrial">
-                  Trải nghiệm đọc truyện cinematic, tốc độ siêu nhanh và kho truyện khổng lồ từ những nguồn tốt nhất Việt Nam.
+                  Trải nghiệm Ä‘oc truyện cinematic, tốc độ siêu nhanh và  kho truyện khổng lồ từ những nguồn tốt nháº¥t Việt Nam.
               </p>
           </div>
       </div>
@@ -69,7 +69,7 @@ export default async function Home() {
           <div className="section-header-nebula-industrial">
             <div className="section-title-box-titan">
                 <Sparkles size={24} color="var(--accent)" />
-                <h2 className="section-title-industrial">TRUYỆN ĐANG HOT</h2>
+                <h2 className="section-title-industrial">TRUYộN ÄANG HOT</h2>
             </div>
           </div>
           <div className="manga-grid-titan">
@@ -83,7 +83,7 @@ export default async function Home() {
           <div className="section-header-nebula-industrial">
             <div className="section-title-box-titan">
                 <Zap size={24} color="#60a5fa" />
-                <h2 className="section-title-industrial">VỪA CẬP NHẬT</h2>
+                <h2 className="section-title-industrial">VỪA CẬP NHáº¬T</h2>
             </div>
             <Link href="/genres" className="btn-view-all-industrial">
                 XEM TẤT CẢ <ChevronRight size={18} />
@@ -101,3 +101,4 @@ export default async function Home() {
     </main>
   );
 }
+

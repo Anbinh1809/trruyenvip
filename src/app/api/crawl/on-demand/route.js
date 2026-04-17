@@ -1,28 +1,28 @@
-import { withTitan } from '@/lib/api-handler';
-import { ingestMangaBySlug } from '@/lib/crawler/engine';
+import { ingestMangaBySlug } from '@/HeThong/CaoDuLieu/engine';
+import { withTitan } from '@/HeThong/API/XuLyAPI';
+
+export const runtime = 'nodejs';
 
 export const POST = withTitan({
-    admin: false, // Allow public discovery to make the site feel "Infinity"
     handler: async (req) => {
+        const { slug, source } = await req.json();
+        
+        if (!slug) {
+            throw { status: 400, message: 'Thiếu slug truyện' };
+        }
+
+        console.log(`[API:Discovery] Request for ${slug} on ${source || 'nettruyen'}`);
+        
         try {
-            const body = await req.json().catch(() => ({}));
-            const { slug, source = 'nettruyen' } = body;
-
-            if (!slug) {
-                return { success: false, message: 'Thiếu slug truyện.' };
-            }
-
-            console.log(`[Aegis:OnDemand] Triggering ingestion for: ${slug} (${source})`);
-            const ResultId = await ingestMangaBySlug(slug, source);
-            
+            const finalSlug = await ingestMangaBySlug(slug, source || 'nettruyen');
             return { 
                 success: true, 
-                message: `Dữ liệu truyện ${slug} đang được đồng bộ hóa. Vui lòng F5 sau vài giây.`,
-                id: ResultId
+                message: 'Khởi tạo quy trình khám phá thành công',
+                slug: finalSlug
             };
-        } catch (error) {
-            console.error('[On-Demand API Error]:', error);
-            return { success: false, message: 'Không thể kích hoạt đồng bộ: ' + error.message };
+        } catch (err) {
+            console.error('[Discovery Error]', err.message);
+            throw { status: 500, message: 'Lỗi khởi tạo Titan Engine: ' + err.message };
         }
     }
 });

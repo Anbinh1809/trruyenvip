@@ -1,4 +1,4 @@
-import { query } from '@/lib/db';
+import { query } from '@/HeThong/Database/CoSoDuLieu';
 
 export const dynamic = 'force-dynamic';
 
@@ -50,7 +50,7 @@ export async function GET(request) {
 <channel>
     <title>TruyenVip - Mới Cập Nhật</title>
     <link>${origin}</link>
-    <description>Nền tảng đọc truyện tranh online cao cấp, cập nhật chương mới nhanh nhất.</description>
+    <description>Non tảng Ä‘oc truyện tranh online cao cấp, cập nhật chưÆ¡ng mo›i nhanh nhất.</description>
     <language>vi</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     <atom:link href="${origin}/api/rss" rel="self" type="application/rss+xml" />
@@ -60,13 +60,17 @@ export async function GET(request) {
 
         return new Response(rssFeed, {
             headers: {
-                'Content-Type': 'application/xml',
+                'Content-Type': 'application/xml; charset=utf-8',
                 'Cache-Control': 'public, s-maxage=1800, stale-while-revalidate=600'
             }
         });
 
     } catch (e) {
         console.error('RSS Feed Error:', e);
-        return new Response('<error>Lỗi hệ thống</error>', { status: 500 });
+        return new Response('<error>Lỗi hệ thống</error>', { 
+            status: 500,
+            headers: { 'Content-Type': 'application/xml; charset=utf-8' }
+        });
     }
 }
+

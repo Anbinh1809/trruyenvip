@@ -1,5 +1,5 @@
-import { withTitan } from '@/lib/api-handler';
-import { queueDiscovery } from '@/lib/crawler';
+import { withTitan } from '@/HeThong/API/XuLyAPI';
+import { queueDiscovery } from '@/HeThong/CaoDuLieu';
 
 export const POST = withTitan({
     admin: true,
@@ -17,7 +17,9 @@ export const POST = withTitan({
                 message: `Tiến trình quét ${pageCount} trang đã được đưa vào hàng đợi thành công.` 
             };
         } catch (error) {
-            throw new Error('Không thể kích hoạt quét dữ liệu: ' + error.message);
+            throw { status: 500, message: 'Không thể kích hoạt quét dữ liệu: ' + error.message };
         }
     }
 });
+
+

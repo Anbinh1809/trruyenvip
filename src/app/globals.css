@@ -53,34 +53,8 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan {
   letter-spacing: -0.5px;
 }
 
-:root {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8fafc;
-  --text-primary: #0f172a;
-  --text-muted: #64748b;
-  --accent: #ff3e3e;
-  --accent-gradient: linear-gradient(135deg, #ff3e3e 0%, #d91e1e 100%);
-  --glass-bg: rgba(255, 255, 255, 0.8);
-  --glass-border: rgba(0, 0, 0, 0.08);
-  --glass-blur: blur(20px);
-  --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-  --header-height: 80px;
-  --z-header: 10000;
-  --border-radius: 16px;
-  --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  --font-heading: 'Inter', sans-serif;
-  --font-body: 'Inter', sans-serif;
-}
+/* Design Tokens are imported from tokens.css in layout.js */
 
-[data-theme="dark"] {
-  --bg-primary: #020617;
-  --bg-secondary: #0f172a;
-  --text-primary: #f8fafc;
-  --text-muted: #94a3b8;
-  --glass-bg: rgba(15, 23, 42, 0.8);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --card-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-}
 
 .truncate-1 {
     display: -webkit-box;

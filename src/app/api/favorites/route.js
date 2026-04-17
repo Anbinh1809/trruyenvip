@@ -1,5 +1,5 @@
-import { query } from '@/lib/db';
-import { withTitan } from '@/lib/api-handler';
+﻿import { query } from '@/HeThong/Database/CoSoDuLieu';
+import { withTitan } from '@/HeThong/API/XuLyAPI';
 
 /**
  * GET: Retrieve user favorites
@@ -51,3 +51,4 @@ export const POST = withTitan({
         }
     }
 });
+

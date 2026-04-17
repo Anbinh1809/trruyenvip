@@ -1,9 +1,9 @@
-import Header from '@/components/Header';
-import MangaCard from '@/components/MangaCard';
-import { query, MANGA_CARD_FIELDS } from '@/lib/db';
-import { generateProxySignature } from '@/lib/crypto';
-import Footer from '@/components/Footer';
-import IndustrialEmptyState from '@/components/IndustrialEmptyState';
+﻿import Header from '@/GiaoDien/BoCuc/Header';
+import MangaCard from '@/GiaoDien/ThanhPhan/MangaCard';
+import { query, MANGA_CARD_FIELDS } from '@/HeThong/Database/CoSoDuLieu';
+import { generateProxySignature } from '@/HeThong/BaoMat/crypto';
+import Footer from '@/GiaoDien/BoCuc/Footer';
+import IndustrialEmptyState from '@/GiaoDien/TienIch/IndustrialEmptyState';
 import { Search } from 'lucide-react';
 
 async function searchManga(q, page = 1) {
@@ -80,10 +80,10 @@ export default async function SearchPage({ searchParams }) {
               </div>
               <div className="search-meta-industrial">
                 <h1 className="search-title-industrial">
-                  KẾT QUẢ: &quot;{q}&quot;
+                  Káº¾T QUáº¢: &quot;{q}&quot;
                 </h1>
                 <p className="search-stats-industrial">
-                  Hệ thống tìm thấy {total} bộ truyện phù hợp với từ khóa của bạn.
+                  Hệ tho‘ng tà¬m tháº¥y {total} bo™ truyện phà¹ ho£p với từ khà³a của báº¡n.
                 </p>
               </div>
           </div>
@@ -103,7 +103,7 @@ export default async function SearchPage({ searchParams }) {
                                 href={`/search?q=${encodeURIComponent(q)}&page=${page - 1}`}
                                 className="pagination-node-industrial"
                             >
-                                ← TRƯỚC
+                                â† TRÆ¯ỚC
                             </a>
                         )}
                         
@@ -116,7 +116,7 @@ export default async function SearchPage({ searchParams }) {
                                 href={`/search?q=${encodeURIComponent(q)}&page=${page + 1}`}
                                 className="pagination-node-industrial"
                             >
-                                SAU →
+                                SAU â†’
                             </a>
                         )}
                     </div>
@@ -126,7 +126,7 @@ export default async function SearchPage({ searchParams }) {
             <div className="search-empty-state-industrial">
                 <IndustrialEmptyState 
                     keyword={q} 
-                    title="KHÔNG TÌM THẤY TRUYỆN" 
+                    title="KHÔNG TÌM THẤY TRUYộN" 
                 />
             </div>
           )}
@@ -137,3 +137,4 @@ export default async function SearchPage({ searchParams }) {
     </main>
   );
 }
+

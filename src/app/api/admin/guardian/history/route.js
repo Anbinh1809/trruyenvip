@@ -1,6 +1,6 @@
-import { query } from '@/lib/db';
+﻿import { query } from '@/HeThong/Database/CoSoDuLieu';
 import { NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth';
+import { getSession } from '@/HeThong/BaoMat/XacThuc';
 
 export async function GET(req) {
     try {
@@ -40,3 +40,4 @@ export async function GET(req) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
+

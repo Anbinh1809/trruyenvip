@@ -1,5 +1,5 @@
-import { query } from '@/lib/db';
-import { withTitan } from '@/lib/api-handler';
+﻿import { query } from '@/HeThong/Database/CoSoDuLieu';
+import { withTitan } from '@/HeThong/API/XuLyAPI';
 
 export const revalidate = 300; // Cache for 5 minutes
 
@@ -21,3 +21,4 @@ export const GET = withTitan({
         return result.recordset || [];
     }
 });
+

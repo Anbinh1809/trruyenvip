@@ -1,9 +1,9 @@
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+﻿import Header from '@/GiaoDien/BoCuc/Header';
+import Footer from '@/GiaoDien/BoCuc/Footer';
 
 export const metadata = {
-  title: 'Chính Sách Bảo Mật | TruyenVip',
-  description: 'Chính sách bảo mật thông tin người dùng trên TruyenVip.',
+  title: 'Chà­nh Sách Bảo Máº­t | TruyenVip',
+  description: 'Chà­nh sách bảo máº­t thà´ng tin ngưoi dà¹ng trên TruyenVip.',
 };
 
 export default function PrivacyPage() {
@@ -14,40 +14,40 @@ export default function PrivacyPage() {
       <div className="container legal-container fade-up">
         <header className="legal-header">
             <span className="legal-badge-titan">PRIVACY POLICY</span>
-            <h1 className="legal-title-industrial">Chính Sách Bảo Mật</h1>
+            <h1 className="legal-title-industrial">Chà­nh Sách Bảo Máº­t</h1>
         </header>
 
         <div className="legal-content-industrial shadow-titan">
             <div className="legal-section-industrial">
-                <h2>1. Thu Thập Thông Tin</h2>
+                <h2>1. Thu Tháº­p Thà´ng Tin</h2>
                 <p className="legal-text-industrial">
-                    Chúng tôi chỉ thu thập những thông tin cần thiết tối thiểu để cung cấp dịch vụ tốt nhất cho bạn, bao gồm địa chỉ email (nếu bạn đăng ký tài khoản) và các sở thích đọc truyện để cá nhân hóa trải nghiệm.
+                    Chàºng tà´i cho‰ thu tháº­p những thà´ng tin cáº§n thiáº¿t to‘i thioƒu Ä‘oƒ cung cấp do‹ch vo¥ tốt nháº¥t cho báº¡n, bao gồnm Ä‘o‹a cho‰ email (náº¿u báº¡n Ä‘Äƒng kà½ tà i khoản) và  các soŸ thà­ch Ä‘oc truyện Ä‘oƒ cá nhà¢n hà³a trải nghiệm.
                 </p>
             </div>
 
             <div className="legal-section-industrial">
-                <h2>2. Sử Dụng Cookie</h2>
+                <h2>2. Sử Do¥ng Cookie</h2>
                 <p className="legal-text-industrial">
-                    Chúng tôi sử dụng cookie để lưu trữ phiên đăng nhập và các cài đặt giao diện (như chế độ sáng/tối, cỡ chữ) của bạn. Bạn có thể từ chối cookie qua cài đặt trình duyệt, nhưng một số tính năng có thể không hoạt động ổn định.
+                    Chàºng tà´i sử do¥ng cookie Ä‘oƒ lưu trữ phiên Ä‘Äƒng nháº­p và  các cà i Ä‘áº·t giao diện (như cháº¿ Ä‘o™ sáng/to‘i, co¡ chữ) của báº¡n. Bạn cà³ thoƒ từ cho‘i cookie qua cà i Ä‘áº·t trà¬nh duyệt, nhưng mo™t so‘ tà­nh nÄƒng cà³ thoƒ không hoáº¡t Ä‘o™ng o•n Ä‘o‹nh.
                 </p>
             </div>
 
             <div className="legal-section-industrial">
-                <h2>3. Bảo Mật Dữ Liệu</h2>
+                <h2>3. Bảo Máº­t Dữ Liệu</h2>
                 <p className="legal-text-industrial">
-                    Mọi dữ liệu cá nhân của người dùng được mã hóa bằng công nghệ <strong>SSL 256-bit</strong> tiêu chuẩn công nghiệp. Chúng tôi cam kết không bao giờ bán hoặc chia sẻ thông tin của bạn cho bất kỳ bên thứ ba nào vì mục đích thương mại.
+                    Moi dữ liệu cá nhà¢n của ngưoi dà¹ng Ä‘ưo£c mà£ hà³a báº±ng cà´ng nghệ <strong>SSL 256-bit</strong> tiêu chuáº©n cà´ng nghiệp. Chàºng tà´i cam kết không bao gio bán hoáº·c chia sáº» thà´ng tin của báº¡n cho báº¥t ko³ bên tho© ba nà o và¬ mo¥c Ä‘à­ch thưÆ¡ng máº¡i.
                 </p>
             </div>
 
             <div className="legal-section-industrial">
-                <h2>4. Quyền Của Người Dùng</h2>
+                <h2>4. Quyon Của Ngưoi Dà¹ng</h2>
                 <p className="legal-text-industrial">
-                    Bạn có quyền yêu cầu xem, sửa đổi hoặc xóa hoàn toàn dữ liệu cá nhân (bao gồm cả lịch sử đọc truyện và tài khoản) của mình khỏi hệ thống của chúng tôi thông qua trang cá nhân hoặc liên hệ trực tiếp.
+                    Bạn cà³ quyon yêu cáº§u xem, sửa Ä‘o•i hoáº·c xà³a hoà n toà n dữ liệu cá nhà¢n (bao gồnm cả lo‹ch sử Ä‘oc truyện và  tà i khoản) của mà¬nh khoi hệ thống của chàºng tà´i thà´ng qua trang cá nhà¢n hoáº·c liên hệ trựcc tiáº¿p.
                 </p>
             </div>
 
             <footer className="legal-footer-industrial">
-                Cập nhật lần cuối: Ngày 14 tháng 04 năm 2026
+                Cáº­p nhật láº§n cuo‘i: Ngà y 14 tháng 04 nÄƒm 2026
             </footer>
         </div>
       </div>
@@ -56,3 +56,4 @@ export default function PrivacyPage() {
     </main>
   );
 }
+

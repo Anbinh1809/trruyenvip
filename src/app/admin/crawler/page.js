@@ -1,9 +1,9 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useTransition, useCallback } from 'react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import { useAuth } from '@/context/AuthContext';
+import Header from '@/GiaoDien/BoCuc/Header';
+import Footer from '@/GiaoDien/BoCuc/Footer';
+import { useAuth } from '@/NguCanh/AuthContext';
 import { useRouter } from 'next/navigation';
 import '../admin.css';
 import { 
@@ -19,7 +19,7 @@ import {
     AlertCircle,
     Database
 } from 'lucide-react';
-import { useToast } from '@/components/ToastProvider';
+import { useToast } from '@/GiaoDien/TienIch/ToastProvider';
 
 export default function AdminCrawlerPage() {
   const { user, isAuthenticated, loading } = useAuth();
@@ -62,9 +62,9 @@ export default function AdminCrawlerPage() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ pages })
         });
-        addToast(`Đã kích hoạt deep scan ${pages} trang!`, 'success');
+        addToast(`Äà£ kà­ch hoáº¡t deep scan ${pages} trang!`, 'success');
     } catch (e) {
-        addToast('Lỗi khi kích hoạt deep scan.', 'error');
+        addToast('Lo—i khi kà­ch hoáº¡t deep scan.', 'error');
     }
   };
 
@@ -77,10 +77,10 @@ export default function AdminCrawlerPage() {
         });
         const data = await res.json();
         if (res.ok) {
-            addToast(data.message || 'Lệnh đã được gửi thành công!', 'success');
+            addToast(data.message || 'Lệnh đã Ä‘ưo£c gửi thành công!', 'success');
             fetchData();
         } else {
-            addToast('Lỗi: ' + (data.error || 'Yêu cầu không thể hoàn thành.'), 'error');
+            addToast('Lo—i: ' + (data.error || 'Yêu cáº§u không thoƒ hoà n thà nh.'), 'error');
         }
     } catch (e) {
         addToast('Lỗi kết nối máy chủ.', 'error');
@@ -93,7 +93,7 @@ export default function AdminCrawlerPage() {
             <Header />
             <div className="system-center-industrial">
                 <div className="titan-loader-pulse"></div>
-                <p className="loading-status-hint">Đang thiết lập kết nối Telemetry...</p>
+                <p className="loading-status-hint">Äang thiáº¿t láº­p kết nối Telemetry...</p>
             </div>
         </div>
     );
@@ -105,8 +105,8 @@ export default function AdminCrawlerPage() {
             <Header />
             <div className="system-center-industrial">
                 <AlertCircle size={60} color="var(--accent)" />
-                <h1 className="system-title-industrial">TRUY CẬP BỊ TỪ CHỐI</h1>
-                <p className="system-desc-industrial">Vùng giám sát Crawler chỉ dành cho nhân sự vận hành hệ thống.</p>
+                <h1 className="system-title-industrial">TRUY CẬP BoŠ Toª CHoI</h1>
+                <p className="system-desc-industrial">Và¹ng giám sát Crawler cho‰ dà nh cho nhà¢n sực váº­n hà nh hệ thống.</p>
             </div>
         </div>
     );
@@ -120,8 +120,8 @@ export default function AdminCrawlerPage() {
         <header className="crawler-header-industrial fade-up">
             <div className="header-left">
                 <div className="library-badge-titan">CRAWLER COMMAND CENTER</div>
-                <h1 className="crawler-title-industrial">GIÁM SÁT TELEMETRY</h1>
-                <p className="admin-subtitle">Hệ thống quản lý và thu thập dữ liệu tự động thời gian thực.</p>
+                <h1 className="crawler-title-industrial">GIàM SàT TELEMETRY</h1>
+                <p className="admin-subtitle">Hệ tho‘ng quản là½ và  thu tháº­p dữ liệu tực Ä‘o™ng thoi gian thựcc.</p>
             </div>
             <div className="status-badges-group">
                 <div className={`status-badge-titan shadow-titan ${telemetry?.status && telemetry.status !== 'idle' ? 'active' : ''}`}>
@@ -138,7 +138,7 @@ export default function AdminCrawlerPage() {
         </header>
 
         <section className="crawler-actions-industrial fade-up shadow-titan">
-            <h2 className="section-subtitle-industrial"><Cpu size={18} /> CƠ CHẾ TÁC CHIẾN</h2>
+            <h2 className="section-subtitle-industrial"><Cpu size={18} /> CÆ  CHáº¾ TàC CHIáº¾N</h2>
             <div className="action-button-grid-titan">
                 <button 
                     className={`btn-action-titan ${telemetry?.status && telemetry.status !== 'idle' ? 'dimmed' : 'active'}`}
@@ -147,8 +147,8 @@ export default function AdminCrawlerPage() {
                 >
                     <Rocket size={20} />
                     <div className="action-text">
-                        <span className="action-title">KÍCH HOẠT AUTOPILOT</span>
-                        <span className="action-desc">Chạy vòng lặp Guardian tự động</span>
+                        <span className="action-title">KàCH HOáº T AUTOPILOT</span>
+                        <span className="action-desc">Cháº¡y và²ng láº·p Guardian tực Ä‘o™ng</span>
                     </div>
                 </button>
 
@@ -158,8 +158,8 @@ export default function AdminCrawlerPage() {
                 >
                     <Flame size={20} />
                     <div className="action-text">
-                        <span className="action-title">QUÉT TRANG MỚI</span>
-                        <span className="action-desc">Discovery Page 1 - 5 (Ưu tiên)</span>
+                        <span className="action-title">QUà‰T TRANG MỚI</span>
+                        <span className="action-desc">Discovery Page 1 - 5 (Æ¯u tiên)</span>
                     </div>
                 </button>
 
@@ -169,7 +169,7 @@ export default function AdminCrawlerPage() {
                 >
                     <ShieldCheck size={20} />
                     <div className="action-text">
-                        <span className="action-title">DỌN DẸP HỆ THỐNG</span>
+                        <span className="action-title">DoŒN Dáº¸P Hộ THoNG</span>
                         <span className="action-desc">Prune Logs & Orphaned Records</span>
                     </div>
                 </button>
@@ -212,7 +212,7 @@ export default function AdminCrawlerPage() {
         </section>
 
         <section className="admin-card-industrial shadow-titan fade-up">
-            <h2 className="admin-card-title-industrial"><ShieldQuestion size={20} color="var(--accent)" /> CẤU HÌNH CRAWLER</h2>
+            <h2 className="admin-card-title-industrial"><ShieldQuestion size={20} color="var(--accent)" /> Cáº¤U HàŒNH CRAWLER</h2>
             <div className="config-grid-titan">
                 <div className="config-item-titan">
                     <div className="config-label-titan">TARGET_SOURCES</div>
@@ -238,3 +238,4 @@ export default function AdminCrawlerPage() {
     </main>
   );
 }
+

@@ -1,8 +1,8 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import Header from '@/GiaoDien/BoCuc/Header';
+import Footer from '@/GiaoDien/BoCuc/Footer';
 import { useRouter } from 'next/navigation';
 import { Zap, RefreshCw, CheckCircle, XCircle, ExternalLink } from 'lucide-react';
 
@@ -24,7 +24,7 @@ export default function TransferPage() {
         const allowedTargets = ['nettruyen', 'nhattruyen', 'truyenqq'];
         const invalidUrls = urlList.filter(u => !allowedTargets.some(t => u.includes(t)));
         if (invalidUrls.length > 0) {
-            alert(`Một số liên kết không được hỗ trợ: ${invalidUrls[0]}...`);
+            alert(`Mo™t so‘ liên kết không Ä‘ưo£c ho— tro£: ${invalidUrls[0]}...`);
             return;
         }
 
@@ -81,24 +81,24 @@ export default function TransferPage() {
             <Header />
             <div className="container transfer-container fade-up">
                 <header className="section-header-industrial">
-                    <div className="transfer-header-badge">DI CẦN TIẾP NỐI</div>
-                    <h1 className="transfer-title">Dịch Chuyển Nội Dung</h1>
+                    <div className="transfer-header-badge">DI Cáº¦N TIáº¾P NoI</div>
+                    <h1 className="transfer-title">Do‹ch Chuyoƒn No™i Dung</h1>
                     <p className="transfer-subtitle">
-                        Hệ thống giúp bạn chuyển dữ liệu từ nguồn ngoài về TruyenVip nhanh chóng và ổn định. Mỗi một liên kết là một hành trình mới.
+                        Hệ tho‘ng giàºp báº¡n chuyoƒn dữ liệu từ nguồn ngoà i vo TruyenVip nhanh chà³ng và  o•n Ä‘o‹nh. Mo—i mo™t liên kết là  mo™t hà nh trà¬nh mo›i.
                     </p>
                 </header>
 
                 <div className="transfer-form-card">
                     <div className="card-header-industrial">
-                        <h3 className="card-title-industrial">Nhập liên kết chương truyện</h3>
-                        <span className="card-hint-industrial">Mỗi dòng một liên kết chương truyện (NetTruyen, TruyenQQ...)</span>
+                        <h3 className="card-title-industrial">Nháº­p liên kết chưÆ¡ng truyện</h3>
+                        <span className="card-hint-industrial">Mo—i dà²ng mo™t liên kết chưÆ¡ng truyện (NetTruyen, TruyenQQ...)</span>
                     </div>
 
                     <form onSubmit={handleBatchTransfer}>
                         <textarea 
                             value={urls}
                             onChange={(e) => setUrls(e.target.value)}
-                            placeholder="Dán các liên kết chương truyện vào đây..."
+                            placeholder="Dán các liên kết chưÆ¡ng truyện và o Ä‘à¢y..."
                             className="transfer-textarea-titan"
                         />
                         <button 
@@ -107,16 +107,16 @@ export default function TransferPage() {
                             className={`btn btn-primary btn-large-titan ${isProcessing ? 'processing' : ''}`}
                         >
                             {isProcessing ? (
-                                <><RefreshCw className="spin" size={24} /> ĐANG XỬ LÝ DỮ LIỆU...</>
+                                <><RefreshCw className="spin" size={24} /> ÄANG Xo¬ Là Do® LIộU...</>
                             ) : (
-                                <><Zap size={24} fill="currentColor" /> KÍCH HOẠT DỊCH CHUYỂN</>
+                                <><Zap size={24} fill="currentColor" /> KàCH HOáº T DoŠCH CHUYo‚N</>
                             )}
                         </button>
                     </form>
 
                     {results.length > 0 && (
                         <div className="transfer-results-section fade-in">
-                            <h3 className="results-title-industrial">Bản ghi dịch chuyển</h3>
+                            <h3 className="results-title-industrial">Bản ghi do‹ch chuyoƒn</h3>
                             <div className="results-list-industrial">
                                 {results.map((res, i) => (
                                     <div key={i} className={`result-item-industrial ${res.status === 'success' ? 'is-success' : 'is-error'}`}>
@@ -129,13 +129,13 @@ export default function TransferPage() {
                                                     </a>
                                                     <div className="status-badge-industrial success">
                                                         <CheckCircle size={18} />
-                                                        <span>THÀNH CÔNG</span>
+                                                        <span>THà€NH Cà”NG</span>
                                                     </div>
                                                 </>
                                             ) : (
                                                 <div className="status-badge-industrial error">
                                                     <XCircle size={18} />
-                                                    <span>THẤT BẠI</span>
+                                                    <span>THáº¤T Báº I</span>
                                                 </div>
                                             )}
                                         </div>
@@ -232,3 +232,4 @@ export default function TransferPage() {
         </main>
     );
 }
+
