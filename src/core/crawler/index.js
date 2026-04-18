@@ -10,9 +10,9 @@ import { getOptimizedMirrors, quarantineMirror, rewardMirror, USER_AGENTS, SEARC
 import { updateTelemetry, logGuardianEvent } from './telemetry.js';
 
 const axiosAgent = axios.create({
-    httpAgent: new http.Agent({ keepAlive: true, maxSockets: 160 }),
-    httpsAgent: new https.Agent({ keepAlive: true, maxSockets: 160, rejectUnauthorized: false }),
-    timeout: 90000 
+    httpAgent: new http.Agent({ keepAlive: true, maxSockets: 32 }),
+    httpsAgent: new https.Agent({ keepAlive: true, maxSockets: 32, rejectUnauthorized: false }),
+    timeout: 60000 
 });
 
 /**

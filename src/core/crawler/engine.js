@@ -7,7 +7,7 @@ import * as parsers from './parsers.js';
 import { SOURCES } from './mirrors.js';
 
 let activeWorkers = 0;
-const BASE_CONCURRENCY = 10;
+const BASE_CONCURRENCY = 3;
 const inProgressManga = new Map();
 const inProgressChapters = new Map();
 
