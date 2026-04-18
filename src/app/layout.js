@@ -12,6 +12,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import MobileNav from "@/components/layout/MobileNav";
 import BackToTop from "@/components/layout/BackToTop";
 import SWRegistration from "@/components/widgets/SWRegistration";
+import { Analytics } from '@vercel/analytics/next';
 
 const inter = Inter({
   subsets: ['latin', 'vietnamese'],
@@ -96,6 +97,7 @@ export default function RootLayout({ children }) {
             </ToastProvider>
           </ThemeProvider>
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   );
