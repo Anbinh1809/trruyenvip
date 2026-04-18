@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/core/security/auth';
+import { loadSystemState } from '@/core/database/connection';
 
 export async function GET() {
     try {
@@ -11,21 +12,19 @@ export async function GET() {
         // Access the global state managed by crawler.js
         const state = global.crawlerState || {
             status: 'idle',
-            currentManga: null,
-            currentChapter: null,
-            currentImage: null,
-            successCount: 0,
-            failCount: 0,
-            concurrencyLimit: 128,
-            lastAction: Date.now()
+            concurrencyLimit: BASE_CONCURRENCY || 10,
+            activeWorkers: 0
         };
 
+        const lastPulseAt = await loadSystemState('crawler_last_pulse_at');
+
         const memory = process.memoryUsage();
-        const memoryMB = Math.round(memory.heapUsed / 1024 / 1024);
+        const memoryMB = Math.round(memory.rss / 1024 / 1024);
 
         return NextResponse.json({
             success: true,
             ...state,
+            lastPulseAt,
             ramUsage: memoryMB,
             memoryMB
         });
