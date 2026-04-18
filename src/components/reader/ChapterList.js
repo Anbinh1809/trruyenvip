@@ -50,7 +50,7 @@ export default function ChapterList({ mangaId, chapters }) {
             <button 
                 onClick={() => setSortOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
                 className="btn-sort-titan-industrial"
-                aria-label={sortOrder === 'desc' ? 'S?p xếp cũ nhất' : 'S?p xếp mo�i nhất'}
+                aria-label={sortOrder === 'desc' ? 'S?p xếp cũ nhất' : 'S?p xếp mội nhất'}
             >
                 <ArrowUpDown size={14} /> {sortOrder === 'desc' ? 'MỚI NHẤT' : 'CŨ NHẤT'}
             </button>
@@ -77,7 +77,7 @@ export default function ChapterList({ mangaId, chapters }) {
 
       {filteredChapters.length === 0 ? (
         <div className="empty-state-titan industrial-p-80">
-            Kh�ng t�m thấy chương n�o ph� ho�p v?i t? kh�a của bạn.
+            Kh�ng t�m thấy chương n�o ph� hộp v?i tài khoảnh�a của bạn.
         </div>
       ) : (
         <>
@@ -104,12 +104,12 @@ export default function ChapterList({ mangaId, chapters }) {
                                 <div className="chapter-badges-v2">
                                     {isLastRead && (
                                         <span className="badge-history-titan">
-                                            <Navigation size={10} fill="currentColor" /> LẦN Đo�C CUo�I
+                                            <Navigation size={10} fill="currentColor" /> LẦN ĐộC CUộI
                                         </span>
                                     )}
                                     {isGhost && (
                                         <span className="badge-ghost-v2">
-                                            <Ghost size={12} /> Lo�I NGU?N
+                                            <Ghost size={12} /> LộI NGU?N
                                         </span>
                                     )}
                                     {chapter.status === 'pending' && (

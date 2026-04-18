@@ -55,7 +55,7 @@ export default function TransferPage() {
                         return { url, status: 'error', msg: data.error };
                     }
                 } catch (err) {
-                    return { url, status: 'error', msg: 'L?i kết nối' };
+                    return { url, status: 'error', msg: 'Lỗi kết nối' };
                 }
             }));
             

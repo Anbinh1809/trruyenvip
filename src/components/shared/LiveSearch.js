@@ -84,14 +84,14 @@ export default function LiveSearch({ onSelect }) {
           });
           const data = await res.json();
           if (data.success) {
-              if (addToast) addToast('Đ?nng bo� d? li?u th�nh c�ng!', 'success');
+              if (addToast) addToast('Đ?nng bộ d? li?u th�nh c�ng!', 'success');
               if (onSelect) onSelect();
               router.push(data.redirectUrl);
           } else {
               if (addToast) addToast(data.error || 'T�nh nang n�y hi?n dang b?o tr�.', 'error');
           }
       } catch (e) {
-          if (addToast) addToast('L?i kết nối m�y ch?.', 'error');
+          if (addToast) addToast('Lỗi kết nối m�y ch?.', 'error');
       } finally {
           setLoading(false);
       }
@@ -172,13 +172,13 @@ export default function LiveSearch({ onSelect }) {
                                     <div className="result-title-titan-industrial truncate-1">{m.title}</div>
                                     <div className="result-sub-titan-industrial truncate-1">{m.author || 'Đang c?p nh?t'}</div>
                                 </div>
-                                {idx < 3 && <div className="hot-tag-titan">HOT</div>}
+                                {idx < 3 && <div className="hoạt-tag-titan">HOT</div>}
                             </NextLink>
                         ))
                     ) : !loading && q.length >= 2 && (
                         <div className="search-empty-titan-industrial">
                             <div className="empty-title-industrial">KH�NG T�M TH?Y</div>
-                            <p className="empty-sub-industrial">Th? t? kh�a kh�c ho?c d�n link truy?n.</p>
+                            <p className="empty-sub-industrial">Th? tài khoảnh�a kh�c ho?c d�n link truy?n.</p>
                         </div>
                     )}
                 </div>

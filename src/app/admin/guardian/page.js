@@ -91,7 +91,7 @@ export default function AdminGuardianPage() {
             <div className="metric-card-titan shadow-titan">
                 <div className="metric-label-titan"><Activity size={14} /> So� Co� Đ� Xo� L� (24H)</div>
                 <div className="metric-value-titan">{data.metrics.total_fixes || 0}</div>
-                <p className="metric-desc-titan">D? li?u đuo�c h? th?ng t?c đo�ng nhận di?n v� kh?c pho�c th�nh c�ng.</p>
+                <p className="metric-desc-titan">D? li?u đuo�c hệ thống t?c đo�ng nhận di?n v� kh?c pho�c th�nh c�ng.</p>
             </div>
             <div className="metric-card-titan shadow-titan">
                 <div className="metric-label-titan"><Search size={14} /> V� CHƯƠNG TRo�NG</div>
@@ -107,7 +107,7 @@ export default function AdminGuardianPage() {
 
         <section className="recovery-log-wrapper shadow-titan fade-up">
             <div className="recovery-log-header">
-                <h3 className="recovery-log-title">📂 NHẬT K� HOẠT Đo�NG CHI TIẾT</h3>
+                <h3 className="recovery-log-title">📂 NHẬT KÝ� HOẠT Đã�NG CHI TIẾT</h3>
                 <div className="recovery-log-hint">Hio�n tho� 50 b?n ghi đ?nng bo� gần nhất</div>
             </div>
             <div className="recovery-table-container">

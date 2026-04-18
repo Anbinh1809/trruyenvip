@@ -50,7 +50,7 @@ export default function MissionPanel() {
                         <Trophy size={20} color="white" />
                     </div>
                     <div className="mission-header-text">
-                        <h3 className="mission-title-main">Tiến Đo�</h3>
+                        <h3 className="mission-title-main">Tiến Đã�</h3>
                         <p className="mission-subtitle">Th? th�ch h�ng ng�y</p>
                     </div>
                 </div>

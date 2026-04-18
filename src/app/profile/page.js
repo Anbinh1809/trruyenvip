@@ -40,7 +40,7 @@ export default function ProfilePage() {
             addToast('Lo�i c?p nh?t! Vui l�ng th? lại.', 'error');
         }
     } catch (e) {
-        addToast('L?i kết nối m�y ch?.', 'error');
+        addToast('Lỗi kết nối m�y ch?.', 'error');
     }
     setUpdating(false);
   };
@@ -84,7 +84,7 @@ export default function ProfilePage() {
           </div>
           <h1 className="profile-name-industrial">{user.username}</h1>
           <p className="profile-role-badge">
-            {user.role === 'admin' ? <><Shield size={16} /> QUẢN TRo� VI�N</> : <><User size={16} /> Đo�C GIẢ VIP</>}
+            {user.role === 'admin' ? <><Shield size={16} /> QUẢN TRo� VI�N</> : <><User size={16} /> Đã�C GIẢ VIP</>}
           </p>
           
           <div className="avatar-form-industrial">
@@ -122,7 +122,7 @@ export default function ProfilePage() {
                 <div className="stat-icon-box">
                     <Sparkles size={32} color="var(--accent)" />
                 </div>
-                <div className="stat-label-profile">Cấp Đo�</div>
+                <div className="stat-label-profile">Cấp Đã�</div>
                 <div className="stat-value-profile">{level}</div>
             </div>
             <div className="stat-card-profile">
@@ -136,7 +136,7 @@ export default function ProfilePage() {
 
         <section className="xp-progress-section shadow-titan">
             <div className="xp-header-profile">
-                <span className="xp-label-main">TIẾN Đo� CẤP BẬC</span>
+                <span className="xp-label-main">TIẾN Đã� CẤP BẬC</span>
                 <span className="xp-percent-tag">{Math.floor(xpProgress)}%</span>
             </div>
             <div className="xp-track-industrial">
@@ -153,7 +153,7 @@ export default function ProfilePage() {
                 <ChevronRight size={18} className="node-arrow" />
             </Link>
             <Link href="/history" className="profile-action-node">
-                <span className="node-left-industrial"><History size={20} color="#60a5fa" /> Lo�CH So� Đo�C TRUY?N</span>
+                <span className="node-left-industrial"><History size={20} color="#60a5fa" /> Lo�CH So� Đã�C TRUY?N</span>
                 <ChevronRight size={18} className="node-arrow" />
             </Link>
             <button onClick={logout} className="logout-btn-industrial">

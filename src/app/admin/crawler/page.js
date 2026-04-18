@@ -83,7 +83,7 @@ export default function AdminCrawlerPage() {
             addToast('Lo�i: ' + (data.error || 'Y�u cầu kh�ng tho� ho�n th�nh.'), 'error');
         }
     } catch (e) {
-        addToast('L?i kết nối m�y ch?.', 'error');
+        addToast('Lỗi kết nối m�y ch?.', 'error');
     }
   };
 
@@ -106,7 +106,7 @@ export default function AdminCrawlerPage() {
             <div className="system-center-industrial">
                 <AlertCircle size={60} color="var(--accent)" />
                 <h1 className="system-title-industrial">TRUY C?P Bo� To� CHo�I</h1>
-                <p className="system-desc-industrial">V�ng gi�m s�t Crawler cho� d�nh cho nh�n s?c vận h�nh h? th?ng.</p>
+                <p className="system-desc-industrial">V�ng gi�m s�t Crawler cho� d�nh cho nh�n s?c vận h�nh hệ thống.</p>
             </div>
         </div>
     );
@@ -121,7 +121,7 @@ export default function AdminCrawlerPage() {
             <div className="header-left">
                 <div className="library-badge-titan">CRAWLER COMMAND CENTER</div>
                 <h1 className="crawler-title-industrial">GI�M S�T TELEMETRY</h1>
-                <p className="admin-subtitle">H? tho�ng qu?n l� v� thu thập d? li?u t?c đo�ng tho�i gian th?cc.</p>
+                <p className="admin-subtitle">H? tho�ng qu?n l� v� thu thập d? li?u t?c đo�ng tho�i gian thực.</p>
             </div>
             <div className="status-badges-group">
                 <div className={`status-badge-titan shadow-titan ${telemetry?.status && telemetry.status !== 'idle' ? 'active' : ''}`}>

@@ -14,7 +14,7 @@ export default function NotFound() {
           </div>
           <h1 className="system-title-industrial">404: LOST IN ABYSS</h1>
           <p className="system-desc-industrial">
-              Trang bạn đang t�m kiếm d� lạc v�o mo�t kh�ng gian kh�c hoặc chua t?ng t?nn tại trong h? th?ng.
+              Trang bạn đang t�m kiếm d� lạc v�o mo�t kh�ng gian kh�c hoặc chua t?ng t?nn tại trong hệ thống.
           </p>
           <Link href="/" className="btn btn-primary err-btn-titan">
               QUAY Vo� TRANG CHo�

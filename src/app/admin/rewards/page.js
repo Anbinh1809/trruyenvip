@@ -25,7 +25,7 @@ export default function AdminRewardsPage() {
         setRequests(data);
       }
     } catch (e) {
-      addToast('Lo�i khi lấy danh s�ch y�u cầu.', 'error');
+      addToast('Lội khi lấy danh s�ch y�u cầu.', 'error');
     }
     setFetching(false);
   }, [statusFilter, addToast]);
@@ -46,13 +46,13 @@ export default function AdminRewardsPage() {
         body: JSON.stringify({ requestId, action })
       });
       if (res.ok) {
-        addToast(`Đ� ${action === 'approve' ? 'ph� duy?t' : 't? cho�i'} y�u cầu th�nh c�ng!`, 'success');
+        addToast(`Đ� ${action === 'approve' ? 'phê duyệt? chội'} y�u cầu th�nh c�ng!`, 'success');
         fetchRequests();
       } else {
         addToast('Thao t�c thất bại.', 'error');
       }
     } catch (e) {
-      addToast('L?i kết nối m�y ch?.', 'error');
+      addToast('Lỗi kết nối m�y ch?.', 'error');
     }
   };
 
@@ -62,7 +62,7 @@ export default function AdminRewardsPage() {
             <Header />
             <div className="system-center-industrial">
                 <div className="titan-loader-pulse"></div>
-                <p className="loading-status-hint">Đang t?i d? li?u qu?n tro�...</p>
+                <p className="loading-status-hint">Đang t?i d? li?u quản trị�...</p>
             </div>
         </div>
     );
@@ -74,8 +74,8 @@ export default function AdminRewardsPage() {
             <Header />
             <div className="system-center-industrial">
                 <XCircle size={60} color="var(--accent)" />
-                <h1 className="system-title-industrial">TRUY C?P Bo� To� CHo�I</h1>
-                <p className="system-desc-industrial">B?n kh�ng c� quyo�n hạn đo� truy c?p v�o khu v?cc qu?n tro� to�i mật n�y.</p>
+                <h1 className="system-title-industrial">TRUY C?P Bộ Tộ CHộI</h1>
+                <p className="system-desc-industrial">B?n kh�ng c� quyộn hạn độ truy c?p v�o khu vực quản trị� tội mật n�y.</p>
             </div>
         </div>
     );
@@ -89,8 +89,8 @@ export default function AdminRewardsPage() {
         <header className="admin-header-industrial fade-up">
             <div className="header-left">
                 <div className="library-badge-titan">ADMIN CONSOLE</div>
-                <h1 className="admin-title-industrial">QUẢN L� GIAO Do�CH</h1>
-                <p className="admin-subtitle">Ph� duy?t c�c y�u cầu quy đo�i phần thuo�ng t? nguo�i d�ng.</p>
+                <h1 className="admin-title-industrial">QUẢN L� GIAO DộCH</h1>
+                <p className="admin-subtitle">Ph� duy?t c�c y�u cầu quy đội phần thuộng t? nguội d�ng.</p>
             </div>
             <div className="admin-filter-group shadow-titan">
                 {['pending', 'approved', 'rejected'].map(s => (
@@ -99,7 +99,7 @@ export default function AdminRewardsPage() {
                         className={`filter-btn-titan ${statusFilter === s ? 'active' : ''}`}
                         onClick={() => setStatusFilter(s)}
                     >
-                        {s === 'pending' ? 'CHo� DUY?T' : (s === 'approved' ? 'Đ� DUY?T' : 'Đ� To� CHo�I')}
+                        {s === 'pending' ? 'CHộ DUY?T' : (s === 'approved' ? 'Đ� DUY?T' : 'Đ� Tộ CHộI')}
                     </button>
                 ))}
             </div>
@@ -109,8 +109,8 @@ export default function AdminRewardsPage() {
             <table className="admin-table">
                 <thead>
                     <tr>
-                        <th>Y�U CẦU / THo�I GIAN</th>
-                        <th>NGƯo�I THo� HƯo�NG</th>
+                        <th>Y�U CẦU / THộI GIAN</th>
+                        <th>NGƯộI THộ HƯộNG</th>
                         <th>TH�NG TIN THANH TO�N</th>
                         <th>M?NH GI�</th>
                         <th>TRẠNG TH�I</th>
@@ -151,7 +151,7 @@ export default function AdminRewardsPage() {
                             </td>
                             <td>
                                 <span className={`status-pill-industrial status-${req.status}`}>
-                                    {req.status === 'pending' ? 'ĐANG CHo�' : (req.status === 'approved' ? 'HO�N TẤT' : 'Bo� HUo�')}
+                                    {req.status === 'pending' ? 'ĐANG CHộ' : (req.status === 'approved' ? 'HO�N TẤT' : 'Bộ HUộ')}
                                 </span>
                             </td>
                             <td>
@@ -161,11 +161,11 @@ export default function AdminRewardsPage() {
                                             <CheckCircle size={16} /> DUY?T
                                         </button>
                                         <button className="reject-btn-titan" onClick={() => handleAction(req.id, 'reject')}>
-                                            HUo�
+                                            HUộ
                                         </button>
                                     </div>
                                 ) : (
-                                    <span className="action-done-titan">Đ� Xo� L�</span>
+                                    <span className="action-done-titan">Đ� Xộ L�</span>
                                 )}
                             </td>
                         </tr>

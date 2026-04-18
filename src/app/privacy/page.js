@@ -42,7 +42,7 @@ export default function PrivacyPage() {
             <div className="legal-section-industrial">
                 <h2>4. Quyo�n C?a Nguo�i D�ng</h2>
                 <p className="legal-text-industrial">
-                    B?n c� quyo�n y�u cầu xem, s?a đo�i hoặc x�a ho�n to�n d? li?u c� nh�n (bao g?nm c? lo�ch s? đo�c truy?n v� t�i kho?n) c?a m�nh kho�i h? th?ng c?a ch�ng t�i th�ng qua trang c� nh�n hoặc li�n h? tr?cc tiếp.
+                    B?n c� quyo�n y�u cầu xem, s?a đo�i hoặc x�a ho�n to�n d? li?u c� nh�n (bao g?nm c? lo�ch s? đo�c truy?n v� t�i kho?n) c?a m�nh kho�i hệ thống c?a ch�ng t�i th�ng qua trang c� nh�n hoặc li�n h? tr?cc tiếp.
                 </p>
             </div>
 

@@ -21,7 +21,7 @@ export default function ContinueReadingButton({ mangaId, chapters }) {
             href={`/manga/${mangaId}/chapter/${lastRead.chapterId}`} 
             className="btn btn-primary cont-reading-btn-industrial"
         >
-            <Play size={20} fill="currentColor" /> Đo�C TIẾP (Ch. {lastRead.chapterNumber || '?'})
+            <Play size={20} fill="currentColor" /> Đã�C TIẾP (Ch. {lastRead.chapterNumber || '?'})
             <style jsx>{`
                 .cont-reading-btn-industrial {
                     display: flex;
@@ -42,7 +42,7 @@ export default function ContinueReadingButton({ mangaId, chapters }) {
   return (
       <div className="reading-init-industrial">
           <Link href={`/manga/${mangaId}/chapter/${chapters[chapters.length - 1].id}`} className="btn btn-glass init-btn init-first">
-             <SkipForward size={18} /> Đo�C To� ĐẦU
+             <SkipForward size={18} /> Đã�C To� ĐẦU
           </Link>
           <Link href={`/manga/${mangaId}/chapter/${chapters[0].id}`} className="btn btn-primary init-btn init-latest">
              <FastForward size={18} fill="currentColor" /> CHƯƠNG MỚI NHẤT

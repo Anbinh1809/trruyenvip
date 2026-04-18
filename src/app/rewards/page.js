@@ -102,7 +102,7 @@ export default function RewardsPage() {
         setMsgType('error');
       }
     } catch (e) {
-      setMsg('L?i kết nối m�y ch?.');
+      setMsg('Lỗi kết nối m�y ch?.');
       setMsgType('error');
     }
     setLoading(false);
@@ -219,7 +219,7 @@ export default function RewardsPage() {
                                     </div>
                                 </div>
                             ))}
-                            {history.length === 0 && <div className="history-empty-state">Chua c� giao do�ch n�o đuo�c th?cc hi?n.</div>}
+                            {history.length === 0 && <div className="history-empty-state">Chua c� giao do�ch n�o đuo�c thực hi?n.</div>}
                         </div>
                 </div>
           </div>

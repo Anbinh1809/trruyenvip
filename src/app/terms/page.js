@@ -40,7 +40,7 @@ export default function TermsPage() {
             </div>
 
             <div className="legal-section-industrial">
-                <h2>4. Thay Đo�i Do�ch Vo�</h2>
+                <h2>4. Thay Đã�i Do�ch Vo�</h2>
                 <p className="legal-text-industrial">
                     Ch�ng t�i c� quyo�n thay đo�i, tạm ngủng hộặc ng?ng cung c?p do�ch vo� bất ko� l�c n�o m� kh�ng cần th�ng b�o truo�c. C�c thay đo�i vo� đio�u kho?n sẽ c� hi?u l?cc ngay khi đuo�c đăng tải tr�n trang n�y.
                 </p>

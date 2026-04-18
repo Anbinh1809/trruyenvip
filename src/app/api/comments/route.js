@@ -53,16 +53,16 @@ export const POST = withTitan({
 
         const sanitized = sanitizeContent(content);
         if (sanitized.length < 2) {
-            throw { status: 400, message: 'No�i dung b�nh luận qu� ng?n hoặc kh�ng h?p l?.' };
+            throw { status: 400, message: 'Nội dung b�nh luận qụ ng?n hoặc kh�ng h?p l?.' };
         }
 
         const userUuid = session.uuid;
-        const userName = session.username || 'Kh�ch ?n danh';
+        const userName = session.username || 'Khách ẩn danh';
 
         // TITAN RATE LIMIT: Unify with core system infrastructure
         const limiter = await checkRateLimit(`comment_${userUuid}`, 2, 30); // 2 comments / 30s
         if (!limiter.success) {
-            throw { status: 429, message: 'Y�u c?u b�nh luận qu� nhanh. Vui l�ng đo�i th�m gi�y l�t.' };
+            throw { status: 429, message: 'Y�u c?u b�nh luận qụ nhanh. Vui l�ng đội th�m gịy l�t.' };
         }
 
         await query(`
@@ -116,7 +116,7 @@ export const DELETE = withTitan({
         const isAdmin = session.role === 'admin';
 
         if (!isOwner && !isAdmin) {
-            throw { status: 403, message: 'B?n kh�ng c� quyo�n x�a b�nh luận n�y' };
+            throw { status: 403, message: 'B?n kh�ng c� quyộn x�a b�nh luận n�y' };
         }
 
         // TITAN INTEGRITY: Clean up orphan likes before deleting the comment

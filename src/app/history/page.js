@@ -18,8 +18,8 @@ export default function HistoryPage() {
                 <header className="history-header-industrial fade-up">
                     <div className="header-left-industrial">
                         <div className="library-badge-titan">TRUY?N Đ� XEM</div>
-                        <h1 className="history-title-industrial">Lo�CH So� Đo�C</h1>
-                        <p className="history-subtitle">C�c b?n ghi hoạt đo�ng đo�c truy?n của bạn tr�n h? th?ng.</p>
+                        <h1 className="history-title-industrial">Lo�CH So� Đã�C</h1>
+                        <p className="history-subtitle">C�c b?n ghi hoạt đo�ng đo�c truy?n của bạn tr�n hệ thống.</p>
                     </div>
                     {history.length > 0 && (
                         <button className="btn btn-outline clear-btn-industrial" onClick={clearHistory}>
@@ -51,7 +51,7 @@ export default function HistoryPage() {
                                         href={`/manga/${item.mangaId}/chapter/${item.chapterId}`} 
                                         className="btn btn-primary history-action-industrial"
                                     >
-                                        Đo�C TIẾP <BookOpen size={16} />
+                                        Đã�C TIẾP <BookOpen size={16} />
                                     </Link>
                                 </div>
                             </div>

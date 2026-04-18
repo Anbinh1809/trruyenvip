@@ -42,7 +42,7 @@ export default function CopyrightPage() {
             <div className="legal-section-industrial">
                 <h2>4. Li�n H? Ho�p T�c</h2>
                 <p className="legal-text-industrial">
-                    Đo�i v?i c�c t�c gi? muo�n ho�p t�c đăng tải truy?n b?n quyo�n ch�nh tho�c tr�n no�n t?ng c?a ch�ng t�i đo� nhận doanh thu qu?ng c�o v� ủng hộ� t? đo�c gi?, vui l�ng g?i th�ng tin vo� bo� phận đo�i ngoại c?a ch�ng t�i.
+                    Đã�i v?i c�c t�c gi? muo�n ho�p t�c đăng tải truy?n b?n quyo�n ch�nh tho�c tr�n no�n t?ng c?a ch�ng t�i đo� nhận doanh thu qu?ng c�o v� ủng hộ� t? đo�c gi?, vui l�ng g?i th�ng tin vo� bo� phận đo�i ngoại c?a ch�ng t�i.
                 </p>
             </div>
 
