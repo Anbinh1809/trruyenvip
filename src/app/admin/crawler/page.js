@@ -62,9 +62,9 @@ export default function AdminCrawlerPage() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ pages })
         });
-        addToast(`Đ� k�ch hoạt deep scan ${pages} trang!`, 'success');
+        addToast(`Đã kích hoạt deep scan ${pages} trang!`, 'success');
     } catch (e) {
-        addToast('Lo�i khi k�ch hoạt deep scan.', 'error');
+        addToast('Lỗi khi kích hoạt deep scan.', 'error');
     }
   };
 
@@ -77,13 +77,13 @@ export default function AdminCrawlerPage() {
         });
         const data = await res.json();
         if (res.ok) {
-            addToast(data.message || 'L?nh d� đuo�c g?i th�nh c�ng!', 'success');
+            addToast(data.message || 'Lệnh đã được gửi thành công!', 'success');
             fetchData();
         } else {
-            addToast('Lo�i: ' + (data.error || 'Y�u cầu kh�ng tho� ho�n th�nh.'), 'error');
+            addToast('Lỗi: ' + (data.error || 'Yêu cầu không thể hoàn thành.'), 'error');
         }
     } catch (e) {
-        addToast('Lỗi kết nối m�y ch?.', 'error');
+        addToast('Lỗi kết nối máy chủ.', 'error');
     }
   };
 

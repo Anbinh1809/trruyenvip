@@ -46,13 +46,13 @@ export default function AdminRewardsPage() {
         body: JSON.stringify({ requestId, action })
       });
       if (res.ok) {
-        addToast(`Đ� ${action === 'approve' ? 'phê duyệt? chội'} y�u cầu th�nh c�ng!`, 'success');
+        addToast(`Đã ${action === 'approve' ? 'phê duyệt' : 'từ chối'} yêu cầu thành công!`, 'success');
         fetchRequests();
       } else {
-        addToast('Thao t�c thất bại.', 'error');
+        addToast('Thao tác thất bại.', 'error');
       }
     } catch (e) {
-      addToast('Lỗi kết nối m�y ch?.', 'error');
+      addToast('Lỗi kết nối máy chủ.', 'error');
     }
   };
 
