@@ -13,6 +13,7 @@
     "crawl:manual": "node -e \"import('./src/core/crawler/index.js').then(c => c.crawlLatest('nettruyen', 5))\""
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "axios": "^1.14.0",
     "bcryptjs": "^3.0.3",
     "cheerio": "^1.2.0",
