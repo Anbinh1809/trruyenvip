@@ -9,15 +9,15 @@ export const POST = withTitan({
 
         switch (action) {
             case 'start_autopilot':
-                // Starts background loop if not already running
-                runTitanWorker().catch(e => console.error('[API] Autopilot crash:', e.message));
-                return { success: true, message: 'H? th?ng Guardian Autopilot d� đuo�c k�ch hoạt trong no�n.' };
+                // Starts background loop persistently (oneShot = false)
+                runTitanWorker(false).catch(e => console.error('[API] Autopilot crash:', e.message));
+                return { success: true, message: 'Hệ thống Guardian Autopilot đã được kích hoạt chạy ngầm.' };
 
             case 'force_discovery':
                 // Immediate priority discovery
                 await queueDiscovery('nettruyen', 5, 1, 10);
                 await queueDiscovery('truyenqq', 5, 1, 10);
-                return { success: true, message: 'L?nh Discovery (5 trang đầu) d� đuo�c đua v�o h�ng đo�i uu ti�n.' };
+                return { success: true, message: 'L?nh Discovery (5 trang đầu) d đuoc đua vo hng đoi uu tin.' };
 
             case 'maintenance':
                 // Run DB cleanup

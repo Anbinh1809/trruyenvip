@@ -26,6 +26,11 @@ export const POST = withTitan({
             await setSessionCookie(freshToken);
         }
 
+        // TITAN AUTOMATION: Trigger crawler pulse if needed (Throttled to 5 mins)
+        // This ensures the crawler runs as soon as any user interacts with the web
+        const { checkAndPulse } = await import('@/core/crawler/automation');
+        checkAndPulse().catch(() => {});
+
         return NextResponse.json({ auth: true, user: session });
     }
 });
