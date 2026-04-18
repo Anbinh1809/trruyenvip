@@ -36,15 +36,15 @@ function MangaCard({ manga, isNew = false, priority = false }) {
   };
 
   const formatTimeAgo = (dateStr) => {
-    if (!dateStr) return 'Vá»«a xong';
+    if (!dateStr) return 'Vừa xong';
     const now = new Date();
     const past = new Date(dateStr);
     const diffInMinutes = Math.floor((now - past) / 60000);
     
-    if (diffInMinutes < 1) return 'Vá»«a xong';
-    if (diffInMinutes < 60) return `${diffInMinutes} phÃºt trÆ°á»›c`;
+    if (diffInMinutes < 1) return 'Vừa xong';
+    if (diffInMinutes < 60) return `${diffInMinutes} phút trước`;
     const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) return `${diffInHours} giá» trÆ°á»›c`;
+    if (diffInHours < 24) return `${diffInHours} giờ trước`;
     return past.toLocaleDateString('vi-VN');
   };
 
@@ -86,7 +86,7 @@ function MangaCard({ manga, isNew = false, priority = false }) {
 
         <button 
             className={`bookmark-btn ${favorited ? 'active' : ''}`}
-            aria-label={favorited ? `Xóa ${manga.title} khá» i yêu thích` : `ThÃªm ${manga.title} vÃ o yêu thích`}
+            aria-label={favorited ? `Xóa ${manga.title} khỏi yêu thích` : `Thêm ${manga.title} vào yêu thích`}
             onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -114,10 +114,10 @@ function MangaCard({ manga, isNew = false, priority = false }) {
       </h3>
       <p className="card-chapter-centered">
         {manga.latest_chapter_number ? (
-            `ChÆ°Æ¡ng ${manga.latest_chapter_number}`
+            `Chương ${manga.latest_chapter_number}`
         ) : (manga.last_chap_num && isNaN(manga.last_chap_num) ? 
             manga.last_chap_num : 
-            (manga.last_chap_num && manga.last_chap_num !== '0' ? `ChÆ°Æ¡ng ${manga.last_chap_num}` : 'Äang cập nhật'))
+            (manga.last_chap_num && manga.last_chap_num !== '0' ? `Chương ${manga.last_chap_num}` : 'Đang cập nhật'))
         }
       </p>
 

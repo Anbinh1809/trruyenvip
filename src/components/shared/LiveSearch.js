@@ -170,7 +170,7 @@ export default function LiveSearch({ onSelect }) {
                                 </div>
                                 <div className="result-info-titan-industrial">
                                     <div className="result-title-titan-industrial truncate-1">{m.title}</div>
-                                    <div className="result-sub-titan-industrial truncate-1">{m.author || 'Đang c?p nh?t'}</div>
+                                    <div className="result-sub-titan-industrial truncate-1">{m.author || 'Đang cập nhật'}</div>
                                 </div>
                                 {idx < 3 && <div className="hoạt-tag-titan">HOT</div>}
                             </NextLink>

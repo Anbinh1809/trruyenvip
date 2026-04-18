@@ -2,21 +2,20 @@ import "./tokens.css";
 import "./industrial-core.css";
 import "./titan-components.css";
 import "./globals.css";
-import { Inter } from 'next/font/google';
+import { Inter, Outfit } from 'next/font/google';
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import { HistoryProvider } from "@/contexts/HistoryContext";
-import { FavoritesProvider } from "@/contexts/FavoritesContext";
-import { EngagementProvider } from "@/contexts/EngagementContext";
-import { ToastProvider } from "@/components/widgets/ToastProvider";
-import { AuthProvider } from "@/contexts/AuthContext";
-import MobileNav from "@/components/layout/MobileNav";
-import BackToTop from "@/components/layout/BackToTop";
-import SWRegistration from "@/components/widgets/SWRegistration";
+// ... (rest of imports)
 
 const inter = Inter({
   subsets: ['latin', 'vietnamese'],
   display: 'swap',
   variable: '--font-inter',
+});
+
+const outfit = Outfit({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-outfit',
 });
 
 export const metadata = {
@@ -61,7 +60,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="vi" className={`${inter.variable}`} data-scroll-smooth="true" suppressHydrationWarning>
+    <html lang="vi" className={`${inter.variable} ${outfit.variable}`} data-scroll-smooth="true" suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{
