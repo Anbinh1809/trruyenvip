@@ -1,0 +1,36 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useEngagement } from '@/contexts/EngagementContext';
+import { Zap } from 'lucide-react';
+
+/**
+ * RewardTimer (Repurposed for Mission Tracking)
+ * Theo d�i tho�i gian đo�c đo� co�ng v�o nhi?m vo� "Ngo� t�nh cao" (15 ph�t).
+ */
+export default function RewardTimer({ chapterId }) {
+  const { updateMission } = useEngagement();
+  const [seconds, setSeconds] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSeconds(prev => {
+          if (prev >= 59) {
+              updateMission('READ_PROGRESS', 1);
+              return 0;
+          }
+          return prev + 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [updateMission]);
+
+  return (
+    <div className="progress-hint-industrial fade-in">
+        <Zap size={10} color="var(--accent)" className="pulse-slow" /> 
+        <span>ĐANG T�NH ĐIo�M NGo� T�NH... ({seconds}s)</span>
+    </div>
+  );
+}
+

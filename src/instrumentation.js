@@ -9,9 +9,9 @@ export async function register() {
 
         console.log('--- [Guardian] Initializing Autonomous Engine (Industrial Path) ---');
 
-        import('./HeThong/CaoDuLieu/index.js')
+        import('./core/crawler/index.js')
             .then(async (m) => {
-                const { query } = await import('./HeThong/Database/CoSoDuLieu.js');
+                const { query } = await import('./core/database/connection.js');
 
                 // 1. Initial System Bootstrap
                 if (m && m.bootstrapCrawler) {
@@ -19,7 +19,7 @@ export async function register() {
                 }
                 
                 // 2. Automated Centralized Maintenance
-                const { runFullMaintenance } = await import('./HeThong/Database/BaoTri.js');
+                const { runFullMaintenance } = await import('./core/database/maintenance.js');
                 
                 // Trigger Initial Maintenance Cycle
                 runFullMaintenance().catch(e => console.error('[Guardian] Maintenance boot error:', e.message));

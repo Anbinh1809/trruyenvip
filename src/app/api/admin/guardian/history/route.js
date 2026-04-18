@@ -1,6 +1,6 @@
-﻿import { query } from '@/HeThong/Database/CoSoDuLieu';
+import { query } from '@/core/database/connection';
 import { NextResponse } from 'next/server';
-import { getSession } from '@/HeThong/BaoMat/XacThuc';
+import { getSession } from '@/core/security/auth';
 
 export async function GET(req) {
     try {
@@ -40,4 +40,5 @@ export async function GET(req) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
+
 

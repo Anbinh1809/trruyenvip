@@ -1,4 +1,4 @@
-import { query } from '@/HeThong/Database/CoSoDuLieu';
+import { query } from '@/core/database/connection';
 
 export async function GET(request, { params }) {
     const { chapterId } = await params;
@@ -19,6 +19,6 @@ export async function GET(request, { params }) {
         
         return Response.json(images);
     } catch (err) {
-        return new Response('Database error', { status: 500 });
+        return new Response('database error', { status: 500 });
     }
 }

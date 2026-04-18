@@ -1,6 +1,6 @@
-﻿import { NextResponse } from 'next/server';
-import { query } from '@/HeThong/Database/CoSoDuLieu';
-import { parseChapterNumber } from '@/HeThong/CaoDuLieu';
+import { NextResponse } from 'next/server';
+import { query } from '@/core/database/connection';
+import { parseChapterNumber } from '@/core/crawler';
 
 /**
  * Maintenance tool to repair NULL 'chapter_number' values by parsing titles.

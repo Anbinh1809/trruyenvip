@@ -1,7 +1,7 @@
-import { query, checkRateLimit } from '@/HeThong/Database/CoSoDuLieu';
+import { query, checkRateLimit } from '@/core/database/connection';
 import bcrypt from 'bcryptjs';
-import { signToken, setSessionCookie } from '@/HeThong/BaoMat/XacThuc';
-import { withTitan } from '@/HeThong/API/XuLyAPI';
+import { signToken, setSessionCookie } from '@/core/security/auth';
+import { withTitan } from '@/core/api/handler';
 
 export const POST = withTitan({
     handler: async (req) => {
@@ -13,16 +13,16 @@ export const POST = withTitan({
             // 1. Rate Limit: 10 attempts / 1 minute
             const limiter = await checkRateLimit(`login_${ip}`, 10, 60);
             if (!limiter.success) {
-                throw { status: 429, message: 'Quá nhiều lần thử. Vui lòng quay lại sau ít phút.' };
+                throw { status: 429, message: 'QuÃ¡ nhiá»u láº§n thá»­. Vui lÃ²ng quay láº¡i sau Ã­t phÃºt.' };
             }
 
             if (!username || !password) {
-                throw { status: 400, message: 'Thiếu thông tin đăng nhập' };
+                throw { status: 400, message: 'Thiáº¿u thÃ´ng tin Ä‘Äƒng nháº­p' };
             }
 
             // --- LOGIN GUARD ---
             if (username.length > 100 || password.length > 100) {
-                throw { status: 400, message: 'Thông tin đăng nhập quá dài' };
+                throw { status: 400, message: 'ThÃ´ng tin Ä‘Äƒng nháº­p quÃ¡ dÃ i' };
             }
 
             // Fetch user: Universal login (Username or Email)
@@ -36,7 +36,7 @@ export const POST = withTitan({
             if (!user) {
                 // IRONCLAD DEFENSE: 1s delay to deter brute force
                 await new Promise(r => setTimeout(r, 1000));
-                throw { status: 400, message: 'Người dùng không tồn tại' };
+                throw { status: 400, message: 'NgÆ°á»i dÃ¹ng khÃ´ng tá»“n táº¡i' };
             }
 
             // Verify password
@@ -44,7 +44,7 @@ export const POST = withTitan({
             if (!isMatch) {
                 // IRONCLAD DEFENSE: 1s delay to deter brute force
                 await new Promise(r => setTimeout(r, 1000));
-                throw { status: 401, message: 'Mật khẩu không chính xác' };
+                throw { status: 401, message: 'Máº­t kháº©u khÃ´ng chÃ­nh xÃ¡c' };
             }
 
             // Sign token
@@ -60,7 +60,7 @@ export const POST = withTitan({
             if (elapsed < 1500) await new Promise(r => setTimeout(r, 1500 - elapsed));
 
             return {
-                message: 'Đăng nhập thành công',
+                message: 'ÄÄƒng nháº­p thÃ nh cÃ´ng',
                 user: { 
                     username: user.username, 
                     uuid: user.uuid, 
@@ -77,9 +77,10 @@ export const POST = withTitan({
             console.error('Login error', e);
             const elapsed = Date.now() - startTime;
             if (elapsed < 1500) await new Promise(r => setTimeout(r, 1500 - elapsed));
-            throw { status: 500, message: 'Lỗi hệ thống khi đăng nhập' };
+            throw { status: 500, message: 'Lá»—i há»‡ thá»‘ng khi Ä‘Äƒng nháº­p' };
         }
     }
 });
+
 
 

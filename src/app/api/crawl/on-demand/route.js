@@ -1,5 +1,5 @@
-import { ingestMangaBySlug } from '@/HeThong/CaoDuLieu/engine';
-import { withTitan } from '@/HeThong/API/XuLyAPI';
+import { ingestMangaBySlug } from '@/core/crawler/engine';
+import { withTitan } from '@/core/api/handler';
 
 export const runtime = 'nodejs';
 
@@ -19,7 +19,7 @@ export const POST = withTitan({
                 success: true, 
                 message: 'Khởi tạo quy trình khám phá thành công',
                 slug: finalSlug
-            };
+            };// tui đang cần lắm 1 cái để test á, 
         } catch (err) {
             console.error('[Discovery Error]', err.message);
             throw { status: 500, message: 'Lỗi khởi tạo Titan Engine: ' + err.message };

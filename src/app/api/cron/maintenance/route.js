@@ -1,4 +1,4 @@
-﻿import { runFullMaintenance } from '@/HeThong/Database/BaoTri';
+import { runFullMaintenance } from '@/core/database/maintenance';
 import { NextResponse } from 'next/server';
 
 /**

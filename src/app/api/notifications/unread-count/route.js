@@ -1,5 +1,5 @@
-﻿import { query } from '@/HeThong/Database/CoSoDuLieu';
-import { getSession } from '@/HeThong/BaoMat/XacThuc';
+import { query } from '@/core/database/connection';
+import { getSession } from '@/core/security/auth';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
@@ -17,4 +17,5 @@ export async function GET() {
         return NextResponse.json({ count: 0 });
     }
 }
+
 

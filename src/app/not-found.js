@@ -1,6 +1,6 @@
-﻿import Link from 'next/link';
-import Header from '@/GiaoDien/BoCuc/Header';
-import Footer from '@/GiaoDien/BoCuc/Footer';
+import Link from 'next/link';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
 import { Compass } from 'lucide-react';
 import "@/app/system.css";
 
@@ -14,10 +14,10 @@ export default function NotFound() {
           </div>
           <h1 className="system-title-industrial">404: LOST IN ABYSS</h1>
           <p className="system-desc-industrial">
-              Trang báº¡n Ä‘ang tà¬m kiáº¿m đã láº¡c và o mo™t không gian khác hoáº·c chưa từng tồnn táº¡i trong hệ thống.
+              Trang bạn đang t�m kiếm d� lạc v�o mo�t kh�ng gian kh�c hoặc chua t?ng t?nn tại trong h? th?ng.
           </p>
           <Link href="/" className="btn btn-primary err-btn-titan">
-              QUAY Vo€ TRANG CHo¦
+              QUAY Vo� TRANG CHo�
           </Link>
       </div>
       <Footer />

@@ -1,14 +1,14 @@
-import Header from '@/GiaoDien/BoCuc/Header';
-import Footer from '@/GiaoDien/BoCuc/Footer';
-import ChapterList from '@/GiaoDien/TrinhDoc/ChapterList';
-import DetailCover from '@/GiaoDien/ThanhPhan/DetailCover';
-import DetailActions from '@/GiaoDien/ThanhPhan/DetailActions';
-import { query, MANGA_CARD_FIELDS } from '@/HeThong/Database/CoSoDuLieu';
-import { getSignedProxyUrl } from '@/HeThong/BaoMat/crypto';
-import "@/GiaoDien/ThanhPhan/Styles/manga-detail.css";
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
+import ChapterList from '@/components/reader/ChapterList';
+import DetailCover from '@/components/shared/DetailCover';
+import DetailActions from '@/components/shared/DetailActions';
+import { query, MANGA_CARD_FIELDS } from '@/core/database/connection';
+import { getSignedProxyUrl } from '@/core/security/crypto';
+import "@/components/shared/Styles/manga-detail.css";
 import Link from 'next/link';
 import { BookOpen, User, Star, Calendar, Share2, Heart, AlertOctagon, Sparkles, Eye } from 'lucide-react';
-import DiscoveryTrigger from '@/GiaoDien/BoCuc/DiscoveryTrigger';
+import DiscoveryTrigger from '@/components/layout/DiscoveryTrigger';
 
 // Helper to determine if a slug is a potential new ingestion target
 function isDiscoveryCandidate(slug) {
@@ -263,7 +263,7 @@ export default async function MangaDetailPage({ params }) {
 
                             <DetailActions 
                                 mangaId={id} 
-                                firstChapterId={manga.chapters?.length > 0 ? manga.chapters[manga.chapters.length - 1]?.id : null} 
+                                firstChapterId={manga.chapters?.length > 0 ? manga.chapters[0]?.id : null} 
                                 mangaTitle={manga.title}
                                 mangaCover={manga.rawCover || manga.cover}
                             />

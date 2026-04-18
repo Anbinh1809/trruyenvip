@@ -1,5 +1,5 @@
-﻿import { query, checkRateLimit } from '@/HeThong/Database/CoSoDuLieu';
-import { withTitan } from '@/HeThong/API/XuLyAPI';
+import { query, checkRateLimit } from '@/core/database/connection';
+import { withTitan } from '@/core/api/handler';
 
 export const GET = withTitan({
     handler: async (req) => {
@@ -53,16 +53,16 @@ export const POST = withTitan({
 
         const sanitized = sanitizeContent(content);
         if (sanitized.length < 2) {
-            throw { status: 400, message: 'No™i dung bà¬nh luáº­n quá ngắn hoáº·c không hợp lệ.' };
+            throw { status: 400, message: 'No�i dung b�nh luận qu� ng?n hoặc kh�ng h?p l?.' };
         }
 
         const userUuid = session.uuid;
-        const userName = session.username || 'Khách ẩn danh';
+        const userName = session.username || 'Kh�ch ?n danh';
 
         // TITAN RATE LIMIT: Unify with core system infrastructure
         const limiter = await checkRateLimit(`comment_${userUuid}`, 2, 30); // 2 comments / 30s
         if (!limiter.success) {
-            throw { status: 429, message: 'Yêu cầu bà¬nh luáº­n quá nhanh. Vui lòng Ä‘o£i thêm giây lát.' };
+            throw { status: 429, message: 'Y�u c?u b�nh luận qu� nhanh. Vui l�ng đo�i th�m gi�y l�t.' };
         }
 
         await query(`
@@ -70,7 +70,7 @@ export const POST = withTitan({
             VALUES (@chapterId, @userName, @content, @parentId, @userUuid)
         `, { chapterId, userName, content: sanitized, parentId, userUuid });
 
-        return { success: true, message: 'Bà¬nh luáº­n thành công!' };
+        return { success: true, message: 'B�nh luận th�nh c�ng!' };
     }
 });
 
@@ -92,7 +92,7 @@ export const PATCH = withTitan({
                 return { success: true };
             } catch (e) {
                 // If unique constraint fails, they already liked it
-                return { success: false, message: 'Bạn đã thà­ch bà¬nh luáº­n nà y rồni.' };
+                return { success: false, message: 'B?n d� th�ch b�nh luận n�y r?ni.' };
             }
         }
         
@@ -110,13 +110,13 @@ export const DELETE = withTitan({
 
         // Permission check
         const comment = await query(`SELECT user_uuid FROM comments WHERE id = @id`, { id });
-        if (!comment.recordset?.length) throw { status: 404, message: 'Bà¬nh luáº­n không tồn tại' };
+        if (!comment.recordset?.length) throw { status: 404, message: 'B�nh luận kh�ng t?n t?i' };
 
         const isOwner = comment.recordset[0].user_uuid === session.uuid;
         const isAdmin = session.role === 'admin';
 
         if (!isOwner && !isAdmin) {
-            throw { status: 403, message: 'Bạn không cà³ quyon xà³a bà¬nh luáº­n nà y' };
+            throw { status: 403, message: 'B?n kh�ng c� quyo�n x�a b�nh luận n�y' };
         }
 
         // TITAN INTEGRITY: Clean up orphan likes before deleting the comment
@@ -124,7 +124,7 @@ export const DELETE = withTitan({
         
         // Delete comment and its replies
         await query(`DELETE FROM comments WHERE id = @id OR parent_id = @id`, { id });
-        return { success: true, message: 'Äà£ xà³a bà¬nh luáº­n' };
+        return { success: true, message: 'Đ� x�a b�nh luận' };
     }
 });
 

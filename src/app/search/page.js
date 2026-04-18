@@ -1,9 +1,9 @@
-﻿import Header from '@/GiaoDien/BoCuc/Header';
-import MangaCard from '@/GiaoDien/ThanhPhan/MangaCard';
-import { query, MANGA_CARD_FIELDS } from '@/HeThong/Database/CoSoDuLieu';
-import { generateProxySignature } from '@/HeThong/BaoMat/crypto';
-import Footer from '@/GiaoDien/BoCuc/Footer';
-import IndustrialEmptyState from '@/GiaoDien/TienIch/IndustrialEmptyState';
+import Header from '@/components/layout/Header';
+import MangaCard from '@/components/shared/MangaCard';
+import { query, MANGA_CARD_FIELDS } from '@/core/database/connection';
+import { generateProxySignature } from '@/core/security/crypto';
+import Footer from '@/components/layout/Footer';
+import IndustrialEmptyState from '@/components/widgets/IndustrialEmptyState';
 import { Search } from 'lucide-react';
 
 async function searchManga(q, page = 1) {
@@ -83,7 +83,7 @@ export default async function SearchPage({ searchParams }) {
                   Káº¾T QUáº¢: &quot;{q}&quot;
                 </h1>
                 <p className="search-stats-industrial">
-                  Hệ tho‘ng tà¬m tháº¥y {total} bo™ truyện phà¹ ho£p với từ khà³a của báº¡n.
+                  Hệ thống tà¬m tháº¥y {total} bo™ truy?n phà¹ ho£p v?i t? khà³a c?a báº¡n.
                 </p>
               </div>
           </div>
@@ -103,7 +103,7 @@ export default async function SearchPage({ searchParams }) {
                                 href={`/search?q=${encodeURIComponent(q)}&page=${page - 1}`}
                                 className="pagination-node-industrial"
                             >
-                                â† TRÆ¯ỚC
+                                â† TRÆ¯?C
                             </a>
                         )}
                         
@@ -126,7 +126,7 @@ export default async function SearchPage({ searchParams }) {
             <div className="search-empty-state-industrial">
                 <IndustrialEmptyState 
                     keyword={q} 
-                    title="KHÔNG TÌM THẤY TRUYộN" 
+                    title="KHÔNG TÌM TH?Y TRUY?N" 
                 />
             </div>
           )}
@@ -137,4 +137,5 @@ export default async function SearchPage({ searchParams }) {
     </main>
   );
 }
+
 

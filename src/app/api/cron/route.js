@@ -1,5 +1,5 @@
-﻿import { queueDiscovery } from '@/HeThong/CaoDuLieu';
-import { runFullMaintenance } from '@/HeThong/Database/BaoTri';
+import { queueDiscovery } from '@/core/crawler';
+import { runFullMaintenance } from '@/core/database/maintenance';
 
 export async function GET(request) {
   const authHeader = request.headers.get('authorization');

@@ -1,9 +1,9 @@
-﻿import Header from '@/GiaoDien/BoCuc/Header';
-import Footer from '@/GiaoDien/BoCuc/Footer';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
 
 export const metadata = {
-  title: 'Äiou Khoản Do‹ch Vo¥ | TruyenVip',
-  description: 'Các Ä‘iou khoản và  quy Ä‘o‹nh khi sử do¥ng non tảng TruyenVip.',
+  title: 'Đio�u Kho?n Do�ch Vo� | TruyenVip',
+  description: 'C�c đio�u kho?n v� quy đo�nh khi s? do�ng no�n t?ng TruyenVip.',
 };
 
 export default function TermsPage() {
@@ -14,40 +14,40 @@ export default function TermsPage() {
       <div className="container legal-container fade-up">
         <header className="legal-header">
             <span className="legal-badge-titan">TERMS OF SERVICE</span>
-            <h1 className="legal-title-industrial">Äiou Khoản Do‹ch Vo¥</h1>
+            <h1 className="legal-title-industrial">Đio�u Kho?n Do�ch Vo�</h1>
         </header>
 
         <div className="legal-content-industrial shadow-titan">
             <div className="legal-section-industrial">
-                <h2>1. Cháº¥p Thuáº­n Äiou Khoản</h2>
+                <h2>1. Chấp Thuận Đio�u Kho?n</h2>
                 <p className="legal-text-industrial">
-                    Báº±ng cách truy cập hoáº·c sử do¥ng <strong>TruyenVip</strong>, báº¡n Ä‘ồnng à½ tuà¢n thủ các Äiou Khoản Do‹ch Vo¥ nà y. Náº¿u báº¡n không Ä‘ồnng à½ với báº¥t ko³ pháº§n nà o của các Ä‘iou khoản, vui là²ng không sử do¥ng do‹ch vo¥ của chàºng tà´i.
+                    Bằng c�ch truy c?p hoặc s? do�ng <strong>TruyenVip</strong>, bạn đ?nng � tu�n th? c�c Đio�u Kho?n Do�ch Vo� n�y. Nếu bạn kh�ng đ?nng � v?i bất ko� phần n�o c?a c�c đio�u kho?n, vui l�ng kh�ng s? do�ng do�ch vo� c?a ch�ng t�i.
                 </p>
             </div>
 
             <div className="legal-section-industrial">
-                <h2>2. Quyon Truy Cáº­p Website</h2>
+                <h2>2. Quyo�n Truy Cập Website</h2>
                 <p className="legal-text-industrial">
-                    Chàºng tà´i cấp cho báº¡n quyon truy cập cà³ gio›i háº¡n và o website cho mo¥c Ä‘à­ch giải trà­ cá nhà¢n. Bạn không Ä‘ưo£c phà©p sử do¥ng báº¥t ko³ cà´ng co¥ cào dữ liệu tực Ä‘o™ng nà o Ä‘oƒ láº¥y nội dung từ website mà  không cà³ sực cho phà©p báº±ng vÄƒn bản của chàºng tà´i.
+                    Ch�ng t�i c?p cho bạn quyo�n truy c?p c� gio�i hạn v�o website cho mo�c đ�ch gi?i tr� c� nh�n. B?n kh�ng đuo�c ph�p s? do�ng bất ko� c�ng co� c�o d? li?u t?c đo�ng n�o đo� lấy n?i dung t? website m� kh�ng c� s?c cho ph�p bằng văn b?n c?a ch�ng t�i.
                 </p>
             </div>
 
             <div className="legal-section-industrial">
-                <h2>3. No™i Dung Ngưoi Dà¹ng</h2>
+                <h2>3. No�i Dung Nguo�i D�ng</h2>
                 <p className="legal-text-industrial">
-                    Khi bà¬nh luáº­n hoáº·c tưÆ¡ng tác trên non tảng, báº¡n cho‹u trách nhiệm hoà n toà n vo nội dung mà¬nh Ä‘Äƒng tải. Moi hà nh vi vi pháº¡m pháp luáº­t, xàºc pháº¡m hoáº·c spam sáº½ bo‹ xử là½ nghiêm khắc, bao gồnm cả việc khà³a tà i khoản vĩnh viễn.
+                    Khi b�nh luận hoặc tuơng t�c tr�n no�n t?ng, bạn cho�u tr�ch nhi?m ho�n to�n vo� n?i dung m�nh đăng t?i. Mo�i h�nh vi vi phạm ph�p luật, x�c phạm hoặc spam sẽ bo� x? l� nghi�m kh?c, bao g?nm c? vi?c kh�a t�i kho?n vinh vi?n.
                 </p>
             </div>
 
             <div className="legal-section-industrial">
-                <h2>4. Thay Äo•i Do‹ch Vo¥</h2>
+                <h2>4. Thay Đo�i Do�ch Vo�</h2>
                 <p className="legal-text-industrial">
-                    Chàºng tà´i cà³ quyon thay Ä‘o•i, táº¡m ngừng hoáº·c ngừng cung cấp do‹ch vo¥ báº¥t ko³ làºc nà o mà  không cáº§n thà´ng báo trưo›c. Các thay Ä‘o•i vo Ä‘iou khoản sáº½ cà³ hiệu lựcc ngay khi Ä‘ưo£c Ä‘Äƒng tải trên trang nà y.
+                    Ch�ng t�i c� quyo�n thay đo�i, tạm ng?ng hoặc ng?ng cung c?p do�ch vo� bất ko� l�c n�o m� kh�ng cần th�ng b�o truo�c. C�c thay đo�i vo� đio�u kho?n sẽ c� hi?u l?cc ngay khi đuo�c đăng t?i tr�n trang n�y.
                 </p>
             </div>
 
             <footer className="legal-footer-industrial">
-                Cáº­p nhật láº§n cuo‘i: Ngà y 14 tháng 04 nÄƒm 2026
+                Cập nh?t lần cuo�i: Ng�y 14 th�ng 04 năm 2026
             </footer>
         </div>
       </div>

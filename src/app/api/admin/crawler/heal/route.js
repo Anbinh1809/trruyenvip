@@ -1,6 +1,6 @@
-﻿import { NextResponse } from 'next/server';
-import { getSession } from '@/HeThong/BaoMat/XacThuc';
-import { healChapterGaps } from '@/HeThong/CaoDuLieu';
+import { NextResponse } from 'next/server';
+import { getSession } from '@/core/security/auth';
+import { healChapterGaps } from '@/core/crawler';
 
 export async function POST(req) {
     try {
@@ -10,14 +10,15 @@ export async function POST(req) {
         }
 
         // Trigger healing in the background to avoid timeout
-        healChapterGaps(20).catch(err => console.error('[HealAPI] Async error:', err));
+        healChapterGaps(20).catch(err => console.error('[Healapi] Async error:', err));
 
         return NextResponse.json({ 
             success: true, 
-            message: 'Quy trà¬nh vá lo—i (Gap Healing) đã Ä‘ưo£c kà­ch hoáº¡t thành công!' 
+            message: 'Quy trà¬nh vá lo—i (Gap Healing) dã Ä‘uo£c kà­ch hoáº¡t thành công!' 
         });
     } catch (err) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
+
 

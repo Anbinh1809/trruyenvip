@@ -1,5 +1,5 @@
-﻿import { queueDiscovery } from '@/HeThong/CaoDuLieu';
-import { withTitan } from '@/HeThong/API/XuLyAPI';
+import { queueDiscovery } from '@/core/crawler';
+import { withTitan } from '@/core/api/handler';
 
 /**
  * POST: Manual/Cron Deep Scan Trigger
@@ -20,7 +20,7 @@ export const POST = withTitan({
         
         // Note: we don't set 'admin: true' in withTitan because we want to allow 
         // the machine-to-machine CRON_SECRET bypass. We handle authorization manually inside.
-        const session = await (require('@/HeThong/BaoMat/XacThuc').getSession());
+        const session = await (require('@/core/security/auth').getSession());
         const isAdmin = session?.role === 'admin';
 
         if (!isCron && !isAdmin) {
@@ -56,4 +56,5 @@ export const POST = withTitan({
         }
     }
 });
+
 

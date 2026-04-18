@@ -1,13 +1,20 @@
-﻿import { query } from '@/HeThong/Database/CoSoDuLieu';
-import { withTitan } from '@/HeThong/API/XuLyAPI';
+import { query, checkRateLimit } from '@/core/database/connection';
+import { withTitan } from '@/core/api/handler';
 
 export const POST = withTitan({
     auth: true,
     handler: async (req, session) => {
         const { commentId, reason } = await req.json();
+        const ip = req.headers.get('x-forwarded-for') || '127.0.0.1';
+
+        // 1. Rate Limit: 10 reports / 1 hour
+        const limiter = await checkRateLimit(`report_${session.uuid || ip}`, 10, 3600);
+        if (!limiter.success) {
+            throw { status: 429, message: 'Bạn đã gửi quá nhiều báo cáo. Vui lòng thử lại sau.' };
+        }
 
         if (!commentId || !reason) {
-            throw { status: 400, message: 'Missing fields' };
+            throw { status: 400, message: 'Thiếu thông tin báo cáo' };
         }
 
         const userUuid = session.uuid;
@@ -19,7 +26,7 @@ export const POST = withTitan({
         `, { userUuid, commentId });
 
         if (check.recordset?.length > 0) {
-            return { success: true, message: 'Bạn đã báo cáo bà¬nh luáº­n nà y rồni.' };
+            return { success: true, message: 'Bạn đã báo cáo bình luận này rồi.' };
         }
 
         await query(`
@@ -27,7 +34,9 @@ export const POST = withTitan({
             VALUES (@userUuid, @commentId, @reason)
         `, { userUuid, commentId, reason });
 
-        return { success: true, message: 'Äà£ gửi báo cáo. Chàºng tà´i sáº½ xử là½ so›m nháº¥t cà³ thoƒ.' };
+        return { success: true, message: 'Đã gửi báo cáo. Chúng tôi sẽ xử lý sớm nhất có thể.' };
     }
 });
+
+
 

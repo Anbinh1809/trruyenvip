@@ -1,5 +1,5 @@
-﻿import { query } from '@/HeThong/Database/CoSoDuLieu';
-import { getSignedProxyUrl } from '@/HeThong/BaoMat/crypto';
+import { query } from '@/core/database/connection';
+import { getSignedProxyUrl } from '@/core/security/crypto';
 
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
@@ -49,8 +49,9 @@ export async function GET(request) {
             cover: m.cover?.startsWith('http') ? getSignedProxyUrl(m.cover, 300, 75) : (m.cover || '/placeholder-manga.svg')
         })));
     } catch (err) {
-        console.error('Recommendations API Error:', err);
-        return Response.json({ error: 'Database error' }, { status: 500 });
+        console.error('Recommendations api Error:', err);
+        return Response.json({ error: 'database error' }, { status: 500 });
     }
 }
+
 

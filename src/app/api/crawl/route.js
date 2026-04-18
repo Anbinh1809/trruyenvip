@@ -1,5 +1,5 @@
-import { withTitan } from '@/HeThong/API/XuLyAPI';
-import { queueDiscovery } from '@/HeThong/CaoDuLieu';
+import { withTitan } from '@/core/api/handler';
+import { queueDiscovery } from '@/core/crawler';
 
 export const POST = withTitan({
     admin: true,

@@ -1,5 +1,5 @@
-import { query, withTransaction, checkRateLimit } from '@/HeThong/Database/CoSoDuLieu';
-import { withTitan } from '@/HeThong/API/XuLyAPI';
+import { query, withTransaction, checkRateLimit } from '@/core/database/connection';
+import { withTitan } from '@/core/api/handler';
 
 export const GET = withTitan({
     auth: true,

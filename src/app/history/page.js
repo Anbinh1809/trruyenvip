@@ -1,10 +1,10 @@
-﻿'use client';
+'use client';
 
-import Header from '@/GiaoDien/BoCuc/Header';
-import { useHistory } from '@/NguCanh/HistoryContext';
+import Header from '@/components/layout/Header';
+import { useHistory } from '@/contexts/HistoryContext';
 import Link from 'next/link';
 import Image from 'next/image';
-import EmptyState from '@/GiaoDien/ThanhPhan/EmptyState';
+import EmptyState from '@/components/shared/EmptyState';
 import { Trash2, BookOpen, Clock } from 'lucide-react';
 
 export default function HistoryPage() {
@@ -17,13 +17,13 @@ export default function HistoryPage() {
             <div className="container history-container fade-in">
                 <header className="history-header-industrial fade-up">
                     <div className="header-left-industrial">
-                        <div className="library-badge-titan">TRUYộN Äàƒ XEM</div>
-                        <h1 className="history-title-industrial">LoŠCH So¬ ÄoŒC</h1>
-                        <p className="history-subtitle">Các bản ghi hoáº¡t Ä‘o™ng Ä‘oc truyện của báº¡n trên hệ thống.</p>
+                        <div className="library-badge-titan">TRUY?N Đ� XEM</div>
+                        <h1 className="history-title-industrial">Lo�CH So� Đo�C</h1>
+                        <p className="history-subtitle">C�c b?n ghi hoạt đo�ng đo�c truy?n c?a bạn tr�n h? th?ng.</p>
                     </div>
                     {history.length > 0 && (
                         <button className="btn btn-outline clear-btn-industrial" onClick={clearHistory}>
-                            <Trash2 size={18} /> XOà LoŠCH So¬
+                            <Trash2 size={18} /> XO� Lo�CH So�
                         </button>
                     )}
                 </header>
@@ -46,12 +46,12 @@ export default function HistoryPage() {
                                 </Link>
                                 <div className="history-info-industrial">
                                     <h3 className="history-item-title">{item.mangaTitle}</h3>
-                                    <div className="history-last-read">Dừng láº¡i oŸ: {item.chapterTitle}</div>
+                                    <div className="history-last-read">D?ng lại o�: {item.chapterTitle}</div>
                                     <Link 
                                         href={`/manga/${item.mangaId}/chapter/${item.chapterId}`} 
                                         className="btn btn-primary history-action-industrial"
                                     >
-                                        ÄoŒC TIáº¾P <BookOpen size={16} />
+                                        Đo�C TIẾP <BookOpen size={16} />
                                     </Link>
                                 </div>
                             </div>
@@ -59,9 +59,9 @@ export default function HistoryPage() {
                     </div>
                 ) : (
                     <EmptyState 
-                        title="Hà€NH TRàŒNH CHÆ¯A Báº®T Äáº¦U"
-                        subtitle="Lo‹ch sử Ä‘oc của báº¡n hiện Ä‘ang tro‘ng. Hà£y khám phá những tác pháº©m tinh hoa ngay bà¢y gio!"
-                        actionText="KHàM PHà NGAY"
+                        title="H�NH TR�NH CHƯA BẮT ĐẦU"
+                        subtitle="Lo�ch s? đo�c c?a bạn hi?n đang tro�ng. H�y kh�m ph� nh?ng t�c phẩm tinh hoa ngay b�y gio�!"
+                        actionText="KH�M PH� NGAY"
                         actionUrl="/"
                     />
                 )}

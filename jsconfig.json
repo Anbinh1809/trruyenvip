@@ -2,10 +2,10 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"],
-      "@hethong/*": ["./src/HeThong/*"],
-      "@giaodien/*": ["./src/GiaoDien/*"],
-      "@ngucanh/*": ["./src/NguCanh/*"],
-      "@trothu/*": ["./src/TroThu/*"]
+      "@core/*": ["./src/core/*"],
+      "@components/*": ["./src/components/*"],
+      "@contexts/*": ["./src/contexts/*"],
+      "@hooks/*": ["./src/hooks/*"]
     }
   }
 }

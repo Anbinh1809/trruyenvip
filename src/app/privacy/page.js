@@ -1,9 +1,9 @@
-﻿import Header from '@/GiaoDien/BoCuc/Header';
-import Footer from '@/GiaoDien/BoCuc/Footer';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
 
 export const metadata = {
-  title: 'Chà­nh Sách Bảo Máº­t | TruyenVip',
-  description: 'Chà­nh sách bảo máº­t thà´ng tin ngưoi dà¹ng trên TruyenVip.',
+  title: 'Ch�nh S�ch B?o Mật | TruyenVip',
+  description: 'Ch�nh s�ch b?o mật th�ng tin nguo�i d�ng tr�n TruyenVip.',
 };
 
 export default function PrivacyPage() {
@@ -14,40 +14,40 @@ export default function PrivacyPage() {
       <div className="container legal-container fade-up">
         <header className="legal-header">
             <span className="legal-badge-titan">PRIVACY POLICY</span>
-            <h1 className="legal-title-industrial">Chà­nh Sách Bảo Máº­t</h1>
+            <h1 className="legal-title-industrial">Ch�nh S�ch B?o Mật</h1>
         </header>
 
         <div className="legal-content-industrial shadow-titan">
             <div className="legal-section-industrial">
-                <h2>1. Thu Tháº­p Thà´ng Tin</h2>
+                <h2>1. Thu Thập Th�ng Tin</h2>
                 <p className="legal-text-industrial">
-                    Chàºng tà´i cho‰ thu tháº­p những thà´ng tin cáº§n thiáº¿t to‘i thioƒu Ä‘oƒ cung cấp do‹ch vo¥ tốt nháº¥t cho báº¡n, bao gồnm Ä‘o‹a cho‰ email (náº¿u báº¡n Ä‘Äƒng kà½ tà i khoản) và  các soŸ thà­ch Ä‘oc truyện Ä‘oƒ cá nhà¢n hà³a trải nghiệm.
+                    Ch�ng t�i cho� thu thập nh?ng th�ng tin cần thiết to�i thio�u đo� cung c?p do�ch vo� t?t nhất cho bạn, bao g?nm đo�a cho� email (nếu bạn đăng k� t�i kho?n) v� c�c so� th�ch đo�c truy?n đo� c� nh�n h�a tr?i nghi?m.
                 </p>
             </div>
 
             <div className="legal-section-industrial">
-                <h2>2. Sử Do¥ng Cookie</h2>
+                <h2>2. S? Do�ng Cookie</h2>
                 <p className="legal-text-industrial">
-                    Chàºng tà´i sử do¥ng cookie Ä‘oƒ lưu trữ phiên Ä‘Äƒng nháº­p và  các cà i Ä‘áº·t giao diện (như cháº¿ Ä‘o™ sáng/to‘i, co¡ chữ) của báº¡n. Bạn cà³ thoƒ từ cho‘i cookie qua cà i Ä‘áº·t trà¬nh duyệt, nhưng mo™t so‘ tà­nh nÄƒng cà³ thoƒ không hoáº¡t Ä‘o™ng o•n Ä‘o‹nh.
+                    Ch�ng t�i s? do�ng cookie đo� luu tr? phi�n đăng nhập v� c�c c�i đặt giao di?n (nhu chế đo� s�ng/to�i, co� ch?) c?a bạn. B?n c� tho� t? cho�i cookie qua c�i đặt tr�nh duy?t, nhung mo�t so� t�nh năng c� tho� kh�ng hoạt đo�ng o�n đo�nh.
                 </p>
             </div>
 
             <div className="legal-section-industrial">
-                <h2>3. Bảo Máº­t Dữ Liệu</h2>
+                <h2>3. B?o Mật D? Li?u</h2>
                 <p className="legal-text-industrial">
-                    Moi dữ liệu cá nhà¢n của ngưoi dà¹ng Ä‘ưo£c mà£ hà³a báº±ng cà´ng nghệ <strong>SSL 256-bit</strong> tiêu chuáº©n cà´ng nghiệp. Chàºng tà´i cam kết không bao gio bán hoáº·c chia sáº» thà´ng tin của báº¡n cho báº¥t ko³ bên tho© ba nà o và¬ mo¥c Ä‘à­ch thưÆ¡ng máº¡i.
+                    Mo�i d? li?u c� nh�n c?a nguo�i d�ng đuo�c m� h�a bằng c�ng ngh? <strong>SSL 256-bit</strong> ti�u chuẩn c�ng nghi?p. Ch�ng t�i cam k?t kh�ng bao gio� b�n hoặc chia sẻ th�ng tin c?a bạn cho bất ko� b�n tho� ba n�o v� mo�c đ�ch thuơng mại.
                 </p>
             </div>
 
             <div className="legal-section-industrial">
-                <h2>4. Quyon Của Ngưoi Dà¹ng</h2>
+                <h2>4. Quyo�n C?a Nguo�i D�ng</h2>
                 <p className="legal-text-industrial">
-                    Bạn cà³ quyon yêu cáº§u xem, sửa Ä‘o•i hoáº·c xà³a hoà n toà n dữ liệu cá nhà¢n (bao gồnm cả lo‹ch sử Ä‘oc truyện và  tà i khoản) của mà¬nh khoi hệ thống của chàºng tà´i thà´ng qua trang cá nhà¢n hoáº·c liên hệ trựcc tiáº¿p.
+                    B?n c� quyo�n y�u cầu xem, s?a đo�i hoặc x�a ho�n to�n d? li?u c� nh�n (bao g?nm c? lo�ch s? đo�c truy?n v� t�i kho?n) c?a m�nh kho�i h? th?ng c?a ch�ng t�i th�ng qua trang c� nh�n hoặc li�n h? tr?cc tiếp.
                 </p>
             </div>
 
             <footer className="legal-footer-industrial">
-                Cáº­p nhật láº§n cuo‘i: Ngà y 14 tháng 04 nÄƒm 2026
+                Cập nh?t lần cuo�i: Ng�y 14 th�ng 04 năm 2026
             </footer>
         </div>
       </div>

@@ -1,17 +1,17 @@
-﻿import "./tokens.css";
+import "./tokens.css";
 import "./industrial-core.css";
 import "./titan-components.css";
 import "./globals.css";
 import { Inter } from 'next/font/google';
-import { ThemeProvider } from "@/NguCanh/ThemeContext";
-import { HistoryProvider } from "@/NguCanh/HistoryContext";
-import { FavoritesProvider } from "@/NguCanh/FavoritesContext";
-import { EngagementProvider } from "@/NguCanh/EngagementContext";
-import { ToastProvider } from "@/GiaoDien/TienIch/ToastProvider";
-import { AuthProvider } from "@/NguCanh/AuthContext";
-import MobileNav from "@/GiaoDien/BoCuc/MobileNav";
-import BackToTop from "@/GiaoDien/BoCuc/BackToTop";
-import SWRegistration from "@/GiaoDien/TienIch/SWRegistration";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import { HistoryProvider } from "@/contexts/HistoryContext";
+import { FavoritesProvider } from "@/contexts/FavoritesContext";
+import { EngagementProvider } from "@/contexts/EngagementContext";
+import { ToastProvider } from "@/components/widgets/ToastProvider";
+import { AuthProvider } from "@/contexts/AuthContext";
+import MobileNav from "@/components/layout/MobileNav";
+import BackToTop from "@/components/layout/BackToTop";
+import SWRegistration from "@/components/widgets/SWRegistration";
 
 const inter = Inter({
   subsets: ['latin', 'vietnamese'],
@@ -20,8 +20,8 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "TruyenVip - Non tảng Äoc Truyện Tranh Online Cao Cấp",
-  description: "Website Ä‘oc truyện tranh bản quyon, tốc độ siêu nhanh, giao diện cinematic, trải nghiệm mượt mà không quảng cáo.",
+  title: "TruyenVip - Nền tảng Đọc Truyện Tranh Online Cao Cấp",
+  description: "Website đọc truyện tranh bản quyền, tốc độ siêu nhanh, giao diện cinematic, trải nghiệm mượt mà không quảng cáo.",
   icons: {
     icon: '/favicon.ico',
     apple: '/apple-icon.png',
@@ -30,7 +30,7 @@ export const metadata = {
     'preconnect': ['https://fonts.googleapis.com', 'https://fonts.gstatic.com'],
   },
   openGraph: {
-    title: "TruyenVip - Äoc Truyện Tranh Cao Cấp",
+    title: "TruyenVip - Đọc Truyện Tranh Cao Cấp",
     description: "Khám phá thế giới truyện tranh đỉnh cao với giao diện Premium tuyệt mỹ.",
     url: 'https://truyenvip.com',
     siteName: 'TruyenVip',
@@ -39,8 +39,8 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "TruyenVip - Äoc Truyện Tranh Cao Cấp",
-    description: "Trải nghiệm Ä‘oc truyện đỉnh cao táº¡i TruyenVip",
+    title: "TruyenVip - Đọc Truyện Tranh Cao Cấp",
+    description: "Trải nghiệm đọc truyện đỉnh cao tại TruyenVip",
   },
   manifest: '/manifest.json',
   appleWebApp: {
@@ -77,7 +77,7 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body suppressHydrationWarning>
-        <a href="#main-content" className="skip-to-content-titan">Bo qua Ä‘áº¿n nội dung chính</a>
+        <a href="#main-content" className="skip-to-content-titan">Bỏ qua đến nội dung chính</a>
         <AuthProvider>
           <ThemeProvider>
             <ToastProvider> 
@@ -100,4 +100,3 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
-

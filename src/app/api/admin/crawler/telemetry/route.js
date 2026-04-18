@@ -1,5 +1,5 @@
-﻿import { NextResponse } from 'next/server';
-import { getSession } from '@/HeThong/BaoMat/XacThuc';
+import { NextResponse } from 'next/server';
+import { getSession } from '@/core/security/auth';
 
 export async function GET() {
     try {
@@ -33,4 +33,5 @@ export async function GET() {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
+
 

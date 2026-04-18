@@ -1,12 +1,12 @@
-﻿import { query, checkRateLimit } from '@/HeThong/Database/CoSoDuLieu';
-import { getSession } from '@/HeThong/BaoMat/XacThuc';
+import { query, checkRateLimit } from '@/core/database/connection';
+import { getSession } from '@/core/security/auth';
 import { NextResponse } from 'next/server';
 
 export async function POST(request) {
     try {
         const session = await getSession();
         if (!session) {
-            return NextResponse.json({ error: 'Chưa Ä‘Äƒng nháº­p' }, { status: 401 });
+            return NextResponse.json({ error: 'Chua Ä‘Äƒng nháº­p' }, { status: 401 });
         }
 
         // 1. Robust Parsing for Beacon/Keepalive (handles missing Content-Type)
@@ -35,14 +35,14 @@ export async function POST(request) {
         // TITAN-GRADE SANITY CHECK: Max 500 XP and 100 Coins per heart-beat (3s)
         // This makes it virtually impossible to farm massive amounts without triggering rate limits.
         if (deltaXp > 500 || deltaCoins > 100) {
-            return NextResponse.json({ error: 'Dữ liệu báº¥t thưong (Deltas excessive)' }, { status: 400 });
+            return NextResponse.json({ error: 'D? li?u báº¥t thuong (Deltas excessive)' }, { status: 400 });
         }
 
         // 4. TITAN RATE LIMIT: Unify with core system infrastructure
         const limiter = await checkRateLimit(`stats_${session.uuid}`, 1, 3); // 1 update / 3s
         if (!limiter.success) {
             return NextResponse.json({ 
-              error: 'Hệ thống Ä‘ang bận',
+              error: 'H? th?ng Ä‘ang b?n',
               nextAvailable: limiter.reset - Date.now()
             }, { status: 429 });
         }
@@ -70,7 +70,8 @@ export async function POST(request) {
 
     } catch (e) {
         console.error('[TITAN ERROR] Update stats failed:', e.message);
-        return NextResponse.json({ error: 'Lo—i Ä‘ồnng bo™ dữ liệu' }, { status: 500 });
+        return NextResponse.json({ error: 'Lo—i Ä‘?nng bo™ d? li?u' }, { status: 500 });
     }
 }
+
 

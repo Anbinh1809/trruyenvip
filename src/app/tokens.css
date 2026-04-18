@@ -7,22 +7,36 @@
   /* Premium Dark Theme Core (Default) */
   --bg-primary: #020617;
   --bg-secondary: #0a0a0a;
-  --bg-tertiary: #111827;
+  --bg-tertiary: #0f172a;
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
   --accent: #ff3e3e;
-  --accent-gradient: linear-gradient(135deg, #ff3e3e 0%, #b91c1c 100%);
-  --glass-bg: #111827;
-  --glass-border: rgba(255, 255, 255, 0.07);
-  --glass-blur: blur(20px);
+  --accent-glow: rgba(255, 62, 62, 0.4);
+  --accent-gradient: linear-gradient(135deg, #ff3e3e 0%, #dc2626 100%);
+  
+  /* Industrial Depth & Glass */
+  --glass-bg: rgba(15, 23, 42, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: blur(24px);
   --header-height: 72px;
-  --header-bg: rgba(2, 6, 23, 0.82);
-  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  --border-radius: 12px;
-  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-heading: 'Inter', system-ui, -apple-system, sans-serif;
+  --header-bg: rgba(2, 6, 23, 0.85);
+
+  /* Kinetic Constants - The "Titan" Rhythm */
+  --ease-titan: cubic-bezier(0.16, 1, 0.3, 1);
+  --transition: all 0.4s var(--ease-titan);
+  --transition-fast: all 0.2s var(--ease-titan);
+  
+  /* Shadow Architecture (Layered for High Fidelity) */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 30px 60px -12px rgba(0, 0, 0, 0.6);
+  --shadow-accent: 0 0 20px -5px var(--accent-glow);
+
+  --border-radius: 14px;
+  --font-body: var(--font-inter), 'Inter', system-ui, sans-serif;
+  --font-heading: var(--font-inter), 'Inter', system-ui, sans-serif;
   
   /* Z-Index Architecture */
   --z-header: 1000;
@@ -32,11 +46,11 @@
   --z-mobile-nav: 9999;
 
   /* Nebula Design Tokens */
-  --nebula-blue: #4dc6e8;
-  --nebula-orange: #ffb400;
-  --nebula-red: #ff4757;
-  --nebula-glass: rgba(255, 255, 255, 0.1);
-  --focal-mask: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.85) 100%);
+  --nebula-blue: #38bdf8;
+  --nebula-orange: #fbbf24;
+  --nebula-red: #f87171;
+  --nebula-glass: rgba(255, 255, 255, 0.03);
+  --focal-mask: linear-gradient(to bottom, transparent 0%, rgba(2, 6, 23, 0.95) 100%);
 
   /* Ranking Colors */
   --rank-gold: #fbbf24;

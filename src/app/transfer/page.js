@@ -1,8 +1,8 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
-import Header from '@/GiaoDien/BoCuc/Header';
-import Footer from '@/GiaoDien/BoCuc/Footer';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
 import { useRouter } from 'next/navigation';
 import { Zap, RefreshCw, CheckCircle, XCircle, ExternalLink } from 'lucide-react';
 
@@ -24,7 +24,7 @@ export default function TransferPage() {
         const allowedTargets = ['nettruyen', 'nhattruyen', 'truyenqq'];
         const invalidUrls = urlList.filter(u => !allowedTargets.some(t => u.includes(t)));
         if (invalidUrls.length > 0) {
-            alert(`Mo™t so‘ liên kết không Ä‘ưo£c ho— tro£: ${invalidUrls[0]}...`);
+            alert(`Mo�t so� li�n k?t kh�ng đuo�c ho� tro�: ${invalidUrls[0]}...`);
             return;
         }
 
@@ -55,7 +55,7 @@ export default function TransferPage() {
                         return { url, status: 'error', msg: data.error };
                     }
                 } catch (err) {
-                    return { url, status: 'error', msg: 'Lỗi kết nối' };
+                    return { url, status: 'error', msg: 'L?i k?t n?i' };
                 }
             }));
             
@@ -81,24 +81,24 @@ export default function TransferPage() {
             <Header />
             <div className="container transfer-container fade-up">
                 <header className="section-header-industrial">
-                    <div className="transfer-header-badge">DI Cáº¦N TIáº¾P NoI</div>
-                    <h1 className="transfer-title">Do‹ch Chuyoƒn No™i Dung</h1>
+                    <div className="transfer-header-badge">DI CẦN TIẾP No�I</div>
+                    <h1 className="transfer-title">Do�ch Chuyo�n No�i Dung</h1>
                     <p className="transfer-subtitle">
-                        Hệ tho‘ng giàºp báº¡n chuyoƒn dữ liệu từ nguồn ngoà i vo TruyenVip nhanh chà³ng và  o•n Ä‘o‹nh. Mo—i mo™t liên kết là  mo™t hà nh trà¬nh mo›i.
+                        H? tho�ng gi�p bạn chuyo�n d? li?u t? ngu?n ngo�i vo� TruyenVip nhanh ch�ng v� o�n đo�nh. Mo�i mo�t li�n k?t l� mo�t h�nh tr�nh mo�i.
                     </p>
                 </header>
 
                 <div className="transfer-form-card">
                     <div className="card-header-industrial">
-                        <h3 className="card-title-industrial">Nháº­p liên kết chưÆ¡ng truyện</h3>
-                        <span className="card-hint-industrial">Mo—i dà²ng mo™t liên kết chưÆ¡ng truyện (NetTruyen, TruyenQQ...)</span>
+                        <h3 className="card-title-industrial">Nhập li�n k?t chuơng truy?n</h3>
+                        <span className="card-hint-industrial">Mo�i d�ng mo�t li�n k?t chuơng truy?n (NetTruyen, TruyenQQ...)</span>
                     </div>
 
                     <form onSubmit={handleBatchTransfer}>
                         <textarea 
                             value={urls}
                             onChange={(e) => setUrls(e.target.value)}
-                            placeholder="Dán các liên kết chưÆ¡ng truyện và o Ä‘à¢y..."
+                            placeholder="D�n c�c li�n k?t chuơng truy?n v�o đ�y..."
                             className="transfer-textarea-titan"
                         />
                         <button 
@@ -107,16 +107,16 @@ export default function TransferPage() {
                             className={`btn btn-primary btn-large-titan ${isProcessing ? 'processing' : ''}`}
                         >
                             {isProcessing ? (
-                                <><RefreshCw className="spin" size={24} /> ÄANG Xo¬ Là Do® LIộU...</>
+                                <><RefreshCw className="spin" size={24} /> ĐANG Xo� L� Do� LI?U...</>
                             ) : (
-                                <><Zap size={24} fill="currentColor" /> KàCH HOáº T DoŠCH CHUYo‚N</>
+                                <><Zap size={24} fill="currentColor" /> K�CH HOẠT Do�CH CHUYo�N</>
                             )}
                         </button>
                     </form>
 
                     {results.length > 0 && (
                         <div className="transfer-results-section fade-in">
-                            <h3 className="results-title-industrial">Bản ghi do‹ch chuyoƒn</h3>
+                            <h3 className="results-title-industrial">B?n ghi do�ch chuyo�n</h3>
                             <div className="results-list-industrial">
                                 {results.map((res, i) => (
                                     <div key={i} className={`result-item-industrial ${res.status === 'success' ? 'is-success' : 'is-error'}`}>
@@ -129,13 +129,13 @@ export default function TransferPage() {
                                                     </a>
                                                     <div className="status-badge-industrial success">
                                                         <CheckCircle size={18} />
-                                                        <span>THà€NH Cà”NG</span>
+                                                        <span>TH�NH C�NG</span>
                                                     </div>
                                                 </>
                                             ) : (
                                                 <div className="status-badge-industrial error">
                                                     <XCircle size={18} />
-                                                    <span>THáº¤T Báº I</span>
+                                                    <span>THẤT BẠI</span>
                                                 </div>
                                             )}
                                         </div>

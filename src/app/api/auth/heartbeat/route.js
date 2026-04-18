@@ -1,7 +1,7 @@
-﻿import { getSession, setSessionCookie, signToken, verifyToken } from '@/HeThong/BaoMat/XacThuc';
+import { getSession, setSessionCookie, signToken, verifyToken } from '@/core/security/auth';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { withTitan } from '@/HeThong/API/XuLyAPI';
+import { withTitan } from '@/core/api/handler';
 
 export const POST = withTitan({
     allowOptional: true,
@@ -29,4 +29,5 @@ export const POST = withTitan({
         return NextResponse.json({ auth: true, user: session });
     }
 });
+
 

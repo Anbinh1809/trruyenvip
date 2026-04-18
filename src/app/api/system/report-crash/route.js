@@ -1,4 +1,4 @@
-﻿import { query } from '@/HeThong/Database/CoSoDuLieu';
+import { query } from '@/core/database/connection';
 import { NextResponse } from 'next/server';
 
 export async function POST(request) {

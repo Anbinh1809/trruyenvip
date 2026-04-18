@@ -1,18 +1,18 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
-import Header from '@/GiaoDien/BoCuc/Header';
-import Footer from '@/GiaoDien/BoCuc/Footer';
-import { useAuth } from '@/NguCanh/AuthContext';
-import { useEngagement } from '@/NguCanh/EngagementContext';
-import { useToast } from '@/GiaoDien/TienIch/ToastProvider';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
+import { useAuth } from '@/contexts/AuthContext';
+import { useEngagement } from '@/contexts/EngagementContext';
+import { useToast } from '@/components/widgets/ToastProvider';
 import Link from 'next/link';
 import { User, Shield, Coins, Sparkles, Activity, Heart, History, LogOut, ShieldCheck, AlertOctagon, ChevronRight } from 'lucide-react';
 
 export default function ProfilePage() {
   const { user, isAuthenticated, logout, loading, refreshUser } = useAuth();
   const engagement = useEngagement() || {};
-  const { vipCoins = 0, level = 1, rankTitle = 'Phà m Nhà¢n', xp = 0, xpProgress = 0 } = engagement;
+  const { vipCoins = 0, level = 1, rankTitle = 'Ph�m Nh�n', xp = 0, xpProgress = 0 } = engagement;
   const { addToast } = useToast();
   const [avatarUrl, setAvatarUrl] = useState('');
   const [updating, setUpdating] = useState(false);
@@ -35,12 +35,12 @@ export default function ProfilePage() {
         });
         if (res.ok) {
             await refreshUser();
-            addToast('Äà£ cập nhật ảnh Ä‘áº¡i diện!', 'success');
+            addToast('Đ� c?p nh?t ?nh đại di?n!', 'success');
         } else {
-            addToast('Lo—i cập nhật! Vui lòng thử láº¡i.', 'error');
+            addToast('Lo�i c?p nh?t! Vui l�ng th? lại.', 'error');
         }
     } catch (e) {
-        addToast('Lỗi kết nối máy chủ.', 'error');
+        addToast('L?i k?t n?i m�y ch?.', 'error');
     }
     setUpdating(false);
   };
@@ -55,9 +55,9 @@ export default function ProfilePage() {
                 <div className="center-icon-titan">
                     <AlertOctagon size={80} color="var(--accent)" />
                 </div>
-                <h1 className="auth-required-title">Yêu cáº§u Ä‘Äƒng nháº­p</h1>
-                <p className="auth-required-subtitle">Cáº§n Ä‘Äƒng nháº­p Ä‘oƒ xem thà´ng tin cá nhà¢n và  quản là½ tà i khoản của báº¡n.</p>
-                <Link href="/auth/login" className="btn btn-primary login-trigger-titan">ÄÄ‚NG NHáº¬P NGAY</Link>
+                <h1 className="auth-required-title">Y�u cầu đăng nhập</h1>
+                <p className="auth-required-subtitle">Cần đăng nhập đo� xem th�ng tin c� nh�n v� qu?n l� t�i kho?n c?a bạn.</p>
+                <Link href="/auth/login" className="btn btn-primary login-trigger-titan">ĐĂNG NHẬP NGAY</Link>
             </div>
             <Footer />
             <style jsx>{`
@@ -84,13 +84,13 @@ export default function ProfilePage() {
           </div>
           <h1 className="profile-name-industrial">{user.username}</h1>
           <p className="profile-role-badge">
-            {user.role === 'admin' ? <><Shield size={16} /> QUáº¢N TRoŠ VIàŠN</> : <><User size={16} /> Äo˜C GIáº¢ VIP</>}
+            {user.role === 'admin' ? <><Shield size={16} /> QUẢN TRo� VI�N</> : <><User size={16} /> Đo�C GIẢ VIP</>}
           </p>
           
           <div className="avatar-form-industrial">
             <input 
                 type="text" 
-                placeholder="Dán link ảnh Ä‘áº¡i diện mo›i..." 
+                placeholder="D�n link ?nh đại di?n mo�i..." 
                 value={avatarUrl}
                 onChange={(e) => setAvatarUrl(e.target.value)}
                 className="input-titan-profile"
@@ -100,12 +100,12 @@ export default function ProfilePage() {
                 className="btn btn-primary avatar-update-btn" 
                 disabled={updating || !avatarUrl.trim()}
             >
-                {updating ? '...' : 'CẬP NHáº¬T'}
+                {updating ? '...' : 'C?P NHẬT'}
             </button>
           </div>
           {user.role === 'admin' && (
               <Link href="/admin" className="btn btn-outline admin-portal-btn-titan">
-                <ShieldCheck size={18} /> Báº¢NG ÄIo€U KHIo‚N QUáº¢N TRoŠ
+                <ShieldCheck size={18} /> BẢNG ĐIo�U KHIo�N QUẢN TRo�
               </Link>
           )}
         </section>
@@ -122,42 +122,42 @@ export default function ProfilePage() {
                 <div className="stat-icon-box">
                     <Sparkles size={32} color="var(--accent)" />
                 </div>
-                <div className="stat-label-profile">Cáº¥p Äo™</div>
+                <div className="stat-label-profile">Cấp Đo�</div>
                 <div className="stat-value-profile">{level}</div>
             </div>
             <div className="stat-card-profile">
                 <div className="stat-icon-box">
                     <Activity size={32} color="#60a5fa" />
                 </div>
-                <div className="stat-label-profile">Háº¡ng</div>
+                <div className="stat-label-profile">Hạng</div>
                 <div className="stat-value-profile accent-rank">{rankTitle}</div>
             </div>
         </div>
 
         <section className="xp-progress-section shadow-titan">
             <div className="xp-header-profile">
-                <span className="xp-label-main">TIáº¾N Äo˜ Cáº¤P Báº¬C</span>
+                <span className="xp-label-main">TIẾN Đo� CẤP BẬC</span>
                 <span className="xp-percent-tag">{Math.floor(xpProgress)}%</span>
             </div>
             <div className="xp-track-industrial">
                 <div className="xp-fill-industrial" style={{ '--progress': `${xpProgress}%` }} />
             </div>
             <p className="xp-footer-hint">
-                Cáº§n thêm <strong>{new Intl.NumberFormat().format((level * 100) - xp)} XP</strong> Ä‘oƒ thÄƒng cấp tiáº¿p theo.
+                Cần th�m <strong>{new Intl.NumberFormat().format((level * 100) - xp)} XP</strong> đo� thăng c?p tiếp theo.
             </p>
         </section>
 
         <div className="profile-actions-list">
             <Link href="/favorites" className="profile-action-node">
-                <span className="node-left-industrial"><Heart size={20} color="var(--accent)" /> TRUYộN YàŠU THàCH</span>
+                <span className="node-left-industrial"><Heart size={20} color="var(--accent)" /> TRUY?N Y�U TH�CH</span>
                 <ChevronRight size={18} className="node-arrow" />
             </Link>
             <Link href="/history" className="profile-action-node">
-                <span className="node-left-industrial"><History size={20} color="#60a5fa" /> LoŠCH So¬ ÄoŒC TRUYộN</span>
+                <span className="node-left-industrial"><History size={20} color="#60a5fa" /> Lo�CH So� Đo�C TRUY?N</span>
                 <ChevronRight size={18} className="node-arrow" />
             </Link>
             <button onClick={logout} className="logout-btn-industrial">
-                <LogOut size={20} /> ÄÄ‚NG XUáº¤T Tà€I KHOáº¢N
+                <LogOut size={20} /> ĐĂNG XUẤT T�I KHOẢN
             </button>
         </div>
       </div>

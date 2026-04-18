@@ -1,7 +1,7 @@
-﻿import { query, checkRateLimit } from '@/HeThong/Database/CoSoDuLieu';
-import { queueMangaSync, queueChapterScrape } from '@/HeThong/CaoDuLieu/engine';
-import { parseChapterNumber } from '@/HeThong/CaoDuLieu/utils';
-import { withTitan } from '@/HeThong/API/XuLyAPI';
+import { query, checkRateLimit } from '@/core/database/connection';
+import { queueMangaSync, queueChapterScrape } from '@/core/crawler/engine';
+import { parseChapterNumber } from '@/core/crawler/utils';
+import { withTitan } from '@/core/api/handler';
 
 export const POST = withTitan({
     auth: true,
@@ -16,7 +16,7 @@ export const POST = withTitan({
         if (!limiter.success) {
             throw {  
                 status: 429,
-                message: 'Bạn Ä‘ang thựcc hiện quá nhiou yêu cáº§u do‹ch chuyoƒn. Vui lòng Ä‘o£i trong giây lát.' 
+                message: 'B?n đang th?cc hi?n qu� nhio�u y�u cầu do�ch chuyo�n. Vui l�ng đo�i trong gi�y l�t.' 
             };
         }
 
@@ -28,7 +28,7 @@ export const POST = withTitan({
                        host.includes('nhattruyen') ? 'nhattruyen' : null;
                        
         if (!source) {
-            throw { status: 400, message: 'Nguồnn không ho— tro£. Cho‰ ho— tro£ NetTruyen, TruyenQQ, BlogTruyen, CManga, NhatTruyen.' };
+            throw { status: 400, message: 'Ngu?nn kh�ng ho� tro�. Cho� ho� tro� NetTruyen, TruyenQQ, BlogTruyen, CManga, NhatTruyen.' };
         }
 
         // Robust Parsing Logic
@@ -61,7 +61,7 @@ export const POST = withTitan({
         }
 
         if (!mangaSlug) {
-            throw { status: 400, message: 'Khà´ng thoƒ nháº­n diện mà£ truyện' };
+            throw { status: 400, message: 'Kh�ng tho� nhận di?n m� truy?n' };
         }
 
         // 1. Ensure Manga exists

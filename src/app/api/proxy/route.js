@@ -1,10 +1,10 @@
 import sharp from 'sharp';
-import { query } from '@/HeThong/Database/CoSoDuLieu';
+import { query } from '@/core/database/connection';
 
 // RAM OPTIMIZATION: Enable Sharp cache with a 50MB limit to balance speed vs memory
 sharp.cache({ memory: 50, items: 100, files: 20 });
 
-import { generateProxySignature, simpleHash } from '@/HeThong/BaoMat/crypto';
+import { generateProxySignature, simpleHash } from '@/core/security/crypto';
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -260,4 +260,5 @@ export async function GET(request) {
     });
   }
 }
+
 

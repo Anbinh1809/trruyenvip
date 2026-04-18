@@ -1,4 +1,4 @@
-import { query } from '@/HeThong/Database/CoSoDuLieu';
+import { query } from '@/core/database/connection';
 
 export const dynamic = 'force-dynamic';
 

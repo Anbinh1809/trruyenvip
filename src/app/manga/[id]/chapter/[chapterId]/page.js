@@ -1,16 +1,16 @@
-import Header from '@/GiaoDien/BoCuc/Header';
-import Footer from '@/GiaoDien/BoCuc/Footer';
-import ChapterContent from '@/GiaoDien/TrinhDoc/ChapterContent';
-import ReaderSettings from '@/GiaoDien/TrinhDoc/ReaderSettings';
-import { query } from '@/HeThong/Database/CoSoDuLieu';
-import { generateProxySignature } from '@/HeThong/BaoMat/crypto';
-import "@/GiaoDien/ThanhPhan/Styles/reader.css";
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
+import ChapterContent from '@/components/reader/ChapterContent';
+import ReaderSettings from '@/components/reader/ReaderSettings';
+import { query } from '@/core/database/connection';
+import { generateProxySignature } from '@/core/security/crypto';
+import "@/components/shared/Styles/reader.css";
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { Sparkles, ChevronLeft, ChevronRight, Home, BookOpen, AlertTriangle } from 'lucide-react';
-import ChapterSelector from '@/GiaoDien/TrinhDoc/ChapterSelector';
-import DiscoveryTrigger from '@/GiaoDien/BoCuc/DiscoveryTrigger';
-import ReaderHud from '@/GiaoDien/TrinhDoc/ReaderHud';
+import ChapterSelector from '@/components/reader/ChapterSelector';
+import DiscoveryTrigger from '@/components/layout/DiscoveryTrigger';
+import ReaderHud from '@/components/reader/ReaderHud';
 
 // Helper to determine if a slug is a potential new ingestion target
 function isDiscoveryCandidate(slug) {
@@ -20,7 +20,7 @@ function isDiscoveryCandidate(slug) {
 }
 
 // Lazy load comments to prevent hydration mismatches
-const Comments = dynamic(() => import('@/GiaoDien/ThanhPhan/CommentSection'), { 
+const Comments = dynamic(() => import('@/components/shared/CommentSection'), { 
   loading: () => <div className="loading-dots-industrial">Đang tải bình luận...</div>
 });
 
@@ -67,7 +67,7 @@ async function getChapterData(mangaId, chapterId) {
     let imagesRes = await query('SELECT image_url FROM chapterimages WHERE chapter_id = @id ORDER BY "order" ASC', { id: chapterId });
     if (!imagesRes.recordset || imagesRes.recordset.length === 0) {
         console.log(`[Aegis:Sync] No images for ${chapterId}. Triggering Hot-Sync...`);
-        const { crawlChapterImages } = await import('@/HeThong/CaoDuLieu/engine');
+        const { crawlChapterImages } = await import('@/core/crawler/engine');
         // Infer source from URL or default to nettruyen style
         const source = chapter.source_url?.includes('truyenqq') ? 'truyenqq' : 'nettruyen';
         if (chapter.source_url) {

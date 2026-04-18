@@ -1,11 +1,11 @@
-﻿'use client';
+'use client';
 
-import Header from '@/GiaoDien/BoCuc/Header';
-import Footer from '@/GiaoDien/BoCuc/Footer';
-import { calculateRank } from '@/NguCanh/EngagementContext';
-import { useAuth } from '@/NguCanh/AuthContext';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
+import { calculateRank } from '@/contexts/EngagementContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useState, useEffect, useMemo } from 'react';
-import { Trophy, Crown, Medal, Shield, User } from 'lucide-react';
+import { Trophy, Crown, Medal, Shield, User, Star } from 'lucide-react';
 
 export const dynamic = "force-dynamic";
 
@@ -61,17 +61,17 @@ export default function LeaderboardPage() {
             <div className="container leaderboard-container fade-in">
                 <section className="leaderboard-header fade-up">
                     <div className="leaderboard-badge-titan">
-                        <Trophy size={14} /> Báº¢NG VINH DANH
+                        <Trophy size={14} /> BẢNG VINH DANH TRUYỆNVIP
                     </div>
-                    <h1 className="leaderboard-title-industrial">Báº¢NG Xáº¾P Háº NG</h1>
-                    <p className="leaderboard-subtitle">Vinh danh những thà nh viên cà³ hoáº¡t Ä‘o™ng tà­ch cựcc nháº¥t trên hệ thống.</p>
+                    <h1 className="leaderboard-title-industrial">BẢNG XẾP HẠNG CAO THỦ</h1>
+                    <p className="leaderboard-subtitle">Vinh danh những thành viên có hoạt động tích cực nhất trên hệ thống.</p>
                 </section>
 
                 <div className="leaderboard-list-industrial">
                     {loading ? (
                         <div className="leaderboard-loading-industrial">
                             <div className="titan-loader-pulse"></div>
-                            <p className="loading-text-industrial">Äang truy xuáº¥t bảng xáº¿p háº¡ng...</p>
+                            <p className="loading-text-industrial">Đang truy xuất bảng xếp hạng...</p>
                         </div>
                     ) : processedLeaders.map((player, idx) => (
                         <div 
@@ -99,12 +99,12 @@ export default function LeaderboardPage() {
                                 <h4 className="rank-user-title">
                                     {player.name}
                                     <div className="user-tags-wrapper-titan">
-                                        {player.isUser && <span className="self-tag-titan">Báº N</span>}
+                                        {player.isUser && <span className="self-tag-titan">BẠN</span>}
                                         {player.role === 'admin' && <span className="admin-tag-titan">ADMIN</span>}
                                     </div>
                                 </h4>
                                 <div className="rank-stats-industrial">
-                                    <span className="rank-stat-node"><span className="label">Cáº¥p:</span> <span className="value">{player.level}</span></span>
+                                    <span className="rank-stat-node"><span className="label">Cấp:</span> <span className="value">{player.level}</span></span>
                                     <span className="rank-title-tag">{player.rankTitle}</span>
                                 </div>
                             </div>
@@ -112,7 +112,7 @@ export default function LeaderboardPage() {
                             <div className="rank-values-group-titan">
                                 <div className="rank-xp-industrial">
                                     <div className="xp-value-industrial">{new Intl.NumberFormat().format(player.xp)}</div>
-                                    <div className="xp-label-industrial">To”NG XP</div>
+                                    <div className="xp-label-industrial">TỔNG XP</div>
                                 </div>
                                 <div className="v-divider-titan" />
                                 <div className="rank-coins-industrial">
@@ -126,34 +126,84 @@ export default function LeaderboardPage() {
             </div>
             <Footer />
             <style jsx>{`
-                .leaderboard-list-industrial { display: flex; flex-direction: column; padding-bottom: 100px; }
-                .rank-number-industrial { font-size: 1.2rem; font-weight: 950; opacity: 0.3; }
-                .rank-avatar-box-industrial { position: relative; }
+                .leaderboard-container { padding-top: 60px; }
+                .leaderboard-header { text-align: center; margin-bottom: 60px; }
+                .leaderboard-badge-titan {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 10px;
+                    padding: 8px 16px;
+                    background: rgba(251, 191, 36, 0.1);
+                    color: #fbbf24;
+                    border-radius: 8px;
+                    font-size: 0.75rem;
+                    font-weight: 900;
+                    letter-spacing: 1.5px;
+                    margin-bottom: 25px;
+                }
+                .leaderboard-title-industrial { font-size: 2.8rem; font-weight: 950; letter-spacing: -1.5px; color: white; margin-bottom: 15px; }
+                .leaderboard-subtitle { color: rgba(255,255,255,0.4); max-width: 600px; margin: 0 auto; line-height: 1.6; }
+                
+                .leaderboard-list-industrial { display: flex; flex-direction: column; gap: 12px; padding-bottom: 120px; }
+                
+                .rank-node-titan-industrial {
+                    display: flex;
+                    align-items: center;
+                    padding: 20px 40px;
+                    background: rgba(15, 23, 42, 0.4);
+                    backdrop-filter: blur(10px);
+                    border: 1px solid var(--glass-border);
+                    border-radius: 20px;
+                    transition: all 0.3s var(--ease-titan);
+                    animation: fadeUp 0.8s both var(--delay);
+                }
+                .rank-node-titan-industrial:hover { transform: scale(1.01) translateY(-3px); border-color: rgba(255,255,255,0.15); background: rgba(15, 23, 42, 0.6); }
+                .rank-node-titan-industrial.is-self { border-color: var(--accent); background: rgba(255, 62, 62, 0.05); }
+
+                .podium-gold { border-color: rgba(251, 191, 36, 0.3); background: linear-gradient(90deg, rgba(251, 191, 36, 0.05) 0%, transparent 100%); }
+                .podium-silver { border-color: rgba(148, 163, 184, 0.3); }
+                .podium-bronze { border-color: rgba(180, 83, 9, 0.3); }
+
+                .rank-icon-box-industrial { width: 50px; display: flex; align-items: center; justify-content: center; }
+                .rank-number-industrial { font-size: 1.2rem; font-weight: 950; opacity: 0.2; }
+                
+                .rank-avatar-wrapper-industrial {
+                    width: 56px; height: 56px; border-radius: 50%; overflow: hidden; 
+                    background: rgba(255,255,255,0.05); border: 2px solid var(--glass-border);
+                    margin: 0 25px;
+                }
                 .rank-avatar-img-industrial { width: 100%; height: 100%; object-fit: cover; }
-                .rank-avatar-placeholder { opacity: 0.3; }
-                .self-tag-titan { font-size: 0.65rem; background: var(--accent); padding: 3px 10px; border-radius: 4px; color: white; letter-spacing: 1px; }
-                .admin-tag-titan { font-size: 0.65rem; background: rgba(255,255,255,0.1); padding: 3px 10px; border-radius: 4px; color: rgba(255,255,255,0.6); letter-spacing: 1px; }
-                .rank-stat-node .label { color: rgba(255,255,255,0.4); }
-                .rank-stat-node .value { color: white; }
-                .rank-title-tag { color: var(--accent); text-transform: uppercase; letter-spacing: 1px; font-size: 0.75rem; }
-                .xp-label-industrial { font-size: 0.7rem; font-weight: 900; color: rgba(255,255,255,0.3); letter-spacing: 1px; }
-                .leaderboard-loading-industrial { text-align: center; padding: 120px 0; }
-                .loading-text-industrial { margin-top: 30px; color: rgba(255,255,255,0.4); font-weight: 800; letter-spacing: 1px; }
-                .rank-node-titan-industrial { animation: fadeUp 0.8s both var(--delay); }
+                .rank-avatar-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.2); }
+
+                .rank-info-industrial { flex: 1; }
+                .rank-user-title { font-size: 1.2rem; font-weight: 900; margin-bottom: 4px; display: flex; align-items: center; color: white; }
+                .user-tags-wrapper-titan { display: flex; gap: 8px; margin-left: 15px; }
+                .self-tag-titan { font-size: 0.65rem; background: var(--accent); padding: 3px 10px; border-radius: 4px; color: white; letter-spacing: 1px; font-weight: 900; }
+                .admin-tag-titan { font-size: 0.65rem; background: rgba(255,255,255,0.1); padding: 3px 10px; border-radius: 4px; color: rgba(255,255,255,0.6); letter-spacing: 1px; font-weight: 900; }
+                
+                .rank-stats-industrial { display: flex; align-items: center; gap: 15px; }
+                .rank-stat-node { font-size: 0.85rem; font-weight: 800; }
+                .rank-stat-node .label { color: rgba(255,255,255,0.3); text-transform: uppercase; margin-right: 5px; }
+                .rank-title-tag { color: var(--accent); text-transform: uppercase; letter-spacing: 1px; font-size: 0.75rem; font-weight: 900; }
+
                 .rank-values-group-titan { display: flex; align-items: center; gap: 20px; text-align: right; }
                 .v-divider-titan { width: 1px; height: 30px; background: rgba(255,255,255,0.05); }
-                .user-tags-wrapper-titan { display: flex; gap: 8px; margin-left: 10px; }
+                .xp-value-industrial { font-size: 1.1rem; font-weight: 950; color: white; }
+                .xp-label-industrial { font-size: 0.7rem; font-weight: 900; color: rgba(255,255,255,0.2); letter-spacing: 1px; }
                 .coin-value-industrial { font-size: 1.1rem; font-weight: 950; color: #fbbf24; }
                 .coin-label-industrial { font-size: 0.7rem; font-weight: 900; color: rgba(251, 191, 36, 0.3); letter-spacing: 1px; }
+
+                .leaderboard-loading-industrial { text-align: center; padding: 120px 0; }
+                .loading-text-industrial { margin-top: 30px; color: rgba(255,255,255,0.4); font-weight: 800; letter-spacing: 1px; }
                 
                 @media (max-width: 768px) {
+                    .rank-node-titan-industrial { padding: 15px 20px; }
+                    .rank-avatar-wrapper-industrial { margin: 0 15px; width: 44px; height: 44px; }
                     .rank-values-group-titan { display: none; }
                     .rank-user-title { font-size: 1rem; }
-                    .rank-info-industrial { flex: 1; }
                 }
                 @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
             `}</style>
         </main>
     );
 }
-

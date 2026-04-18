@@ -1,9 +1,9 @@
-﻿import { NextResponse } from 'next/server';
-import { getSession } from '@/HeThong/BaoMat/XacThuc';
-import { queueDiscovery } from '@/HeThong/CaoDuLieu';
+import { NextResponse } from 'next/server';
+import { getSession } from '@/core/security/auth';
+import { queueDiscovery } from '@/core/crawler';
 
 /**
- * Titan Deep Scan API
+ * Titan Deep Scan api
  * Allows administrators to trigger mass-discovery tasks across multiple pages.
  */
 export async function POST(req) {
@@ -26,11 +26,12 @@ export async function POST(req) {
 
         return NextResponse.json({ 
             success: true, 
-            message: `Quy trà¬nh 'Äà o sà¢u' (Deep Scan) đã Ä‘ưo£c kà­ch hoáº¡t cho ${pages} trang của nguồn ${source}. Káº¿t quả sáº½ dáº§n xuáº¥t hiện trong Bảng Ä‘iou khioƒn.` 
+            message: `Quy trà¬nh 'Äà o sà¢u' (Deep Scan) dã Ä‘uo£c kà­ch hoáº¡t cho ${pages} trang c?a ngu?n ${source}. Káº¿t qu? sáº½ dáº§n xuáº¥t hi?n trong B?ng Ä‘iou khioƒn.` 
         });
     } catch (err) {
-        console.error('[DeepScan API] Error:', err.message);
+        console.error('[DeepScan api] Error:', err.message);
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
+
 

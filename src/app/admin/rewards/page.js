@@ -1,10 +1,10 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect, useTransition, useCallback } from 'react';
-import Header from '@/GiaoDien/BoCuc/Header';
-import Footer from '@/GiaoDien/BoCuc/Footer';
-import { useAuth } from '@/NguCanh/AuthContext';
-import { useToast } from '@/GiaoDien/TienIch/ToastProvider';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/components/widgets/ToastProvider';
 import { CheckCircle, XCircle, Clock, User, Landmark, CreditCard, ChevronRight, Shield } from 'lucide-react';
 import '../admin.css';
 
@@ -25,7 +25,7 @@ export default function AdminRewardsPage() {
         setRequests(data);
       }
     } catch (e) {
-      addToast('Lo—i khi láº¥y danh sách yêu cáº§u.', 'error');
+      addToast('Lo�i khi lấy danh s�ch y�u cầu.', 'error');
     }
     setFetching(false);
   }, [statusFilter, addToast]);
@@ -46,13 +46,13 @@ export default function AdminRewardsPage() {
         body: JSON.stringify({ requestId, action })
       });
       if (res.ok) {
-        addToast(`Äà£ ${action === 'approve' ? 'phê duyệt' : 'từ cho‘i'} yêu cáº§u thành công!`, 'success');
+        addToast(`Đ� ${action === 'approve' ? 'ph� duy?t' : 't? cho�i'} y�u cầu th�nh c�ng!`, 'success');
         fetchRequests();
       } else {
-        addToast('Thao tác tháº¥t báº¡i.', 'error');
+        addToast('Thao t�c thất bại.', 'error');
       }
     } catch (e) {
-      addToast('Lỗi kết nối máy chủ.', 'error');
+      addToast('L?i k?t n?i m�y ch?.', 'error');
     }
   };
 
@@ -62,7 +62,7 @@ export default function AdminRewardsPage() {
             <Header />
             <div className="system-center-industrial">
                 <div className="titan-loader-pulse"></div>
-                <p className="loading-status-hint">Äang tải dữ liệu quản tro‹...</p>
+                <p className="loading-status-hint">Đang t?i d? li?u qu?n tro�...</p>
             </div>
         </div>
     );
@@ -74,8 +74,8 @@ export default function AdminRewardsPage() {
             <Header />
             <div className="system-center-industrial">
                 <XCircle size={60} color="var(--accent)" />
-                <h1 className="system-title-industrial">TRUY CẬP BoŠ Toª CHoI</h1>
-                <p className="system-desc-industrial">Bạn không cà³ quyon háº¡n Ä‘oƒ truy cập và o khu vựcc quản tro‹ to‘i máº­t nà y.</p>
+                <h1 className="system-title-industrial">TRUY C?P Bo� To� CHo�I</h1>
+                <p className="system-desc-industrial">B?n kh�ng c� quyo�n hạn đo� truy c?p v�o khu v?cc qu?n tro� to�i mật n�y.</p>
             </div>
         </div>
     );
@@ -89,8 +89,8 @@ export default function AdminRewardsPage() {
         <header className="admin-header-industrial fade-up">
             <div className="header-left">
                 <div className="library-badge-titan">ADMIN CONSOLE</div>
-                <h1 className="admin-title-industrial">QUáº¢N Là GIAO DoŠCH</h1>
-                <p className="admin-subtitle">Phê duyệt các yêu cáº§u quy Ä‘o•i pháº§n thưoŸng từ ngưoi dà¹ng.</p>
+                <h1 className="admin-title-industrial">QUẢN L� GIAO Do�CH</h1>
+                <p className="admin-subtitle">Ph� duy?t c�c y�u cầu quy đo�i phần thuo�ng t? nguo�i d�ng.</p>
             </div>
             <div className="admin-filter-group shadow-titan">
                 {['pending', 'approved', 'rejected'].map(s => (
@@ -99,7 +99,7 @@ export default function AdminRewardsPage() {
                         className={`filter-btn-titan ${statusFilter === s ? 'active' : ''}`}
                         onClick={() => setStatusFilter(s)}
                     >
-                        {s === 'pending' ? 'CHoœ DUYộT' : (s === 'approved' ? 'Äàƒ DUYộT' : 'Äàƒ Toª CHoI')}
+                        {s === 'pending' ? 'CHo� DUY?T' : (s === 'approved' ? 'Đ� DUY?T' : 'Đ� To� CHo�I')}
                     </button>
                 ))}
             </div>
@@ -109,19 +109,19 @@ export default function AdminRewardsPage() {
             <table className="admin-table">
                 <thead>
                     <tr>
-                        <th>YàŠU Cáº¦U / THoœI GIAN</th>
-                        <th>NGÆ¯oœI THo¤ HÆ¯ožNG</th>
-                        <th>THà”NG TIN THANH TOàN</th>
-                        <th>MộNH GIà</th>
-                        <th>TRáº NG THàI</th>
-                        <th>THAO TàC</th>
+                        <th>Y�U CẦU / THo�I GIAN</th>
+                        <th>NGƯo�I THo� HƯo�NG</th>
+                        <th>TH�NG TIN THANH TO�N</th>
+                        <th>M?NH GI�</th>
+                        <th>TRẠNG TH�I</th>
+                        <th>THAO T�C</th>
                     </tr>
                 </thead>
                 <tbody>
                     {requests.length === 0 ? (
                         <tr>
                             <td colSpan="6" className="empty-table-cell">
-                                Khà´ng cà³ yêu cáº§u nà o trong danh sách nà y.
+                                Kh�ng c� y�u cầu n�o trong danh s�ch n�y.
                             </td>
                         </tr>
                     ) : requests.map(req => (
@@ -146,26 +146,26 @@ export default function AdminRewardsPage() {
                                 </div>
                             </td>
                             <td>
-                                <div className="amount-admin-titan">{new Intl.NumberFormat().format(req.amount_vnd)} VNÄ</div>
+                                <div className="amount-admin-titan">{new Intl.NumberFormat().format(req.amount_vnd)} VNĐ</div>
                                 <div className="cost-coins-titan">({new Intl.NumberFormat().format(req.cost_coins)} Coins)</div>
                             </td>
                             <td>
                                 <span className={`status-pill-industrial status-${req.status}`}>
-                                    {req.status === 'pending' ? 'ÄANG CHoœ' : (req.status === 'approved' ? 'HOà€N Táº¤T' : 'BoŠ HUo¶')}
+                                    {req.status === 'pending' ? 'ĐANG CHo�' : (req.status === 'approved' ? 'HO�N TẤT' : 'Bo� HUo�')}
                                 </span>
                             </td>
                             <td>
                                 {req.status === 'pending' ? (
                                     <div className="action-btn-group">
                                         <button className="approve-btn-titan" onClick={() => handleAction(req.id, 'approve')}>
-                                            <CheckCircle size={16} /> DUYộT
+                                            <CheckCircle size={16} /> DUY?T
                                         </button>
                                         <button className="reject-btn-titan" onClick={() => handleAction(req.id, 'reject')}>
-                                            HUo¶
+                                            HUo�
                                         </button>
                                     </div>
                                 ) : (
-                                    <span className="action-done-titan">Äàƒ Xo¬ Là</span>
+                                    <span className="action-done-titan">Đ� Xo� L�</span>
                                 )}
                             </td>
                         </tr>

@@ -1,19 +1,20 @@
-﻿import Header from '@/GiaoDien/BoCuc/Header';
-import RecentlyRead from '@/GiaoDien/ThanhPhan/RecentlyRead';
-import MangaCard from '@/GiaoDien/ThanhPhan/MangaCard';
-import Footer from '@/GiaoDien/BoCuc/Footer';
-import { query, MANGA_CARD_FIELDS } from '@/HeThong/Database/CoSoDuLieu';
-import { getSignedProxyUrl } from '@/HeThong/BaoMat/crypto';
+import Header from '@/components/layout/Header';
+import RecentlyRead from '@/components/shared/RecentlyRead';
+import MangaCard from '@/components/shared/MangaCard';
+import Footer from '@/components/layout/Footer';
+import { query, MANGA_CARD_FIELDS } from '@/core/database/connection';
+import { getSignedProxyUrl } from '@/core/security/crypto';
 import Link from 'next/link';
 import { Suspense } from 'react';
-import { Sparkles, Zap, ChevronRight } from 'lucide-react';
+import { Sparkles, Zap, ChevronRight, Play } from 'lucide-react';
+import './home.css';
 
 export const revalidate = 300; // ISR: Revalidate every 5 minutes
 
 export const metadata = {
-  title: 'TruyenVip - Non tảng Äoc Truyện Tranh Online Cao Cấp',
-  description: 'Trải nghiệm Ä‘oc truyện tranh đỉnh cao với tốc độ siêu nhanh, giao diện cinematic và  kho truyện khổng lồ từ NetTruyen, TruyenQQ Ä‘ưo£c cập nhật liên to¥c.',
-  keywords: ['Ä‘oc truyện tranh', 'nettruyen', 'truyenqq', 'manga online', 'truyenvip', 'truyện hot'],
+  title: 'TruyenVip - Nền tảng Đọc Truyện Tranh Online Cao Cấp',
+  description: 'Trải nghiệm đọc truyện tranh đỉnh cao với tốc độ siêu nhanh, giao diện cinematic và kho truyện khổng lồ từ NetTruyen, TruyenQQ được cập nhật liên tục.',
+  keywords: ['đọc truyện tranh', 'nettruyen', 'truyenqq', 'manga online', 'truyenvip', 'truyện hot'],
 };
 
 async function getManga() {
@@ -44,18 +45,34 @@ export default async function Home() {
     <main className="main-wrapper titan-bg home-page">
       <Header />
       
-      {/* Hero Section: Premium Branding & SEO */}
-      <div className="home-hero-glow">
-          <div className="container center-content-titan">
-              <div className="hero-badge-titan">PREMIUM READING EXPERIENCE</div>
-              <h1 className="home-title-industrial">
-                  TRUYỆN<span className="accent-text-titan">VIP</span>: THẾ GIỚI TRUYộN TRANH <br/> ÄốNH CAO
-              </h1>
-              <p className="home-subtitle-industrial">
-                  Trải nghiệm Ä‘oc truyện cinematic, tốc độ siêu nhanh và  kho truyện khổng lồ từ những nguồn tốt nháº¥t Việt Nam.
-              </p>
+      {/* Cinematic Hero Section */}
+      <section className="home-hero-nebula fade-in">
+          <div className="hero-glow-layer"></div>
+          <div className="container relative-z-10">
+              <div className="hero-content-industrial">
+                  <div className="hero-badge-titan fade-up">
+                      <span className="pulse-dot"></span>
+                      PREMIUM CINEMATIC EXPERIENCE
+                  </div>
+                  <h1 className="home-title-industrial fade-up">
+                      TRUYỆN<span className="accent-text-titan">VIP</span>: THẾ GIỚI <br/>
+                      <span className="text-gradient-titan">TRUYỆN TRANH</span> ĐỈNH CAO
+                  </h1>
+                  <p className="home-subtitle-industrial fade-up">
+                      Trải nghiệm đọc truyện cinematic, tốc độ siêu nhanh và kho truyện khổng lồ 
+                      từ những nguồn tốt nhất Việt Nam.
+                  </p>
+                  <div className="hero-actions-titan fade-up">
+                      <Link href="/genres" className="btn btn-primary btn-large-titan">
+                          <Play size={18} fill="currentColor" /> KHÁM PHÁ NGAY
+                      </Link>
+                      <Link href="/auth/register" className="btn btn-outline btn-large-titan">
+                          GIA NHẬP VIP
+                      </Link>
+                  </div>
+              </div>
           </div>
-      </div>
+      </section>
 
       <div className="container relative-z-100">
         
@@ -69,7 +86,7 @@ export default async function Home() {
           <div className="section-header-nebula-industrial">
             <div className="section-title-box-titan">
                 <Sparkles size={24} color="var(--accent)" />
-                <h2 className="section-title-industrial">TRUYộN ÄANG HOT</h2>
+                <h2 className="section-title-industrial">TRUYỆN ĐANG HOT</h2>
             </div>
           </div>
           <div className="manga-grid-titan">
@@ -83,7 +100,7 @@ export default async function Home() {
           <div className="section-header-nebula-industrial">
             <div className="section-title-box-titan">
                 <Zap size={24} color="#60a5fa" />
-                <h2 className="section-title-industrial">VỪA CẬP NHáº¬T</h2>
+                <h2 className="section-title-industrial">VỪA CẬP NHẬT</h2>
             </div>
             <Link href="/genres" className="btn-view-all-industrial">
                 XEM TẤT CẢ <ChevronRight size={18} />
@@ -101,4 +118,3 @@ export default async function Home() {
     </main>
   );
 }
-

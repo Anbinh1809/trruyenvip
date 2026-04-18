@@ -1,5 +1,5 @@
-﻿import { query, MANGA_CARD_FIELDS } from '@/HeThong/Database/CoSoDuLieu';
-import { generateProxySignature } from '@/HeThong/BaoMat/crypto';
+import { query, MANGA_CARD_FIELDS } from '@/core/database/connection';
+import { generateProxySignature } from '@/core/security/crypto';
 
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
@@ -67,4 +67,5 @@ export async function GET(request) {
         return Response.json([]);
     }
 }
+
 

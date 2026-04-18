@@ -1,5 +1,5 @@
-﻿import { query, withTransaction, checkRateLimit } from '@/HeThong/Database/CoSoDuLieu';
-import { withTitan } from '@/HeThong/API/XuLyAPI';
+import { query, withTransaction, checkRateLimit } from '@/core/database/connection';
+import { withTitan } from '@/core/api/handler';
 import { NextResponse } from 'next/server';
 
 /**
@@ -16,7 +16,7 @@ export const POST = withTitan({
         // TITAN RATE LIMIT: Prevent rapid clicking / duplicate trigger bypass attempts
         const limiter = await checkRateLimit(`checkin_${userUuid}`, 1, 10); // 1 request / 10s
         if (!limiter.success) {
-            throw { status: 429, message: 'Yêu cầu điểm danh quá nhanh. Vui lòng thử lại sau.' };
+            throw { status: 429, message: 'Y�u c?u di?m danh qu� nhanh. Vui l�ng thử lại sau.' };
         }
 
             const result = await withTransaction(async (tx) => {
@@ -28,7 +28,7 @@ export const POST = withTitan({
                 );
 
                 if (todayCheck.rowCount > 0) {
-                    throw new Error('Bạn đã điểm danh hôm nay rồi.');
+                    throw new Error('B?n d� di?m danh h�m nay r?i.');
                 }
 
                 // 2. Check yesterday to calculate streak
@@ -45,12 +45,12 @@ export const POST = withTitan({
 
                 // 3. Calculate Reward
                 let reward = 10;
-                let message = `Äioƒm danh thành công! Nháº­n Ä‘ưo£c ${reward} xu. Chuo—i: ${newStreak} ngà y.`;
+                let message = `Đio�m danh th�nh c�ng! Nhận đuo�c ${reward} xu. Chuo�i: ${newStreak} ng�y.`;
                 
                 if (newStreak % 7 === 0) {
                     const bonus = 100;
                     reward += bonus;
-                    message = `Tuyệt voi! Bạn đã điểm danh liên tiếp 7 ngà y. Nhận thưởng ${reward} xu!`;
+                    message = `Tuy?t vo�i! B?n d� di?m danh li�n ti?p 7 ng�y. Nh?n thu?ng ${reward} xu!`;
                 }
 
                 // 4. Record Check-in

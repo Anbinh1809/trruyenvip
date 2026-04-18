@@ -1,0 +1,215 @@
+/* ==========================================================================
+   TITAN TRADITIONAL - MIRROR PARITY (v5.9)
+   Matches TruyenQQ/Mirror aesthetics
+   ========================================================================== */
+
+.detail-hero-titan {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 500px;
+    background-image: var(--bg-cover);
+    background-size: cover;
+    background-position: center 20%;
+    filter: blur(60px) brightness(0.3);
+    opacity: 0.5;
+    z-index: 0;
+    mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
+}
+
+.detail-content-wrapper {
+    position: relative;
+    z-index: 10;
+    padding-top: 40px;
+}
+
+.breadcrumb-traditional {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 35px;
+    font-size: 0.8rem;
+    font-weight: 850;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.bread-node {
+    color: rgba(255, 255, 255, 0.4);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.bread-node:hover {
+    color: var(--accent);
+}
+
+.bread-sep {
+    color: rgba(255,255,255,0.1);
+}
+
+.bread-current {
+    color: var(--accent);
+}
+
+.detail-top-section {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 50px;
+    margin-bottom: 60px;
+}
+
+.traditional-title {
+    font-size: 3rem;
+    font-weight: 950;
+    color: white;
+    margin-bottom: 30px;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+    text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.info-table-titan {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 35px;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 25px;
+    border-radius: 18px;
+    border: 1px solid var(--glass-border);
+}
+
+.info-row {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.info-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 850;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.info-icon {
+    opacity: 0.5;
+}
+
+.info-value {
+    font-weight: 750;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.text-accent {
+    color: var(--accent) !important;
+}
+
+.genre-cloud-traditional {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 45px;
+}
+
+.genre-pill-traditional {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--glass-border);
+    padding: 8px 18px;
+    border-radius: 30px;
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-weight: 950;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s var(--ease-titan);
+}
+
+.genre-pill-traditional:hover {
+    border-color: var(--accent);
+    color: white;
+    background: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px var(--accent-glow);
+}
+
+.detail-description-traditional {
+    margin-top: 80px;
+    padding: 50px;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    margin-bottom: 80px;
+}
+
+.desc-title-traditional {
+    font-size: 1.4rem;
+    font-weight: 950;
+    color: white;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.desc-title-traditional::before {
+    content: '';
+    width: 4px;
+    height: 24px;
+    background: var(--accent);
+    border-radius: 4px;
+}
+
+.desc-content-traditional {
+    font-size: 1.05rem;
+    line-height: 1.9;
+    color: rgba(255,255,255,0.5);
+    font-weight: 500;
+}
+
+.detail-left-cover .detail-cover-box {
+    border-radius: 16px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+    border: 1px solid var(--glass-border);
+    overflow: hidden;
+}
+
+@media (max-width: 1024px) {
+    .detail-top-section {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+    .detail-left-cover {
+        max-width: 280px;
+        margin: 0 auto;
+    }
+    .info-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+    .info-label {
+        font-size: 0.7rem;
+    }
+    .genre-cloud-traditional {
+        justify-content: center;
+    }
+    .traditional-title {
+        font-size: 2.2rem;
+        text-align: center;
+    }
+    .detail-description-traditional {
+        padding: 30px 20px;
+    }
+}
+

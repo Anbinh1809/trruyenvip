@@ -1,5 +1,5 @@
-﻿import { query } from '@/HeThong/Database/CoSoDuLieu';
-import { withTitan } from '@/HeThong/API/XuLyAPI';
+import { query } from '@/core/database/connection';
+import { withTitan } from '@/core/api/handler';
 
 /**
  * GET: Retrieve crawler logs

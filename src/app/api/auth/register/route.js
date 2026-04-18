@@ -1,7 +1,7 @@
-import { query, checkRateLimit } from '@/HeThong/Database/CoSoDuLieu';
+import { query, checkRateLimit } from '@/core/database/connection';
 import bcrypt from 'bcryptjs';
-import { signToken, setSessionCookie } from '@/HeThong/BaoMat/XacThuc';
-import { withTitan } from '@/HeThong/API/XuLyAPI';
+import { signToken, setSessionCookie } from '@/core/security/auth';
+import { withTitan } from '@/core/api/handler';
 
 export const POST = withTitan({
     handler: async (req) => {
@@ -12,11 +12,11 @@ export const POST = withTitan({
             // 1. Rate Limit: 5 registrations / 1 hour
             const limiter = await checkRateLimit(`register_${ip}`, 5, 3600);
             if (!limiter.success) {
-                throw { status: 429, message: 'Bạn đã đăng ký quá nhiều tài khoản. Vui lòng quay lại sau 1 giờ.' };
+                throw { status: 429, message: 'Báº¡n Ä‘Ã£ Ä‘Äƒng kÃ½ quÃ¡ nhiá»u tÃ i khoáº£n. Vui lÃ²ng quay láº¡i sau 1 giá».' };
             }
 
             if (!username || !password || !uuid || typeof uuid !== 'string' || uuid.length < 8) {
-                throw { status: 400, message: 'Thông tin đăng ký không hợp lệ hoặc thiếu dữ liệu thiết bị' };
+                throw { status: 400, message: 'ThÃ´ng tin Ä‘Äƒng kÃ½ khÃ´ng há»£p lá»‡ hoáº·c thiáº¿u dá»¯ liá»‡u thiáº¿t bá»‹' };
             }
 
             // --- GATEKEEPER VALIDATION: Infiltration Shield ---
@@ -25,15 +25,15 @@ export const POST = withTitan({
             const isValidUsername = /^[a-zA-Z0-9_\u00C0-\u1EF9\s]+$/.test(cleanUsername);
 
             if (!isValidUsername || cleanUsername.length < 3) {
-                throw { status: 400, message: 'Tên đăng nhập không hợp lệ hoặc quá ngắn (tối thiểu 3 ký tự, không dùng ký tự đặc biệt)' };
+                throw { status: 400, message: 'TÃªn Ä‘Äƒng nháº­p khÃ´ng há»£p lá»‡ hoáº·c quÃ¡ ngáº¯n (tá»‘i thiá»ƒu 3 kÃ½ tá»±, khÃ´ng dÃ¹ng kÃ½ tá»± Ä‘áº·c biá»‡t)' };
             }
 
             if (password.length < 6) {
-                throw { status: 400, message: 'Mật khẩu phải có ít nhất 6 ký tự' };
+                throw { status: 400, message: 'Máº­t kháº©u pháº£i cÃ³ Ã­t nháº¥t 6 kÃ½ tá»±' };
             }
 
             if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                 throw { status: 400, message: 'Email không đúng định dạng' };
+                 throw { status: 400, message: 'Email khÃ´ng Ä‘Ãºng Ä‘á»‹nh dáº¡ng' };
             }
 
             const cleanEmail = email ? email.trim().toLowerCase() : null;
@@ -55,7 +55,7 @@ export const POST = withTitan({
             } catch (dbErr) {
                 // PostgreSQL Error 23505: Unique Violation
                 if (dbErr.code === '23505' || dbErr.message.toLowerCase().includes('unique constraint')) {
-                    throw { status: 400, message: 'Tên đăng nhập, Email hoặc Thiết bị này đã được sử dụng.' };
+                    throw { status: 400, message: 'TÃªn Ä‘Äƒng nháº­p, Email hoáº·c Thiáº¿t bá»‹ nÃ y Ä‘Ã£ Ä‘Æ°á»£c sá»­ dá»¥ng.' };
                 }
                 throw dbErr; // Rethrow other DB errors to the withTitan catch block
             }
@@ -65,16 +65,17 @@ export const POST = withTitan({
             await setSessionCookie(token);
 
             return {
-                message: 'Đăng ký thành công',
+                message: 'ÄÄƒng kÃ½ thÃ nh cÃ´ng',
                 user: { username: cleanUsername, uuid, xp: 0, vipCoins: 0, role: 'user' }
             };
 
         } catch (e) {
             if (e.status) throw e;
             console.error('Registration error', e);
-            throw { status: 500, message: 'Lỗi hệ thống khi đăng ký' };
+            throw { status: 500, message: 'Lá»—i há»‡ thá»‘ng khi Ä‘Äƒng kÃ½' };
         }
     }
 });
+
 
 
