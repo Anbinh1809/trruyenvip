@@ -5,7 +5,7 @@ import { useEngagement } from '@/contexts/EngagementContext';
 
 /**
  * XPRewarder (To�i gi?n)
- * Thuo�ng mo�t luo�ng kinh nghi?m nho� khi đo�c xong chuơng.
+ * Thuo�ng mo�t luo�ng kinh nghi?m nho� khi đo�c xong chương.
  */
 export default function XPRewarder({ chapterId }) {
   const { addXp } = useEngagement();

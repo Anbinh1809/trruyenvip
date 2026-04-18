@@ -91,7 +91,7 @@ export default function LiveSearch({ onSelect }) {
               if (addToast) addToast(data.error || 'T�nh nang n�y hi?n dang b?o tr�.', 'error');
           }
       } catch (e) {
-          if (addToast) addToast('L?i k?t n?i m�y ch?.', 'error');
+          if (addToast) addToast('L?i kết nối m�y ch?.', 'error');
       } finally {
           setLoading(false);
       }

@@ -20,11 +20,8 @@ export async function GET(request) {
         const protocol = host.startsWith('localhost') ? 'http' : 'https';
         const origin = `${protocol}://${host}`;
 
-        // POLARIS OPTIMIZATION: Fix case-sensitivity and add safety limit
         const mangaRes = await query("SELECT id, last_crawled FROM manga ORDER BY last_crawled DESC LIMIT 10000");
         const mangaList = mangaRes.recordset;
-
-        // Fetch all genres
         const genreRes = await query("SELECT slug FROM genres ORDER BY slug ASC");
         const genreList = genreRes.recordset;
 
@@ -41,7 +38,6 @@ export async function GET(request) {
         let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
 
-        // Add static pages
         staticPages.forEach(page => {
             xml += `
   <url>
@@ -51,7 +47,6 @@ export async function GET(request) {
   </url>`;
         });
 
-        // Add genres
         genreList.forEach(genre => {
             xml += `
   <url>
@@ -61,7 +56,6 @@ export async function GET(request) {
   </url>`;
         });
 
-        // Add manga pages
         mangaList.forEach(manga => {
             const lastMod = manga.last_crawled ? new Date(manga.last_crawled).toISOString() : new Date().toISOString();
             xml += `

@@ -6,7 +6,7 @@ import { Zap } from 'lucide-react';
 
 /**
  * RewardTimer (Repurposed for Mission Tracking)
- * Theo d�i tho�i gian đo�c đo� co�ng v�o nhi?m vo� "Ngo� t�nh cao" (15 ph�t).
+ * Theo d�i tho�i gian đo�c đo� co�ng v�o nhiệm vụ� "Ngo� t�nh cao" (15 ph�t).
  */
 export default function RewardTimer({ chapterId }) {
   const { updateMission } = useEngagement();

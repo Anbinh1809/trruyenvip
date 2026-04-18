@@ -62,7 +62,7 @@ const CommentItem = ({ comment, isReply = false, chapterId, userName, fetchComme
     };
 
     const handleReport = async (id) => {
-        const reason = prompt('L� do b�o c�o n?i dung n�y (v� d?: N?i dung d?c h?i, Spam...):');
+        const reason = prompt('L� do b�o c�o nội dung n�y (v� d?: Nội dung độc hại, Spam...):');
         if (!reason || reason.length < 5) return;
 
         try {

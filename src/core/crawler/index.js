@@ -12,7 +12,7 @@ import { updateTelemetry, logGuardianEvent } from './telemetry.js';
 const axiosAgent = axios.create({
     httpAgent: new http.Agent({ keepAlive: true, maxSockets: 160 }),
     httpsAgent: new https.Agent({ keepAlive: true, maxSockets: 160, rejectUnauthorized: false }),
-    timeout: 30000
+    timeout: 45000
 });
 
 /**
@@ -20,7 +20,7 @@ const axiosAgent = axios.create({
  */
 export async function fetchWithRetry(url, options = {}, retries = 2) {
     const mirrors = getOptimizedMirrors(url);
-    const defaultTimeout = options.isDiscovery ? 25000 : 40000;
+    const defaultTimeout = options.isDiscovery ? 35000 : 55000;
     const ua = USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
     const searchReferer = SEARCH_REFERERS[Math.floor(Math.random() * SEARCH_REFERERS.length)];
 

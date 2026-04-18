@@ -64,7 +64,7 @@ export default function AdminDashboard() {
             addToast(data.error || 'K�ch hoạt thất bại. Vui l�ng kio�m tra log.', 'error');
         }
     } catch (e) {
-        addToast('L?i k?t n?i m�y ch?.', 'error');
+        addToast('L?i kết nối m�y ch?.', 'error');
     } finally {
         setCrawlLoading(false);
     }

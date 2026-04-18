@@ -512,6 +512,7 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan {
     font-weight: 900;
     margin-bottom: 8px;
     letter-spacing: -1px;
+    color: var(--text-primary);
 }
 
 .auth-subtitle-titan {
@@ -529,16 +530,16 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan {
 .input-label-titan {
     font-size: 0.85rem;
     font-weight: 700;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
 .input-control-titan, .input-titan {
     width: 100%;
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: white;
+    background: var(--nebula-glass);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
     padding: 12px 16px;
     border-radius: var(--border-radius);
     font-size: 1rem;
@@ -549,12 +550,220 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan {
 .input-control-titan:focus, .input-titan:focus {
     outline: none;
     border-color: var(--accent);
-    background: rgba(0, 0, 0, 0.4);
     box-shadow: 0 0 0 4px rgba(255, 62, 62, 0.1);
 }
 
 .input-control-titan::placeholder, .input-titan::placeholder {
-    color: rgba(255, 255, 255, 0.2);
+    color: var(--text-muted);
+}
+
+/* ── Industrial Auth Classes (login/register pages) ── */
+.auth-page {
+    min-height: 100vh;
+}
+
+.auth-wrapper-industrial {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 20px 60px;
+}
+
+.auth-card-titan {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 48px 40px;
+    width: 100%;
+    max-width: 500px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.auth-badge-titan {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 14px;
+    background: rgba(255, 62, 62, 0.12);
+    border: 1px solid rgba(255, 62, 62, 0.2);
+    border-radius: 8px;
+    color: var(--accent);
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+.auth-title-industrial {
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    font-weight: 950;
+    letter-spacing: -2px;
+    line-height: 1;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+}
+
+.auth-subtitle-industrial {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.6;
+    margin-bottom: 36px;
+}
+
+.auth-form-industrial {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.auth-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.auth-label-titan {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+}
+
+.input-relative {
+    position: relative;
+}
+
+.input-icon-titan {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    transition: color 0.3s;
+    pointer-events: none;
+}
+
+.auth-input-titan {
+    width: 100%;
+    background: var(--nebula-glass);
+    border: 1.5px solid var(--glass-border);
+    color: var(--text-primary);
+    padding: 14px 16px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: var(--font-body);
+    transition: var(--transition);
+}
+
+.auth-input-titan.with-icon {
+    padding-left: 50px;
+}
+
+.auth-input-titan:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(255, 62, 62, 0.1);
+    background: var(--glass-bg);
+}
+
+.auth-input-titan:focus ~ .input-icon-titan,
+.auth-input-titan:focus + .input-icon-titan {
+    color: var(--accent);
+}
+
+.auth-input-titan::placeholder {
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+.auth-error-banner {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: #ef4444;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.auth-submit-btn-titan {
+    width: 100%;
+    padding: 16px;
+    font-size: 1rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    margin-top: 8px;
+    gap: 10px;
+}
+
+.auth-footer-industrial {
+    margin-top: 28px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.auth-link-titan {
+    color: var(--accent);
+    font-weight: 800;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 6px;
+    transition: 0.2s;
+}
+
+.auth-link-titan:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
+.shadow-titan {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+}
+
+/* Light mode overrides for auth */
+[data-theme='light'] .auth-input-titan {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.12);
+}
+
+[data-theme='light'] .auth-input-titan:focus {
+    background: #fff;
+    border-color: var(--accent);
+}
+
+[data-theme='light'] .auth-card-titan {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='light'] .shadow-titan {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme='light'] .input-control-titan,
+[data-theme='light'] .input-titan {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.12);
+    color: var(--text-primary);
+}
+
+[data-theme='light'] .input-control-titan:focus,
+[data-theme='light'] .input-titan:focus {
+    background: #fff;
+}
+
+[data-theme='light'] .input-control-titan::placeholder,
+[data-theme='light'] .input-titan::placeholder,
+[data-theme='light'] .auth-input-titan::placeholder {
+    color: var(--text-muted);
+    opacity: 0.6;
 }
 
 /* ==========================================================================

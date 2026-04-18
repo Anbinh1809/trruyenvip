@@ -49,7 +49,7 @@ export default function AdminGuardianPage() {
             <Header />
             <div className="system-center-industrial">
                 <div className="titan-loader-pulse"></div>
-                <p className="loading-status-hint">Đang k?t n?i v?i Guardian Network...</p>
+                <p className="loading-status-hint">Đang kết nối v?i Guardian Network...</p>
             </div>
         </div>
     );
@@ -96,7 +96,7 @@ export default function AdminGuardianPage() {
             <div className="metric-card-titan shadow-titan">
                 <div className="metric-label-titan"><Search size={14} /> V� CHƯƠNG TRo�NG</div>
                 <div className="metric-value-titan">{data.metrics.gaps_filled || 0}</div>
-                <p className="metric-desc-titan">So� luo�ng chuơng truy?n bo� thiếu d� đuo�c đ?nng bo� h�a bo� sung.</p>
+                <p className="metric-desc-titan">So� luo�ng chương truy?n bo� thiếu d� đuo�c đ?nng bo� h�a bo� sung.</p>
             </div>
             <div className="metric-card-titan shadow-titan">
                 <div className="metric-label-titan"><ShieldCheck size={14} /> IMAGE_RESCUE</div>

@@ -16,7 +16,7 @@ export const POST = withTitan({
         // TITAN RATE LIMIT: Prevent rapid clicking / duplicate trigger bypass attempts
         const limiter = await checkRateLimit(`checkin_${userUuid}`, 1, 10); // 1 request / 10s
         if (!limiter.success) {
-            throw { status: 429, message: 'Y�u c?u di?m danh qu� nhanh. Vui l�ng thử lại sau.' };
+            throw { status: 429, message: 'Y�u c?u điểm danh qu� nhanh. Vui l�ng thử lại sau.' };
         }
 
             const result = await withTransaction(async (tx) => {
@@ -28,7 +28,7 @@ export const POST = withTitan({
                 );
 
                 if (todayCheck.rowCount > 0) {
-                    throw new Error('B?n d� di?m danh h�m nay r?i.');
+                    throw new Error('B?n d� điểm danh h�m nay r?i.');
                 }
 
                 // 2. Check yesterday to calculate streak
@@ -50,7 +50,7 @@ export const POST = withTitan({
                 if (newStreak % 7 === 0) {
                     const bonus = 100;
                     reward += bonus;
-                    message = `Tuy?t vo�i! B?n d� di?m danh li�n ti?p 7 ng�y. Nh?n thu?ng ${reward} xu!`;
+                    message = `Tuy?t vo�i! B?n d� điểm danh li�n ti?p 7 ng�y. Nh?n thu?ng ${reward} xu!`;
                 }
 
                 // 4. Record Check-in

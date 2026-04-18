@@ -52,7 +52,7 @@ export default function AdminRewardsPage() {
         addToast('Thao t�c thất bại.', 'error');
       }
     } catch (e) {
-      addToast('L?i k?t n?i m�y ch?.', 'error');
+      addToast('L?i kết nối m�y ch?.', 'error');
     }
   };
 

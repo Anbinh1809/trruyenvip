@@ -217,7 +217,9 @@ export default async function MangaDetailPage({ params }) {
                         </div>
                         
                         <div className="detail-right-info">
-                            <h1 className="traditional-title" itemProp="name">{manga.title}</h1>
+                            <h1 className="traditional-title" itemProp="name">
+                                {manga.title && /^[a-z0-9-]+$/.test(manga.title) ? manga.title.replace(/-[0-9]+$/, '').split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : manga.title}
+                            </h1>
                             
                             {/* TRADITIONAL INFO TABLE */}
                             <div className="info-table-titan">

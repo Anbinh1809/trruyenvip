@@ -13,6 +13,7 @@ export default function DetailCover({ src, alt }) {
                 src={imgSrc} 
                 alt={alt} 
                 fill 
+                unoptimized
                 sizes="(max-width: 768px) 200px, 350px"
                 priority
                 fetchPriority="high"

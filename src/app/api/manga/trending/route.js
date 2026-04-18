@@ -6,27 +6,17 @@ export const GET = withTitan({
     handler: async () => {
         const trending = await query(`
             SELECT m.id, m.title, m.cover, m.normalized_title
-            FROM manga m
-            LEFT JOIN chapters c ON m.id = c.manga_id
-            GROUP BY m.id, m.title, m.cover, m.normalized_title
-            ORDER BY m.views DESC, COUNT(c.id) DESC
-            LIMIT 5
+            FROM manga m LEFT JOIN chapters c ON m.id = c.manga_id
+            GROUP BY m.id ORDER BY m.views DESC, COUNT(c.id) DESC LIMIT 5
         `);
 
         return (trending.recordset || []).map(m => {
-            const coverUrl = m.cover || '/placeholder-manga.svg';
-            const w = 100;
-            const q = 75; // Standardized quality
-            let finalCover = coverUrl;
-
-            if (coverUrl.startsWith('http')) {
-                const sig = generateProxySignature(coverUrl, w, q);
-                finalCover = `/api/proxy?url=${encodeURIComponent(coverUrl)}&w=${w}&q=${q}&sig=${sig}`;
-            }
-
+            const url = m.cover || '/placeholder-manga.svg';
             return {
                 ...m,
-                cover: finalCover
+                cover: url.startsWith('http') 
+                    ? `/api/proxy?url=${encodeURIComponent(url)}&w=100&q=75&sig=${generateProxySignature(url, 100, 75)}` 
+                    : url
             };
         });
     }

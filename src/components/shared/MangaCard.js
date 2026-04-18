@@ -56,11 +56,14 @@ function MangaCard({ manga, isNew = false, priority = false }) {
       itemType="http://schema.org/CreativeWork"
     >
       <meta itemProp="url" content={`https://truyenvip.com/manga/${manga.normalized_title || manga.id}`} />
+      <script dangerouslySetInnerHTML={{__html: `/* MangaCard */`}}/>
+      {/* ... keeping the fade ... */}
       <div className={`card-media-titan ${!isLoaded ? 'skeleton-shimmer' : ''}`}>
         <Image 
           src={imgSrc} 
-          alt={`áº¢nh bÃ¬a truyá»‡n ${manga.title}`} 
+          alt={`Bạn đang đọc truyện ${manga.title}`} 
           fill
+          unoptimized
           sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 20vw"
           className={`card-img-titan ${isLoaded ? 'is-loaded' : ''}`} 
           onLoad={() => setIsLoaded(true)}
@@ -83,7 +86,7 @@ function MangaCard({ manga, isNew = false, priority = false }) {
 
         <button 
             className={`bookmark-btn ${favorited ? 'active' : ''}`}
-            aria-label={favorited ? `XÃ³a ${manga.title} khá»i yÃªu thÃ­ch` : `ThÃªm ${manga.title} vÃ o yÃªu thÃ­ch`}
+            aria-label={favorited ? `Xóa ${manga.title} khá» i yêu thích` : `ThÃªm ${manga.title} vÃ o yêu thích`}
             onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -106,13 +109,15 @@ function MangaCard({ manga, isNew = false, priority = false }) {
         </div>
       </div>
 
-      <h3 className="card-title-centered truncate-1" itemProp="name">{manga.title}</h3>
+      <h3 className="card-title-centered truncate-1" itemProp="name">
+          {manga.title && /^[a-z0-9-]+$/.test(manga.title) ? manga.title.replace(/-[0-9]+$/, '').split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : manga.title}
+      </h3>
       <p className="card-chapter-centered">
         {manga.latest_chapter_number ? (
             `ChÆ°Æ¡ng ${manga.latest_chapter_number}`
         ) : (manga.last_chap_num && isNaN(manga.last_chap_num) ? 
             manga.last_chap_num : 
-            (manga.last_chap_num && manga.last_chap_num !== '0' ? `ChÆ°Æ¡ng ${manga.last_chap_num}` : 'Äang cáº­p nháº­t'))
+            (manga.last_chap_num && manga.last_chap_num !== '0' ? `ChÆ°Æ¡ng ${manga.last_chap_num}` : 'Äang cập nhật'))
         }
       </p>
 

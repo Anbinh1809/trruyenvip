@@ -38,7 +38,7 @@ export function cleanTitleForSearch(title) {
         .replace(/\(m?i\)/g, '')
         .replace(/chapter\s*\d+/g, '')
         .replace(/chap\s*\d+/g, '')
-        .replace(/t?m l?/g, '') 
+        .replace(/tóm lược/g, '') 
         .replace(/[-\s]+/g, ' ')
         .trim();
 }

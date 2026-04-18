@@ -6,7 +6,7 @@ export async function POST(request) {
     try {
         const session = await getSession();
         if (!session) {
-            return NextResponse.json({ error: 'Chua Ä‘Äƒng nháº­p' }, { status: 401 });
+            return NextResponse.json({ error: 'Chua đăng nhập' }, { status: 401 });
         }
 
         // 1. Robust Parsing for Beacon/Keepalive (handles missing Content-Type)

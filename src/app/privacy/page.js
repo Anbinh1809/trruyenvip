@@ -28,14 +28,14 @@ export default function PrivacyPage() {
             <div className="legal-section-industrial">
                 <h2>2. S? Do�ng Cookie</h2>
                 <p className="legal-text-industrial">
-                    Ch�ng t�i s? do�ng cookie đo� luu tr? phi�n đăng nhập v� c�c c�i đặt giao di?n (nhu chế đo� s�ng/to�i, co� ch?) c?a bạn. B?n c� tho� t? cho�i cookie qua c�i đặt tr�nh duy?t, nhung mo�t so� t�nh năng c� tho� kh�ng hoạt đo�ng o�n đo�nh.
+                    Ch�ng t�i s? do�ng cookie đo� luu tr? phi�n đăng nhập v� c�c c�i đặt giao di?n (nhu chế đo� s�ng/to�i, co� ch?) của bạn. B?n c� tho� t? cho�i cookie qua c�i đặt tr�nh duy?t, nhung mo�t so� t�nh năng c� tho� kh�ng hoạt đo�ng o�n đo�nh.
                 </p>
             </div>
 
             <div className="legal-section-industrial">
                 <h2>3. B?o Mật D? Li?u</h2>
                 <p className="legal-text-industrial">
-                    Mo�i d? li?u c� nh�n c?a nguo�i d�ng đuo�c m� h�a bằng c�ng ngh? <strong>SSL 256-bit</strong> ti�u chuẩn c�ng nghi?p. Ch�ng t�i cam k?t kh�ng bao gio� b�n hoặc chia sẻ th�ng tin c?a bạn cho bất ko� b�n tho� ba n�o v� mo�c đ�ch thuơng mại.
+                    Mo�i d? li?u c� nh�n c?a nguo�i d�ng đuo�c m� h�a bằng c�ng ngh? <strong>SSL 256-bit</strong> ti�u chuẩn c�ng nghi?p. Ch�ng t�i cam k?t kh�ng bao gio� b�n hoặc chia sẻ th�ng tin của bạn cho bất ko� b�n tho� ba n�o v� mo�c đ�ch thuơng mại.
                 </p>
             </div>
 

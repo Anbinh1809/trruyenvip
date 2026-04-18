@@ -102,7 +102,7 @@ export default function RewardsPage() {
         setMsgType('error');
       }
     } catch (e) {
-      setMsg('L?i k?t n?i m�y ch?.');
+      setMsg('L?i kết nối m�y ch?.');
       setMsgType('error');
     }
     setLoading(false);
@@ -131,7 +131,7 @@ export default function RewardsPage() {
       <div className="container rewards-container fade-in">
         <div className="rewards-header-box">
                <h1 className="rewards-title-industrial">R�t Tio�n T�i Kho?n</h1>
-               <p className="rewards-subtitle-industrial">C�y truy?n nhận thuo�ng. Chuyo�n tio�n tr?cc tiếp vo� ng�n h�ng c?a bạn. To� l? quy đo�i: 1 VipCoin = 1 VNĐ.</p>
+               <p className="rewards-subtitle-industrial">C�y truy?n nhận thuo�ng. Chuyo�n tio�n tr?cc tiếp vo� ng�n h�ng của bạn. To� l? quy đo�i: 1 VipCoin = 1 VNĐ.</p>
                
                <div className="coins-display-industrial">
                   <Coins size={40} color="#fbbf24" strokeWidth={1.5} />

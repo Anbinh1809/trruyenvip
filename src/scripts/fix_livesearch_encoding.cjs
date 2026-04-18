@@ -4,7 +4,7 @@ let content = fs.readFileSync(file, 'utf8');
 
 const mappings = {
     'Ä á»“ng bá»™ dá»¯ liá»‡u thÃ nh cÃ´ng!': 'Đồng bộ dữ liệu thành công!',
-    'TÃ­nh nÄƒng nÃ y hiá»‡n Ä‘ang báº£o trÃ¬.': 'Tính năng này hiện đang bảo trì.',
+    'Tính năng ¬tính năng đang phát triển.': 'Tính năng này hiện đang bảo trì.',
     'Lá»—i káº¿t ná»‘i mÃ¡y chá»§.': 'Lỗi kết nối máy chủ.',
     'TÃ¬m truyá»‡n hoáº·c dÃ¡n link NetTruyen...': 'Tìm truyện hoặc dán link NetTruyen...',
     'Ä ANG Ä á»’NG Bá»˜...': 'ĐANG ĐỒNG BỘ...',

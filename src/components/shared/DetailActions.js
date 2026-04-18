@@ -58,12 +58,12 @@ export default function DetailActions({ mangaId, firstChapterId, mangaTitle, man
         if (navigator.share) {
             navigator.share({
                 title: mangaTitle,
-                text: `Äá»c truyá»‡n ${mangaTitle} cá»±c hay táº¡i TruyenVip!`,
+                text: `Đọc truyện ${mangaTitle} cực hay tại TruyenVip!`,
                 url: window.location.href,
             }).catch(() => {});
         } else {
             navigator.clipboard.writeText(window.location.href);
-            addToast('ÄÃ£ sao chÃ©p liên kết vào bộ nhớ tạm!', 'success');
+            addToast('Đã sao chép liên kết vào bộ nhớ tạm!', 'success');
         }
     };
 
@@ -77,7 +77,7 @@ export default function DetailActions({ mangaId, firstChapterId, mangaTitle, man
                         onMouseEnter={() => handleHover(mangaHistory.chapterId)}
                         onMouseLeave={handleHoverExit}
                     >
-                        <Play size={18} fill="currentColor" /> Äá»c tiáº¿p chÆ°Æ¡ng {mangaHistory.chapterNumber}
+                        <Play size={18} fill="currentColor" /> Đọc tiếp chương {mangaHistory.chapterNumber}
                     </Link>
                 ) : (
                     <Link 
@@ -87,7 +87,7 @@ export default function DetailActions({ mangaId, firstChapterId, mangaTitle, man
                         onMouseLeave={handleHoverExit}
                         onClick={(e) => !firstChapterId && e.preventDefault()}
                     >
-                        <BookOpen size={18} /> Äá»c tá»« Ä‘áº§u
+                        <BookOpen size={18} /> Đọc từ đầu
                     </Link>
                 )}
                 

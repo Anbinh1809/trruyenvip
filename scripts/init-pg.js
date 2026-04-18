@@ -1,15 +1,10 @@
 import 'dotenv/config';
-import { query } from '../src/lib/db.js';
+import { query } from '../src/core/database/connection.js';
 
 async function init() {
-    console.log('--- Initializing TruyenVip PostgreSQL (Neon) Schema ---');
+    console.log('--- Initializing TruyenVip PostgreSQL Schema ---');
     try {
-        // 1. EXTENSIONS
-        console.log('[1/4] Enabling Extensions...');
         await query('CREATE EXTENSION IF NOT EXISTS pg_trgm;');
-
-        // 2. CORE TABLES
-        console.log('[2/4] Creating Core Tables...');
 
         await query(`
             CREATE TABLE IF NOT EXISTS users (
@@ -29,7 +24,6 @@ async function init() {
             );
         `);
 
-        // TITAN-GRADE MIGRATION: Ensure columns exist if table was created in a previous version
         await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS mission_data JSONB DEFAULT '{}';`);
         await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS last_mission_reset TIMESTAMPTZ DEFAULT NOW();`);
 
@@ -67,7 +61,6 @@ async function init() {
             );
         `);
 
-        // TITAN-GRADE MIGRATION: Health Tracking
         await query(`ALTER TABLE chapters ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'pending';`);
         await query(`ALTER TABLE chapters ADD COLUMN IF NOT EXISTS fail_count INT DEFAULT 0;`);
 
@@ -81,9 +74,6 @@ async function init() {
                 UNIQUE(chapter_id, "order")
             );
         `);
-
-        // 3. AUXILIARY TABLES
-        console.log('[3/4] Creating Auxiliary Tables...');
 
         await query(`
             CREATE TABLE IF NOT EXISTS genres (
@@ -245,15 +235,9 @@ async function init() {
             );
         `);
 
-        // 4. PERFORMANCE INDEXES
-        console.log('[4/4] Creating Performance Indexes...');
-        
-        // Trigram Indexes for Fuzzy Search
         await query('CREATE INDEX IF NOT EXISTS idx_manga_title_trgm ON manga USING gin (title gin_trgm_ops);');
         await query('CREATE INDEX IF NOT EXISTS idx_manga_alt_titles_trgm ON manga USING gin (alternative_titles gin_trgm_ops);');
         await query('CREATE INDEX IF NOT EXISTS idx_manga_norm_title_trgm ON manga USING gin (normalized_title gin_trgm_ops);');
-
-        // Standard Indexes
         await query('CREATE INDEX IF NOT EXISTS idx_chapters_manga_id ON chapters(manga_id);');
         await query('CREATE INDEX IF NOT EXISTS idx_chapters_updated_at ON chapters(updated_at DESC);');
         await query('CREATE INDEX IF NOT EXISTS idx_users_xp ON users(xp DESC);');
@@ -263,16 +247,13 @@ async function init() {
         await query('CREATE INDEX IF NOT EXISTS idx_crawlertasks_manga_id ON crawlertasks(manga_id);');
         await query('CREATE INDEX IF NOT EXISTS idx_comments_chapter_id ON comments(chapter_id);');
         await query('CREATE INDEX IF NOT EXISTS idx_readhistory_composite ON readhistory(user_uuid, manga_id);');
-        
-        // Time-based Indexes for Scaling
         await query('CREATE INDEX IF NOT EXISTS idx_crawllogs_created_at ON crawllogs(created_at DESC);');
         await query('CREATE INDEX IF NOT EXISTS idx_guardianreports_created_at ON guardianreports(created_at DESC);');
         await query('CREATE INDEX IF NOT EXISTS idx_chapterimages_created_at ON chapterimages(created_at DESC);');
 
         console.log('--- PostgreSQL Initialization Complete ---');
     } catch (err) {
-        console.error('--- Init Failed ---');
-        console.error(err);
+        console.error('Init Failed:', err);
     }
 }
 

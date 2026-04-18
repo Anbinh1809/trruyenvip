@@ -2,9 +2,7 @@ name: Titan Crawler Worker
 
 on:
   schedule:
-    # Run every 5 minutes, 24/7 (ULTRA-FAST INGESTION)
-    - cron: '*/5 * * * *'
-  # Allow manual trigger from GitHub UI
+    - cron: '*/10 * * * *'
   workflow_dispatch:
 
 concurrency:
@@ -15,7 +13,7 @@ jobs:
   crawl:
     name: Run Autonomous Crawler
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
 
     steps:
       - name: Checkout repository
@@ -24,14 +22,16 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci --omit=dev
+        run: npm ci
 
       - name: Run Titan Worker
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          PROXY_SECRET: ${{ secrets.PROXY_SECRET }}
+          NODE_TLS_REJECT_UNAUTHORIZED: '0'
         run: node scripts/titan-worker.js

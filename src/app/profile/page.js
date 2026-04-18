@@ -40,7 +40,7 @@ export default function ProfilePage() {
             addToast('Lo�i c?p nh?t! Vui l�ng th? lại.', 'error');
         }
     } catch (e) {
-        addToast('L?i k?t n?i m�y ch?.', 'error');
+        addToast('L?i kết nối m�y ch?.', 'error');
     }
     setUpdating(false);
   };
@@ -56,7 +56,7 @@ export default function ProfilePage() {
                     <AlertOctagon size={80} color="var(--accent)" />
                 </div>
                 <h1 className="auth-required-title">Y�u cầu đăng nhập</h1>
-                <p className="auth-required-subtitle">Cần đăng nhập đo� xem th�ng tin c� nh�n v� qu?n l� t�i kho?n c?a bạn.</p>
+                <p className="auth-required-subtitle">Cần đăng nhập đo� xem th�ng tin c� nh�n v� qu?n l� t�i kho?n của bạn.</p>
                 <Link href="/auth/login" className="btn btn-primary login-trigger-titan">ĐĂNG NHẬP NGAY</Link>
             </div>
             <Footer />

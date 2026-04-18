@@ -45,7 +45,7 @@ export default function ContinueReadingButton({ mangaId, chapters }) {
              <SkipForward size={18} /> Đo�C To� ĐẦU
           </Link>
           <Link href={`/manga/${mangaId}/chapter/${chapters[0].id}`} className="btn btn-primary init-btn init-latest">
-             <FastForward size={18} fill="currentColor" /> CHƯƠNG M?I NHẤT
+             <FastForward size={18} fill="currentColor" /> CHƯƠNG MỚI NHẤT
           </Link>
           <style jsx>{`
             .reading-init-industrial {

@@ -52,17 +52,17 @@ export default function ChapterList({ mangaId, chapters }) {
                 className="btn-sort-titan-industrial"
                 aria-label={sortOrder === 'desc' ? 'S?p xếp cũ nhất' : 'S?p xếp mo�i nhất'}
             >
-                <ArrowUpDown size={14} /> {sortOrder === 'desc' ? 'M?I NHẤT' : 'CŨ NHẤT'}
+                <ArrowUpDown size={14} /> {sortOrder === 'desc' ? 'MỚI NHẤT' : 'CŨ NHẤT'}
             </button>
 
             <div className="chapter-search-box-industrial">
               <input 
                 type="text" 
-                placeholder="T�m nhanh chuơng..." 
+                placeholder="T�m nhanh chương..." 
                 value={searchTerm}
                 autoComplete="off"
                 className="chapter-search-input-industrial"
-                aria-label="T�m nhanh chuơng"
+                aria-label="T�m nhanh chương"
                 onChange={(e) => {
                     setSearchTerm(e.target.value);
                     setDisplayCount(50);
@@ -77,7 +77,7 @@ export default function ChapterList({ mangaId, chapters }) {
 
       {filteredChapters.length === 0 ? (
         <div className="empty-state-titan industrial-p-80">
-            Kh�ng t�m thấy chuơng n�o ph� ho�p v?i t? kh�a c?a bạn.
+            Kh�ng t�m thấy chương n�o ph� ho�p v?i t? kh�a của bạn.
         </div>
       ) : (
         <>

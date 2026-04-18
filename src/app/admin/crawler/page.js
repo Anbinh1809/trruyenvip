@@ -83,7 +83,7 @@ export default function AdminCrawlerPage() {
             addToast('Lo�i: ' + (data.error || 'Y�u cầu kh�ng tho� ho�n th�nh.'), 'error');
         }
     } catch (e) {
-        addToast('L?i k?t n?i m�y ch?.', 'error');
+        addToast('L?i kết nối m�y ch?.', 'error');
     }
   };
 

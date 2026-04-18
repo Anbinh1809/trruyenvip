@@ -104,7 +104,7 @@ export default function MissionPanel() {
                         </div>
                         <h2 className="prize-amount">+{claimedPrize.amount}</h2>
                         <p className="prize-type-label">{claimedPrize.type.toUpperCase()} THƯo�NG</p>
-                        <p className="prize-desc-text">Ch�c m?ng bạn d� ho�n th�nh nhi?m vo� v� nhận đuo�c phần qu� n�y.</p>
+                        <p className="prize-desc-text">Ch�c m?ng bạn d� ho�n th�nh nhiệm vụ� v� nhận đuo�c phần qu� n�y.</p>
                         <button className="btn btn-primary prize-close-btn" onClick={closeCelebration}>Đ�NG</button>
                     </div>
                 ) : (

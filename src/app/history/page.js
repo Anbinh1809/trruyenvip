@@ -19,7 +19,7 @@ export default function HistoryPage() {
                     <div className="header-left-industrial">
                         <div className="library-badge-titan">TRUY?N Đ� XEM</div>
                         <h1 className="history-title-industrial">Lo�CH So� Đo�C</h1>
-                        <p className="history-subtitle">C�c b?n ghi hoạt đo�ng đo�c truy?n c?a bạn tr�n h? th?ng.</p>
+                        <p className="history-subtitle">C�c b?n ghi hoạt đo�ng đo�c truy?n của bạn tr�n h? th?ng.</p>
                     </div>
                     {history.length > 0 && (
                         <button className="btn btn-outline clear-btn-industrial" onClick={clearHistory}>
@@ -60,7 +60,7 @@ export default function HistoryPage() {
                 ) : (
                     <EmptyState 
                         title="H�NH TR�NH CHƯA BẮT ĐẦU"
-                        subtitle="Lo�ch s? đo�c c?a bạn hi?n đang tro�ng. H�y kh�m ph� nh?ng t�c phẩm tinh hoa ngay b�y gio�!"
+                        subtitle="Lo�ch s? đo�c của bạn hi?n đang tro�ng. H�y kh�m ph� nh?ng t�c phẩm tinh hoa ngay b�y gio�!"
                         actionText="KH�M PH� NGAY"
                         actionUrl="/"
                     />

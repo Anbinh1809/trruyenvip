@@ -55,7 +55,7 @@ export default function RecommendedForYou() {
                 </>
             ) : (
                 <>
-                    <Library size={28} color="var(--accent)" /> Truy?n mo�i c?p nh?t
+                    <Library size={28} color="var(--accent)" /> Truyện mo�i c?p nh?t
                 </>
             )}
         </h2>

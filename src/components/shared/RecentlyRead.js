@@ -18,7 +18,7 @@ export default function RecentlyRead() {
   return (
     <section className="recently-read-titan fade-in">
       <div className="recent-section-header-industrial">
-          <h2 className="title-titan section-title-industrial">TIáº¾P To¤C ÄoŒC</h2>
+          <h2 className="title-titan section-title-industrial">TIẾP TỤC ÄoŒC</h2>
           <Link href="/history" className="view-all-link-industrial">XEM TẤT CẢ</Link>
       </div>
 
@@ -30,7 +30,7 @@ export default function RecentlyRead() {
           />
           <div className="banner-content-titan">
             <div className="banner-label-titan">
-                <span className="pulse-dot-industrial" /> ÄANG ÄoŒC Dož
+                <span className="pulse-dot-industrial" /> ÄANG ÄoŒC DỞ
             </div>
             <h3 className="banner-title-titan truncate-1">{mostRecent.mangaTitle}</h3>
             <p className="banner-sub-titan">Chương {mostRecent.chapterNumber} • {mostRecent.mangaAuthor || 'Äang c?p nh?t'}</p>
@@ -38,7 +38,7 @@ export default function RecentlyRead() {
               href={`/manga/${mostRecent.mangaNormalizedTitle || mostRecent.mangaId}/chapter/${mostRecent.chapterId}`} 
               className="btn btn-primary banner-btn-titan-industrial"
             >
-              TIáº¾P To¤C ÄoŒC
+              TIẾP TỤC ÄoŒC
             </Link>
           </div>
         </div>

@@ -159,7 +159,7 @@ export default function CommentSection({ chapterId }) {
             />
             <div className="form-actions-industrial">
                <button type="submit" className="btn btn-primary submit-btn-titan" disabled={submitting}>
-                    <Send size={18} /> {submitting ? 'ÄANG Go¬I...' : 'GỬI BÌNH LUẬN'}
+                    <Send size={18} /> {submitting ? 'ÄANG GỬI...' : 'GỬI BÌNH LUẬN'}
                </button>
             </div>
         </form>
@@ -185,7 +185,7 @@ export default function CommentSection({ chapterId }) {
           ))
         ) : (
           <div className="empty-comments-industrial">
-              <p>Chưa có bình luận nào. Hà£y là  ngưoi Ä‘áº§u tiên!</p>
+              <p>Chưa có bình luận nào. Hãy là  ngưoi đầu tiên!</p>
           </div>
         )}
       </div>

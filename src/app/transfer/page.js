@@ -55,7 +55,7 @@ export default function TransferPage() {
                         return { url, status: 'error', msg: data.error };
                     }
                 } catch (err) {
-                    return { url, status: 'error', msg: 'L?i k?t n?i' };
+                    return { url, status: 'error', msg: 'L?i kết nối' };
                 }
             }));
             
@@ -90,15 +90,15 @@ export default function TransferPage() {
 
                 <div className="transfer-form-card">
                     <div className="card-header-industrial">
-                        <h3 className="card-title-industrial">Nhập li�n k?t chuơng truy?n</h3>
-                        <span className="card-hint-industrial">Mo�i d�ng mo�t li�n k?t chuơng truy?n (NetTruyen, TruyenQQ...)</span>
+                        <h3 className="card-title-industrial">Nhập li�n k?t chương truy?n</h3>
+                        <span className="card-hint-industrial">Mo�i d�ng mo�t li�n k?t chương truy?n (NetTruyen, TruyenQQ...)</span>
                     </div>
 
                     <form onSubmit={handleBatchTransfer}>
                         <textarea 
                             value={urls}
                             onChange={(e) => setUrls(e.target.value)}
-                            placeholder="D�n c�c li�n k?t chuơng truy?n v�o đ�y..."
+                            placeholder="D�n c�c li�n k?t chương truy?n v�o đ�y..."
                             className="transfer-textarea-titan"
                         />
                         <button 

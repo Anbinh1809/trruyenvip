@@ -92,7 +92,7 @@ export const PATCH = withTitan({
                 return { success: true };
             } catch (e) {
                 // If unique constraint fails, they already liked it
-                return { success: false, message: 'B?n d� th�ch b�nh luận n�y r?ni.' };
+                return { success: false, message: 'B?n d� th�ch b�nh luận n�y rồi.' };
             }
         }
         
@@ -110,7 +110,7 @@ export const DELETE = withTitan({
 
         // Permission check
         const comment = await query(`SELECT user_uuid FROM comments WHERE id = @id`, { id });
-        if (!comment.recordset?.length) throw { status: 404, message: 'B�nh luận kh�ng t?n t?i' };
+        if (!comment.recordset?.length) throw { status: 404, message: 'B�nh luận kh�ng tồn tại' };
 
         const isOwner = comment.recordset[0].user_uuid === session.uuid;
         const isAdmin = session.role === 'admin';

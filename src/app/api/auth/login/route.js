@@ -17,12 +17,12 @@ export const POST = withTitan({
             }
 
             if (!username || !password) {
-                throw { status: 400, message: 'Thiáº¿u thÃ´ng tin Ä‘Äƒng nháº­p' };
+                throw { status: 400, message: 'Thiáº¿u thÃ´ng tin đăng nhập' };
             }
 
             // --- LOGIN GUARD ---
             if (username.length > 100 || password.length > 100) {
-                throw { status: 400, message: 'ThÃ´ng tin Ä‘Äƒng nháº­p quÃ¡ dÃ i' };
+                throw { status: 400, message: 'Thông tin đăng nhập quÃ¡ dÃ i' };
             }
 
             // Fetch user: Universal login (Username or Email)
@@ -44,7 +44,7 @@ export const POST = withTitan({
             if (!isMatch) {
                 // IRONCLAD DEFENSE: 1s delay to deter brute force
                 await new Promise(r => setTimeout(r, 1000));
-                throw { status: 401, message: 'Máº­t kháº©u khÃ´ng chÃ­nh xÃ¡c' };
+                throw { status: 401, message: 'Mật khẩu khÃ´ng chÃ­nh xÃ¡c' };
             }
 
             // Sign token
@@ -60,7 +60,7 @@ export const POST = withTitan({
             if (elapsed < 1500) await new Promise(r => setTimeout(r, 1500 - elapsed));
 
             return {
-                message: 'ÄÄƒng nháº­p thÃ nh cÃ´ng',
+                message: 'ÄÄƒng nháº­p thành công',
                 user: { 
                     username: user.username, 
                     uuid: user.uuid, 
@@ -77,7 +77,7 @@ export const POST = withTitan({
             console.error('Login error', e);
             const elapsed = Date.now() - startTime;
             if (elapsed < 1500) await new Promise(r => setTimeout(r, 1500 - elapsed));
-            throw { status: 500, message: 'Lá»—i há»‡ thá»‘ng khi Ä‘Äƒng nháº­p' };
+            throw { status: 500, message: 'Lỗi hệ thống khi đăng nhập' };
         }
     }
 });
