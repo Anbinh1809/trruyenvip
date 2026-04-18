@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { RefreshCcw, ShieldCheck, Activity, Search, AlertCircle, Clock } from 'lucide-react';
 
 export default function AdminGuardianPage() {
-  const { user, isAuthenticated, loading } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth() || {};
   const [data, setData] = useState({ metrics: {}, history: [] });
   const [fetching, setFetching] = useState(true);
   const [isPending, startTransition] = useTransition();

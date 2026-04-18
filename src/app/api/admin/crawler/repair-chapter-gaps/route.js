@@ -19,10 +19,9 @@ export async function POST(req) {
         }
 
         const manga = mangaData.recordset[0];
-        const source = manga.source_url.includes('nettruyen') ? 'nettruyen' : 'truyenqq';
+        if (!manga.source_url) return NextResponse.json({ error: 'Manga has no source URL' }, { status: 400 });
+        const source = manga.source_url?.includes('nettruyen') ? 'nettruyen' : 'truyenqq';
 
-        // Trigger deep crawl
-        console.log(`[REPAIR-GAP] Starting deep repair for ${mangaId} initiated by ${session.username}`);
         crawlFullMangaChapters(mangaId, manga.source_url, source).catch(e => {
             console.error(`[REPAIR-GAP] Error for ${mangaId}:`, e.message);
         });

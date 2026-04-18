@@ -15,7 +15,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { register } = useAuth();
+  const { register } = useAuth() || {};
   const router = useRouter();
 
   const handleSubmit = async (e) => {

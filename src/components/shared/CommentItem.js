@@ -13,7 +13,7 @@ const CommentItem = ({ comment, isReply = false, chapterId, userName, fetchComme
     
     const { addXp, updateMission, getRankInfo } = useEngagement();
     const { addToast } = useToast();
-    const { user, isAuthenticated } = useAuth();
+    const { user, isAuthenticated } = useAuth() || {};
 
     const rankInfo = getRankInfo(comment.user_xp || 0);
     const isAdmin = comment.user_role === 'admin';
@@ -183,7 +183,7 @@ const CommentItem = ({ comment, isReply = false, chapterId, userName, fetchComme
                 }
                 .rank-badge-industrial {
                     font-size: 0.65rem;
-                    background: rgba(255, 255, 255, 0.05);
+                    background: var(--nebula-glass);
                     padding: 3px 8px;
                     border-radius: 4px;
                     font-weight: 950;
@@ -191,7 +191,7 @@ const CommentItem = ({ comment, isReply = false, chapterId, userName, fetchComme
                 }
                 .rank-badge-industrial.is-admin {
                     background: var(--accent);
-                    color: white;
+                    color: var(--text-primary);
                 }
                 .reply-indicator {
                     font-size: 0.7rem; 
@@ -210,7 +210,7 @@ const CommentItem = ({ comment, isReply = false, chapterId, userName, fetchComme
                 .reply-form-industrial {
                     margin-top: 20px;
                     padding-top: 20px;
-                    border-top: 1px solid rgba(255, 255, 255, 0.05);
+                    border-top: 1px solid var(--glass-border);
                 }
                 .comment-textarea-industrial.mini {
                     min-height: 80px;

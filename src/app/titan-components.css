@@ -17,7 +17,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: var(--text-primary);
     cursor: pointer;
     z-index: 10005;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -52,7 +52,7 @@
 .setting-label {
     font-size: 0.75rem;
     font-weight: 850;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 1.5px;
     margin-bottom: 12px;
@@ -61,7 +61,7 @@
 
 .setting-control-row {
     display: flex; 
-    background: rgba(255, 255, 255, 0.04); 
+    background: var(--nebula-glass); 
     padding: 4px; 
     border-radius: 12px;
 }
@@ -76,7 +76,7 @@
     font-weight: 850;
     transition: all 0.25s;
     background: transparent;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--text-muted);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -85,7 +85,7 @@
 
 .btn-setting-toggle.active {
     background: var(--accent);
-    color: white;
+    color: var(--text-primary);
     box-shadow: 0 4px 12px rgba(255, 62, 62, 0.3);
 }
 
@@ -93,7 +93,7 @@
 .empty-state-titan {
     text-align: center;
     padding: 60px 40px;
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--nebula-glass);
     border-radius: 20px;
     border: 1px dashed var(--glass-border);
     margin: 40px 0;
@@ -104,7 +104,7 @@
     font-weight: 950;
     margin-bottom: 12px;
     letter-spacing: -1px;
-    color: white;
+    color: var(--text-primary);
 }
 
 .empty-sub {
@@ -159,7 +159,7 @@
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     background: rgba(255, 62, 62, 0.4);
     border: 1px solid var(--glass-border);
-    color: white;
+    color: var(--text-primary);
 }
 
 .mission-toggle:hover {
@@ -196,7 +196,7 @@
 
 .mission-item {
     padding: 18px; 
-    background: rgba(255, 255, 255, 0.03); 
+    background: var(--nebula-glass); 
     border-radius: 14px; 
     border: 1px solid var(--glass-border); 
     transition: all 0.3s ease;
@@ -209,7 +209,7 @@
 
 .mission-progress-bg {
     height: 6px; 
-    background: rgba(255, 255, 255, 0.08); 
+    background: var(--nebula-glass); 
     border-radius: 10px; 
     position: relative; 
     overflow: hidden;
@@ -326,7 +326,7 @@
     gap: 25px; 
     margin-bottom: 35px; 
     font-weight: 850; 
-    color: rgba(255, 255, 255, 0.4); 
+    color: var(--text-muted); 
     font-size: 0.9rem;
 }
 
@@ -344,7 +344,7 @@
 /* USER ACTIONS (HEADER) */
 .user-info-plate {
     padding: 12px 18px; 
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05); 
+    border-bottom: 1px solid var(--glass-border); 
     margin-bottom: 8px;
 }
 
@@ -360,7 +360,7 @@
 .user-display-name {
     font-size: 0.95rem; 
     font-weight: 900; 
-    color: white;
+    color: var(--text-primary);
 }
 
 /* RESPONSIVE HERO */
@@ -391,7 +391,7 @@
 .error-text-industrial {
     font-size: 1.1rem;
     font-weight: 700;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--text-primary);
     margin-bottom: 25px;
     max-width: 500px;
     line-height: 1.6;
@@ -404,7 +404,7 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-    background: rgba(15, 23, 42, 0.4);
+    background: var(--glass-bg);
     border-radius: 24px;
     margin: 40px 0;
 }
@@ -412,7 +412,7 @@
 .sync-title-industrial {
     font-size: 1.8rem;
     font-weight: 950;
-    color: white;
+    color: var(--text-primary);
     letter-spacing: -1px;
     margin: 30px 0 15px;
     display: flex;
@@ -422,7 +422,7 @@
 
 .sync-sub-industrial {
     font-size: 1rem;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--text-muted);
     font-weight: 600;
     max-width: 550px;
     line-height: 1.7;
@@ -445,7 +445,7 @@
 /* DAILY CHECK-IN SYSTEM */
 .glass-titan-checkin {
     padding: 30px;
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--nebula-glass);
     border: 1px solid var(--glass-border);
     border-radius: 20px;
     display: flex;
@@ -460,13 +460,13 @@
     font-size: 1.4rem;
     font-weight: 950;
     margin-bottom: 8px;
-    color: white;
+    color: var(--text-primary);
     letter-spacing: -1px;
 }
 
 .checkin-subtitle {
     font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--text-muted);
     font-weight: 700;
 }
 
@@ -474,7 +474,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--nebula-glass);
     padding: 8px;
     border-radius: 40px;
     width: 100%;
@@ -484,7 +484,7 @@
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--nebula-glass);
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
     display: flex;
@@ -499,7 +499,7 @@
 
 .streak-step.active::after {
     content: '✓';
-    color: white;
+    color: var(--text-primary);
     font-size: 14px;
     font-weight: 950;
 }
@@ -518,12 +518,12 @@
 
 .btn-titan-checkin.active {
     background: var(--accent);
-    color: white;
+    color: var(--text-primary);
 }
 
 .btn-titan-checkin.checked {
-    background: rgba(255, 255, 255, 0.05);
-    color: rgba(255, 255, 255, 0.3);
+    background: var(--nebula-glass);
+    color: var(--text-muted);
     cursor: default;
     border: 1px solid var(--glass-border);
 }
@@ -539,7 +539,7 @@
     margin-top: 15px; 
     font-size: 0.7rem; 
     font-weight: 850; 
-    color: rgba(255, 255, 255, 0.3); 
+    color: var(--text-muted); 
     text-transform: uppercase;
     letter-spacing: 1px;
 }
@@ -558,7 +558,7 @@
 /* CELEBRATION & END-OF-CONTENT */
 .celebration-industrial {
     padding: 60px 40px;
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--nebula-glass);
     border-radius: 24px;
     border: 1px solid var(--glass-border);
     margin: 40px 0;
@@ -603,7 +603,7 @@
 .expandable-text-industrial {
     margin-bottom: 12px; 
     line-height: 1.8; 
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--text-secondary);
     font-size: 1rem;
     font-weight: 500;
 }
@@ -611,7 +611,7 @@
 .expand-btn-industrial {
     width: 100%;
     padding: 10px;
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--nebula-glass);
     border: 1px solid var(--glass-border);
     border-radius: 10px;
     color: var(--accent);
@@ -626,8 +626,8 @@
 }
 
 .expand-btn-industrial:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.15);
+    background: var(--glass-bg);
+    border-color: var(--accent);
 }
 
 @media (max-width: 768px) {
@@ -702,7 +702,7 @@
 .titan-slider-indicator {
     width: 40px;
     height: 4px;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--glass-bg);
     border-radius: 2px;
     cursor: pointer;
     transition: all 0.4s;

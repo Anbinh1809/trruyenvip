@@ -280,7 +280,7 @@ export async function crawlLatest(source = 'nettruyen', pageCount = 1, startPage
                 const existing = await query("SELECT id FROM manga WHERE normalized_title = @normalizedTitle OR id = @rawSlug LIMIT 1", { normalizedTitle, rawSlug });
                 let slug = rawSlug;
                 if (existing.recordset?.length > 0) {
-                    slug = existing.recordset[0].id;
+                    slug = existing.recordset?.[0]?.id || rawSlug;
                 } else {
                     await query(`INSERT INTO manga (id, title, source_url, normalized_title) VALUES (@slug, @title, @mangaUrl, @normalizedTitle) ON CONFLICT (id) DO NOTHING`,
                         { slug, title, mangaUrl, normalizedTitle });
@@ -396,7 +396,7 @@ export async function healChapterGaps(batchSize = 20) {
     const res = await query(`SELECT id, source_url FROM manga WHERE last_crawled < NOW() - INTERVAL '6 hours' ORDER BY last_crawled ASC LIMIT @batchSize`, { batchSize });
     for (const m of res.recordset) {
         if (!m.source_url) continue;
-        queueMangaSync(m.id, m.source_url, m.source_url.includes('truyenqq') ? 'truyenqq' : 'nettruyen', true, 2);
+        queueMangaSync(m.id, m.source_url, m.source_url?.includes('truyenqq') ? 'truyenqq' : 'nettruyen', true, 2);
     }
 }
 
@@ -410,7 +410,7 @@ export async function rescueBrokenImages(batchSize = 10) {
     `, { batchSize });
     for (const c of res.recordset) {
         if (!c.source_url || !c.manga_url) continue;
-        queueChapterScrape(c.id, c.source_url, c.manga_url.includes('truyenqq') ? 'truyenqq' : 'nettruyen', true, 2);
+        queueChapterScrape(c.id, c.source_url, c.manga_url?.includes('truyenqq') ? 'truyenqq' : 'nettruyen', true, 2);
     }
 }
 

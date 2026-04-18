@@ -215,8 +215,8 @@ export default function LiveSearch({ onSelect }) {
                 border: 1px solid transparent;
             }
             .live-result-item-industrial:hover, .highlighted-industrial {
-                background: rgba(255, 255, 255, 0.05);
-                border-color: rgba(255, 255, 255, 0.08);
+                background: var(--glass-bg);
+                border-color: var(--glass-border);
                 transform: translateX(3px);
             }
             .result-thumb-titan-industrial {
@@ -226,7 +226,7 @@ export default function LiveSearch({ onSelect }) {
                 overflow: hidden;
                 flex-shrink: 0;
                 position: relative;
-                border: 1px solid rgba(255, 255, 255, 0.05);
+                border: 1px solid var(--glass-border);
             }
             .titan-thumb-img-tag {
                 object-fit: cover;
@@ -238,14 +238,14 @@ export default function LiveSearch({ onSelect }) {
             .result-title-titan-industrial {
                 font-size: 0.95rem;
                 font-weight: 900;
-                color: white;
+                color: var(--text-primary);
                 margin-bottom: 2px;
                 letter-spacing: -0.3px;
             }
             .result-sub-titan-industrial {
                 font-size: 0.75rem;
                 font-weight: 750;
-                color: rgba(255, 255, 255, 0.3);
+                color: var(--text-muted);
             }
             .search-empty-titan-industrial {
                 padding: 80px 20px;
@@ -254,14 +254,14 @@ export default function LiveSearch({ onSelect }) {
             .empty-title-industrial {
                 font-size: 1rem;
                 font-weight: 950;
-                color: rgba(255, 255, 255, 0.5);
+                color: var(--text-muted);
                 letter-spacing: 1px;
                 margin-bottom: 8px;
             }
             .empty-sub-industrial {
                 font-size: 0.8rem;
                 font-weight: 750;
-                color: rgba(255, 255, 255, 0.2);
+                color: var(--text-secondary);
             }
         `}</style>
     </div>

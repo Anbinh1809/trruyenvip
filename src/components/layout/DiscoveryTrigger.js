@@ -65,9 +65,9 @@ export default function DiscoveryTrigger({ slug }) {
 
             <style jsx>{`
                 .discovery-industrial {
-                    background: rgba(20, 20, 25, 0.8);
+                    background: var(--glass-bg);
                     backdrop-filter: blur(12px);
-                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    border: 1px solid var(--glass-border);
                     padding: 2rem;
                     border-radius: 12px;
                     display: flex;
@@ -81,12 +81,12 @@ export default function DiscoveryTrigger({ slug }) {
                     font-size: 1.1rem;
                     letter-spacing: 2px;
                     font-weight: 950;
-                    color: white;
+                    color: var(--text-primary);
                 }
                 .discovery-msg {
                     margin: 4px 0 0 0;
                     font-size: 0.9rem;
-                    color: rgba(255, 255, 255, 0.6);
+                    color: var(--text-muted);
                 }
                 .color-accent { color: var(--accent); }
             `}</style>

@@ -10,7 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
  */
 export default function ChapterPrefetcher({ mangaId, chapters = [] }) {
   const { history, mounted } = useHistory();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth() || {};
   const hasPrefetchedRef = useRef(false);
 
   useEffect(() => {

@@ -210,20 +210,20 @@ export default function ReaderSettings() {
             margin: 0;
             font-size: 0.95rem;
             font-weight: 950;
-            color: white;
+            color: var(--text-primary);
             letter-spacing: -0.5px;
         }
         .setting-desc {
             margin: 0;
             font-size: 0.7rem;
-            color: rgba(255, 255, 255, 0.4);
+            color: var(--text-muted);
             font-weight: 750;
         }
         .titan-switch {
             margin-left: auto;
             width: 44px;
             height: 24px;
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--glass-border);
             border-radius: 20px;
             position: relative;
             cursor: pointer;
@@ -237,7 +237,7 @@ export default function ReaderSettings() {
             left: 2px;
             width: 20px;
             height: 20px;
-            background: white;
+            background: var(--text-primary);
             border-radius: 50%;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -249,7 +249,7 @@ export default function ReaderSettings() {
         }
         .hifi-toggle-card {
             padding: 15px;
-            background: rgba(255, 255, 255, 0.03);
+            background: var(--nebula-glass);
             border: 1px solid var(--glass-border);
             border-radius: 14px;
             display: flex;
@@ -259,8 +259,8 @@ export default function ReaderSettings() {
             transition: all 0.3s;
         }
         .hifi-toggle-card:hover {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(255, 255, 255, 0.15);
+            background: var(--glass-bg);
+            border-color: var(--accent);
         }
         .hifi-toggle-card.active {
             border-color: var(--accent);
@@ -269,18 +269,18 @@ export default function ReaderSettings() {
         .hifi-title {
             font-size: 0.85rem;
             font-weight: 900;
-            color: white;
+            color: var(--text-primary);
         }
         .hifi-sub {
             font-size: 0.65rem;
-            color: rgba(255, 255, 255, 0.3);
+            color: var(--text-muted);
             font-weight: 750;
             margin-top: 2px;
         }
         .titan-checkbox {
             width: 22px;
             height: 22px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--glass-border);
             border-radius: 6px;
             position: relative;
             transition: all 0.3s;
@@ -291,7 +291,7 @@ export default function ReaderSettings() {
         }
         .titan-checkbox.checked::after {
             content: '✓';
-            color: white;
+            color: var(--text-primary);
             font-size: 14px;
             position: absolute;
             inset: 0;
@@ -301,7 +301,7 @@ export default function ReaderSettings() {
         }
         .setting-footer-hint {
             font-size: 0.65rem;
-            color: rgba(255, 255, 255, 0.2);
+            color: var(--text-muted);
             margin-top: 15px;
             font-style: italic;
             font-weight: 700;

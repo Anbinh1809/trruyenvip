@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 
 export default function AdminDashboard() {
-  const { user, isAuthenticated, loading } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth() || {};
   const { addToast } = useToast();
   const [stats, setStats] = useState(null);
   const [crawlLoading, setCrawlLoading] = useState(false);

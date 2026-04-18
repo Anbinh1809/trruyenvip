@@ -80,7 +80,7 @@ export default function DailyCheckIn() {
             .streak-gift-box {
                 position: absolute;
                 top: -35px;
-                color: rgba(255, 255, 255, 0.1);
+                color: var(--glass-border);
                 transition: all 0.5s;
             }
             .streak-gift-box.is-active {
@@ -99,7 +99,7 @@ export default function DailyCheckIn() {
             
             .skeleton-loader-industrial {
                 height: 180px;
-                background: rgba(255, 255, 255, 0.02);
+                background: var(--nebula-glass);
                 border-radius: 20px;
                 border: 1px dashed var(--glass-border);
             }

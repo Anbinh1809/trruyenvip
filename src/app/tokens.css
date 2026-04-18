@@ -85,7 +85,7 @@
 .fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 .titan-spin { animation: spin 1s linear infinite; }
 .skeleton-shimmer {
-  background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+  background: linear-gradient(90deg, var(--nebula-glass) 25%, var(--glass-border) 50%, var(--nebula-glass) 75%);
   background-size: 200% 100%;
   animation: shimmer 2s infinite linear;
 }

@@ -9,15 +9,16 @@ import { NextResponse } from 'next/server';
 export const POST = withTitan({
     auth: true,
     handler: async (request, session) => {
-        const userUuid = session.uuid;
-        const today = new Date().toISOString().split('T')[0];
-        const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+        try {
+            const userUuid = session.uuid;
+            const today = new Date().toISOString().split('T')[0];
+            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
 
-        // TITAN RATE LIMIT: Prevent rapid clicking / duplicate trigger bypass attempts
-        const limiter = await checkRateLimit(`checkin_${userUuid}`, 1, 10); // 1 request / 10s
-        if (!limiter.success) {
-            throw { status: 429, message: 'Y�u c?u điểm danh qu� nhanh. Vui l�ng thử lại sau.' };
-        }
+            // TITAN RATE LIMIT: Prevent rapid clicking / duplicate trigger bypass attempts
+            const limiter = await checkRateLimit(`checkin_${userUuid}`, 1, 10); // 1 request / 10s
+            if (!limiter.success) {
+                throw { status: 429, message: 'Yêu cầu điểm danh quá nhanh. Vui lòng thử lại sau.' };
+            }
 
             const result = await withTransaction(async (tx) => {
                 // 1. Check if already checked in today
@@ -28,7 +29,7 @@ export const POST = withTitan({
                 );
 
                 if (todayCheck.rowCount > 0) {
-                    throw new Error('B?n d� điểm danh h�m nay r?i.');
+                    throw new Error('Bạn đã điểm danh hôm nay rồi.');
                 }
 
                 // 2. Check yesterday to calculate streak
@@ -40,17 +41,17 @@ export const POST = withTitan({
 
                 let newStreak = 1;
                 if (yesterdayCheck.rowCount > 0) {
-                    newStreak = parseInt(yesterdayCheck.recordset[0].streak) + 1;
+                    newStreak = parseInt(yesterdayCheck.recordset?.[0]?.streak || 0) + 1;
                 }
 
                 // 3. Calculate Reward
                 let reward = 10;
-                let message = `Đio�m danh th�nh c�ng! Nhận đuo�c ${reward} xu. Chuo�i: ${newStreak} ng�y.`;
+                let message = `Điểm danh thành công! Nhận được ${reward} xu. Chuỗi: ${newStreak} ngày.`;
                 
                 if (newStreak % 7 === 0) {
                     const bonus = 100;
                     reward += bonus;
-                    message = `Tuy?t vo�i! B?n d� điểm danh li�n ti?p 7 ng�y. Nh?n thu?ng ${reward} xu!`;
+                    message = `Tuyệt vời! Bạn đã điểm danh liên tiếp 7 ngày. Nhận thưởng ${reward} xu!`;
                 }
 
                 // 4. Record Check-in
@@ -76,28 +77,36 @@ export const POST = withTitan({
                 reward: result.reward,
                 streak: result.streak
             };
-
+        } catch (e) {
+            console.error('Checkin POST error:', e);
+            throw e;
+        }
     }
 });
 
 export const GET = withTitan({
     auth: true,
     handler: async (request, session) => {
-        const today = new Date().toISOString().split('T')[0];
-        const res = await query(`
-            SELECT streak, 
-                   (SELECT COUNT(*) FROM dailycheckins WHERE user_uuid = @uuid AND checkin_date = @today) as done_today
-            FROM dailycheckins 
-            WHERE user_uuid = @uuid 
-            ORDER BY checkin_date DESC 
-            LIMIT 1
-        `, { uuid: session.uuid, today });
+        try {
+            const today = new Date().toISOString().split('T')[0];
+            const res = await query(`
+                SELECT streak, 
+                       (SELECT COUNT(*) FROM dailycheckins WHERE user_uuid = @uuid AND checkin_date = @today) as done_today
+                FROM dailycheckins 
+                WHERE user_uuid = @uuid 
+                ORDER BY checkin_date DESC 
+                LIMIT 1
+            `, { uuid: session.uuid, today });
 
-        const stats = res.recordset[0] || { streak: 0, done_today: 0 };
-        return {
-            streak: stats.streak,
-            doneToday: stats.done_today > 0
-        };
+            const stats = res.recordset[0] || { streak: 0, done_today: 0 };
+            return {
+                streak: stats.streak,
+                doneToday: stats.done_today > 0
+            };
+        } catch (e) {
+            console.error('Checkin GET error:', e);
+            throw e;
+        }
     }
 });
 

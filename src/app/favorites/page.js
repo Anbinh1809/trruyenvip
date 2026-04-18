@@ -12,7 +12,7 @@ import { Gem, Lock } from 'lucide-react';
 
 export default function FavoritesPage() {
   const { favorites, mounted } = useFavorites();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth() || {};
   const { history } = useHistory();
   
   return (

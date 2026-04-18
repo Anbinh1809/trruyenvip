@@ -14,7 +14,7 @@ import NotificationBell from '@/components/layout/NotificationBell';
 import './layout/Header/Header.css';
 
 export default function Header() {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading } = useAuth() || {};
   const mounted = useIsMounted();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);

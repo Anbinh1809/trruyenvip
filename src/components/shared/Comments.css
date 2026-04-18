@@ -1,7 +1,7 @@
 .comment-section-container {
     margin-top: 80px;
     padding: 50px;
-    background: rgba(15, 23, 42, 0.4);
+    background: var(--glass-bg);
     border-radius: 24px;
     border: 1px solid var(--glass-border);
     backdrop-filter: blur(20px);
@@ -20,7 +20,7 @@
     gap: 12px; 
     font-weight: 950;
     font-size: 1.5rem;
-    color: white;
+    color: var(--text-primary);
     letter-spacing: -1px;
 }
 
@@ -28,7 +28,7 @@
     padding: 30px; 
     text-align: center; 
     margin-bottom: 40px; 
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--nebula-glass);
     border-radius: 16px;
     border: 1px dashed var(--glass-border);
 }
@@ -36,11 +36,11 @@
 .comment-textarea-industrial {
     width: 100%;
     min-height: 120px;
-    background: rgba(2, 6, 23, 0.4);
+    background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     padding: 20px;
     border-radius: 16px;
-    color: white;
+    color: var(--text-primary);
     margin-bottom: 20px;
     outline: none;
     resize: vertical;
@@ -51,13 +51,13 @@
 
 .comment-textarea-industrial:focus {
     border-color: var(--accent);
-    background: rgba(2, 6, 23, 0.6);
+    background: var(--glass-bg);
     box-shadow: 0 0 0 4px rgba(255, 62, 62, 0.1);
 }
 
 .comment-item {
     padding: 24px;
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--nebula-glass);
     border-radius: 20px;
     border: 1px solid var(--glass-border);
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -65,13 +65,13 @@
 }
 
 .comment-item:hover {
-    background: rgba(255, 255, 255, 0.04);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--glass-bg);
+    border-color: var(--glass-border);
 }
 
 .comment-item.reply {
     margin-left: 50px;
-    background: rgba(255, 255, 255, 0.01);
+    background: var(--nebula-glass);
 }
 
 .author-meta-industrial {
@@ -82,7 +82,7 @@
 
 .author-name-industrial {
     font-weight: 950;
-    color: white;
+    color: var(--text-primary);
     font-size: 1rem;
     letter-spacing: -0.3px;
 }
@@ -93,7 +93,7 @@
 
 .comment-timestamp {
     font-size: 0.75rem; 
-    color: rgba(255, 255, 255, 0.3);
+    color: var(--text-muted);
     font-weight: 800;
 }
 
@@ -101,7 +101,7 @@
     font-size: 1rem;
     line-height: 1.7;
     margin: 15px 0 20px;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--text-secondary);
     font-weight: 500;
 }
 
@@ -113,7 +113,7 @@
 .action-btn-industrial {
     background: none;
     border: none;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--text-muted);
     font-size: 0.8rem;
     cursor: pointer;
     display: flex;

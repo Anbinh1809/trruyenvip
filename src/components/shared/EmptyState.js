@@ -31,7 +31,7 @@ export default function EmptyState({ title, subtitle, actionText = 'TIẾP TỤC
             align-items: center;
         }
         .empty-icon-titan {
-            color: rgba(255, 255, 255, 0.1);
+            color: var(--glass-border);
             margin-bottom: 30px;
             animation: float-slow 4s ease-in-out infinite;
         }
@@ -39,11 +39,11 @@ export default function EmptyState({ title, subtitle, actionText = 'TIẾP TỤC
             font-size: 2rem; 
             font-weight: 950; 
             margin: 0 0 15px; 
-            color: white; 
+            color: var(--text-primary); 
             letter-spacing: -1px;
         }
         .empty-desc-industrial {
-            color: rgba(255, 255, 255, 0.4); 
+            color: var(--text-muted); 
             max-width: 500px; 
             margin: 0 auto; 
             font-weight: 700; 

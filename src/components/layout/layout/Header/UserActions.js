@@ -7,8 +7,8 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useIsMounted } from '@/hooks/useIsMounted';
 
 export default function UserActions({ loading }) {
-  const { user, isAuthenticated, logout } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+  const { user, isAuthenticated, logout } = useAuth() || {};
+  const { theme, toggleTheme } = useTheme() || { theme: 'dark', toggleTheme: () => {} };
   const mounted = useIsMounted();
 
   if (!mounted) return <div className="skeleton-user-actions skeleton-shimmer" />;

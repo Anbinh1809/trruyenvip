@@ -131,7 +131,7 @@ export default function MissionPanel() {
             height: 14px;
             background: var(--accent);
             border-radius: 50%;
-            border: 2px solid white;
+            border: 2px solid var(--background-default);
         }
         .mission-header-industrial {
             display: flex;
@@ -154,25 +154,25 @@ export default function MissionPanel() {
             margin: 0;
             font-weight: 950;
             font-size: 1.25rem;
-            color: white;
+            color: var(--text-primary);
             letter-spacing: -0.5px;
         }
         .mission-subtitle {
             margin: 0;
             font-size: 0.7rem;
-            opacity: 0.5;
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 1px;
             font-weight: 800;
         }
         .badge-titan-rank {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--nebula-glass);
             padding: 6px 14px;
             border-radius: 20px;
             font-size: 0.75rem;
             font-weight: 800;
             border: 1px solid var(--glass-border);
-            color: white;
+            color: var(--text-primary);
         }
         .mission-list-industrial {
             display: flex;
@@ -193,7 +193,7 @@ export default function MissionPanel() {
         .mission-label-text {
             font-weight: 800;
             font-size: 0.9rem;
-            color: white;
+            color: var(--text-primary);
         }
         .mission-item.done .mission-label-text {
             color: var(--accent);
@@ -201,14 +201,14 @@ export default function MissionPanel() {
         .mission-count-text {
             font-size: 0.8rem;
             font-weight: 900;
-            color: rgba(255, 255, 255, 0.4);
+            color: var(--text-muted);
         }
         .mission-item.done .mission-count-text {
             color: var(--accent);
         }
         .mission-progress-bg {
             height: 6px;
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--nebula-glass);
             border-radius: 3px;
             overflow: hidden;
             position: relative;
@@ -242,7 +242,7 @@ export default function MissionPanel() {
         .prize-amount {
             font-size: 4rem;
             font-weight: 950;
-            color: white;
+            color: var(--text-primary);
             margin-bottom: 5px;
             letter-spacing: -3px;
         }
@@ -254,7 +254,7 @@ export default function MissionPanel() {
             font-size: 0.95rem;
         }
         .prize-desc-text {
-            color: rgba(255, 255, 255, 0.4);
+            color: var(--text-secondary);
             margin-top: 25px;
             max-width: 320px;
             margin-left: auto;
@@ -274,7 +274,7 @@ export default function MissionPanel() {
         }
         .celebration-sync-text {
             margin-top: 30px;
-            color: white;
+            color: var(--text-primary);
             font-weight: 950;
             font-size: 1.4rem;
             letter-spacing: 1px;
@@ -282,7 +282,7 @@ export default function MissionPanel() {
         .celebration-loader-bar {
             width: 120px;
             height: 4px;
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--glass-border);
             border-radius: 2px;
             margin: 25px auto 0;
             overflow: hidden;

@@ -14,9 +14,7 @@ export async function GET() {
             return new Response('Unauthorized', { status: 401 });
         }
         
-        console.log('[Maintenance] Starting Link Repair Process...');
-        
-        // 1. Repair relative Chapter URLs
+
         const relativeChapters = await query(`
             SELECT id, source_url FROM chapters 
             WHERE source_url LIKE '/%'
@@ -25,14 +23,13 @@ export async function GET() {
         let repairedCount = 0;
         const taskRows = relativeChapters.recordset || [];
         for (const chap of taskRows) {
+            if (!chap.source_url) continue;
             let newUrl = '';
-            // Majority of relative links are from TruyenQQ in this DB state
-            if (chap.source_url.includes('chap')) {
+            if (chap.source_url?.includes('chap')) {
                 newUrl = SOURCES.TRUYENQQ + (chap.source_url.startsWith('/') ? '' : '/') + chap.source_url;
             } else {
                 newUrl = SOURCES.NETTRUYEN + (chap.source_url.startsWith('/') ? '' : '/') + chap.source_url;
             }
-            
             await query('UPDATE chapters SET source_url = @newUrl WHERE id = @id', { newUrl, id: chap.id });
             repairedCount++;
         }

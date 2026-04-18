@@ -28,9 +28,9 @@ export default function ChapterSelector({ mangaId, chapters, currentId }) {
             </select>
             <style jsx>{`
                 .select-titan-industrial {
-                    background: rgba(255, 255, 255, 0.05);
+                    background: var(--nebula-glass);
                     border: 1px solid var(--glass-border);
-                    color: white;
+                    color: var(--text-primary);
                     padding: 8px 15px;
                     border-radius: 8px;
                     font-size: 0.85rem;
@@ -41,7 +41,7 @@ export default function ChapterSelector({ mangaId, chapters, currentId }) {
                     max-width: 150px;
                 }
                 .select-titan-industrial:hover {
-                    background: rgba(255, 255, 255, 0.1);
+                    background: var(--glass-bg);
                     border-color: var(--accent);
                 }
                 @media (max-width: 768px) {

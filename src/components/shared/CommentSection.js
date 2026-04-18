@@ -17,7 +17,7 @@ export default function CommentSection({ chapterId }) {
   const [userName, setUserName] = useState('');
   const { xp, addXp, updateMission } = useEngagement();
   const { addToast } = useToast();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth() || {};
   const [submitting, setSubmitting] = useState(false);
   const [isPending, startTransition] = useTransition();
   const mounted = useIsMounted();
@@ -197,7 +197,7 @@ export default function CommentSection({ chapterId }) {
         }
         .active-user-hint {
             font-size: 0.85rem; 
-            color: rgba(255, 255, 255, 0.4);
+            color: var(--text-muted);
             font-weight: 700;
         }
         .active-user-name {
@@ -207,7 +207,7 @@ export default function CommentSection({ chapterId }) {
         .login-prompt-text {
             margin-bottom: 25px; 
             font-weight: 700;
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--text-secondary);
         }
         .login-btn-wide {
             display: inline-flex; 
@@ -236,15 +236,15 @@ export default function CommentSection({ chapterId }) {
             width: 100%;
             height: 120px;
             border-radius: 20px;
-            background: rgba(255, 255, 255, 0.02);
+            background: var(--nebula-glass);
             animation: pulse-industrial 2s infinite;
         }
         .empty-comments-industrial {
             text-align: center;
-            color: rgba(255, 255, 255, 0.3);
+            color: var(--text-muted);
             padding: 60px;
             font-weight: 800;
-            background: rgba(255, 255, 255, 0.01);
+            background: var(--glass-bg);
             border-radius: 20px;
             border: 1px dashed var(--glass-border);
         }

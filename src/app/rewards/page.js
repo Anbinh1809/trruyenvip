@@ -22,7 +22,7 @@ const BANK_LIST = [
 ];
 
 export default function RewardsPage() {
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { isAuthenticated, loading: authLoading } = useAuth() || {};
   const { vipCoins, mounted, deductCoins } = useEngagement();
   const { addToast } = useToast();
   
@@ -239,7 +239,7 @@ export default function RewardsPage() {
             letter-spacing: -3px;
         }
         .rewards-subtitle-industrial {
-            color: rgba(255,255,255,0.4); 
+            color: var(--text-muted); 
             font-size: 1.1rem; 
             max-width: 650px; 
             margin: 0 auto 50px; 
@@ -258,7 +258,7 @@ export default function RewardsPage() {
             font-size: 2rem; 
             font-weight: 950;
             letter-spacing: -1px;
-            color: white;
+            color: var(--text-primary);
         }
         .rewards-main-grid-industrial {
             display: grid; 
@@ -269,7 +269,7 @@ export default function RewardsPage() {
         .redemption-form-card {
             padding: 40px; 
             border-radius: 24px; 
-            background: rgba(15, 23, 42, 0.4);
+            background: var(--glass-bg);
             border: 1px solid var(--glass-border);
             backdrop-filter: blur(20px);
         }
@@ -280,25 +280,25 @@ export default function RewardsPage() {
             display: flex; 
             align-items: center; 
             gap: 12px;
-            color: white;
+            color: var(--text-primary);
             letter-spacing: 0.5px;
         }
         .field-label-titan {
             display: block;
             font-size: 0.75rem;
             font-weight: 950;
-            color: rgba(255, 255, 255, 0.4);
+            color: var(--text-muted);
             margin-bottom: 12px;
             letter-spacing: 1px;
         }
         .input-field-industrial { margin-bottom: 25px; }
         .select-titan-industrial, .input-titan-industrial {
             width: 100%;
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--nebula-glass);
             border: 1px solid var(--glass-border);
             padding: 15px 20px;
             border-radius: 12px;
-            color: white;
+            color: var(--text-primary);
             font-weight: 700;
             font-size: 1rem;
             outline: none;
@@ -306,7 +306,7 @@ export default function RewardsPage() {
         }
         .select-titan-industrial:focus, .input-titan-industrial:focus {
             border-color: var(--accent);
-            background: rgba(255, 255, 255, 0.08);
+            background: var(--glass-bg);
         }
         .uppercase-text { text-transform: uppercase; }
         .form-message-industrial {
@@ -338,18 +338,18 @@ export default function RewardsPage() {
             gap: 10px;
             font-size: 0.75rem;
             font-weight: 700;
-            color: rgba(255, 255, 255, 0.2);
+            color: var(--text-muted);
         }
         .catalog-title-industrial {
             font-size: 1.4rem;
             font-weight: 950;
             margin-bottom: 30px;
             letter-spacing: 1px;
-            color: white;
+            color: var(--text-primary);
         }
         .card-icon-industrial { margin-bottom: 20px; opacity: 0.8; }
-        .card-label-industrial { font-size: 1.5rem; font-weight: 950; margin-bottom: 8px; color: white; }
-        .card-cost-industrial { font-size: 0.9rem; font-weight: 700; color: rgba(255, 255, 255, 0.4); margin-bottom: 25px; }
+        .card-label-industrial { font-size: 1.5rem; font-weight: 950; margin-bottom: 8px; color: var(--text-primary); }
+        .card-cost-industrial { font-size: 0.9rem; font-weight: 700; color: var(--text-muted); margin-bottom: 25px; }
         .redeem-btn-titan { width: 100%; border-radius: 12px; font-weight: 950; font-size: 1rem; padding: 14px; }
         .redemption-history-section { margin-top: 80px; }
         .history-title-industrial {
@@ -359,11 +359,11 @@ export default function RewardsPage() {
             display: flex;
             align-items: center;
             gap: 15px;
-            color: white;
+            color: var(--text-primary);
             letter-spacing: 0.5px;
         }
         .history-list-industrial {
-            background: rgba(15, 23, 42, 0.3);
+            background: var(--glass-bg);
             border-radius: 20px;
             border: 1px solid var(--glass-border);
             max-height: 500px;
@@ -374,14 +374,14 @@ export default function RewardsPage() {
             justify-content: space-between;
             align-items: center;
             padding: 25px 30px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid var(--glass-border);
             transition: background 0.3s;
         }
-        .history-item-industrial:hover { background: rgba(255, 255, 255, 0.02); }
+        .history-item-industrial:hover { background: var(--nebula-glass); }
         .history-item-industrial:last-child { border-bottom: none; }
-        .history-value-row { font-size: 1.3rem; font-weight: 950; color: white; margin-bottom: 4px; }
+        .history-value-row { font-size: 1.3rem; font-weight: 950; color: var(--text-primary); margin-bottom: 4px; }
         .bank-name-industrial { color: #60a5fa; }
-        .history-time-industrial { font-size: 0.8rem; font-weight: 700; color: rgba(255, 255, 255, 0.3); }
+        .history-time-industrial { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); }
         .status-pill-industrial {
             display: flex;
             align-items: center;
@@ -390,8 +390,8 @@ export default function RewardsPage() {
             border-radius: 40px;
             font-size: 0.75rem;
             font-weight: 950;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: var(--nebula-glass);
+            border: 1px solid var(--glass-border);
             letter-spacing: 1px;
         }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; }
@@ -401,7 +401,7 @@ export default function RewardsPage() {
         .status-pill-industrial.done .status-dot { background: #10b981; box-shadow: 0 0 10px #10b981; }
         .status-pill-industrial.rejected { color: #ef4444; }
         .status-pill-industrial.rejected .status-dot { background: #ef4444; box-shadow: 0 0 10px #ef4444; }
-        .history-empty-state { padding: 80px; text-align: center; color: rgba(255, 255, 255, 0.2); font-weight: 800; }
+        .history-empty-state { padding: 80px; text-align: center; color: var(--text-muted); font-weight: 800; }
         @media (max-width: 1024px) {
             .rewards-main-grid-industrial { grid-template-columns: 1fr; }
             .rewards-title-industrial { font-size: 2.5rem; }

@@ -78,10 +78,10 @@ export default function Footer() {
             margin-bottom: 20px; 
             font-weight: 950; 
             letter-spacing: -1.5px;
-            color: white;
+            color: var(--text-primary);
         }
         .text-accent { color: var(--accent); }
-        .text-white { color: white; }
+        .text-white { color: var(--text-primary); }
         .footer-brand-text {
             font-size: 0.9rem;
             line-height: 1.8;
@@ -95,7 +95,7 @@ export default function Footer() {
             letter-spacing: 2px;
             margin-bottom: 30px;
             text-transform: uppercase;
-            color: white;
+            color: var(--text-primary);
             opacity: 0.9;
         }
         .footer-links {
@@ -122,18 +122,18 @@ export default function Footer() {
             align-items: center;
             gap: 10px;
             padding: 8px 18px;
-            background: rgba(255, 255, 255, 0.03);
+            background: var(--nebula-glass);
             border-radius: 8px;
             font-size: 0.7rem;
             font-weight: 950;
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
             letter-spacing: 1px;
         }
         .dmca-check { color: #10b981; }
         .footer-bottom-titan {
             padding: 40px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-top: 1px solid var(--glass-border);
             display: flex;
             justify-content: space-between;
             align-items: center;

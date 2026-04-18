@@ -123,7 +123,7 @@ export default function DetailActions({ mangaId, firstChapterId, mangaTitle, man
                     border-radius: 6px;
                     font-size: 0.95rem;
                     font-weight: 800;
-                    color: white;
+                    color: var(--text-primary);
                     text-decoration: none;
                     border: none;
                     cursor: pointer;
@@ -146,7 +146,7 @@ export default function DetailActions({ mangaId, firstChapterId, mangaTitle, man
                     border: 1px solid var(--glass-border);
                 }
                 .btn-purple:hover {
-                    background-color: rgba(255, 255, 255, 0.05);
+                    background-color: var(--nebula-glass);
                     transform: translateY(-2px);
                 }
                 .disabled-mirror {

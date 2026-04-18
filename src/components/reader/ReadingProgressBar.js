@@ -34,7 +34,7 @@ export default function ReadingProgressBar() {
             width: 100%;
             height: 4px;
             z-index: 10001; /* Above Reader Nav */
-            background: rgba(255, 255, 255, 0.02);
+            background: var(--nebula-glass);
             overflow: hidden;
         }
         .reading-progress-bar-industrial {
@@ -50,9 +50,9 @@ export default function ReadingProgressBar() {
             position: absolute;
             inset: 0;
             background: linear-gradient(90deg, 
-                rgba(255,255,255,0) 0%, 
-                rgba(255,255,255,0.2) 50%, 
-                rgba(255,255,255,0) 100%
+                transparent 0%, 
+                var(--glass-border) 50%, 
+                transparent 100%
             );
             width: 50%;
             height: 100%;

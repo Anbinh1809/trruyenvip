@@ -95,7 +95,7 @@ export default function LevelUpOverlay({ level, rank, onComplete }) {
         .celebration-title-titan-industrial {
             font-size: 1.2rem;
             font-weight: 950;
-            color: white;
+            color: var(--text-primary);
             margin: 0;
             letter-spacing: 1px;
         }
@@ -110,7 +110,7 @@ export default function LevelUpOverlay({ level, rank, onComplete }) {
         .celebration-subtitle-titan-industrial {
             font-size: 0.85rem;
             font-weight: 750;
-            color: rgba(255, 255, 255, 0.4);
+            color: var(--text-muted);
             margin: 4px 0 0;
         }
         @keyframes titan-toast-slide {

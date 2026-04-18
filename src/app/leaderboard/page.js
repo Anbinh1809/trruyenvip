@@ -17,7 +17,7 @@ const RankingIcon = ({ index }) => {
 }
 
 export default function LeaderboardPage() {
-  const { user: currentUser } = useAuth();
+  const { user: currentUser } = useAuth() || {};
   const [leaders, setLeaders] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -141,8 +141,8 @@ export default function LeaderboardPage() {
                     letter-spacing: 1.5px;
                     margin-bottom: 25px;
                 }
-                .leaderboard-title-industrial { font-size: 2.8rem; font-weight: 950; letter-spacing: -1.5px; color: white; margin-bottom: 15px; }
-                .leaderboard-subtitle { color: rgba(255,255,255,0.4); max-width: 600px; margin: 0 auto; line-height: 1.6; }
+                .leaderboard-title-industrial { font-size: 2.8rem; font-weight: 950; letter-spacing: -1.5px; color: var(--text-primary); margin-bottom: 15px; }
+                .leaderboard-subtitle { color: var(--text-muted); max-width: 600px; margin: 0 auto; line-height: 1.6; }
                 
                 .leaderboard-list-industrial { display: flex; flex-direction: column; gap: 12px; padding-bottom: 120px; }
                 
@@ -150,14 +150,14 @@ export default function LeaderboardPage() {
                     display: flex;
                     align-items: center;
                     padding: 20px 40px;
-                    background: rgba(15, 23, 42, 0.4);
+                    background: var(--glass-bg);
                     backdrop-filter: blur(10px);
                     border: 1px solid var(--glass-border);
                     border-radius: 20px;
                     transition: all 0.3s var(--ease-titan);
                     animation: fadeUp 0.8s both var(--delay);
                 }
-                .rank-node-titan-industrial:hover { transform: scale(1.01) translateY(-3px); border-color: rgba(255,255,255,0.15); background: rgba(15, 23, 42, 0.6); }
+                .rank-node-titan-industrial:hover { transform: scale(1.01) translateY(-3px); border-color: var(--glass-border); background: var(--glass-bg); }
                 .rank-node-titan-industrial.is-self { border-color: var(--accent); background: rgba(255, 62, 62, 0.05); }
 
                 .podium-gold { border-color: rgba(251, 191, 36, 0.3); background: linear-gradient(90deg, rgba(251, 191, 36, 0.05) 0%, transparent 100%); }
@@ -165,36 +165,36 @@ export default function LeaderboardPage() {
                 .podium-bronze { border-color: rgba(180, 83, 9, 0.3); }
 
                 .rank-icon-box-industrial { width: 50px; display: flex; align-items: center; justify-content: center; }
-                .rank-number-industrial { font-size: 1.2rem; font-weight: 950; opacity: 0.2; }
+                .rank-number-industrial { font-size: 1.2rem; font-weight: 950; color: var(--text-muted); }
                 
                 .rank-avatar-wrapper-industrial {
                     width: 56px; height: 56px; border-radius: 50%; overflow: hidden; 
-                    background: rgba(255,255,255,0.05); border: 2px solid var(--glass-border);
+                    background: var(--nebula-glass); border: 2px solid var(--glass-border);
                     margin: 0 25px;
                 }
                 .rank-avatar-img-industrial { width: 100%; height: 100%; object-fit: cover; }
-                .rank-avatar-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.2); }
+                .rank-avatar-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
 
                 .rank-info-industrial { flex: 1; }
-                .rank-user-title { font-size: 1.2rem; font-weight: 900; margin-bottom: 4px; display: flex; align-items: center; color: white; }
+                .rank-user-title { font-size: 1.2rem; font-weight: 900; margin-bottom: 4px; display: flex; align-items: center; color: var(--text-primary); }
                 .user-tags-wrapper-titan { display: flex; gap: 8px; margin-left: 15px; }
-                .self-tag-titan { font-size: 0.65rem; background: var(--accent); padding: 3px 10px; border-radius: 4px; color: white; letter-spacing: 1px; font-weight: 900; }
-                .admin-tag-titan { font-size: 0.65rem; background: rgba(255,255,255,0.1); padding: 3px 10px; border-radius: 4px; color: rgba(255,255,255,0.6); letter-spacing: 1px; font-weight: 900; }
+                .self-tag-titan { font-size: 0.65rem; background: var(--accent); padding: 3px 10px; border-radius: 4px; color: var(--text-primary); letter-spacing: 1px; font-weight: 900; }
+                .admin-tag-titan { font-size: 0.65rem; background: var(--nebula-glass); padding: 3px 10px; border-radius: 4px; color: var(--text-secondary); letter-spacing: 1px; font-weight: 900; }
                 
                 .rank-stats-industrial { display: flex; align-items: center; gap: 15px; }
-                .rank-stat-node { font-size: 0.85rem; font-weight: 800; }
-                .rank-stat-node .label { color: rgba(255,255,255,0.3); text-transform: uppercase; margin-right: 5px; }
+                .rank-stat-node { font-size: 0.85rem; font-weight: 800; color: var(--text-primary); }
+                .rank-stat-node .label { color: var(--text-muted); text-transform: uppercase; margin-right: 5px; }
                 .rank-title-tag { color: var(--accent); text-transform: uppercase; letter-spacing: 1px; font-size: 0.75rem; font-weight: 900; }
 
                 .rank-values-group-titan { display: flex; align-items: center; gap: 20px; text-align: right; }
-                .v-divider-titan { width: 1px; height: 30px; background: rgba(255,255,255,0.05); }
-                .xp-value-industrial { font-size: 1.1rem; font-weight: 950; color: white; }
-                .xp-label-industrial { font-size: 0.7rem; font-weight: 900; color: rgba(255,255,255,0.2); letter-spacing: 1px; }
+                .v-divider-titan { width: 1px; height: 30px; background: var(--glass-border); }
+                .xp-value-industrial { font-size: 1.1rem; font-weight: 950; color: var(--text-primary); }
+                .xp-label-industrial { font-size: 0.7rem; font-weight: 900; color: var(--text-muted); letter-spacing: 1px; }
                 .coin-value-industrial { font-size: 1.1rem; font-weight: 950; color: #fbbf24; }
-                .coin-label-industrial { font-size: 0.7rem; font-weight: 900; color: rgba(251, 191, 36, 0.3); letter-spacing: 1px; }
+                .coin-label-industrial { font-size: 0.7rem; font-weight: 900; color: rgba(251, 191, 36, 0.5); letter-spacing: 1px; }
 
                 .leaderboard-loading-industrial { text-align: center; padding: 120px 0; }
-                .loading-text-industrial { margin-top: 30px; color: rgba(255,255,255,0.4); font-weight: 800; letter-spacing: 1px; }
+                .loading-text-industrial { margin-top: 30px; color: var(--text-muted); font-weight: 800; letter-spacing: 1px; }
                 
                 @media (max-width: 768px) {
                     .rank-node-titan-industrial { padding: 15px 20px; }

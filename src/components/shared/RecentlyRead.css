@@ -96,14 +96,14 @@
     margin-bottom: 10px;
     letter-spacing: -1.5px;
     line-height: 1.1;
-    color: white;
-    text-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    color: var(--text-primary);
+    text-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
 .banner-sub-titan {
     font-size: 1rem;
     font-weight: 600;
-    color: rgba(255,255,255,0.6);
+    color: var(--text-secondary);
     margin-bottom: 25px;
 }
 
@@ -165,7 +165,7 @@
     align-items: center;
     gap: 15px;
     padding: 12px 18px;
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--nebula-glass);
     border: 1px solid var(--glass-border);
     border-radius: var(--border-radius);
     text-decoration: none;
@@ -175,7 +175,7 @@
 }
 
 .titan-recent-card-industrial:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--glass-bg);
     border-color: var(--accent);
     transform: translateX(5px);
 }
@@ -187,7 +187,7 @@
     overflow: hidden;
     flex-shrink: 0;
     position: relative;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
     background: var(--bg-secondary);
 }
 
@@ -203,7 +203,7 @@
 .titan-recent-title-industrial {
     font-size: 0.9rem;
     font-weight: 900;
-    color: white;
+    color: var(--text-primary);
     margin: 0;
     letter-spacing: -0.3px;
 }
@@ -211,7 +211,7 @@
 .titan-recent-badge-industrial {
     font-size: 0.75rem;
     font-weight: 750;
-    color: rgba(255, 255, 255, 0.3);
+    color: var(--text-muted);
     display: block;
     margin-top: 2px;
 }

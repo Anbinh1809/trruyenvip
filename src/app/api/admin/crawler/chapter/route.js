@@ -23,12 +23,10 @@ export async function POST(req) {
     }
 
     const chap = chapData.recordset[0];
-    const source = chap.source_url.includes('nettruyen') ? 'nettruyen' : 'truyenqq';
+    if (!chap.source_url) return NextResponse.json({ error: 'Chapter has no source URL' }, { status: 400 });
+    const source = chap.source_url?.includes('nettruyen') ? 'nettruyen' : 'truyenqq';
 
-    // Force deletion of old images to trigger fresh crawl
     await query('DELETE FROM chapterimages WHERE chapter_id = @id', { id: chapterId });
-    
-    console.log(`[AdminCrawl] Manually triggering crawl for: ${chapterId}`);
     await crawlChapterImages(chapterId, chap.source_url, source);
 
     const newImgs = await query('SELECT COUNT(*) as count FROM chapterimages WHERE chapter_id = @id', { id: chapterId });

@@ -56,7 +56,7 @@ export default function RecrawlButton({ chapterId }) {
             justify-content: center;
             margin-bottom: 25px;
             opacity: 0.15;
-            color: white;
+            color: var(--text-primary);
         }
         .recrawl-btn-industrial {
             display: flex;

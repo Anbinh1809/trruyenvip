@@ -151,7 +151,7 @@ export default function ChapterList({ mangaId, chapters }) {
             display: flex;
             flex-direction: column;
             gap: 2px;
-            background: rgba(255, 255, 255, 0.02);
+            background: var(--nebula-glass);
             border-radius: 12px;
             overflow: hidden;
             border: 1px solid var(--glass-border);
@@ -162,10 +162,10 @@ export default function ChapterList({ mangaId, chapters }) {
             justify-content: space-between;
             align-items: center;
             padding: 14px 24px;
-            background: rgba(255, 255, 255, 0.02);
+            background: var(--nebula-glass);
             text-decoration: none;
             transition: all 0.2s;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid var(--glass-border);
             position: relative;
         }
 
@@ -174,7 +174,7 @@ export default function ChapterList({ mangaId, chapters }) {
         }
 
         .chapter-row-titan:hover {
-            background: rgba(255, 255, 255, 0.06);
+            background: var(--glass-bg);
             padding-left: 30px;
         }
 
@@ -200,14 +200,14 @@ export default function ChapterList({ mangaId, chapters }) {
 
         .chapter-num-pill-v2 {
             font-weight: 950;
-            color: white;
+            color: var(--text-primary);
             font-size: 0.95rem;
             white-space: nowrap;
         }
 
         .chapter-title-v2 {
             font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.4);
+            color: var(--text-muted);
             font-weight: 700;
         }
 
@@ -219,7 +219,7 @@ export default function ChapterList({ mangaId, chapters }) {
 
         .badge-history-titan {
             background: var(--accent);
-            color: white;
+            color: #fff;
             padding: 2px 10px;
             border-radius: 4px;
             font-size: 0.6rem;
@@ -233,7 +233,7 @@ export default function ChapterList({ mangaId, chapters }) {
 
         .badge-new-v2 {
             background: #10b981;
-            color: white;
+            color: #fff;
             padding: 2px 8px;
             border-radius: 4px;
             font-size: 0.6rem;
@@ -260,7 +260,7 @@ export default function ChapterList({ mangaId, chapters }) {
 
         .chapter-date-v2 {
             font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.2);
+            color: var(--text-muted);
             font-weight: 800;
         }
 
@@ -275,7 +275,7 @@ export default function ChapterList({ mangaId, chapters }) {
         .chapter-list-title-titan {
             font-size: 1.5rem;
             font-weight: 950;
-            color: white;
+            color: var(--text-primary);
             letter-spacing: 2px;
             margin: 0;
         }
@@ -294,11 +294,11 @@ export default function ChapterList({ mangaId, chapters }) {
             display: flex;
             align-items: center;
             gap: 10px;
-            background: rgba(255, 255, 255, 0.04);
+            background: var(--nebula-glass);
             border: 1px solid var(--glass-border);
             padding: 10px 18px;
             border-radius: 10px;
-            color: white;
+            color: var(--text-primary);
             font-size: 0.75rem;
             font-weight: 900;
             cursor: pointer;
@@ -307,8 +307,8 @@ export default function ChapterList({ mangaId, chapters }) {
         }
 
         .btn-sort-titan-industrial:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.15);
+            background: var(--glass-bg);
+            border-color: var(--accent);
         }
 
         .chapter-search-box-industrial {
@@ -318,11 +318,11 @@ export default function ChapterList({ mangaId, chapters }) {
 
         .chapter-search-input-industrial {
             width: 100%;
-            background: rgba(2, 6, 23, 0.4);
+            background: var(--glass-bg);
             border: 1px solid var(--glass-border);
             padding: 10px 15px 10px 45px;
             border-radius: 10px;
-            color: white;
+            color: var(--text-primary);
             font-size: 0.85rem;
             font-weight: 600;
             outline: none;
@@ -338,8 +338,7 @@ export default function ChapterList({ mangaId, chapters }) {
             left: 15px;
             top: 50%;
             transform: translateY(-50%);
-            opacity: 0.3;
-            color: white;
+            color: var(--text-muted);
             display: flex;
         }
 
@@ -356,8 +355,8 @@ export default function ChapterList({ mangaId, chapters }) {
             letter-spacing: 2px;
             border-radius: 12px;
             border: 1px solid var(--glass-border);
-            background: rgba(255, 255, 255, 0.03);
-            color: white;
+            background: var(--nebula-glass);
+            color: var(--text-primary);
             cursor: pointer;
             transition: all 0.3s;
         }

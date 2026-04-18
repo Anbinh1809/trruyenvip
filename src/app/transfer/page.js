@@ -164,12 +164,12 @@ export default function TransferPage() {
                     font-size: 1.5rem;
                     font-weight: 950;
                     letter-spacing: -0.5px;
-                    color: white;
+                    color: var(--text-primary);
                 }
                 .card-hint-industrial {
                     font-size: 0.8rem;
                     font-weight: 800;
-                    color: rgba(255, 255, 255, 0.3);
+                    color: var(--text-muted);
                     text-transform: uppercase;
                     letter-spacing: 0.5px;
                 }
@@ -180,7 +180,7 @@ export default function TransferPage() {
                     font-size: 1.2rem;
                     font-weight: 950;
                     margin-bottom: 25px;
-                    color: rgba(255, 255, 255, 0.5);
+                    color: var(--text-muted);
                     text-transform: uppercase;
                     letter-spacing: 1px;
                 }
@@ -192,7 +192,7 @@ export default function TransferPage() {
                 .result-url-industrial {
                     font-size: 0.85rem;
                     font-weight: 700;
-                    color: rgba(255, 255, 255, 0.6);
+                    color: var(--text-secondary);
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;

@@ -22,7 +22,7 @@ import {
 import { useToast } from '@/components/widgets/ToastProvider';
 
 export default function AdminCrawlerPage() {
-  const { user, isAuthenticated, loading } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth() || {};
   const { addToast } = useToast();
   const [telemetry, setTelemetry] = useState(null);
   const [ramUsage, setRamUsage] = useState(0);

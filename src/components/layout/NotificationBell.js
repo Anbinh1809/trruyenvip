@@ -121,7 +121,7 @@ export default function NotificationBell() {
                     top: -2px;
                     right: -2px;
                     background: var(--accent);
-                    color: white;
+                    color: var(--text-primary);
                     font-size: 0.6rem;
                     font-weight: 900;
                     padding: 2px 4px;
@@ -138,7 +138,7 @@ export default function NotificationBell() {
                     background: rgba(10, 10, 15, 0.95);
                     backdrop-filter: blur(30px) saturate(180%);
                     -webkit-backdrop-filter: blur(30px) saturate(180%);
-                    border: 1px solid rgba(255, 255, 255, 0.08);
+                    border: 1px solid var(--glass-border);
                     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
                     border-radius: 20px;
                     z-index: 99999;
@@ -178,9 +178,9 @@ export default function NotificationBell() {
                     padding: 15px;
                     text-decoration: none;
                     transition: all 0.3s;
-                    border-bottom: 1px solid rgba(255,255,255,0.03);
+                    border-bottom: 1px solid var(--glass-border);
                 }
-                .notification-item-titan:hover { background: rgba(255,255,255,0.05); }
+                .notification-item-titan:hover { background: var(--glass-bg); }
                 .notification-item-titan.unread { background: rgba(255, 62, 62, 0.03); }
                 .noti-thumb {
                     width: 40px;
@@ -191,7 +191,7 @@ export default function NotificationBell() {
                 .noti-title {
                     font-size: 0.85rem;
                     font-weight: 900;
-                    color: white;
+                    color: var(--text-primary);
                     margin: 0 0 2px 0;
                 }
                 .noti-msg {

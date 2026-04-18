@@ -22,7 +22,7 @@ html {
     left: 50%;
     transform: translateX(-50%);
     background: var(--accent);
-    color: white;
+    color: var(--text-primary);
     padding: 15px 30px;
     border-radius: 0 0 15px 15px;
     font-weight: 950;
@@ -115,7 +115,7 @@ body {
 
 .btn-primary {
     background: var(--accent-gradient);
-    color: white;
+    color: var(--text-primary);
     box-shadow: 0 10px 20px rgba(255, 62, 62, 0.2);
 }
 
@@ -125,9 +125,9 @@ body {
 }
 
 .btn-glass {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--nebula-glass);
     border: 1px solid var(--glass-border);
-    color: white;
+    color: var(--text-primary);
     backdrop-filter: blur(10px);
 }
 

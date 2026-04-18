@@ -10,7 +10,7 @@ export function FavoritesProvider({ children }) {
   const [favorites, setFavorites] = useState([]);
   const mounted = useIsMounted();
 
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user } = useAuth() || {};
 
   // Load from LocalStorage (initial)
   useEffect(() => {

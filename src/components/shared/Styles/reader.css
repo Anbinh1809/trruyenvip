@@ -41,7 +41,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    color: white;
+    color: var(--text-primary);
     text-decoration: none;
     font-weight: 850;
     font-size: 0.9rem;
@@ -49,7 +49,7 @@
 
 .current-chapter-pill {
     background: var(--accent);
-    color: white;
+    color: #ffffff;
     font-weight: 950;
     font-size: 0.8rem;
     padding: 6px 18px;
@@ -65,7 +65,7 @@
 
 .nav-step-group { display: flex; gap: 8px; }
 .nav-btn-reader {
-    background: rgba(255,255,255,0.05);
+    background: var(--nebula-glass);
     border: 1px solid var(--glass-border);
     width: 40px;
     height: 40px;
@@ -73,13 +73,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: var(--text-primary);
     transition: all 0.3s;
 }
 
 .nav-btn-reader:hover { background: var(--accent); border-color: var(--accent); }
 
-.v-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.1); }
+.v-divider { width: 1px; height: 24px; background: var(--glass-border); }
 
 /* READER CONTENT */
 .reader-content-industrial {
@@ -101,8 +101,9 @@
 }
 
 .reader-footer-container-titan { max-width: 850px; margin: 0 auto; padding: 0 20px; }
+.info-panel-titan { font-size: 0.8rem; font-weight: 800; color: var(--text-primary); text-align: center; }
 .finish-label-titan { font-size: 0.75rem; font-weight: 950; color: var(--accent); letter-spacing: 3px; display: block; margin-bottom: 20px; }
-.finish-title-titan { font-size: 3rem; font-weight: 950; color: white; margin-bottom: 60px; letter-spacing: -2px; }
+.finish-title-titan { font-size: 3rem; font-weight: 950; color: var(--text-primary); margin-bottom: 60px; letter-spacing: -2px; }
 
 @media (max-width: 768px) {
     .finish-title-titan { font-size: 1.8rem; margin-bottom: 40px; }
@@ -118,7 +119,7 @@
 }
 
 .next-chapter-card-titan {
-    background: rgba(15, 23, 42, 0.6);
+    background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     border-radius: 24px;
     padding: 40px;
@@ -130,17 +131,17 @@
     backdrop-filter: blur(20px);
 }
 
-.next-up-tag { font-size: 0.7rem; font-weight: 950; color: rgba(255,255,255,0.3); letter-spacing: 2px; margin-bottom: 8px; }
-.next-chapter-title-titan { font-size: 1.8rem; font-weight: 950; color: white; margin: 0; }
+.next-up-tag { font-size: 0.7rem; font-weight: 950; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 8px; }
+.next-chapter-title-titan { font-size: 1.8rem; font-weight: 950; color: var(--text-primary); margin: 0; }
 
 .next-btn-industrial { padding: 0 40px; height: 60px; font-weight: 950; }
 
 .all-caught-up-industrial { padding: 60px; text-align: center; }
-.caught-up-title { font-size: 2rem; font-weight: 950; color: white; }
-.caught-up-desc { color: rgba(255,255,255,0.4); font-weight: 700; margin-top: 10px; }
+.caught-up-title { font-size: 2rem; font-weight: 950; color: var(--text-primary); }
+.caught-up-desc { color: var(--text-muted); font-weight: 700; margin-top: 10px; }
 
 .reader-footer-actions { display: flex; justify-content: center; gap: 15px; margin-bottom: 80px; }
 .footer-action-btn { padding: 14px 25px; border-radius: 12px; }
 
 .reader-comments-section { margin-top: 100px; text-align: left; }
-.loading-dots-industrial { padding: 60px; text-align: center; color: rgba(255,255,255,0.4); font-weight: 800; }
+.loading-dots-industrial { padding: 60px; text-align: center; color: var(--text-muted); font-weight: 800; }

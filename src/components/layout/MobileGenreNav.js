@@ -71,10 +71,10 @@ export default function MobileGenreNav({ genres }) {
                     align-items: center;
                     gap: 8px;
                     padding: 8px 16px;
-                    background: rgba(255, 255, 255, 0.04);
-                    border: 1px solid rgba(255, 255, 255, 0.08);
+                    background: var(--nebula-glass);
+                    border: 1px solid var(--glass-border);
                     border-radius: 30px;
-                    color: rgba(255, 255, 255, 0.6);
+                    color: var(--text-muted);
                     font-size: 0.8rem;
                     font-weight: 800;
                     white-space: nowrap;
@@ -84,7 +84,7 @@ export default function MobileGenreNav({ genres }) {
                 .titan-genre-tag-mobile.active {
                     background: var(--accent);
                     border-color: var(--accent);
-                    color: white;
+                    color: var(--text-primary);
                     box-shadow: 0 4px 15px rgba(255, 62, 62, 0.2);
                 }
             `}</style>

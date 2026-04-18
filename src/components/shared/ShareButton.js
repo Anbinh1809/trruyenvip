@@ -58,17 +58,17 @@ export default function ShareButton({ title, text, url, className = "" }) {
                     gap: 10px;
                     padding: 10px 24px;
                     border-radius: 12px;
-                    background: rgba(255, 255, 255, 0.04);
+                    background: var(--nebula-glass);
                     border: 1px solid var(--glass-border);
-                    color: white;
+                    color: var(--text-primary);
                     font-size: 0.85rem;
                     font-weight: 850;
                     cursor: pointer;
                     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
                 }
                 .btn-share-industrial:hover {
-                    background: rgba(255, 255, 255, 0.08);
-                    border-color: rgba(255, 255, 255, 0.15);
+                    background: var(--glass-bg);
+                    border-color: var(--accent);
                     transform: translateY(-2px);
                 }
                 .btn-share-industrial.is-copied {

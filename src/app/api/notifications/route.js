@@ -8,16 +8,21 @@ import { withTitan } from '@/core/api/handler';
 export const GET = withTitan({
     auth: true,
     handler: async (req, session) => {
-        const res = await query(`
-            SELECT n.*, m.cover 
-            FROM notifications n
-            LEFT JOIN manga m ON n.manga_id = m.id
-            WHERE n.user_uuid = @uuid
-            ORDER BY n.created_at DESC
-            LIMIT 20
-        `, { uuid: session.uuid });
+        try {
+            const res = await query(`
+                SELECT n.*, m.cover 
+                FROM notifications n
+                LEFT JOIN manga m ON n.manga_id = m.id
+                WHERE n.user_uuid = @uuid
+                ORDER BY n.created_at DESC
+                LIMIT 20
+            `, { uuid: session.uuid });
 
-        return res.recordset || [];
+            return res.recordset || [];
+        } catch (e) {
+            console.error('Notifications GET error:', e);
+            throw e;
+        }
     }
 });
 
@@ -27,15 +32,20 @@ export const GET = withTitan({
 export const PATCH = withTitan({
     auth: true,
     handler: async (req, session) => {
-        const { id, all } = await req.json();
+        try {
+            const { id, all } = await req.json();
 
-        if (all) {
-            await query('UPDATE notifications SET is_read = TRUE WHERE user_uuid = @uuid', { uuid: session.uuid });
-        } else if (id) {
-            await query('UPDATE notifications SET is_read = TRUE WHERE id = @id AND user_uuid = @uuid', { id, uuid: session.uuid });
+            if (all) {
+                await query('UPDATE notifications SET is_read = TRUE WHERE user_uuid = @uuid', { uuid: session.uuid });
+            } else if (id) {
+                await query('UPDATE notifications SET is_read = TRUE WHERE id = @id AND user_uuid = @uuid', { id, uuid: session.uuid });
+            }
+
+            return { success: true };
+        } catch (e) {
+            console.error('Notifications PATCH error:', e);
+            throw e;
         }
-
-        return { success: true };
     }
 });
 

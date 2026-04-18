@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { User, Shield, Coins, Sparkles, Activity, Heart, History, LogOut, ShieldCheck, AlertOctagon, ChevronRight } from 'lucide-react';
 
 export default function ProfilePage() {
-  const { user, isAuthenticated, logout, loading, refreshUser } = useAuth();
+  const { user, isAuthenticated, logout, loading, refreshUser } = useAuth() || {};
   const engagement = useEngagement() || {};
   const { vipCoins = 0, level = 1, rankTitle = 'Ph�m Nh�n', xp = 0, xpProgress = 0 } = engagement;
   const { addToast } = useToast();
@@ -62,7 +62,7 @@ export default function ProfilePage() {
             <Footer />
             <style jsx>{`
                 .center-icon-titan { display: flex; justify-content: center; margin-bottom: 30px; }
-                .auth-required-subtitle { color: rgba(255,255,255,0.4); margin-bottom: 40px; font-weight: 700; font-size: 1.1rem; }
+                .auth-required-subtitle { color: var(--text-muted); margin-bottom: 40px; font-weight: 700; font-size: 1.1rem; }
                 .login-trigger-titan { padding: 18px 60px; font-weight: 950; letter-spacing: 1px; }
             `}</style>
         </main>
@@ -168,7 +168,7 @@ export default function ProfilePage() {
         .accent-rank { color: var(--accent) !important; font-size: 1.4rem !important; }
         .node-arrow { opacity: 0.3; transition: transform 0.3s; }
         .profile-action-node:hover .node-arrow { opacity: 1; transform: translateX(5px); }
-        .xp-footer-hint strong { color: white; }
+        .xp-footer-hint strong { color: var(--text-primary); }
       `}</style>
     </main>
   );

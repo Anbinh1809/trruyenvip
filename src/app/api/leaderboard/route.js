@@ -10,15 +10,20 @@ export const revalidate = 300; // Cache for 5 minutes
  */
 export const GET = withTitan({
     handler: async () => {
-        // SELECT only public-safe fields
-        const result = await query(`
-            SELECT username, xp, avatar
-            FROM users
-            ORDER BY xp DESC
-            LIMIT 100
-        `);
+        try {
+            // SELECT only public-safe fields
+            const result = await query(`
+                SELECT username, xp, avatar
+                FROM users
+                ORDER BY xp DESC
+                LIMIT 100
+            `);
 
-        return result.recordset || [];
+            return result.recordset || [];
+        } catch (e) {
+            console.error('Leaderboard error:', e);
+            throw e;
+        }
     }
 });
 

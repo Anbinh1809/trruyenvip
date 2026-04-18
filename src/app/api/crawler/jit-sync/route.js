@@ -34,7 +34,7 @@ export const POST = withTitan({
         // Fast-path: Check if already exists
         const existing = await query('SELECT COUNT(*) as count FROM chapterimages WHERE chapter_id = @id', { id: chapterId });
         if (parseInt(existing.recordset?.[0]?.count || 0) >= 1) {
-            return { success: true, imageCount: existing.recordset[0].count };
+            return { success: true, imageCount: existing.recordset?.[0]?.count || 0 };
         }
 
         jitTelemetry.set(rateLimitKey, Date.now());

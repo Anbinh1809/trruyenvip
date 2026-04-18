@@ -8,7 +8,7 @@ import { Home, LayoutGrid, Bookmark, User, LogIn } from 'lucide-react';
 
 export default function MobileNav() {
     const pathname = usePathname();
-    const { isAuthenticated, loading } = useAuth();
+    const { isAuthenticated, loading } = useAuth() || {};
     const mounted = useIsMounted();
 
     if (!mounted) return null;

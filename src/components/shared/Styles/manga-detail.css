@@ -1,6 +1,5 @@
 /* ==========================================================================
-   TITAN TRADITIONAL - MIRROR PARITY (v5.9)
-   Matches TruyenQQ/Mirror aesthetics
+   TITAN TRADITIONAL - MIRROR PARITY
    ========================================================================== */
 
 .detail-hero-titan {
@@ -37,7 +36,7 @@
 }
 
 .bread-node {
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--text-muted);
     text-decoration: none;
     transition: color 0.3s;
 }
@@ -47,7 +46,7 @@
 }
 
 .bread-sep {
-    color: rgba(255,255,255,0.1);
+    color: var(--glass-border);
 }
 
 .bread-current {
@@ -64,11 +63,11 @@
 .traditional-title {
     font-size: 3rem;
     font-weight: 950;
-    color: white;
+    color: var(--text-primary);
     margin-bottom: 30px;
     line-height: 1.1;
     letter-spacing: -1.5px;
-    text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    text-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 
 .info-table-titan {
@@ -76,7 +75,7 @@
     flex-direction: column;
     gap: 14px;
     margin-bottom: 35px;
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--nebula-glass);
     padding: 25px;
     border-radius: 18px;
     border: 1px solid var(--glass-border);
@@ -94,7 +93,7 @@
     align-items: center;
     gap: 12px;
     font-weight: 850;
-    color: rgba(255,255,255,0.3);
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 1.5px;
 }
@@ -105,7 +104,7 @@
 
 .info-value {
     font-weight: 750;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--text-primary);
 }
 
 .text-accent {
@@ -120,11 +119,11 @@
 }
 
 .genre-pill-traditional {
-    background: rgba(255,255,255,0.03);
+    background: var(--nebula-glass);
     border: 1px solid var(--glass-border);
     padding: 8px 18px;
     border-radius: 30px;
-    color: rgba(255,255,255,0.7);
+    color: var(--text-secondary);
     text-decoration: none;
     font-size: 0.75rem;
     font-weight: 950;
@@ -135,7 +134,7 @@
 
 .genre-pill-traditional:hover {
     border-color: var(--accent);
-    color: white;
+    color: var(--text-primary);
     background: var(--accent);
     transform: translateY(-2px);
     box-shadow: 0 5px 15px var(--accent-glow);
@@ -144,7 +143,7 @@
 .detail-description-traditional {
     margin-top: 80px;
     padding: 50px;
-    background: rgba(15, 23, 42, 0.4);
+    background: var(--glass-bg);
     backdrop-filter: blur(10px);
     border: 1px solid var(--glass-border);
     border-radius: 24px;
@@ -154,7 +153,7 @@
 .desc-title-traditional {
     font-size: 1.4rem;
     font-weight: 950;
-    color: white;
+    color: var(--text-primary);
     margin-bottom: 25px;
     text-transform: uppercase;
     letter-spacing: 2px;
@@ -174,13 +173,13 @@
 .desc-content-traditional {
     font-size: 1.05rem;
     line-height: 1.9;
-    color: rgba(255,255,255,0.5);
+    color: var(--text-secondary);
     font-weight: 500;
 }
 
 .detail-left-cover .detail-cover-box {
     border-radius: 16px;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.4);
     border: 1px solid var(--glass-border);
     overflow: hidden;
 }
@@ -212,4 +211,3 @@
         padding: 30px 20px;
     }
 }
-

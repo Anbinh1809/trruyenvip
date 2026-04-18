@@ -8,8 +8,13 @@ import { withTitan } from '@/core/api/handler';
 export const GET = withTitan({
     admin: true,
     handler: async () => {
-        const res = await query('SELECT * FROM crawllogs ORDER BY created_at DESC LIMIT 50');
-        return res.recordset || [];
+        try {
+            const res = await query('SELECT * FROM crawllogs ORDER BY created_at DESC LIMIT 50');
+            return res.recordset || [];
+        } catch (e) {
+            console.error('Logs error:', e);
+            throw e;
+        }
     }
 });
 

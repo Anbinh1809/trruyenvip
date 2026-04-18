@@ -118,7 +118,7 @@ function engagementReducer(state, action) {
 
 export function EngagementProvider({ children }) {
   const { addToast } = useToast();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth() || {};
   const [state, dispatch] = useReducer(engagementReducer, initialState);
   const [celebrationQueue, setCelebrationQueue] = useState([]);
   const [activeCelebration, setActiveCelebration] = useState(null);

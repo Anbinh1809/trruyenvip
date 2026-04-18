@@ -36,7 +36,7 @@ export default function DetailCover({ src, alt }) {
                     transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
                 }
                 .is-loaded-industrial {
-                    border-color: rgba(255, 255, 255, 0.1);
+                    border-color: var(--glass-border);
                     box-shadow: 0 40px 80px rgba(0, 0, 0, 0.4);
                 }
                 .detail-cover-container-industrial:hover {

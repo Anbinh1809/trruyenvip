@@ -37,7 +37,7 @@ export default function IndustrialEmptyState({
                     align-items: center;
                 }
                 .empty-icon-titan {
-                    color: rgba(255, 255, 255, 0.1);
+                    color: var(--glass-border);
                     margin-bottom: 30px;
                     animation: float 4s ease-in-out infinite;
                 }
@@ -45,11 +45,11 @@ export default function IndustrialEmptyState({
                     font-size: 1.8rem; 
                     font-weight: 950; 
                     margin-bottom: 15px; 
-                    color: white;
+                    color: var(--text-primary);
                     letter-spacing: -1px;
                 }
                 .empty-desc-industrial {
-                    color: rgba(255, 255, 255, 0.4); 
+                    color: var(--text-muted); 
                     max-width: 520px; 
                     margin: 0 auto; 
                     font-weight: 700; 

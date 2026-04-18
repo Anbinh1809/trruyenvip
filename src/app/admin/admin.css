@@ -21,13 +21,13 @@
     font-size: clamp(1.5rem, 4vw, 2.5rem);
     font-weight: 950;
     letter-spacing: -1px;
-    color: white;
+    color: var(--text-primary);
     margin-bottom: 8px;
 }
 
 .admin-subtitle {
     font-size: 0.95rem;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--text-muted);
     font-weight: 700;
 }
 
@@ -40,7 +40,7 @@
 }
 
 .admin-stat-node-industrial {
-    background: rgba(15, 23, 42, 0.4);
+    background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     border-radius: 20px;
     padding: 30px;
@@ -63,7 +63,7 @@
 .admin-stat-label-industrial {
     font-size: 0.7rem;
     font-weight: 950;
-    color: rgba(255, 255, 255, 0.3);
+    color: var(--text-muted);
     letter-spacing: 2px;
     text-transform: uppercase;
     display: flex;
@@ -75,7 +75,7 @@
 .admin-stat-value-industrial {
     font-size: 2.5rem;
     font-weight: 950;
-    color: white;
+    color: var(--text-primary);
     letter-spacing: -2px;
 }
 
@@ -87,7 +87,7 @@
 }
 
 .admin-card-industrial {
-    background: rgba(15, 23, 42, 0.6);
+    background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     border-radius: 24px;
     padding: 40px;
@@ -102,14 +102,15 @@
     gap: 15px;
     margin-bottom: 30px;
     letter-spacing: 1px;
+    color: var(--text-primary);
 }
 
 /* TASK MONITORING */
 .monitored-task-box-industrial {
-    background: rgba(0, 0, 0, 0.2);
+    background: var(--nebula-glass);
     border-radius: 16px;
     padding: 25px;
-    border: 1px solid rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
 }
 
 .task-stat-line {
@@ -117,7 +118,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 12px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid var(--glass-border);
 }
 
 .task-stat-line:last-child {
@@ -126,13 +127,14 @@
 
 .task-stat-label-industrial {
     font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--text-muted);
     font-weight: 700;
 }
 
 .task-stat-value-titan {
     font-weight: 950;
     font-size: 1.1rem;
+    color: var(--text-primary);
 }
 
 /* FAILURE LOGS */
@@ -153,7 +155,7 @@
     border-left: 2px solid #f87171;
     padding: 12px 18px;
     font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--text-secondary);
     margin-bottom: 10px;
     border-radius: 0 8px 8px 0;
 }
@@ -162,12 +164,12 @@
 .heatmap-engine-industrial {
     margin-top: 40px;
     padding-top: 30px;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid var(--glass-border);
 }
 
 /* TABLE STYLES */
 .admin-table-wrapper {
-    background: rgba(15, 23, 42, 0.6);
+    background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     border-radius: 20px;
     overflow: hidden;
@@ -180,20 +182,21 @@
 }
 
 .admin-table th {
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--nebula-glass);
     padding: 20px;
     text-align: left;
     font-size: 0.7rem;
     font-weight: 950;
-    color: rgba(255, 255, 255, 0.3);
+    color: var(--text-muted);
     letter-spacing: 2px;
     border-bottom: 1px solid var(--glass-border);
 }
 
 .admin-table td {
     padding: 24px 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid var(--glass-border);
     vertical-align: middle;
+    color: var(--text-primary);
 }
 
 /* ANIMATIONS */
@@ -247,7 +250,7 @@
     align-items: center;
     gap: 18px;
     padding: 20px;
-    background: rgba(128, 128, 128, 0.05);
+    background: var(--nebula-glass);
     border: 1px solid var(--glass-border);
     border-radius: 12px;
     cursor: pointer;
@@ -257,7 +260,7 @@
 }
 
 .btn-action-titan:hover {
-    background: rgba(128, 128, 128, 0.1);
+    background: var(--glass-bg);
     border-color: var(--accent);
     transform: translateY(-2px);
 }
@@ -302,21 +305,31 @@
     }
 }
 
-.worker-load-indicator { width: 100px; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; }
+.worker-load-indicator { width: 100px; height: 6px; background: var(--nebula-glass); border-radius: 10px; overflow: hidden; }
 .load-fill { height: 100%; background: var(--accent); transition: width 0.5s ease; box-shadow: 0 0 10px var(--accent); }
 
 .config-grid-titan { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; }
-.config-label-titan { font-size: 0.7rem; font-weight: 950; color: rgba(255,255,255,0.2); letter-spacing: 2px; margin-bottom: 8px; }
-.config-value-titan { font-size: 1rem; font-weight: 850; color: white; }
+.config-label-titan { font-size: 0.7rem; font-weight: 950; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 8px; }
+.config-value-titan { font-size: 1rem; font-weight: 850; color: var(--text-primary); }
 .rotate-hover-titan { width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; padding: 0; }
 .rotate-hover-titan:hover svg { transform: rotate(180deg); }
 .rotate-hover-titan svg { transition: transform 0.5s; }
 
 /* REWARDS SPECIFIC */
-.empty-table-cell { text-align: center; padding: 60px; color: rgba(255,255,255,0.2); font-weight: 800; font-style: italic; }
-.avatar-mini-titan { width: 24px; height: 24px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-.bank-name-titan { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-bottom: 4px; }
+.empty-table-cell { text-align: center; padding: 60px; color: var(--text-muted); font-weight: 800; font-style: italic; }
+.avatar-mini-titan { width: 24px; height: 24px; background: var(--nebula-glass); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.bank-name-titan { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
 .account-no-titan { display: flex; align-items: center; gap: 8px; font-size: 1rem; color: #60a5fa; margin-bottom: 2px; }
-.holder-name-titan { font-size: 0.75rem; color: rgba(255,255,255,0.3); text-transform: uppercase; }
-.cost-coins-titan { font-size: 0.75rem; color: rgba(255,255,255,0.3); font-weight: 800; }
-.action-done-titan { font-size: 0.8rem; font-weight: 950; color: rgba(255,255,255,0.1); letter-spacing: 1px; }
+.holder-name-titan { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
+.cost-coins-titan { font-size: 0.75rem; color: var(--text-muted); font-weight: 800; }
+.action-done-titan { font-size: 0.8rem; font-weight: 950; color: var(--text-muted); letter-spacing: 1px; }
+
+/* Light mode adjustments */
+[data-theme='light'] .admin-header-industrial {
+    border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+[data-theme='light'] .admin-stat-node-industrial:hover {
+    border-color: rgba(0, 0, 0, 0.15);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+}
+

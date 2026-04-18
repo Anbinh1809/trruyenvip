@@ -33,7 +33,7 @@ export async function GET(request) {
             })));
         }
 
-        const genreId = genresRes.recordset[0].genre_id;
+        const genreId = genresRes.recordset?.[0]?.genre_id;
 
         // Find other manga with same genre
         const recommendationRes = await query(`

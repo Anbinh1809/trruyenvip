@@ -1,4 +1,7 @@
+'use client';
+
 import { useState, useEffect } from 'react';
+
 
 /**
  * useIsMounted: A hydration-safety hook for Next.js

@@ -23,24 +23,24 @@ export default function EndPageCelebration() {
             
             <style jsx>{`
                 .btn-glass {
-                    background: rgba(255, 255, 255, 0.08);
+                    background: var(--nebula-glass);
                     backdrop-filter: blur(10px);
-                    color: white;
-                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    color: var(--text-primary);
+                    border: 1px solid var(--glass-border);
                 }
                 .btn-glass:hover {
-                    background: rgba(255, 255, 255, 0.12);
-                    border-color: rgba(255, 255, 255, 0.2);
+                    background: var(--glass-bg);
+                    border-color: var(--accent);
                 }
                 .btn-outline-clear-industrial {
                     background: transparent;
-                    border: 1px solid rgba(255, 255, 255, 0.1);
-                    color: rgba(255, 255, 255, 0.6);
+                    border: 1px solid var(--glass-border);
+                    color: var(--text-muted);
                 }
                 .btn-outline-clear-industrial:hover {
-                    background: rgba(255, 255, 255, 0.05);
+                    background: var(--glass-bg);
                     border-color: var(--accent);
-                    color: white;
+                    color: var(--text-primary);
                 }
             `}</style>
         </div>

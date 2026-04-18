@@ -129,7 +129,7 @@ function MangaCard({ manga, isNew = false, priority = false }) {
             gap: 8px; 
             font-size: 0.75rem; 
             font-weight: 950; 
-            color: white;
+            color: var(--text-primary);
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
         .stat-item {

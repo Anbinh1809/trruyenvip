@@ -9,7 +9,7 @@ import { CheckCircle, XCircle, Clock, User, Landmark, CreditCard, ChevronRight, 
 import '../admin.css';
 
 export default function AdminRewardsPage() {
-  const { user, isAuthenticated, loading } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth() || {};
   const { addToast } = useToast();
   const [isPending, startTransition] = useTransition();
   const [requests, setRequests] = useState([]);

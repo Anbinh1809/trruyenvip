@@ -37,10 +37,10 @@ export default function IndustrialSkeleton({
         >
             <style jsx>{`
                 .skeleton-titan-shimmer {
-                    background: rgba(255, 255, 255, 0.05);
+                    background: var(--nebula-glass);
                     position: relative;
                     overflow: hidden;
-                    border: 1px solid rgba(255, 255, 255, 0.03);
+                    border: 1px solid var(--glass-border);
                 }
 
                 .skeleton-titan-shimmer::after {
@@ -51,7 +51,7 @@ export default function IndustrialSkeleton({
                     background: linear-gradient(
                         90deg, 
                         transparent 0%, 
-                        rgba(255, 255, 255, 0.05) 50%, 
+                        var(--glass-border) 50%, 
                         transparent 100%
                     );
                     animation: shimmer-titan 2s infinite;

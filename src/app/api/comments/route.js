@@ -112,7 +112,7 @@ export const DELETE = withTitan({
         const comment = await query(`SELECT user_uuid FROM comments WHERE id = @id`, { id });
         if (!comment.recordset?.length) throw { status: 404, message: 'B�nh luận kh�ng tồn tại' };
 
-        const isOwner = comment.recordset[0].user_uuid === session.uuid;
+        const isOwner = comment.recordset?.[0]?.user_uuid === session.uuid;
         const isAdmin = session.role === 'admin';
 
         if (!isOwner && !isAdmin) {
