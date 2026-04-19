@@ -84,14 +84,14 @@ export default function LiveSearch({ onSelect }) {
           });
           const data = await res.json();
           if (data.success) {
-              if (addToast) addToast('Đ?nng bộ d? li?u th�nh c�ng!', 'success');
+              if (addToast) addToast('Đồng bộ dữ liệu thành công!', 'success');
               if (onSelect) onSelect();
               router.push(data.redirectUrl);
           } else {
-              if (addToast) addToast(data.error || 'T�nh nang n�y hi?n dang b?o tr�.', 'error');
+              if (addToast) addToast(data.error || 'Tính năng này hiện đang bảo trì.', 'error');
           }
       } catch (e) {
-          if (addToast) addToast('Lỗi kết nối m�y ch?.', 'error');
+          if (addToast) addToast('Lỗi kết nối máy chủ.', 'error');
       } finally {
           setLoading(false);
       }
@@ -122,7 +122,7 @@ export default function LiveSearch({ onSelect }) {
         <form className="titan-search-form" onSubmit={handleSearch}>
             <input 
                 type="text" 
-                placeholder="T�m truy?n ho?c d�n link NetTruyen..." 
+                placeholder="Tìm truyện hoặc dán link NetTruyen..." 
                 value={q}
                 autoComplete="off"
                 className="titan-search-input"
@@ -151,7 +151,7 @@ export default function LiveSearch({ onSelect }) {
                 {isUrl && (
                     <div className="titan-migration-bar-industrial">
                         <button onClick={handleMigration} className="btn btn-primary migration-btn-titan">
-                            <Zap size={14} fill="currentColor" /> {loading ? 'ĐANG ĐỒNG BỘ...' : '�?NG D? LI?U NGU?N NGO�I'}
+                            <Zap size={14} fill="currentColor" /> {loading ? 'ĐANG ĐỒNG BỘ...' : 'LẤY DỮ LIỆU NGUỒN NGOÀI'}
                         </button>
                     </div>
                 )}
@@ -166,25 +166,38 @@ export default function LiveSearch({ onSelect }) {
                                 onClick={() => { setIsOpen(false); if (onSelect) onSelect(); }}
                             >
                                 <div className="result-thumb-titan-industrial">
-                                    <Image src={m.cover} alt={m.title} fill sizes="50px" className="titan-thumb-img-tag" />
+                                    <Image src={m.cover} alt={m.title} fill sizes="50px" className="titan-thumb-img-tag" unoptimized />
                                 </div>
                                 <div className="result-info-titan-industrial">
                                     <div className="result-title-titan-industrial truncate-1">{m.title}</div>
                                     <div className="result-sub-titan-industrial truncate-1">{m.author || 'Đang cập nhật'}</div>
                                 </div>
-                                {idx < 3 && <div className="hoạt-tag-titan">HOT</div>}
+                                {idx < 3 && <div className="hot-tag-titan">HOT</div>}
                             </NextLink>
                         ))
                     ) : !loading && q.length >= 2 && (
                         <div className="search-empty-titan-industrial">
-                            <div className="empty-title-industrial">KH�NG T�M TH?Y</div>
-                            <p className="empty-sub-industrial">Th? tài khoảnh�a kh�c ho?c d�n link truy?n.</p>
+                            <div className="empty-title-industrial">KHÔNG TÌM THẤY</div>
+                            <p className="empty-sub-industrial">Thử từ khóa khác hoặc dán link truyện.</p>
                         </div>
                     )}
                 </div>
             </div>
         )}
         <style jsx>{`
+            .titan-results-panel {
+                position: absolute;
+                top: calc(100% + 15px);
+                left: 0;
+                right: 0;
+                background: var(--glass-bg);
+                backdrop-filter: var(--glass-blur);
+                border: 1px solid var(--glass-border);
+                border-radius: 20px;
+                padding: 15px;
+                z-index: 1000;
+                box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+            }
             .titan-migration-bar-industrial {
                 margin-bottom: 12px;
             }
@@ -215,7 +228,7 @@ export default function LiveSearch({ onSelect }) {
                 border: 1px solid transparent;
             }
             .live-result-item-industrial:hover, .highlighted-industrial {
-                background: var(--glass-bg);
+                background: var(--nebula-glass);
                 border-color: var(--glass-border);
                 transform: translateX(3px);
             }
@@ -241,14 +254,23 @@ export default function LiveSearch({ onSelect }) {
                 color: var(--text-primary);
                 margin-bottom: 2px;
                 letter-spacing: -0.3px;
+                line-height: 1.2;
             }
             .result-sub-titan-industrial {
                 font-size: 0.75rem;
                 font-weight: 750;
                 color: var(--text-muted);
             }
+            .hot-tag-titan {
+                font-size: 0.6rem;
+                background: var(--accent);
+                color: white;
+                padding: 2px 6px;
+                border-radius: 4px;
+                font-weight: 900;
+            }
             .search-empty-titan-industrial {
-                padding: 80px 20px;
+                padding: 60px 20px;
                 text-align: center;
             }
             .empty-title-industrial {
@@ -267,4 +289,3 @@ export default function LiveSearch({ onSelect }) {
     </div>
   );
 }
-

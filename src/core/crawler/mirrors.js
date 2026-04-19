@@ -3,25 +3,26 @@
  */
 
 export const SOURCES = {
-    NETTRUYEN: 'https://nettruyennew.com/',
+    NETTRUYEN: 'https://www.nettruyentv.online/',
     NETTRUYEN_MIRRORS: [
+        'https://www.nettruyentv.online/',
+        'https://nettruyenfull.fun/',
+        'https://www.nettruyenus.com/',
         'https://nettruyennew.com/',
         'https://nettruyenco.vn/',
-        'https://nettruyenon.com/',
         'https://nettruyenmax.com/',
         'https://nettruyenplus.com/',
-        'https://nettruyenfull.com/',
+        'https://nettruyenon.com/',
         'https://nettruyenviet.com/',
-        'https://nettruyenus.com/',
+        'https://www.nettruyenmoi.com/',
+        'https://www.nettruyen.me/'
     ],
-    TRUYENQQ: 'https://truyenqqvn.com/',
+    TRUYENQQ: 'https://truyenqqq.com/',
     TRUYENQQ_MIRRORS: [
-        'https://truyenqqvn.com/',
         'https://truyenqqq.com/',
-        'https://truyenqqv.com/',
         'https://truyenqq.top/',
         'https://truyenqq.info/',
-        'https://truyenqq.nu/',
+        'https://truyenqqvn.com/',
     ]
 };
 

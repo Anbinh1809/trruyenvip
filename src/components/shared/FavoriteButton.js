@@ -19,14 +19,13 @@ export default function FavoriteButton({ manga, className = "btn btn-glass fav-b
     <button 
         className={`${className} ${favorited ? 'active' : ''}`}
         onClick={() => toggleFavorite(manga)}
-        aria-label={favorited ? "X�a kho�i y�u th�ch" : "Th�m v�o y�u th�ch"}
+        aria-label={favorited ? "Xóa khỏi yêu thích" : "Thêm vào yêu thích"}
     >
         {favorited ? (
-            <><Heart size={20} fill="var(--accent)" color="var(--accent)" /> Đ� TH�CH</>
+            <><Heart size={20} fill="var(--accent)" color="var(--accent)" /> ĐÃ THÍCH</>
         ) : (
-            <><Heart size={20} /> Y�U TH�CH</>
+            <><Heart size={20} /> YÊU THÍCH</>
         )}
     </button>
   );
 }
-

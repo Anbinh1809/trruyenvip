@@ -198,6 +198,10 @@ export async function crawlFullMangaChapters(mangaId, url, source, earlyExit = f
 
         const $ = cheerio.load(html);
         const chapterRows = source === 'nettruyen' ? $('.list-chapter li').toArray() : $('.list01 li').toArray();
+        if (chapterRows.length === 0) {
+            throw new Error(`ZERO_CHAPTERS_FOUND: Parser found 0 chapters at ${url}`);
+        }
+
         const existingIds = new Set();
         const existingUrls = new Set();
 

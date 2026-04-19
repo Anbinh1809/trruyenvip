@@ -9,6 +9,7 @@ import "@/components/shared/Styles/manga-detail.css";
 import Link from 'next/link';
 import { BookOpen, User, Star, Calendar, Share2, Heart, AlertOctagon, Sparkles, Eye } from 'lucide-react';
 import DiscoveryTrigger from '@/components/layout/DiscoveryTrigger';
+import MangaHealer from '@/components/reader/MangaHealer';
 
 // Helper to determine if a slug is a potential new ingestion target
 function isDiscoveryCandidate(slug) {
@@ -284,6 +285,7 @@ export default async function MangaDetailPage({ params }) {
                             <h2 className="title-titan section-title-industrial">DANH SÁCH CHƯƠNG</h2>
                             <span className="chapter-count-titan">{manga.chapters.length} CHAPTERS</span>
                         </div>
+                        {manga.chapters.length === 0 && <MangaHealer mangaId={id} />}
                         <ChapterList chapters={manga.chapters} mangaId={id} />
                     </section>
                 </div>

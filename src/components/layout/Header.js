@@ -1,131 +1,126 @@
 'use client';
 
-import NextLink from 'next/link';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { 
+    Search, 
+    User, 
+    LogOut, 
+    History, 
+    Heart, 
+    Award, 
+    Settings, 
+    Hexagon,
+    Menu,
+    X,
+    LayoutDashboard,
+    Zap
+} from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useIsMounted } from '@/hooks/useIsMounted';
+import { useEngagement } from '@/contexts/EngagementContext';
 import LiveSearch from '@/components/shared/LiveSearch';
-import { Search, X, Menu } from 'lucide-react';
-
-// Sub-components
-import HeaderLogo from './layout/Header/HeaderLogo';
-import UserActions from './layout/Header/UserActions';
-import NotificationBell from '@/components/layout/NotificationBell';
-import './layout/Header/Header.css';
+import Image from 'next/image';
 
 export default function Header() {
-  const { isAuthenticated, loading } = useAuth() || {};
-  const mounted = useIsMounted();
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    const { user, isAuthenticated, logout } = useAuth() || {};
+    const { vipCoins, level, rankTitle, mounted } = useEngagement();
+    const [scrolled, setScrolled] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const pathname = usePathname();
 
-    // Titan Heartbeat: Extend session
-    let heartbeatInterval;
-    if (isAuthenticated) {
-        heartbeatInterval = setInterval(async () => {
-            try {
-                const res = await fetch('/api/auth/heartbeat', { method: 'POST' });
-                if (res.status === 401) {
-                    console.warn('[Titan] Session expired. Force logging out...');
-                    // Note: In an ideal world, we'd call a logout function from useAuth
-                    // But for now, we'll let the next restricted action handle it
-                    // or force a refresh if necessary.
-                }
-            } catch (e) {}
-        }, 300000); // 5 minutes
-    }
+    useEffect(() => {
+        const handleScroll = () => setScrolled(window.scrollY > 20);
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if (heartbeatInterval) clearInterval(heartbeatInterval);
-    };
-  }, [isAuthenticated]);
+    const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
+    const closeMobileMenu = () => setMobileMenuOpen(false);
 
-  useEffect(() => {
-    if (isMenuOpen || isSearchOpen) {
-        document.body.classList.add('no-scroll-titan');
-    } else {
-        document.body.classList.remove('no-scroll-titan');
-    }
-    return () => { document.body.classList.remove('no-scroll-titan'); };
-  }, [isMenuOpen, isSearchOpen]);
+    return (
+        <header className={`glass-nav ${scrolled ? 'scrolled' : ''}`}>
+            <div className="header-wrapper container">
+                <div className="header-left">
+                    <Link href="/" className="logo hover-3d-titan" onClick={closeMobileMenu}>
+                        <div className="logo-icon-titan">
+                            <Zap size={24} fill="var(--accent)" strokeWidth={1.5} />
+                        </div>
+                        TRUYEN<span className="accent">VIP</span>
+                    </Link>
 
-  if (!mounted) return null;
+                    <nav className={`nav-titan ${mobileMenuOpen ? 'nav-open' : ''}`}>
+                        <Link href="/genres" className={`nav-link-titan ${pathname === '/genres' ? 'active' : ''}`} onClick={closeMobileMenu}>THỂ LOẠI</Link>
+                        <Link href="/leaderboard" className={`nav-link-titan ${pathname === '/leaderboard' ? 'active' : ''}`} onClick={closeMobileMenu}>XẾP HẠNG</Link>
+                        <Link href="/history" className={`nav-link-titan ${pathname === '/history' ? 'active' : ''}`} onClick={closeMobileMenu}>LỊCH SỬ</Link>
+                        <Link href="/transfer" className={`nav-link-titan ${pathname === '/transfer' ? 'active' : ''}`} onClick={closeMobileMenu}>DI CƯ</Link>
+                    </nav>
+                </div>
 
-  return (
-    <header className={`titan-header ${isScrolled ? 'header-scrolled' : ''}`}>
-      <div className="container">
-        <div className="header-wrapper">
-          <HeaderLogo />
+                <div className="header-actions">
+                    <div className="desktop-search-container">
+                        <LiveSearch onSelect={closeMobileMenu} />
+                    </div>
 
-          <nav className={`nav-titan ${isMenuOpen ? 'nav-open' : ''}`}>
-            <div className="mobile-only-header">
-                <HeaderLogo />
-                <button 
-                  className="titan-icon-btn" 
-                  onClick={() => setIsMenuOpen(false)}
-                  aria-label="Đóng menu điều hướng"
-                >
-                    <X size={20} />
-                </button>
+                    <div className="user-interactions">
+                        {isAuthenticated ? (
+                            <div className="user-profile-titan">
+                                <div className="profile-trigger-titan shadow-titan">
+                                    {user?.avatar ? (
+                                        <img src={user.avatar} alt={user.username} className="avatar-img-tag" />
+                                    ) : (
+                                        <div className="avatar-placeholder-titan">
+                                            {user?.username?.charAt(0).toUpperCase()}
+                                        </div>
+                                    )}
+                                    <div className="profile-indicator-titan" />
+                                </div>
+                                
+                                <div className="profile-dropdown-titan shadow-titan">
+                                    <div className="dropdown-header-titan">
+                                        <div className="user-meta-titan">
+                                            <div className="user-name-titan truncate-1">{user?.username}</div>
+                                            <div className="rank-badge-titan-mini">{rankTitle} - Cấp {level}</div>
+                                        </div>
+                                        <div className="coins-pill-titan">
+                                            <Zap size={14} fill="currentColor" /> {mounted ? vipCoins.toLocaleString() : '...'}
+                                        </div>
+                                    </div>
+                                    <div className="dropdown-divider-titan" />
+                                    <div className="dropdown-links-titan">
+                                        <Link href="/profile" className="dropdown-link-node" onClick={closeMobileMenu}>
+                                            <User size={18} /> Hồ sơ cá nhân
+                                        </Link>
+                                        <Link href="/favorites" className="dropdown-link-node" onClick={closeMobileMenu}>
+                                            <Heart size={18} /> Truyện yêu thích
+                                        </Link>
+                                        <Link href="/rewards" className="dropdown-link-node" onClick={closeMobileMenu}>
+                                            <Award size={18} /> Đổi phần thưởng
+                                        </Link>
+                                        {user?.role === 'admin' && (
+                                            <Link href="/admin" className="dropdown-link-node admin-link" onClick={closeMobileMenu}>
+                                                <LayoutDashboard size={18} /> Bảng điều khiển
+                                            </Link>
+                                        )}
+                                        <div className="dropdown-divider-titan" />
+                                        <button onClick={() => { logout(); closeMobileMenu(); }} className="dropdown-link-node logout-node">
+                                            <LogOut size={18} /> Đăng xuất
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <Link href="/auth/login" className="btn-auth-titan shadow-titan" onClick={closeMobileMenu}>
+                                <User size={18} /> <span>ĐĂNG NHẬP</span>
+                            </Link>
+                        )}
+
+                        <button className="mobile-menu-btn desktop-hide" onClick={toggleMobileMenu}>
+                            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                        </button>
+                    </div>
+                </div>
             </div>
-            
-            <div className="desktop-search-container">
-                <LiveSearch />
-            </div>
-            
-            <div className="nav-links">
-                <NextLink href="/genres" className="nav-link-titan" onClick={() => setIsMenuOpen(false)}>Thể loại</NextLink>
-                <NextLink href="/transfer" className="nav-link-titan" onClick={() => setIsMenuOpen(false)}>Dịch chuyển</NextLink>
-                <NextLink href="/leaderboard" className="nav-link-titan" onClick={() => setIsMenuOpen(false)}>Xếp hạng</NextLink>
-            </div>
-          </nav>
-
-          {/* MOBILE SEARCH OVERLAY (HUD) */}
-          {isSearchOpen && (
-              <div className="mobile-search-hud-industrial fade-in" role="dialog" aria-modal="true" aria-label="Tìm kiếm truyện">
-                  <div className="search-hud-header-industrial">
-                      <button 
-                        onClick={() => setIsSearchOpen(false)} 
-                        className="titan-icon-btn"
-                        aria-label="Đóng tìm kiếm"
-                      >
-                          <X size={20} />
-                      </button>
-                      <h3 className="search-hud-title-industrial">Tìm truyện</h3>
-                  </div>
-                  <LiveSearch onSelect={() => setIsSearchOpen(false)} />
-              </div>
-          )}
-
-          <div className="header-actions">
-            <button 
-              className="mobile-only titan-icon-btn" 
-              onClick={() => setIsSearchOpen(true)}
-              aria-label="Mở tìm kiếm"
-            >
-              <Search size={18} />
-            </button>
-
-            {isAuthenticated && <NotificationBell />}
-            <UserActions loading={loading} />
-
-            <button 
-              className="mobile-only titan-icon-btn" 
-              onClick={() => setIsMenuOpen(true)}
-              aria-label="Mở menu điều hướng"
-            >
-              <Menu size={20} />
-            </button>
-          </div>
-        </div>
-      </div>
-    </header>
-  );
+        </header>
+    );
 }
-

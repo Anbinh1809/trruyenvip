@@ -9,15 +9,15 @@ export const POST = withTitan({
         try {
             const { url } = await req.json();
             if (!url) {
-                throw { status: 400, message: 'Missing URL' };
+                throw { status: 400, message: 'Thiếu liên kết nguồn' };
             }
 
             // TITAN RATE LIMIT: Prevent migration abuse
-            const limiter = await checkRateLimit(`migration_${session.uuid}`, 5, 60);
+            const limiter = await checkRateLimit(`migration_${session.uuid}`, 10, 60);
             if (!limiter.success) {
                 throw {  
                     status: 429,
-                    message: 'B?n đang th?cc hi?n qu nhiou yu cầu doch chuyon. Vui lng đoi trong giy lt.' 
+                    message: 'Bạn đang thực hiện quá nhiều yêu cầu dịch chuyển. Vui lòng đợi trong giây lát.' 
                 };
             }
 
@@ -29,7 +29,7 @@ export const POST = withTitan({
                            host.includes('nhattruyen') ? 'nhattruyen' : null;
                            
             if (!source) {
-                throw { status: 400, message: 'Ngu?nn khng ho tro. Cho ho tro NetTruyen, TruyenQQ, BlogTruyen, CManga, NhatTruyen.' };
+                throw { status: 400, message: 'Nguồn không hỗ trợ. Chúng tôi hiện hỗ trợ NetTruyen, TruyenQQ, BlogTruyen, CManga, NhatTruyen.' };
             }
 
             // Robust Parsing Logic
@@ -62,20 +62,21 @@ export const POST = withTitan({
             }
 
             if (!mangaSlug) {
-                throw { status: 400, message: 'Khng tho nhận di?n m truy?n' };
+                throw { status: 400, message: 'Không thể nhận diện mã truyện từ liên kết này.' };
             }
 
-            // 1. Ensure Manga exists
+            // 1. Ensure Manga exists - Use Shell for immediate feedback
             const mangaCheck = await query('SELECT id FROM manga WHERE id = @id', { id: mangaSlug });
             if (mangaCheck.recordset.length === 0) {
                 const rawTitle = mangaSlug.replace(/-/g, ' ');
                 const capitalizeTitle = rawTitle.replace(/\b\w/g, l => l.toUpperCase());
-                await query('INSERT INTO manga (id, title, source_url) VALUES (@id, @title, @url) ON CONFLICT DO NOTHING', 
-                    { id: mangaSlug, title: capitalizeTitle, url: url.split('/chap-')[0] });
+                await query('INSERT INTO manga (id, title, source_url, status) VALUES (@id, @title, @url, @status) ON CONFLICT DO NOTHING', 
+                    { id: mangaSlug, title: capitalizeTitle, url: url.split('/chap-')[0], status: 'Đang dịch chuyển...' });
             }
 
             // 2. Identify and Queue Sync
-            queueMangaSync(mangaSlug, url.split('/chap-')[0], source, true, 8);
+            const syncUrl = url.split('/chap-')[0];
+            await queueMangaSync(mangaSlug, syncUrl, source, false, 10, true);
 
             let chapterId = null;
             if (chapterSlug) {
@@ -85,7 +86,7 @@ export const POST = withTitan({
                     await query('INSERT INTO chapters (id, manga_id, title, source_url, chapter_number) VALUES (@id, @mId, @title, @url, @num) ON CONFLICT DO NOTHING',
                         { id: chapterId, mId: mangaSlug, title: chapterSlug.replace(/-/g, ' '), url, num: parseChapterNumber(chapterSlug) });
                 }
-                queueChapterScrape(chapterId, url, source, true, 10); // High priority
+                await queueChapterScrape(chapterId, url, source, true, 10); // Ultra High priority
             }
 
             return {
@@ -95,8 +96,8 @@ export const POST = withTitan({
                 redirectUrl: chapterId ? `/manga/${mangaSlug}/chapter/${chapterId}` : `/manga/${mangaSlug}`
             };
         } catch (e) {
-            console.error('Migration error:', e);
-            throw e;
+            console.error('[Migration:Error]', e);
+            throw { status: e.status || 500, message: e.message || 'Lỗi hệ thống trong quá trình dịch chuyển.' };
         }
     }
 });

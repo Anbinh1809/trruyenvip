@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { Search, ArrowUpDown, Ghost, Loader2, Navigation, Check } from 'lucide-react';
+import { Search, ArrowUpDown, Ghost, Loader2, Navigation } from 'lucide-react';
 import { useHistory } from '@/contexts/HistoryContext';
 
 export default function ChapterList({ mangaId, chapters }) {
@@ -43,14 +43,14 @@ export default function ChapterList({ mangaId, chapters }) {
     <section className="chapter-list-section fade-in">
       <div className="chapter-list-header-industrial">
         <h2 className="chapter-list-title-titan">
-          DANH S�CH CHƯƠNG <span className="text-secondary-titan">({chapters?.length || 0})</span>
+          DANH SÁCH CHƯƠNG <span className="text-secondary-titan">({chapters?.length || 0})</span>
         </h2>
         
         <div className="chapter-list-actions-industrial">
             <button 
                 onClick={() => setSortOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
                 className="btn-sort-titan-industrial"
-                aria-label={sortOrder === 'desc' ? 'S?p xếp cũ nhất' : 'S?p xếp mới nhất'}
+                aria-label={sortOrder === 'desc' ? 'Sắp xếp cũ nhất' : 'Sắp xếp mới nhất'}
             >
                 <ArrowUpDown size={14} /> {sortOrder === 'desc' ? 'MỚI NHẤT' : 'CŨ NHẤT'}
             </button>
@@ -58,11 +58,11 @@ export default function ChapterList({ mangaId, chapters }) {
             <div className="chapter-search-box-industrial">
               <input 
                 type="text" 
-                placeholder="T�m nhanh chương..." 
+                placeholder="Tìm nhanh chương..." 
                 value={searchTerm}
                 autoComplete="off"
                 className="chapter-search-input-industrial"
-                aria-label="T�m nhanh chương"
+                aria-label="Tìm nhanh chương"
                 onChange={(e) => {
                     setSearchTerm(e.target.value);
                     setDisplayCount(50);
@@ -77,7 +77,7 @@ export default function ChapterList({ mangaId, chapters }) {
 
       {filteredChapters.length === 0 ? (
         <div className="empty-state-titan industrial-p-80">
-            Kh�ng t�m thấy chương n�o ph� hộp v?i tài khoảnh�a của bạn.
+            Không tìm thấy chương nào phù hợp với từ khóa của bạn.
         </div>
       ) : (
         <>
@@ -104,7 +104,7 @@ export default function ChapterList({ mangaId, chapters }) {
                                 <div className="chapter-badges-v2">
                                     {isLastRead && (
                                         <span className="badge-history-titan">
-                                            <Navigation size={10} fill="currentColor" /> LẦN ĐộC CUộI
+                                            <Navigation size={10} fill="currentColor" /> LẦN ĐỌC CUỐI
                                         </span>
                                     )}
                                     {isGhost && (
@@ -118,7 +118,7 @@ export default function ChapterList({ mangaId, chapters }) {
                                         </span>
                                     )}
                                     {((new Date() - new Date(chapter.updated_at)) < (48 * 60 * 60 * 1000)) && (
-                                        <span className="badge-new-v2">M?I</span>
+                                        <span className="badge-new-v2">MỚI</span>
                                     )}
                                 </div>
                             </div>
@@ -139,7 +139,7 @@ export default function ChapterList({ mangaId, chapters }) {
                         onClick={() => setDisplayCount(prev => prev + 100)}
                         className="btn btn-outline load-more-btn-titan shadow-titan"
                     >
-                        XEM TH�M CHƯƠNG
+                        XEM THÊM CHƯƠNG
                     </button>
                 </div>
             )}
@@ -396,4 +396,3 @@ export default function ChapterList({ mangaId, chapters }) {
     </section>
   );
 }
-

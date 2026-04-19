@@ -24,7 +24,7 @@ export default function TransferPage() {
         const allowedTargets = ['nettruyen', 'nhattruyen', 'truyenqq'];
         const invalidUrls = urlList.filter(u => !allowedTargets.some(t => u.includes(t)));
         if (invalidUrls.length > 0) {
-            alert(`Mo�t so� li�n k?t kh�ng đuo�c ho� tro�: ${invalidUrls[0]}...`);
+            alert(`Một số liên kết không được hỗ trợ: ${invalidUrls[0]}...`);
             return;
         }
 
@@ -69,36 +69,29 @@ export default function TransferPage() {
         setIsProcessing(false);
     };
 
-    const fetchMangaAndAddToHistory = async (mangaId, chapterId) => {
-        if (!chapterId) return; 
-        try {
-            await fetch(`/api/chapter-images/${encodeURIComponent(chapterId)}`);
-        } catch (e) {}
-    };
-
     return (
         <main className="main-wrapper titan-bg">
             <Header />
             <div className="container transfer-container fade-up">
                 <header className="section-header-industrial">
-                    <div className="transfer-header-badge">DI CẦN TIẾP No�I</div>
-                    <h1 className="transfer-title">Do�ch Chuyo�n No�i Dung</h1>
+                    <div className="transfer-header-badge">DI CẢN TIẾP NỐI</div>
+                    <h1 className="transfer-title">Dịch Chuyển Nội Dung</h1>
                     <p className="transfer-subtitle">
-                        H? tho�ng gi�p bạn chuyo�n d? li?u t? ngu?n ngo�i vo� TruyenVip nhanh ch�ng v� o�n đo�nh. Mo�i mo�t li�n k?t l� mo�t h�nh tr�nh mo�i.
+                        Hệ thống giúp bạn chuyển dữ liệu từ nguồn ngoài về TruyenVip nhanh chóng và ổn định. Mỗi một liên kết là một hành trình mới.
                     </p>
                 </header>
 
                 <div className="transfer-form-card">
                     <div className="card-header-industrial">
-                        <h3 className="card-title-industrial">Nhập li�n k?t chương truy?n</h3>
-                        <span className="card-hint-industrial">Mo�i d�ng mo�t li�n k?t chương truy?n (NetTruyen, TruyenQQ...)</span>
+                        <h3 className="card-title-industrial">Nhập liên kết chương truyện</h3>
+                        <span className="card-hint-industrial">Mỗi dòng một liên kết chương truyện (NetTruyen, TruyenQQ...)</span>
                     </div>
 
                     <form onSubmit={handleBatchTransfer}>
                         <textarea 
                             value={urls}
                             onChange={(e) => setUrls(e.target.value)}
-                            placeholder="D�n c�c li�n k?t chương truy?n v�o đ�y..."
+                            placeholder="Dán các liên kết chương truyện vào đây..."
                             className="transfer-textarea-titan"
                         />
                         <button 
@@ -107,16 +100,16 @@ export default function TransferPage() {
                             className={`btn btn-primary btn-large-titan ${isProcessing ? 'processing' : ''}`}
                         >
                             {isProcessing ? (
-                                <><RefreshCw className="spin" size={24} /> ĐANG Xo� L� Do� LI?U...</>
+                                <><RefreshCw className="spin" size={24} /> ĐANG XỬ LÝ DỮ LIỆU...</>
                             ) : (
-                                <><Zap size={24} fill="currentColor" /> K�CH HOẠT Do�CH CHUYo�N</>
+                                <><Zap size={24} fill="currentColor" /> KÍCH HOẠT DỊCH CHUYỂN</>
                             )}
                         </button>
                     </form>
 
                     {results.length > 0 && (
                         <div className="transfer-results-section fade-in">
-                            <h3 className="results-title-industrial">B?n ghi do�ch chuyo�n</h3>
+                            <h3 className="results-title-industrial">Bản ghi dịch chuyển</h3>
                             <div className="results-list-industrial">
                                 {results.map((res, i) => (
                                     <div key={i} className={`result-item-industrial ${res.status === 'success' ? 'is-success' : 'is-error'}`}>
@@ -129,7 +122,7 @@ export default function TransferPage() {
                                                     </a>
                                                     <div className="status-badge-industrial success">
                                                         <CheckCircle size={18} />
-                                                        <span>TH�NH C�NG</span>
+                                                        <span>THÀNH CÔNG</span>
                                                     </div>
                                                 </>
                                             ) : (
@@ -148,9 +141,49 @@ export default function TransferPage() {
             </div>
             <Footer />
             <style jsx>{`
+                .transfer-container {
+                    padding-top: 140px;
+                    padding-bottom: 100px;
+                }
                 .section-header-industrial {
                     text-align: center;
                     margin-bottom: 60px;
+                }
+                .transfer-header-badge {
+                    display: inline-block;
+                    padding: 6px 16px;
+                    background: rgba(255, 62, 62, 0.1);
+                    border: 1px solid rgba(255, 62, 62, 0.2);
+                    border-radius: 8px;
+                    color: var(--accent);
+                    font-size: 0.75rem;
+                    font-weight: 950;
+                    letter-spacing: 2px;
+                    margin-bottom: 20px;
+                }
+                .transfer-title {
+                    font-size: 3.5rem;
+                    font-weight: 950;
+                    letter-spacing: -2px;
+                    margin-bottom: 20px;
+                    color: var(--text-primary);
+                }
+                .transfer-subtitle {
+                    color: var(--text-muted);
+                    font-size: 1.1rem;
+                    max-width: 600px;
+                    margin: 0 auto;
+                    line-height: 1.7;
+                    font-weight: 600;
+                }
+                .transfer-form-card {
+                    background: var(--glass-bg);
+                    border: 1px solid var(--glass-border);
+                    border-radius: 32px;
+                    padding: 50px;
+                    max-width: 900px;
+                    margin: 0 auto;
+                    box-shadow: 0 40px 100px rgba(0,0,0,0.5);
                 }
                 .card-header-industrial {
                     display: flex;
@@ -173,6 +206,32 @@ export default function TransferPage() {
                     text-transform: uppercase;
                     letter-spacing: 0.5px;
                 }
+                .transfer-textarea-titan {
+                    width: 100%;
+                    height: 200px;
+                    background: var(--nebula-glass);
+                    border: 1px solid var(--glass-border);
+                    border-radius: 20px;
+                    padding: 25px;
+                    color: var(--text-primary);
+                    font-size: 1rem;
+                    font-family: var(--font-mono);
+                    margin-bottom: 30px;
+                    resize: none;
+                    transition: all 0.3s;
+                }
+                .transfer-textarea-titan:focus {
+                    outline: none;
+                    border-color: var(--accent);
+                    background: var(--glass-bg);
+                }
+                .btn-large-titan {
+                    width: 100%;
+                    padding: 20px;
+                    font-size: 1.2rem;
+                    letter-spacing: 1px;
+                    gap: 15px;
+                }
                 .transfer-results-section {
                     margin-top: 60px;
                 }
@@ -188,6 +247,15 @@ export default function TransferPage() {
                     display: flex;
                     flex-direction: column;
                     gap: 12px;
+                }
+                .result-item-industrial {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 20px 30px;
+                    background: var(--nebula-glass);
+                    border: 1px solid var(--glass-border);
+                    border-radius: 16px;
                 }
                 .result-url-industrial {
                     font-size: 0.85rem;
@@ -228,8 +296,10 @@ export default function TransferPage() {
                 }
                 .status-badge-industrial.success { color: #10b981; }
                 .status-badge-industrial.error { color: var(--accent); }
+                
+                @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+                .spin { animation: spin 2s linear infinite; }
             `}</style>
         </main>
     );
 }
-

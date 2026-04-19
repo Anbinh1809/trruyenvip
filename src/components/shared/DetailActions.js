@@ -62,8 +62,12 @@ export default function DetailActions({ mangaId, firstChapterId, mangaTitle, man
                 url: window.location.href,
             }).catch(() => {});
         } else {
-            navigator.clipboard.writeText(window.location.href);
-            addToast('Đã sao chép liên kết vào bộ nhớ tạm!', 'success');
+            const url = window.location.href;
+            navigator.clipboard.writeText(url).then(() => {
+                addToast('Đã sao chép liên kết vào bộ nhớ tạm!', 'success');
+            }).catch(() => {
+                addToast('Không thể sao chép liên kết.', 'error');
+            });
         }
     };
 
@@ -110,10 +114,6 @@ export default function DetailActions({ mangaId, firstChapterId, mangaTitle, man
                     grid-template-columns: 1fr 1fr;
                     gap: 15px;
                 }
-                .action-row-sub {
-                    display: grid;
-                    grid-template-columns: 1fr;
-                }
                 .btn-mirror {
                     display: flex;
                     align-items: center;
@@ -131,11 +131,10 @@ export default function DetailActions({ mangaId, firstChapterId, mangaTitle, man
                     text-transform: none;
                 }
                 .btn-green {
-                    background-color: var(--accent); /* TITAN: Unified with brand primary */
+                    background-color: var(--accent);
                     box-shadow: 0 4px 15px rgba(255, 62, 62, 0.2);
                 }
                 .btn-green:hover {
-                    background-color: var(--accent);
                     filter: brightness(1.1);
                     transform: translateY(-2px);
                     box-shadow: 0 8px 25px rgba(255, 62, 62, 0.3);
@@ -162,6 +161,3 @@ export default function DetailActions({ mangaId, firstChapterId, mangaTitle, man
         </div>
     );
 }
-
-
-
