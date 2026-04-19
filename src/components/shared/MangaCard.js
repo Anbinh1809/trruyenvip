@@ -56,7 +56,6 @@ function MangaCard({ manga, isNew = false, priority = false }) {
       itemType="http://schema.org/CreativeWork"
     >
       <meta itemProp="url" content={`https://truyenvip.com/manga/${manga.normalized_title || manga.id}`} />
-      <script dangerouslySetInnerHTML={{__html: `/* MangaCard */`}}/>
       {/* ... keeping the fade ... */}
       <div className={`card-media-titan ${!isLoaded ? 'skeleton-shimmer' : ''}`}>
         <Image 

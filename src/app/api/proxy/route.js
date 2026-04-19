@@ -87,42 +87,32 @@ export async function GET(request) {
     const isAllowed = allowedDomains.some(d => domain === d || domain.endsWith('.' + d));
     if (!isAllowed) return new Response('Forbidden: Domain not whitelisted', { status: 403 });
 
-    // Multi-Stage Referer Strategies (The "Gauntlet")
-    const strategies = [
-        { name: 'Target-Path', referer: imageUrl.split('/').slice(0, -1).join('/') + '/' }, // New Dynamic Path Strategy
-        { name: 'Target-Host', referer: parsedUrl.origin + '/' }, 
-        { name: 'Self-Domain', referer: `https://${domain}/` },
-        { name: 'On-Domain', referer: 'https://nettruyenon.com/' },
-        { name: 'QQ-Domain', referer: 'https://truyenqqno.com/' },
-        { name: 'Stealth', referer: '' }
-    ];
+    // Single Solid Strategy to prevent CDN IP Banning from doing 6x requests
+    const bestReferer = domain.includes('truyenqq') ? 'https://truyenqqq.com/' : 
+                        domain.includes('nettruyen') ? 'https://nettruyenww.com/' :
+                        parsedUrl.origin + '/';
+
+    const strategy = { name: 'Direct', referer: bestReferer };
 
     const userAgents = [
-        'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Mobile/15E148 Safari/604.1',
-        'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Mobile Safari/537.36',
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36'
     ];
 
-    // HIGH-SPEED RACING ENGINE: Fire all strategies concurrently
-    // We use a custom racing logic that takes the first SUCCESSFUL (ok) response
     const fetchWithStrategy = async (strategy) => {
         const headers = { 
-            'User-Agent': userAgents[Math.floor(Math.random() * userAgents.length)],
+            'User-Agent': userAgents[0],
             'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
             'Accept-Language': 'vi,en-US;q=0.9,en;q=0.8',
-            'Cache-Control': 'no-cache',
-            'Pragma': 'no-cache'
+            'Referer': strategy.referer
         };
-        if (strategy.referer) headers['Referer'] = strategy.referer;
 
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 6000); 
+        const timeoutId = setTimeout(() => controller.abort(), 8000); 
 
         try {
-            // TITAN HYBRID FETCH: Force Node.js level SSL bypass if needed (handled by process env in this context)
             const response = await fetch(imageUrl, { 
                 headers, 
-                signal: controller.signal,
-                cache: 'force-cache'
+                signal: controller.signal
             });
             clearTimeout(timeoutId);
             if (response.ok) return { response, strategy: strategy.name };
@@ -134,10 +124,7 @@ export async function GET(request) {
     };
 
     try {
-        // Race the most likely strategies first, but concurrently
-        const { response, strategy: winningStrategy } = await Promise.any(
-            strategies.map(s => fetchWithStrategy(s))
-        ).catch(() => { throw new Error('All strategies failed to fetch image'); });
+        const { response, strategy: winningStrategy } = await fetchWithStrategy(strategy);
 
         const buffer = await response.arrayBuffer();
         const contentType = response.headers.get('content-type') || 'image/jpeg';
@@ -227,10 +214,12 @@ export async function GET(request) {
             });
         }
     } catch (raceError) {
+        console.log('[DEBUG PROXY] Network request failed for:', imageUrl, 'Reason:', raceError.message);
         throw new Error(`Racing Exhausted: ${raceError.message}`);
     }
 
   } catch (error) {
+    console.log('[DEBUG PROXY] Ultimate Proxy Error Captured:', error.message, imageUrl);
     console.error('Ultimate Proxy Error:', error.message, imageUrl);
 
     // Diagnostic Logging: Sampled to avoid DB saturation (5% rate)

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useHistory } from '@/contexts/HistoryContext';
 import Link from 'next/link';

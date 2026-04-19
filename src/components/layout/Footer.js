@@ -35,9 +35,9 @@ export default function Footer() {
           <div className="footer-col">
             <h4 className="footer-heading">Cộng Đồng</h4>
             <ul className="footer-links">
-                <li><a href="#" target="_blank" rel="nofollow">Facebook Feed</a></li>
-                <li><a href="#" target="_blank" rel="nofollow">Discord Community</a></li>
-                <li><a href="#" target="_blank" rel="nofollow">Telegram Global</a></li>
+                <li><a href="https://facebook.com/truyenvip" target="_blank" rel="nofollow">Facebook Feed</a></li>
+                <li><a href="https://discord.gg/truyenvip" target="_blank" rel="nofollow">Discord Community</a></li>
+                <li><a href="https://t.me/truyenvip_official" target="_blank" rel="nofollow">Telegram Global</a></li>
             </ul>
           </div>
 

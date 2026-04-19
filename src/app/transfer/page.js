@@ -208,7 +208,7 @@ export default function TransferPage() {
                 }
                 .transfer-textarea-titan {
                     width: 100%;
-                    height: 200px;
+                    min-height: 200px;
                     background: var(--nebula-glass);
                     border: 1px solid var(--glass-border);
                     border-radius: 20px;
@@ -216,8 +216,8 @@ export default function TransferPage() {
                     color: var(--text-primary);
                     font-size: 1rem;
                     font-family: var(--font-mono);
-                    margin-bottom: 30px;
-                    resize: none;
+                    margin-bottom: 25px;
+                    resize: vertical;
                     transition: all 0.3s;
                 }
                 .transfer-textarea-titan:focus {

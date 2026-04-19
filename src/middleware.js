@@ -14,7 +14,7 @@ const RATE_LIMIT_MAP = new Map();
 const LIMIT_WINDOW = 60 * 1000; // 1 minute
 const MAX_REQUESTS = 120; // Increased for high-traffic scalability
 
-export default async function proxy(request) {
+export default async function middleware(request) {
   const { pathname } = request.nextUrl;
   const ip = request.headers.get('x-forwarded-for') || '127.0.0.1';
 

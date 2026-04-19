@@ -8,7 +8,9 @@ import EmptyState from '@/components/shared/EmptyState';
 import { Trash2, BookOpen, Clock } from 'lucide-react';
 
 export default function HistoryPage() {
-  const { history, clearHistory } = useHistory();
+  const { history, clearHistory, mounted } = useHistory();
+
+    if (!mounted) return null; // Avoid React Hydration Mismatch
 
     return (
         <main className="main-wrapper titan-bg history-page">

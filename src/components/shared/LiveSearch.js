@@ -185,6 +185,56 @@ export default function LiveSearch({ onSelect }) {
             </div>
         )}
         <style jsx>{`
+            .titan-search-container {
+                position: relative;
+                width: 100%;
+                max-width: 400px;
+                display: flex;
+            }
+            .titan-search-form {
+                display: flex;
+                width: 100%;
+                position: relative;
+            }
+            .titan-search-input {
+                width: 100%;
+                background: var(--glass-bg, rgba(255,255,255,0.05));
+                border: 1px solid var(--glass-border, rgba(255,255,255,0.1));
+                padding: 10px 45px 10px 15px;
+                border-radius: 20px;
+                color: var(--text-primary, #fff);
+                font-size: 0.85rem;
+                outline: none;
+                transition: all 0.3s;
+            }
+            .titan-search-input:focus {
+                border-color: var(--accent, #3b82f6);
+                background: var(--nebula-glass, rgba(255,255,255,0.08));
+                box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+            }
+            .titan-search-actions {
+                position: absolute;
+                right: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+            .titan-search-clear, .titan-search-submit {
+                background: transparent;
+                border: none;
+                color: var(--text-muted, #9ca3af);
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 4px;
+                transition: color 0.2s;
+            }
+            .titan-search-clear:hover, .titan-search-submit:hover {
+                color: var(--accent, #3b82f6);
+            }
             .titan-results-panel {
                 position: absolute;
                 top: calc(100% + 15px);

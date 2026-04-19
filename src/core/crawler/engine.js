@@ -192,9 +192,9 @@ export async function crawlFullMangaChapters(mangaId, url, source, earlyExit = f
         const normalizedTitle = normalizeTitle(metadata.title || mangaId);
 
         await query(`
-            UPDATE manga SET title = @title, author = @author, status = @status, description = @description, normalized_title = @normalizedTitle
+            UPDATE manga SET title = @title, cover = @cover, author = @author, status = @status, description = @description, normalized_title = @normalizedTitle
             WHERE id = @mangaId
-        `, { mangaId, title: metadata.title || mangaId, author: metadata.author || 'Đang cập nhật', status: metadata.status || 'Đang cập nhật', description: metadata.description || 'Nội dung đang được cập nhật.', normalizedTitle });
+        `, { mangaId, title: metadata.title || mangaId, cover: metadata.cover || null, author: metadata.author || 'Đang cập nhật', status: metadata.status || 'Đang cập nhật', description: metadata.description || 'Nội dung đang được cập nhật.', normalizedTitle });
 
         const $ = cheerio.load(html);
         const chapterRows = source === 'nettruyen' ? $('.list-chapter li').toArray() : $('.list01 li').toArray();
@@ -233,6 +233,7 @@ export async function crawlFullMangaChapters(mangaId, url, source, earlyExit = f
 
         await query('UPDATE manga SET last_crawled = NOW() WHERE id = @mangaId', { mangaId });
     } catch (err) {
+        console.log('[DEBUG ENGINE] Swallowed Exception in crawlFullMangaChapters:', err.message);
         try { updateMirrorHealth(new URL(url).hostname, false, err.message); } catch {}
     } finally {
         inProgressManga.delete(mangaId);
@@ -276,6 +277,7 @@ export async function crawlLatest(source = 'nettruyen', pageCount = 1, startPage
                 
                 const rawSlug = mangaUrl.split('/').pop()?.split('?')[0];
                 const title = $(link).attr('title') || $(link).find('img').attr('alt') || rawSlug;
+                const cover = $(link).find('img').attr('data-original') || $(link).find('img').attr('src') || '';
                 const normalizedTitle = title.toLowerCase()
                     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
                     .replace(/[đĐ]/g, 'd').replace(/[^a-z0-9]/g, '-')
@@ -286,8 +288,8 @@ export async function crawlLatest(source = 'nettruyen', pageCount = 1, startPage
                 if (existing.recordset?.length > 0) {
                     slug = existing.recordset?.[0]?.id || rawSlug;
                 } else {
-                    await query(`INSERT INTO manga (id, title, source_url, normalized_title) VALUES (@slug, @title, @mangaUrl, @normalizedTitle) ON CONFLICT (id) DO NOTHING`,
-                        { slug, title, mangaUrl, normalizedTitle });
+                    await query(`INSERT INTO manga (id, title, cover, source_url, normalized_title) VALUES (@slug, @title, @cover, @mangaUrl, @normalizedTitle) ON CONFLICT (id) DO NOTHING`,
+                        { slug, title, cover, mangaUrl, normalizedTitle });
                     newMangaCount++;
                 }
                 await queueMangaSync(slug, mangaUrl, source, true, 4);
