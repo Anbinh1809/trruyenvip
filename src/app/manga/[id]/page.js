@@ -281,10 +281,6 @@ export default async function MangaDetailPage({ params }) {
                     </div>
 
                     <section className="chapters-section-industrial">
-                        <div className="section-header-titan">
-                            <h2 className="title-titan section-title-industrial">DANH SÁCH CHƯƠNG</h2>
-                            <span className="chapter-count-titan">{manga.chapters.length} CHAPTERS</span>
-                        </div>
                         {manga.chapters.length === 0 && <MangaHealer mangaId={id} />}
                         <ChapterList chapters={manga.chapters} mangaId={id} />
                     </section>

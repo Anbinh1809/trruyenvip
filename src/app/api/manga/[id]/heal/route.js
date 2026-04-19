@@ -5,7 +5,12 @@ import { withTitan } from '@/core/api/handler';
 export const POST = withTitan({
     auth: true,
     handler: async (req, session, context) => {
-        const { id } = await context.params;
+        // Robust parameter extraction for Next.js 15+ 
+        const params = await (context?.params || {});
+        const id = params.id;
+
+        if (!id) throw { status: 400, message: 'Thiếu định danh truyện.' };
+
         const res = await query('SELECT id, source_url FROM manga WHERE id = @id OR normalized_title = @id LIMIT 1', { id });
         const manga = res.recordset?.[0];
 

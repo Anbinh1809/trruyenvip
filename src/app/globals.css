@@ -230,6 +230,38 @@ h1, h2, h3, h4, .title-titan, .hero-title-titan {
   flex-shrink: 0;
 }
 
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  min-width: 0;
+  flex: 1;
+}
+
+.nav-titan {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.nav-link-titan {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.nav-link-titan:hover, .nav-link-titan.active {
+  color: var(--accent);
+}
+
+@media (max-width: 1024px) {
+    .nav-titan:not(.nav-open) { display: none; }
+}
+
 .user-profile-titan {
   position: relative;
 }
