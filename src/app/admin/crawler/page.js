@@ -12,7 +12,13 @@ import {
     Cpu, 
     Activity, 
     Database,
-    Clock
+    Clock,
+    RefreshCcw,
+    Flame,
+    Rocket,
+    ShieldQuestion,
+    ChevronRight,
+    AlertCircle
 } from 'lucide-react';
 import { useToast } from '@/components/widgets/ToastProvider';
 

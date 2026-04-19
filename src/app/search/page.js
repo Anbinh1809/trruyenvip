@@ -4,7 +4,7 @@ import { query, MANGA_CARD_FIELDS } from '@/core/database/connection';
 import { generateProxySignature } from '@/core/security/crypto';
 import Footer from '@/components/layout/Footer';
 import IndustrialEmptyState from '@/components/widgets/IndustrialEmptyState';
-import { Search } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
 
 async function searchManga(q, page = 1) {
   if (!q) return { manga: [], total: 0 };
@@ -37,8 +37,8 @@ async function searchManga(q, page = 1) {
       FROM manga 
       WHERE normalized_title LIKE @slug OR title ILIKE @q OR author ILIKE @q 
       ORDER BY 
-        CASE WHEN normalized_title LIKE @slug THEN 0 ELSE 1 END,
-        last_crawled DESC
+      CASE WHEN normalized_title LIKE @slug THEN 0 ELSE 1 END,
+      last_crawled DESC
       LIMIT @pageSize OFFSET @offset
     `, { slug: `%${searchSlug}%`, q: `%${sanitizedQ}%`, offset, pageSize });
 
@@ -80,10 +80,10 @@ export default async function SearchPage({ searchParams }) {
               </div>
               <div className="search-meta-industrial">
                 <h1 className="search-title-industrial">
-                  Káº¾T QUáº¢: &quot;{q}&quot;
+                  KẾT QUẢ: &quot;{q}&quot;
                 </h1>
                 <p className="search-stats-industrial">
-                  Hệ thống tà¬m tháº¥y {total} bo™ truy?n phà¹ ho£p v?i t? khà³a c?a báº¡n.
+                  Hệ thống tìm thấy {total} bộ truyện phù hợp với từ khóa của bạn.
                 </p>
               </div>
           </div>
@@ -103,7 +103,7 @@ export default async function SearchPage({ searchParams }) {
                                 href={`/search?q=${encodeURIComponent(q)}&page=${page - 1}`}
                                 className="pagination-node-industrial"
                             >
-                                â† TRÆ¯?C
+                                <ChevronLeft size={16} /> TRƯỚC
                             </a>
                         )}
                         
@@ -116,7 +116,7 @@ export default async function SearchPage({ searchParams }) {
                                 href={`/search?q=${encodeURIComponent(q)}&page=${page + 1}`}
                                 className="pagination-node-industrial"
                             >
-                                SAU â†’
+                                SAU <ChevronRight size={16} />
                             </a>
                         )}
                     </div>
@@ -126,7 +126,7 @@ export default async function SearchPage({ searchParams }) {
             <div className="search-empty-state-industrial">
                 <IndustrialEmptyState 
                     keyword={q} 
-                    title="KHÔNG TÌM TH?Y TRUY?N" 
+                    title="KHÔNG TÌM THẤY TRUYỆN" 
                 />
             </div>
           )}
@@ -137,5 +137,3 @@ export default async function SearchPage({ searchParams }) {
     </main>
   );
 }
-
-

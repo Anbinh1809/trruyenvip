@@ -12,7 +12,7 @@ import { User, Shield, Coins, Sparkles, Activity, Heart, History, LogOut, Shield
 export default function ProfilePage() {
   const { user, isAuthenticated, logout, loading, refreshUser } = useAuth() || {};
   const engagement = useEngagement() || {};
-  const { vipCoins = 0, level = 1, rankTitle = 'Ph�m Nh�n', xp = 0, xpProgress = 0 } = engagement;
+  const { vipCoins = 0, level = 1, rankTitle = 'Phàm Nhân', xp = 0, xpProgress = 0 } = engagement;
   const { addToast } = useToast();
   const [avatarUrl, setAvatarUrl] = useState('');
   const [updating, setUpdating] = useState(false);
@@ -35,12 +35,12 @@ export default function ProfilePage() {
         });
         if (res.ok) {
             await refreshUser();
-            addToast('Đ� c?p nh?t ?nh đại di?n!', 'success');
+            addToast('Đã cập nhật ảnh đại diện!', 'success');
         } else {
-            addToast('Lo�i c?p nh?t! Vui l�ng th? lại.', 'error');
+            addToast('Lỗi cập nhật! Vui lòng thử lại.', 'error');
         }
     } catch (e) {
-        addToast('Lỗi kết nối m�y ch?.', 'error');
+        addToast('Lỗi kết nối máy chủ.', 'error');
     }
     setUpdating(false);
   };
@@ -55,8 +55,8 @@ export default function ProfilePage() {
                 <div className="center-icon-titan">
                     <AlertOctagon size={80} color="var(--accent)" />
                 </div>
-                <h1 className="auth-required-title">Y�u cầu đăng nhập</h1>
-                <p className="auth-required-subtitle">Cần đăng nhập đo� xem th�ng tin c� nh�n v� qu?n l� t�i kho?n của bạn.</p>
+                <h1 className="auth-required-title">Yêu cầu đăng nhập</h1>
+                <p className="auth-required-subtitle">Cần đăng nhập để xem thông tin cá nhân và quản lý tài khoản của bạn.</p>
                 <Link href="/auth/login" className="btn btn-primary login-trigger-titan">ĐĂNG NHẬP NGAY</Link>
             </div>
             <Footer />
@@ -84,13 +84,13 @@ export default function ProfilePage() {
           </div>
           <h1 className="profile-name-industrial">{user.username}</h1>
           <p className="profile-role-badge">
-            {user.role === 'admin' ? <><Shield size={16} /> QUẢN TRo� VI�N</> : <><User size={16} /> Đã�C GIẢ VIP</>}
+            {user.role === 'admin' ? <><Shield size={16} /> QUẢN TRỊ VIÊN</> : <><User size={16} /> ĐỘC GIẢ VIP</>}
           </p>
           
           <div className="avatar-form-industrial">
             <input 
                 type="text" 
-                placeholder="D�n link ?nh đại di?n mo�i..." 
+                placeholder="Dán link ảnh đại diện mới..." 
                 value={avatarUrl}
                 onChange={(e) => setAvatarUrl(e.target.value)}
                 className="input-titan-profile"
@@ -100,12 +100,12 @@ export default function ProfilePage() {
                 className="btn btn-primary avatar-update-btn" 
                 disabled={updating || !avatarUrl.trim()}
             >
-                {updating ? '...' : 'C?P NHẬT'}
+                {updating ? '...' : 'CẬP NHẬT'}
             </button>
           </div>
           {user.role === 'admin' && (
               <Link href="/admin" className="btn btn-outline admin-portal-btn-titan">
-                <ShieldCheck size={18} /> BẢNG ĐIo�U KHIo�N QUẢN TRo�
+                <ShieldCheck size={18} /> BẢNG ĐIỀU KHIỂN QUẢN TRỊ
               </Link>
           )}
         </section>
@@ -122,7 +122,7 @@ export default function ProfilePage() {
                 <div className="stat-icon-box">
                     <Sparkles size={32} color="var(--accent)" />
                 </div>
-                <div className="stat-label-profile">Cấp Đã�</div>
+                <div className="stat-label-profile">Cấp Độ</div>
                 <div className="stat-value-profile">{level}</div>
             </div>
             <div className="stat-card-profile">
@@ -136,28 +136,28 @@ export default function ProfilePage() {
 
         <section className="xp-progress-section shadow-titan">
             <div className="xp-header-profile">
-                <span className="xp-label-main">TIẾN Đã� CẤP BẬC</span>
+                <span className="xp-label-main">TIẾN ĐỘ CẤP BẬC</span>
                 <span className="xp-percent-tag">{Math.floor(xpProgress)}%</span>
             </div>
             <div className="xp-track-industrial">
                 <div className="xp-fill-industrial" style={{ '--progress': `${xpProgress}%` }} />
             </div>
             <p className="xp-footer-hint">
-                Cần th�m <strong>{new Intl.NumberFormat().format((level * 100) - xp)} XP</strong> đo� thăng c?p tiếp theo.
+                Cần thêm <strong>{new Intl.NumberFormat().format((level * 100) - xp)} XP</strong> để thăng cấp tiếp theo.
             </p>
         </section>
 
         <div className="profile-actions-list">
             <Link href="/favorites" className="profile-action-node">
-                <span className="node-left-industrial"><Heart size={20} color="var(--accent)" /> TRUY?N Y�U TH�CH</span>
+                <span className="node-left-industrial"><Heart size={20} color="var(--accent)" /> TRUYỆN YÊU THÍCH</span>
                 <ChevronRight size={18} className="node-arrow" />
             </Link>
             <Link href="/history" className="profile-action-node">
-                <span className="node-left-industrial"><History size={20} color="#60a5fa" /> Lo�CH So� Đã�C TRUY?N</span>
+                <span className="node-left-industrial"><History size={20} color="#60a5fa" /> LỊCH SỬ ĐỌC TRUYỆN</span>
                 <ChevronRight size={18} className="node-arrow" />
             </Link>
             <button onClick={logout} className="logout-btn-industrial">
-                <LogOut size={20} /> ĐĂNG XUẤT T�I KHOẢN
+                <LogOut size={20} /> ĐĂNG XUẤT TÀI KHOẢN
             </button>
         </div>
       </div>
@@ -173,4 +173,3 @@ export default function ProfilePage() {
     </main>
   );
 }
-

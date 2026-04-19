@@ -17,13 +17,13 @@ export default function HistoryPage() {
             <div className="container history-container fade-in">
                 <header className="history-header-industrial fade-up">
                     <div className="header-left-industrial">
-                        <div className="library-badge-titan">TRUY?N Đ� XEM</div>
-                        <h1 className="history-title-industrial">Lo�CH So� Đã�C</h1>
-                        <p className="history-subtitle">C�c b?n ghi hoạt đo�ng đo�c truy?n của bạn tr�n hệ thống.</p>
+                        <div className="library-badge-titan">TRUYỆN ĐÃ XEM</div>
+                        <h1 className="history-title-industrial">LỊCH SỬ ĐỌC</h1>
+                        <p className="history-subtitle">Các bản ghi hoạt động đọc truyện của bạn trên hệ thống.</p>
                     </div>
                     {history.length > 0 && (
                         <button className="btn btn-outline clear-btn-industrial" onClick={clearHistory}>
-                            <Trash2 size={18} /> XO� Lo�CH So�
+                            <Trash2 size={18} /> XOÁ LỊCH SỬ
                         </button>
                     )}
                 </header>
@@ -39,6 +39,7 @@ export default function HistoryPage() {
                                         fill
                                         sizes="(max-width: 768px) 50vw, 300px"
                                         className="history-cover-img"
+                                        unoptimized
                                     />
                                     <div className="history-chapter-tag shadow-titan">
                                         <Clock size={12} /> {new Date(item.timestamp).toLocaleDateString('vi-VN')}
@@ -46,12 +47,12 @@ export default function HistoryPage() {
                                 </Link>
                                 <div className="history-info-industrial">
                                     <h3 className="history-item-title">{item.mangaTitle}</h3>
-                                    <div className="history-last-read">D?ng lại o�: {item.chapterTitle}</div>
+                                    <div className="history-last-read">Dừng lại ở: {item.chapterTitle}</div>
                                     <Link 
                                         href={`/manga/${item.mangaId}/chapter/${item.chapterId}`} 
                                         className="btn btn-primary history-action-industrial"
                                     >
-                                        Đã�C TIẾP <BookOpen size={16} />
+                                        ĐỌC TIẾP <BookOpen size={16} />
                                     </Link>
                                 </div>
                             </div>
@@ -59,9 +60,9 @@ export default function HistoryPage() {
                     </div>
                 ) : (
                     <EmptyState 
-                        title="H�NH TR�NH CHƯA BẮT ĐẦU"
-                        subtitle="Lo�ch s? đo�c của bạn hi?n đang tro�ng. H�y kh�m ph� nh?ng t�c phẩm tinh hoa ngay b�y gio�!"
-                        actionText="KH�M PH� NGAY"
+                        title="HÀNH TRÌNH CHƯA BẮT ĐẦU"
+                        subtitle="Lịch sử đọc của bạn hiện đang trống. Hãy khám phá những tác phẩm tinh hoa ngay bây giờ!"
+                        actionText="KHÁM PHÁ NGAY"
                         actionUrl="/"
                     />
                 )}
@@ -74,4 +75,3 @@ export default function HistoryPage() {
         </main>
     );
 }
-

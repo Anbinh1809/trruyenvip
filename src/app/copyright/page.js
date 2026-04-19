@@ -2,8 +2,8 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 
 export const metadata = {
-  title: 'Ch�nh S�ch B?n Quyo�n | TruyenVip',
-  description: 'Th�ng tin vo� b?n quyo�n nội dung tr�n no�n t?ng TruyenVip.',
+  title: 'Chính Sách Bản Quyền | TruyenVip',
+  description: 'Thông tin về bản quyền nội dung trên nền tảng TruyenVip.',
 };
 
 export default function CopyrightPage() {
@@ -14,40 +14,40 @@ export default function CopyrightPage() {
       <div className="container legal-container fade-up">
         <header className="legal-header">
             <span className="legal-badge-titan">COPYRIGHT POLICY</span>
-            <h1 className="legal-title-industrial">Ch�nh S�ch B?n Quyo�n</h1>
+            <h1 className="legal-title-industrial">Chính Sách Bản Quyền</h1>
         </header>
 
         <div className="legal-content-industrial shadow-titan">
             <div className="legal-section-industrial">
-                <h2>1. Quyo�n So� H?u</h2>
+                <h2>1. Quyền Sở Hữu</h2>
                 <p className="legal-text-industrial">
-                    Tất c? c�c nội dung bao g?nm truy?n tranh, h�nh ?nh, m� ngu?n v� giao di?n tr�n <strong>TruyenVip</strong> đuo�c thu thập t? c�c ngu?n c�ng khai hoặc do nguo�i d�ng đ�ng g�p. Ch�ng t�i kh�ng khẳng đo�nh quyo�n so� h?u đo�i v?i nội dung c?a c�c t�c gi? b�n tho� ba.
+                    Tất cả các nội dung bao gồm truyện tranh, hình ảnh, mã nguồn và giao diện trên <strong>TruyenVip</strong> được thu thập từ các nguồn công khai hoặc do người dùng đóng góp. Chúng tôi không khẳng định quyền sở hữu đối với nội dung của các tác giả bên thứ ba.
                 </p>
             </div>
 
             <div className="legal-section-industrial">
-                <h2>2. Khiếu Nại B?n Quyo�n (DMCA)</h2>
+                <h2>2. Khiếu Nại Bản Quyền (DMCA)</h2>
                 <p className="legal-text-industrial">
-                    Ch�ng t�i t�n tro�ng quyo�n so� h?u tr� tu? c?a nguo�i kh�c. Nếu bạn tin rằng t�c phẩm c?a m�nh d� bo� sao ch�p theo c�ch cấu th�nh h�nh vi vi phạm b?n quyo�n, vui l�ng li�n h? v?i ch�ng t�i qua email: <strong>copyright@truyenvip.com</strong>.
+                    Chúng tôi tôn trọng quyền sở hữu trí tuệ của người khác. Nếu bạn tin rằng tác phẩm của mình đã bị sao chép theo cách cấu thành hành vi vi phạm bản quyền, vui lòng liên hệ với chúng tôi qua email: <strong>copyright@truyenvip.com</strong>.
                 </p>
             </div>
 
             <div className="legal-section-industrial">
-                <h2>3. Quy Tr�nh Go� Bo�</h2>
+                <h2>3. Quy Trình Gỡ Bỏ</h2>
                 <p className="legal-text-industrial">
-                    Sau khi nhận đuo�c th�ng b�o vi phạm ho�p l?, ch�ng t�i sẽ tiến h�nh x�c minh v� go� bo� nội dung vi phạm trong v�ng <strong>24-48 gio� l�m vi?c</strong>. Ch�ng t�i cam k?t ho�p t�c đầy đ? v?i c�c ch? so� h?u b?n quyo�n ch�nh tho�ng.
+                    Sau khi nhận được thông báo vi phạm hợp lệ, chúng tôi sẽ tiến hành xác minh và gỡ bỏ nội dung vi phạm trong vòng <strong>24-48 giờ làm việc</strong>. Chúng tôi cam kết hợp tác đầy đủ với các chủ sở hữu bản quyền chính thống.
                 </p>
             </div>
 
             <div className="legal-section-industrial">
-                <h2>4. Li�n H? Ho�p T�c</h2>
+                <h2>4. Liên Hệ Hợp Tác</h2>
                 <p className="legal-text-industrial">
-                    Đã�i v?i c�c t�c gi? muo�n ho�p t�c đăng tải truy?n b?n quyo�n ch�nh tho�c tr�n no�n t?ng c?a ch�ng t�i đo� nhận doanh thu qu?ng c�o v� ủng hộ� t? đo�c gi?, vui l�ng g?i th�ng tin vo� bo� phận đo�i ngoại c?a ch�ng t�i.
+                    Đối với các tác giả muốn hợp tác đăng tải truyện bản quyền chính thức trên nền tảng của chúng tôi để nhận doanh thu quảng cáo và ủng hộ từ độc giả, vui lòng gửi thông tin về bộ phận đối ngoại của chúng tôi.
                 </p>
             </div>
 
             <footer className="legal-footer-industrial">
-                Cập nh?t lần cuo�i: Ng�y 14 th�ng 04 năm 2026
+                Cập nhật lần cuối: Ngày 14 tháng 04 năm 2026
             </footer>
         </div>
       </div>
@@ -56,4 +56,3 @@ export default function CopyrightPage() {
     </main>
   );
 }
-

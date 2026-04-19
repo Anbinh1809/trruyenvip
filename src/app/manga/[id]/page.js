@@ -275,7 +275,7 @@ export default async function MangaDetailPage({ params }) {
                     <div className="detail-description-traditional">
                         <h3 className="desc-title-traditional">Nội dung truyện</h3>
                         <p className="desc-content-traditional" itemProp="description">
-                            {manga.description || 'Chưa cố tóm tắt nội dung cho bộ truyện này. Chúng tôi sẽ cập nhật trong thời gian sớm nhất.'}
+                            {manga.description || 'Chưa có tóm tắt nội dung cho bộ truyện này. Chúng tôi sẽ cập nhật trong thời gian sớm nhất.'}
                         </p>
                     </div>
 

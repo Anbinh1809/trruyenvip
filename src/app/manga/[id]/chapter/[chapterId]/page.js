@@ -198,7 +198,7 @@ export default async function ChapterPage({ params }) {
       {/* Reader Footer: Finish Celebration */}
       <footer className="reader-footer-industrial">
         <div className="container reader-footer-container-titan">
-            <span className="finish-label-titan">BẠN Đã HOÀN THÀNH CHƯƠNG NÀY</span>
+            <span className="finish-label-titan">BẠN ĐÃ HOÀN THÀNH CHƯƠNG NÀY</span>
             <h2 className="finish-title-titan">{chapter.title || `Chương ${chapter.chapter_number}`}</h2>
 
             {nextChapter ? (
@@ -213,7 +213,7 @@ export default async function ChapterPage({ params }) {
                 </div>
             ) : (
                 <div className="all-caught-up-industrial fade-in">
-                    <h3 className="caught-up-title">BẠN Đã THEO KỊP CHƯƠNG MỚI NHẤT! 🎉</h3>
+                    <h3 className="caught-up-title">BẠN ĐÃ THEO KỊP CHƯƠNG MỚI NHẤT! 🎉</h3>
                     <p className="caught-up-desc">Hãy theo dõi bộ truyện để nhận thông báo khi có chương mới.</p>
                 </div>
             )}

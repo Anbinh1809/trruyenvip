@@ -2,21 +2,15 @@ import "./tokens.css";
 import "./industrial-core.css";
 import "./titan-components.css";
 import "./globals.css";
-import { Inter, Outfit } from 'next/font/google';
+import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-// ... (rest of imports)
-
-const inter = Inter({
-  subsets: ['latin', 'vietnamese'],
-  display: 'swap',
-  variable: '--font-inter',
-});
-
-const outfit = Outfit({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-outfit',
-});
+import { ToastProvider } from "@/components/widgets/ToastProvider";
+import { EngagementProvider } from "@/contexts/EngagementContext";
+import { HistoryProvider } from "@/contexts/HistoryContext";
+import { FavoritesProvider } from "@/contexts/FavoritesContext";
+import SWRegistration from "@/components/widgets/SWRegistration";
+import MobileNav from "@/components/layout/MobileNav";
+import BackToTop from "@/components/layout/BackToTop";
 
 export const metadata = {
   title: "TruyenVip - Nền tảng Đọc Truyện Tranh Online Cao Cấp",
@@ -60,7 +54,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="vi" className={`${inter.variable} ${outfit.variable}`} data-scroll-smooth="true" suppressHydrationWarning>
+    <html lang="vi" data-scroll-smooth="true" suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{
