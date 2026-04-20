@@ -31,7 +31,7 @@ export async function fetchWithRetry(url, options = {}, retries = 2) {
         if (delay > 0) await new Promise(r => setTimeout(r, delay));
         
         let finalUrl = url;
-        if (url.includes('nettruyen') || url.includes('truyenqq')) {
+        if (url.includes('nettruyen') || url.includes('truyenqq') || url.includes('nettruyeno') || url.includes('nettruyenqq')) {
             try {
                 const parsedUrl = new URL(url);
                 finalUrl = safeJoinUrl(mirrorUrl, parsedUrl.pathname + parsedUrl.search);

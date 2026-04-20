@@ -1,20 +1,17 @@
 /**
  * Mirror Intelligence & Racing Engine
+ * Updated: 2026-04-21 — Refreshed mirror list with verified domains
  */
 
 export const SOURCES = {
-    NETTRUYEN: 'https://nettruyenww.com/',
+    NETTRUYEN: 'https://nettruyeno.com/',
     NETTRUYEN_MIRRORS: [
-        'https://nettruyenww.com/',
-        'https://nettruyenviet.com/',
-        'https://www.nettruyen.me/',
-        'https://nettruyen.us.com/',
+        'https://nettruyeno.com/',
+        'https://nettruyenqq.net/',
     ],
-    TRUYENQQ: 'https://truyenqqq.com/',
+    TRUYENQQ: 'https://truyenqq.com.vn/',
     TRUYENQQ_MIRRORS: [
-        'https://truyenqqq.com/',
-        'https://truyenqq.top/',
-        'https://truyenqqvn.com/',
+        'https://truyenqq.com.vn/',
     ]
 };
 
@@ -27,11 +24,11 @@ global.mirrorScores = global.mirrorScores || {};
 global.mirrorQuarantine = global.mirrorQuarantine || {};
 
 export const USER_AGENTS = [
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
-    'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1',
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0',
-    'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36'
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (iPhone; CPU iPhone OS 18_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.2 Mobile/15E148 Safari/604.1',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:134.0) Gecko/20100101 Firefox/134.0',
+    'Mozilla/5.0 (Linux; Android 14; Pixel 9) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36'
 ];
 
 export const SEARCH_REFERERS = [
@@ -42,11 +39,11 @@ export const SEARCH_REFERERS = [
 ];
 
 /**
- * Returns sorted mirrors by score
+ * Returns sorted mirrors by score, filtering quarantined ones
  */
 export function getOptimizedMirrors(sourceUrl) {
     let sourceMirrors = [];
-    if (sourceUrl.includes('nettruyen')) {
+    if (sourceUrl.includes('nettruyen') || sourceUrl.includes('nettruyeno') || sourceUrl.includes('nettruyenqq')) {
         sourceMirrors = SOURCES.NETTRUYEN_MIRRORS;
     } else if (sourceUrl.includes('truyenqq')) {
         sourceMirrors = SOURCES.TRUYENQQ_MIRRORS;
@@ -63,7 +60,7 @@ export function getOptimizedMirrors(sourceUrl) {
 }
 
 /**
- * Quarantines a mirror on failure
+ * Quarantines a mirror on failure (5 min default)
  */
 export function quarantineMirror(mirrorUrl, durationMs = 300000) {
     global.mirrorQuarantine[mirrorUrl] = Date.now() + durationMs;

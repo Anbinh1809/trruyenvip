@@ -1,20 +1,17 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import NextLink from 'next/link';
 import Image from 'next/image';
-import { Search, X, Zap, Loader2 } from 'lucide-react';
-import { useToast } from '@/components/widgets/ToastProvider';
+import { Search, X, Loader2 } from 'lucide-react';
 
 export default function LiveSearch({ onSelect }) {
-  const { addToast } = useToast();
   const [q, setQ] = useState('');
   const [results, setResults] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [highlightIndex, setHighlightIndex] = useState(-1);
-  const [isUrl, setIsUrl] = useState(false);
   const router = useRouter();
   const searchRef = useRef(null);
 
@@ -29,13 +26,8 @@ export default function LiveSearch({ onSelect }) {
   }, []);
 
   useEffect(() => {
-    const supportedMirrors = ['nettruyen', 'truyenqq', 'nhattruyen', 'cmanga', 'blogtruyen', 'truyenvua', 'manga-tx'];
-    const urlPattern = new RegExp(`^(https?://)?([\\w.-]+)\\.(${supportedMirrors.join('|')})`, 'i');
-    const match = q.match(urlPattern);
-    setIsUrl(!!match);
-
     const timer = setTimeout(async () => {
-      if (q.length >= 2 && !match) {
+      if (q.length >= 2) {
         setLoading(true);
         setIsOpen(true);
         try {
@@ -53,48 +45,20 @@ export default function LiveSearch({ onSelect }) {
         }
       } else {
         setResults([]);
-        if (!isUrl) setIsOpen(false);
+        setIsOpen(false);
         setHighlightIndex(-1);
       }
     }, 400);
 
     return () => clearTimeout(timer);
-  }, [q, isUrl]);
+  }, [q]);
 
   const handleSearch = (e) => {
     if (e) e.preventDefault();
     if (!q.trim()) return;
-    if (isUrl) {
-        handleMigration();
-        return;
-    }
     setIsOpen(false);
     if (onSelect) onSelect();
     router.push(`/search?q=${encodeURIComponent(q)}`);
-  };
-
-  const handleMigration = async () => {
-      setLoading(true);
-      setIsOpen(true);
-      try {
-          const res = await fetch('/api/migration', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ url: q })
-          });
-          const data = await res.json();
-          if (data.success) {
-              if (addToast) addToast('Đồng bộ dữ liệu thành công!', 'success');
-              if (onSelect) onSelect();
-              router.push(data.redirectUrl);
-          } else {
-              if (addToast) addToast(data.error || 'Tính năng này hiện đang bảo trì.', 'error');
-          }
-      } catch (e) {
-          if (addToast) addToast('Lỗi kết nối máy chủ.', 'error');
-      } finally {
-          setLoading(false);
-      }
   };
 
   const handleKeyDown = (e) => {
@@ -122,7 +86,7 @@ export default function LiveSearch({ onSelect }) {
         <form className="titan-search-form" onSubmit={handleSearch}>
             <input 
                 type="text" 
-                placeholder="Tìm truyện hoặc dán link NetTruyen..." 
+                placeholder="Tìm truyện..." 
                 value={q}
                 autoComplete="off"
                 className="titan-search-input"
@@ -148,14 +112,6 @@ export default function LiveSearch({ onSelect }) {
 
         {isOpen && (
             <div className="titan-results-panel fade-slide-up glass-titan">
-                {isUrl && (
-                    <div className="titan-migration-bar-industrial">
-                        <button onClick={handleMigration} className="btn btn-primary migration-btn-titan">
-                            <Zap size={14} fill="currentColor" /> {loading ? 'ĐANG ĐỒNG BỘ...' : 'LẤY DỮ LIỆU NGUỒN NGOÀI'}
-                        </button>
-                    </div>
-                )}
-                
                 <div className="results-scroll-titan-industrial glass-scrollbar">
                     {results.length > 0 ? (
                         results.map((m, idx) => (
@@ -178,7 +134,7 @@ export default function LiveSearch({ onSelect }) {
                     ) : !loading && q.length >= 2 && (
                         <div className="search-empty-titan-industrial">
                             <div className="empty-title-industrial">KHÔNG TÌM THẤY</div>
-                            <p className="empty-sub-industrial">Thử từ khóa khác hoặc dán link truyện.</p>
+                            <p className="empty-sub-industrial">Thử từ khóa khác.</p>
                         </div>
                     )}
                 </div>
@@ -247,20 +203,6 @@ export default function LiveSearch({ onSelect }) {
                 padding: 15px;
                 z-index: 1000;
                 box-shadow: 0 30px 60px rgba(0,0,0,0.4);
-            }
-            .titan-migration-bar-industrial {
-                margin-bottom: 12px;
-            }
-            .migration-btn-titan {
-                width: 100%;
-                padding: 14px;
-                font-weight: 950;
-                font-size: 0.8rem;
-                letter-spacing: 0.5px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 10px;
             }
             .results-scroll-titan-industrial {
                 max-height: 450px;

@@ -48,7 +48,6 @@ export default function Header() {
                         <Link href="/genres" className={`nav-link-titan ${pathname === '/genres' ? 'active' : ''}`} onClick={closeMobileMenu}>THỂ LOẠI</Link>
                         <Link href="/leaderboard" className={`nav-link-titan ${pathname === '/leaderboard' ? 'active' : ''}`} onClick={closeMobileMenu}>XẾP HẠNG</Link>
                         <Link href="/history" className={`nav-link-titan ${pathname === '/history' ? 'active' : ''}`} onClick={closeMobileMenu}>LỊCH SỬ</Link>
-                        <Link href="/transfer" className={`nav-link-titan ${pathname === '/transfer' ? 'active' : ''}`} onClick={closeMobileMenu}>DI CƯ</Link>
                     </nav>
                 </div>
 

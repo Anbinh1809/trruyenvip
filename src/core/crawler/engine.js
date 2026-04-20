@@ -125,7 +125,7 @@ export async function processQueue() {
             LEFT JOIN favorite_counts f ON t.manga_id = f.manga_id
             WHERE t.status = 'pending'
             ORDER BY (t.priority + COALESCE(f.fav_count, 0) * 3) DESC, t.created_at ASC
-            LIMIT @needed FOR UPDATE SKIP LOCKED
+            LIMIT @needed FOR UPDATE OF t SKIP LOCKED
         )
         UPDATE crawlertasks SET status = 'processing', updated_at = NOW()
         FROM selected_tasks WHERE crawlertasks.id = selected_tasks.id
@@ -191,7 +191,7 @@ export async function crawlFullMangaChapters(mangaId, url, source, earlyExit = f
 
     try {
         const response = await fetchWithRetry(url, { isDiscovery: true });
-        updateMirrorHealth(new URL(url).hostname, true);
+        try { updateMirrorHealth(new URL(url).hostname, true); } catch {}
         
         const html = response.data;
         const metadata = source === 'nettruyen' ? parsers.parseNetTruyenManga(html, url) : parsers.parseTruyenQQManga(html, url);
@@ -271,35 +271,57 @@ export async function crawlLatest(source = 'nettruyen', pageCount = 1, startPage
     
     for (let p = startPage; p < startPage + pageCount; p++) {
         try {
-            const url = source === 'nettruyen' ? `${base}?page=${p}` : `${base}/latest-updates?page=${p}`;
+            const url = source === 'nettruyen' ? `${base}?page=${p}` : `${base}/truyen-moi-cap-nhat/trang-${p}`;
             const response = await fetchWithRetry(url, { isDiscovery: true });
             const $ = cheerio.load(response.data);
             
             const mangaLinks = source === 'nettruyen' ? $('.items .item .image a').toArray() : $('.book_item .book_avatar a').toArray();
-                
+            
+            // BATCH: Collect all slugs first, then single DB lookup
+            const candidates = [];
             for (const link of mangaLinks) {
                 let mangaUrl = $(link).attr('href');
                 if (!mangaUrl) continue;
                 if (mangaUrl.startsWith('/')) mangaUrl = safeJoinUrl(base, mangaUrl);
                 
                 const rawSlug = mangaUrl.split('/').pop()?.split('?')[0];
+                if (!rawSlug) continue;
                 const title = $(link).attr('title') || $(link).find('img').attr('alt') || rawSlug;
                 const cover = $(link).find('img').attr('data-original') || $(link).find('img').attr('src') || '';
                 const normalizedTitle = title.toLowerCase()
                     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
                     .replace(/[đĐ]/g, 'd').replace(/[^a-z0-9]/g, '-')
                     .replace(/-+/g, '-').replace(/^-|-$/g, '');
+                candidates.push({ mangaUrl, rawSlug, title, cover, normalizedTitle });
+            }
 
-                const existing = await query("SELECT id FROM manga WHERE normalized_title = @normalizedTitle OR id = @rawSlug LIMIT 1", { normalizedTitle, rawSlug });
-                let slug = rawSlug;
-                if (existing.recordset?.length > 0) {
-                    slug = existing.recordset?.[0]?.id || rawSlug;
+            if (candidates.length === 0) continue;
+
+            // Single batch query instead of N queries
+            const slugList = candidates.map(c => c.rawSlug);
+            const normalizedList = candidates.map(c => c.normalizedTitle);
+            const existingRes = await query(
+                `SELECT id, normalized_title FROM manga WHERE id = ANY(@slugList) OR normalized_title = ANY(@normalizedList)`,
+                { slugList, normalizedList }
+            );
+            const existingById = new Map();
+            const existingByNorm = new Map();
+            for (const r of (existingRes.recordset || [])) {
+                existingById.set(r.id, r.id);
+                if (r.normalized_title) existingByNorm.set(r.normalized_title, r.id);
+            }
+
+            for (const c of candidates) {
+                const existingSlug = existingById.get(c.rawSlug) || existingByNorm.get(c.normalizedTitle);
+                let slug = c.rawSlug;
+                if (existingSlug) {
+                    slug = existingSlug;
                 } else {
                     await query(`INSERT INTO manga (id, title, cover, source_url, normalized_title) VALUES (@slug, @title, @cover, @mangaUrl, @normalizedTitle) ON CONFLICT (id) DO NOTHING`,
-                        { slug, title, cover, mangaUrl, normalizedTitle });
+                        { slug, title: c.title, cover: c.cover, mangaUrl: c.mangaUrl, normalizedTitle: c.normalizedTitle });
                     newMangaCount++;
                 }
-                await queueMangaSync(slug, mangaUrl, source, true, 4);
+                await queueMangaSync(slug, c.mangaUrl, source, true, 4);
             }
         } catch (e) {
             try { updateMirrorHealth(new URL(base).hostname, false, e.message); } catch {}
@@ -383,10 +405,14 @@ export async function runGuardianAutopilot(oneShot = false) {
             
             let newFound = 0;
             for (const source of ['nettruyen', 'truyenqq']) {
-                if (!global.isArchivalPulse) {
-                    newFound += await crawlLatest(source, 3);
-                } else {
-                    newFound += await crawlLatest(source, 2, global.discoveryPage % 500 + 1);
+                try {
+                    if (!global.isArchivalPulse) {
+                        newFound += await crawlLatest(source, 3);
+                    } else {
+                        newFound += await crawlLatest(source, 2, global.discoveryPage % 500 + 1);
+                    }
+                } catch (sourceError) {
+                    console.warn(`[Guardian] Source '${source}' discovery stalled: ${sourceError.message}`);
                 }
             }
 

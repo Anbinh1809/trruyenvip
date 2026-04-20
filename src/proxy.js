@@ -57,8 +57,8 @@ export default async function proxy(request) {
   }
 
   // --- TITAN-2: RBAC (Role-Based Access Control) ---
-  const protectedPaths = ['/profile', '/favorites', '/history', '/rewards', '/leaderboard', '/transfer'];
-  const adminPaths = ['/admin', '/api/admin', '/api/crawler/stats', '/api/migration'];
+  const protectedPaths = ['/profile', '/favorites', '/history', '/rewards', '/leaderboard'];
+  const adminPaths = ['/admin', '/api/admin', '/api/crawler/stats'];
 
   const isProtected = protectedPaths.some(path => pathname.startsWith(path));
   const isAdminPath = adminPaths.some(path => pathname.startsWith(path));
@@ -136,7 +136,6 @@ export const config = {
     '/favorites/:path*', 
     '/history/:path*',
     '/history',
-    '/transfer/:path*', 
     '/admin/:path*', 
     '/rewards/:path*',
     '/rewards',

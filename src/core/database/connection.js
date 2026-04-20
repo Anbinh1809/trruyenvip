@@ -4,6 +4,10 @@ import 'dotenv/config';
 if (!process.env.DATABASE_URL) throw new Error('FATAL: DATABASE_URL missing!');
 
 let connectionString = process.env.DATABASE_URL;
+
+// Strip Neon-specific params that pg.Pool doesn't support
+connectionString = connectionString.replace(/[&?]channel_binding=[^&]*/g, '');
+
 if (connectionString?.includes('sslmode=') && !connectionString.includes('uselibpqcompat=true')) {
     connectionString += (connectionString.includes('?') ? '&' : '?') + 'uselibpqcompat=true';
 }
@@ -94,6 +98,10 @@ export async function bulkInsert(tableName, rows, client = null) {
         }
 
         const cols = Object.keys(rows[0]);
+        // TITAN SECURITY: Validate column names to prevent SQL injection
+        if (!cols.every(c => /^[a-zA-Z_0-9]+$/.test(c))) {
+            throw new Error(`SECURITY ALERT: Invalid column names in bulkInsert`);
+        }
         const vals = [];
         const placeholders = rows.map((r, i) => `(${cols.map((_, j) => {
             vals.push(r[cols[j]]);
