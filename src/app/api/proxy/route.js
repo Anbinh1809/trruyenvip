@@ -158,9 +158,9 @@ export async function GET(request) {
             
             let transformer = sharp(Buffer.from(buffer));
             
-            if (width > 0) {
+            if (w > 0) {
                 transformer = transformer.resize({ 
-                    width: Math.min(width, 1800),
+                    width: Math.min(w, 1800),
                     withoutEnlargement: true 
                 });
             }

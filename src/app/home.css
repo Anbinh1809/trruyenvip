@@ -50,3 +50,252 @@
     .home-hero-nebula { padding: 120px 0 80px; }
     .hero-actions-titan { flex-direction: column; align-items: stretch; }
 }
+
+/* ==========================================================================
+   HOMEPAGE SECTIONS — Missing CSS Fix
+   ========================================================================== */
+.home-history-wrapper {
+    margin-bottom: 40px;
+}
+
+.section-header-nebula-industrial {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    gap: 20px;
+}
+
+.section-title-box-titan {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.section-title-industrial {
+    font-size: 1.4rem;
+    font-weight: 950;
+    letter-spacing: 2px;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.btn-view-all-industrial {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: all 0.3s;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.btn-view-all-industrial:hover {
+    color: var(--accent);
+    transform: translateX(3px);
+}
+
+/* ==========================================================================
+   HEADER — Missing CSS for auth button, profile, dropdown
+   ========================================================================== */
+.btn-auth-titan {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 20px;
+    font-size: 0.84rem;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    color: var(--text-primary);
+    background: rgba(128, 128, 128, 0.08);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    text-decoration: none;
+    transition: all 0.25s;
+    cursor: pointer;
+}
+
+.btn-auth-titan:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .btn-auth-titan {
+        padding: 8px 14px;
+        font-size: 0.78rem;
+    }
+    .btn-auth-titan span { display: none; }
+}
+
+.profile-trigger-titan {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid var(--glass-border);
+    transition: border-color 0.3s;
+}
+
+.profile-trigger-titan:hover {
+    border-color: var(--accent);
+}
+
+.avatar-img-tag {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.avatar-placeholder-titan {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 900;
+    font-size: 1rem;
+    border-radius: 50%;
+}
+
+.profile-indicator-titan {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 10px;
+    height: 10px;
+    background: #10b981;
+    border-radius: 50%;
+    border: 2px solid var(--bg-primary);
+}
+
+.dropdown-header-titan {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.user-meta-titan {
+    margin-bottom: 8px;
+}
+
+.user-name-titan {
+    font-size: 0.95rem;
+    font-weight: 900;
+    color: var(--text-primary);
+    margin-bottom: 3px;
+}
+
+.rank-badge-titan-mini {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+}
+
+.coins-pill-titan {
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: var(--text-secondary);
+    background: rgba(128, 128, 128, 0.08);
+    padding: 5px 12px;
+    border-radius: 8px;
+    display: inline-block;
+}
+
+.dropdown-divider-titan {
+    height: 1px;
+    background: var(--glass-border);
+    margin: 4px 0;
+}
+
+.dropdown-links-titan {
+    padding: 6px;
+}
+
+.dropdown-link-node {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    transition: background 0.2s, color 0.2s, padding-left 0.2s;
+    text-decoration: none;
+    width: 100%;
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+}
+
+.dropdown-link-node:hover {
+    background: rgba(128, 128, 128, 0.08);
+    color: var(--text-primary);
+    padding-left: 18px;
+}
+
+.dropdown-link-node.admin-link {
+    color: var(--accent);
+}
+
+.dropdown-link-node.logout-node:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.07);
+}
+
+.user-interactions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.mobile-menu-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(128, 128, 128, 0.08);
+    border: 1px solid var(--glass-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.25s;
+}
+
+.mobile-menu-btn:hover {
+    background: rgba(128, 128, 128, 0.15);
+    border-color: var(--accent);
+}
+
+@media (min-width: 1201px) {
+    .mobile-menu-btn { display: none; }
+}
+
+@media (max-width: 768px) {
+    .section-header-nebula-industrial {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    .section-title-industrial {
+        font-size: 1.1rem;
+        letter-spacing: 1px;
+    }
+}

@@ -61,7 +61,7 @@ function engagementReducer(state, action) {
       const nextXp = state.xp + action.amount;
       const nextLevel = Math.floor(nextXp / 100) + 1;
       const rank = [...RANKS].reverse().find(r => nextLevel >= r.lv);
-      localStorage.setItem('truyenvip_xp', nextXp.toString());
+      if (typeof window !== 'undefined') localStorage.setItem('truyenvip_xp', nextXp.toString());
       return {
         ...state,
         xp: nextXp,
@@ -71,23 +71,23 @@ function engagementReducer(state, action) {
     }
     case 'ADD_COINS': {
         const nextCoins = state.vipCoins + action.amount;
-        localStorage.setItem('truyenvip_coins', nextCoins.toString());
+        if (typeof window !== 'undefined') localStorage.setItem('truyenvip_coins', nextCoins.toString());
         return { ...state, vipCoins: nextCoins };
     }
     case 'DEDUCT_COINS': {
         const nextCoins = Math.max(0, state.vipCoins - action.amount);
-        localStorage.setItem('truyenvip_coins', nextCoins.toString());
+        if (typeof window !== 'undefined') localStorage.setItem('truyenvip_coins', nextCoins.toString());
         return { ...state, vipCoins: nextCoins };
     }
     case 'UPDATE_MISSION': {
-        const { type, increment } = action;
-        const idx = state.dailyMissions.missions.findIndex(m => m.type === type);
+        const { missionType, increment } = action;
+        const idx = state.dailyMissions.missions.findIndex(m => m.type === missionType);
         if (idx === -1 || state.dailyMissions.missions[idx].current >= state.dailyMissions.missions[idx].target) return state;
         
         const newMissions = [...state.dailyMissions.missions];
         newMissions[idx] = { ...newMissions[idx], current: Math.min(newMissions[idx].target, newMissions[idx].current + increment) };
         const nextMissions = { ...state.dailyMissions, missions: newMissions };
-        localStorage.setItem('truyenvip_daily_missions', JSON.stringify(nextMissions));
+        if (typeof window !== 'undefined') localStorage.setItem('truyenvip_daily_missions', JSON.stringify(nextMissions));
         return { ...state, dailyMissions: nextMissions };
     }
     case 'CLAIM_MISSION': {
@@ -97,18 +97,20 @@ function engagementReducer(state, action) {
         const newMissions = [...state.dailyMissions.missions];
         newMissions[idx] = { ...newMissions[idx], claimed: true };
         const nextMissions = { ...state.dailyMissions, missions: newMissions };
-        localStorage.setItem('truyenvip_daily_missions', JSON.stringify(nextMissions));
+        if (typeof window !== 'undefined') localStorage.setItem('truyenvip_daily_missions', JSON.stringify(nextMissions));
         return { ...state, dailyMissions: nextMissions };
     }
     case 'RESET_MISSIONS': {
         const nextMissions = { ...initialState.dailyMissions, date: new Date().toLocaleDateString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }) };
-        localStorage.setItem('truyenvip_daily_missions', JSON.stringify(nextMissions));
+        if (typeof window !== 'undefined') localStorage.setItem('truyenvip_daily_missions', JSON.stringify(nextMissions));
         return { ...state, dailyMissions: nextMissions };
     }
     case 'CHECK_IN': {
         const { today, nextStreak } = action;
-        localStorage.setItem('truyenvip_last_checkin', today || '');
-        localStorage.setItem('truyenvip_checkin_streak', (nextStreak || 0).toString());
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('truyenvip_last_checkin', today || '');
+            localStorage.setItem('truyenvip_checkin_streak', (nextStreak || 0).toString());
+        }
         return { ...state, lastCheckIn: today, checkInStreak: nextStreak };
     }
     default:
@@ -319,8 +321,8 @@ export function EngagementProvider({ children }) {
     pendingDeltasRef.current.coins -= amount;
   }, []);
 
-  const updateMission = useCallback((type, increment = 1) => {
-    dispatch({ type: 'UPDATE_MISSION', type, increment });
+  const updateMission = useCallback((missionType, increment = 1) => {
+    dispatch({ type: 'UPDATE_MISSION', missionType, increment });
   }, []);
 
   const checkIn = useCallback((forcedDate) => {

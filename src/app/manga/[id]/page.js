@@ -250,11 +250,11 @@ export default async function MangaDetailPage({ params }) {
                                 </div>
                                 <div className="info-row">
                                     <span className="info-label"><Heart size={14} className="info-icon" /> Lượt theo dõi</span>
-                                    <span className="info-value">12.5k</span>
+                                    <span className="info-value">{manga.views_at_source ? `${Math.round(manga.views_at_source / 1000)}k` : 'N/A'}</span>
                                 </div>
                                 <div className="info-row">
                                     <span className="info-label"><Eye size={14} className="info-icon" /> Lượt xem</span>
-                                    <span className="info-value">{manga.views || '125,000'}</span>
+                                    <span className="info-value">{manga.views ? Number(manga.views).toLocaleString('vi-VN') : 'N/A'}</span>
                                 </div>
                             </div>
 
