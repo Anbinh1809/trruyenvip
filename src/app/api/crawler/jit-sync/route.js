@@ -58,6 +58,7 @@ export const POST = withTitan({
             crawlResult = await Promise.race([crawlPromise, timeoutPromise]);
         } catch (err) {
             errorStatus = err.code || err.message;
+            console.warn(`[JIT-SYNC] Crawl failed for ${chapterId}: ${errorStatus}`);
         }
 
         // Verification

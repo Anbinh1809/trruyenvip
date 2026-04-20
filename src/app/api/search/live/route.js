@@ -1,11 +1,21 @@
-import { query, MANGA_CARD_FIELDS } from '@/core/database/connection';
+import { query, MANGA_CARD_FIELDS, checkRateLimit } from '@/core/database/connection';
 import { generateProxySignature } from '@/core/security/crypto';
 
+/**
+ * Fix #12: Added IP-based rate limiting to prevent DB query spam.
+ */
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const q = searchParams.get('q');
 
     if (!q || q.length < 2) return Response.json([]);
+
+    // Rate limit: 30 searches per minute per IP
+    const ip = request.headers.get('x-forwarded-for') || '127.0.0.1';
+    const limiter = await checkRateLimit(`search_${ip}`, 30, 60);
+    if (!limiter.success) {
+        return Response.json([], { status: 429 });
+    }
 
     // Titan-Fidelity: Search normalization
     const cleanQ = q.toLowerCase()
@@ -15,10 +25,11 @@ export async function GET(request) {
         .replace(/\s+/g, '-')
         .replace(/-+/g, '-')
         .trim();
+
     try {
         let res;
         try {
-            // PRIMARY: Trigram similarity match (Superior relevance)
+            // PRIMARY: Trigram similarity match
             res = await query(`
                 SELECT ${MANGA_CARD_FIELDS}
                 FROM manga 
@@ -31,8 +42,8 @@ export async function GET(request) {
                     last_crawled DESC
                 LIMIT 6
             `, { q: cleanQ });
-        } catch (trgmError) {
-            // FALLBACK: Traditional LIKE search (Ensures zero-downtime if extension is missing)
+        } catch {
+            // FALLBACK: LIKE search if pg_trgm not available
             res = await query(`
                 SELECT ${MANGA_CARD_FIELDS}
                 FROM manga 
@@ -45,20 +56,16 @@ export async function GET(request) {
 
         const results = (res.recordset || []).map(m => {
             const w = 100;
-            const q = 75;
+            const qv = 75;
             const coverUrl = m.cover || '/placeholder-manga.svg';
             let finalCover = coverUrl;
 
             if (coverUrl.startsWith('http')) {
-                // Ensure w and q are passed exactly as they will be parsed in the proxy route
-                const sig = generateProxySignature(coverUrl, w, q);
-                finalCover = `/api/proxy?url=${encodeURIComponent(coverUrl)}&w=${w}&q=${q}&sig=${sig}`;
+                const sig = generateProxySignature(coverUrl, w, qv);
+                finalCover = `/api/proxy?url=${encodeURIComponent(coverUrl)}&w=${w}&q=${qv}&sig=${sig}`;
             }
 
-            return {
-                ...m,
-                cover: finalCover
-            };
+            return { ...m, cover: finalCover };
         });
 
         return Response.json(results);
@@ -67,5 +74,3 @@ export async function GET(request) {
         return Response.json([]);
     }
 }
-
-

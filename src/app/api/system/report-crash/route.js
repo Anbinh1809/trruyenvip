@@ -1,33 +1,38 @@
-import { query } from '@/core/database/connection';
-import { NextResponse } from 'next/server';
+import { query, checkRateLimit } from '@/core/database/connection';
+import { withTitan } from '@/core/api/handler';
 
-export async function POST(request) {
-    try {
-        const body = await request.json();
-        const { message, stack, digest, url } = body;
+/**
+ * Fix #6: Added IP-based rate limiting to prevent Log Flooding / DoS.
+ */
+export const POST = withTitan({
+    handler: async (request) => {
         const ip = request.headers.get('x-forwarded-for') || '127.0.0.1';
 
-        // Log to guardianreports table for visibility in Admin Dashboard
+        // Rate limit: 5 crash reports per minute per IP
+        const limiter = await checkRateLimit(`crash_${ip}`, 5, 60);
+        if (!limiter.success) {
+            // Silently ignore excess reports to avoid feedback loops
+            return { success: true };
+        }
+
+        const body = await request.json();
+        const { message, stack, digest, url } = body;
+
         await query(`
             INSERT INTO guardianreports (manga_name, chapter_title, issue_type, details)
             VALUES ('CRASH', @message, 'CLIENT_CRASH', @details)
         `, {
             message: (message || 'Web Crash').substring(0, 255),
-            details: JSON.stringify({ 
-                stack, 
-                digest, 
-                url, 
-                ip, 
+            details: JSON.stringify({
+                stack,
+                digest,
+                url,
+                ip,
                 userAgent: request.headers.get('user-agent'),
                 timestamp: new Date().toISOString()
             })
         });
 
-        return NextResponse.json({ success: true });
-    } catch (e) {
-        // Silently fail to avoid infinite error loops
-        console.error('[REPORT_CRASH_FAILURE]', e);
-        return NextResponse.json({ success: false }, { status: 500 });
+        return { success: true };
     }
-}
-
+});

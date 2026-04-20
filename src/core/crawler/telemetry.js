@@ -87,7 +87,7 @@ export function updateTelemetry(data) {
                 discoveryPage: global.crawlerState.discoveryPage,
                 isArchivalPulse: global.crawlerState.isArchivalPulse,
                 mirrorHealth: global.crawlerState.mirrorHealth,
-                mirrorScores: global.mirrorScores,
+                mirrorScores: global.crawlerState.mirrorScores, // Fix #10: was incorrectly reading global.mirrorScores
                 lastSeen: now
             });
             if (data.syncHealth) console.log('[Telemetry] Force-Sync completed.');

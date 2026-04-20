@@ -3,10 +3,14 @@ import { withTitan } from '@/core/api/handler';
 
 export const runtime = 'nodejs';
 
+/**
+ * Fix #11: Added `auth: true` — anonymous users must not trigger full manga crawls.
+ */
 export const POST = withTitan({
+    auth: true,
     handler: async (req) => {
         const { slug, source } = await req.json();
-        
+
         if (!slug) {
             throw { status: 400, message: 'Thiếu slug truyện' };
         }

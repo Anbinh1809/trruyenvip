@@ -4,11 +4,8 @@ import { withTitan } from '@/core/api/handler';
 export const GET = withTitan({
     admin: true,
     handler: async () => {
-        // TITAN CACHE: 10-second statistical caching for high-fidelity accuracy
-        if (global.adminStatsCache && Date.now() - global.adminStatsCache.time < 10000) {
-            return global.adminStatsCache.data;
-        }
-
+        // NOTE: Fix #13 - Removed `global.adminStatsCache` — unreliable on Serverless/Vercel.
+        // Stats are lightweight enough for direct DB fetch with Next.js ISR if needed.
         try {
             // TITAN ROBUSTNESS: Verify table exists before querying to avoid 500s
             const tablesRes = await query(`
@@ -71,7 +68,6 @@ export const GET = withTitan({
                 serverTime: new Date().toISOString()
             };
             
-            global.adminStatsCache = { data, time: Date.now() };
             return data;
         } catch (err) {
             console.error('[STATS_API_ERROR]', err);

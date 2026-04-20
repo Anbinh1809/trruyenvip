@@ -1,4 +1,4 @@
-import { query, checkRateLimit } from '@/core/database/connection';
+import { query, checkRateLimit, withTransaction } from '@/core/database/connection';
 import { withTitan } from '@/core/api/handler';
 
 export const GET = withTitan({
@@ -80,12 +80,15 @@ export const PATCH = withTitan({
 
         if (action === 'like') {
             try {
-                await query(`
-                    INSERT INTO comment_likes (user_uuid, comment_id)
-                    VALUES (@userUuid, @id)
-                `, { userUuid, id });
+                // Fix #15: Wrap in transaction so INSERT and UPDATE are atomic
+                await withTransaction(async (tx) => {
+                    await query(`
+                        INSERT INTO comment_likes (user_uuid, comment_id)
+                        VALUES (@userUuid, @id)
+                    `, { userUuid, id }, tx);
 
-                await query(`UPDATE comments SET likes = likes + 1 WHERE id = @id`, { id });
+                    await query(`UPDATE comments SET likes = likes + 1 WHERE id = @id`, { id }, tx);
+                });
                 return { success: true };
             } catch (e) {
                 return { success: false, message: 'Bạn đã thích bình luận này rồi.' };

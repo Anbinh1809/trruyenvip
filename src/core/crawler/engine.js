@@ -373,6 +373,14 @@ export async function runGuardianAutopilot(oneShot = false) {
             const currentLimit = getConcurrentLimit();
             updateTelemetry({ status: 'guardian_discovery', discoveryPage: global.discoveryPage % 500 + 1, isArchivalPulse: global.isArchivalPulse, activeWorkers, concurrencyLimit: currentLimit });
             
+            // Fix #16: Kill switch — check before each iteration
+            if (global.guardianShouldStop) {
+                console.log('[Guardian] Kill switch triggered. Stopping autopilot loop.');
+                global.guardianActive = false;
+                global.guardianShouldStop = false;
+                return;
+            }
+            
             let newFound = 0;
             for (const source of ['nettruyen', 'truyenqq']) {
                 if (!global.isArchivalPulse) {
@@ -410,7 +418,8 @@ export async function healChapterGaps(batchSize = 20) {
     const res = await query(`SELECT id, source_url FROM manga WHERE last_crawled < NOW() - INTERVAL '6 hours' ORDER BY last_crawled ASC LIMIT @batchSize`, { batchSize });
     for (const m of res.recordset) {
         if (!m.source_url) continue;
-        queueMangaSync(m.id, m.source_url, m.source_url?.includes('truyenqq') ? 'truyenqq' : 'nettruyen', true, 2);
+        // Fix #8: Added await
+        await queueMangaSync(m.id, m.source_url, m.source_url?.includes('truyenqq') ? 'truyenqq' : 'nettruyen', true, 2);
     }
 }
 
@@ -424,7 +433,8 @@ export async function rescueBrokenImages(batchSize = 10) {
     `, { batchSize });
     for (const c of res.recordset) {
         if (!c.source_url || !c.manga_url) continue;
-        queueChapterScrape(c.id, c.source_url, c.manga_url?.includes('truyenqq') ? 'truyenqq' : 'nettruyen', true, 2);
+        // Fix #9: Added await
+        await queueChapterScrape(c.id, c.source_url, c.manga_url?.includes('truyenqq') ? 'truyenqq' : 'nettruyen', true, 2);
     }
 }
 

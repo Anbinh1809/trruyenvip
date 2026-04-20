@@ -1,25 +1,24 @@
 import { query, checkRateLimit } from '@/core/database/connection';
-import { getSession } from '@/core/security/auth';
-import { NextResponse } from 'next/server';
+import { withTitan } from '@/core/api/handler';
 
-export async function POST(request) {
-    try {
-        const session = await getSession();
-        if (!session) {
-            return NextResponse.json({ error: 'Chưa đăng nhập' }, { status: 401 });
-        }
-
-        // 1. Robust Parsing for Beacon/Keepalive (handles missing Content-Type)
+/**
+ * Fix #5: Wrapped in withTitan for unified security headers.
+ * Fix #6 (rate limit): same pattern used here for stats updates.
+ * Replaces the old manual getSession() pattern.
+ */
+export const POST = withTitan({
+    auth: true,
+    handler: async (request, session) => {
+        // 1. Robust body parsing (handles sendBeacon text/plain payloads)
         let body;
         try {
             body = await request.json();
-        } catch (e) {
-            // Fallback for beacon payloads which might be sent as text/plain strings
+        } catch {
             const text = await request.text();
             try {
                 body = JSON.parse(text);
-            } catch (inner) {
-                return NextResponse.json({ error: 'Invalid payload format' }, { status: 400 });
+            } catch {
+                throw { status: 400, message: 'Invalid payload format' };
             }
         }
 
@@ -27,26 +26,27 @@ export async function POST(request) {
         const deltaXp = parseInt(xpDelta || 0);
         const deltaCoins = parseInt(coinDelta || 0);
 
-        // 2. Return early if no changes
+        // Return early if no changes
         if (deltaXp === 0 && deltaCoins === 0 && !missionData) {
-            return NextResponse.json({ success: true });
+            return { success: true };
         }
 
-        // TITAN-GRADE SANITY CHECK: Max 500 XP and 100 Coins per heart-beat (3s)
+        // Sanity check: Max 500 XP and 100 Coins per heartbeat
         if (deltaXp > 500 || deltaCoins > 100) {
-            return NextResponse.json({ error: 'Dữ liệu bất thường (Deltas excessive)' }, { status: 400 });
+            throw { status: 400, message: 'Dữ liệu bất thường (Deltas excessive)' };
         }
 
-        // 4. TITAN RATE LIMIT: Unify with core system infrastructure
-        const limiter = await checkRateLimit(`stats_${session.uuid}`, 1, 3); // 1 update / 3s
+        // Rate limit: 1 update per 3 seconds
+        const limiter = await checkRateLimit(`stats_${session.uuid}`, 1, 3);
         if (!limiter.success) {
-            return NextResponse.json({ 
-              error: 'Hệ thống đang bận',
-              nextAvailable: limiter.reset - Date.now()
-            }, { status: 429 });
+            throw {
+                status: 429,
+                message: 'Hệ thống đang bận',
+                nextAvailable: limiter.reset - Date.now()
+            };
         }
 
-        // 5. Apply Update (ATOMIC RECONCILIATION)
+        // Atomic update
         await query(`
             UPDATE users 
             SET xp = xp + @xp, 
@@ -64,10 +64,6 @@ export async function POST(request) {
             uuid: session.uuid
         });
 
-        return NextResponse.json({ success: true });
-
-    } catch (e) {
-        console.error('[TITAN ERROR] Update stats failed:', e.message);
-        return NextResponse.json({ error: 'Lỗi đồng bộ dữ liệu' }, { status: 500 });
+        return { success: true };
     }
-}
+});

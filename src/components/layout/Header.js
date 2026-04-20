@@ -4,14 +4,10 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
-    Search, 
     User, 
     LogOut, 
-    History, 
     Heart, 
     Award, 
-    Settings, 
-    Hexagon,
     Menu,
     X,
     LayoutDashboard,
@@ -20,7 +16,6 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { useEngagement } from '@/contexts/EngagementContext';
 import LiveSearch from '@/components/shared/LiveSearch';
-import Image from 'next/image';
 
 export default function Header() {
     const { user, isAuthenticated, logout } = useAuth() || {};
@@ -42,7 +37,7 @@ export default function Header() {
         <header className={`glass-nav ${scrolled ? 'scrolled' : ''}`}>
             <div className="header-wrapper container">
                 <div className="header-left">
-                    <Link href="/" className="logo hover-3d-titan" onClick={closeMobileMenu}>
+                    <Link href="/" className="logo" onClick={closeMobileMenu}>
                         <div className="logo-icon-titan">
                             <Zap size={24} fill="var(--accent)" strokeWidth={1.5} />
                         </div>
@@ -65,7 +60,7 @@ export default function Header() {
                     <div className="user-interactions">
                         {isAuthenticated ? (
                             <div className="user-profile-titan">
-                                <div className="profile-trigger-titan shadow-titan">
+                                <div className="profile-trigger-titan">
                                     {user?.avatar ? (
                                         <img src={user.avatar} alt={user.username} className="avatar-img-tag" />
                                     ) : (
@@ -76,14 +71,14 @@ export default function Header() {
                                     <div className="profile-indicator-titan" />
                                 </div>
                                 
-                                <div className="profile-dropdown-titan shadow-titan">
+                                <div className="profile-dropdown-titan">
                                     <div className="dropdown-header-titan">
                                         <div className="user-meta-titan">
                                             <div className="user-name-titan truncate-1">{user?.username}</div>
                                             <div className="rank-badge-titan-mini">{rankTitle} - Cấp {level}</div>
                                         </div>
                                         <div className="coins-pill-titan">
-                                            <Zap size={14} fill="currentColor" /> {mounted ? vipCoins.toLocaleString() : '...'}
+                                            Số dư: {mounted ? vipCoins.toLocaleString() : '...'}
                                         </div>
                                     </div>
                                     <div className="dropdown-divider-titan" />
@@ -110,7 +105,7 @@ export default function Header() {
                                 </div>
                             </div>
                         ) : (
-                            <Link href="/auth/login" className="btn-auth-titan shadow-titan" onClick={closeMobileMenu}>
+                            <Link href="/auth/login" className="btn-auth-titan" onClick={closeMobileMenu}>
                                 <User size={18} /> <span>ĐĂNG NHẬP</span>
                             </Link>
                         )}

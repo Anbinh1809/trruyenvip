@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -51,7 +51,7 @@ function MangaCard({ manga, isNew = false, priority = false }) {
   return (
     <Link 
       href={`/manga/${manga.normalized_title || manga.id}`} 
-      className="manga-card-titan fade-up"
+      className="manga-card-titan"
       itemScope 
       itemType="http://schema.org/CreativeWork"
     >
@@ -141,41 +141,12 @@ function MangaCard({ manga, isNew = false, priority = false }) {
         }
         .card-img-titan {
             opacity: 0;
-            transition: opacity 0.5s ease, transform 0.8s var(--ease-titan);
+            transition: opacity 0.5s ease;
         }
         .card-img-titan.is-loaded {
             opacity: 1;
         }
-        
-        .manga-card-titan:hover .card-img-titan {
-            transform: scale(1.1) rotate(1deg);
-        }
 
-        /* Premium Shine Sweep */
-        .card-media-titan::after {
-            content: '';
-            position: absolute;
-            top: -100%;
-            left: -100%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                135deg,
-                transparent 0%,
-                transparent 45%,
-                rgba(255, 255, 255, 0.08) 50%,
-                transparent 55%,
-                transparent 100%
-            );
-            transition: all 0.6s var(--ease-titan);
-            z-index: 5;
-            pointer-events: none;
-        }
-        
-        .manga-card-titan:hover .card-media-titan::after {
-            top: 0;
-            left: 0;
-        }
 
         .card-title-centered {
             text-shadow: 0 10px 20px rgba(0,0,0,0.2);

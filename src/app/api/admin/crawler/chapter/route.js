@@ -2,16 +2,13 @@ import { crawlChapterImages } from '@/core/crawler';
 import { query } from '@/core/database/connection';
 import { withTitan } from '@/core/api/handler';
 
+/**
+ * Fix #2: Changed to admin: true — this is an admin-only operation.
+ * Removed `allowOptional` + NODE_ENV dev bypass which is insecure by design.
+ */
 export const POST = withTitan({
-  allowOptional: true, // Allow dev access bypass
-  handler: async (req, session) => {
-    const isAdmin = session?.role === 'admin';
-    const isDev = process.env.NODE_ENV === 'development';
-    
-    if (!isAdmin && !isDev) {
-      throw Object.assign(new Error('Unauthorized'), { status: 401 });
-    }
-
+  admin: true,
+  handler: async (req) => {
     const { chapterId } = await req.json();
     if (!chapterId) throw Object.assign(new Error('chapterId is required'), { status: 400 });
 
@@ -29,9 +26,9 @@ export const POST = withTitan({
 
     const newImgs = await query('SELECT COUNT(*) as count FROM chapterimages WHERE chapter_id = @id', { id: chapterId });
     const count = newImgs.recordset?.[0]?.count || 0;
-    
-    return { 
-        success: true, 
+
+    return {
+        success: true,
         count: count,
         message: `Đã cào xong ${count} ảnh.`
     };

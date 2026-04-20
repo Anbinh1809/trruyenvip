@@ -1,37 +1,30 @@
 import { runFullMaintenance } from '@/core/database/maintenance';
-import { NextResponse } from 'next/server';
+import { withTitan } from '@/core/api/handler';
 
 /**
  * TITAN MAINTENANCE ENDPOINT
- * Can be triggered by GitHub Actions Cron, Vercel Cron, or manual admin action.
+ * Auth: Query param ?key= must match MAINTENANCE_KEY env var (no fallback default).
  */
-export async function GET(request) {
-    // Basic Security: Check for internal secret key
+async function handleMaintenance(request) {
     const { searchParams } = new URL(request.url);
     const key = searchParams.get('key');
-    const secret = process.env.MAINTENANCE_KEY || 'truyenvip_polaris_2026';
+    const secret = process.env.MAINTENANCE_KEY;
+
+    if (!secret) {
+        throw { status: 500, message: 'Server misconfiguration: MAINTENANCE_KEY not set.' };
+    }
 
     if (key !== secret) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        throw { status: 401, message: 'Unauthorized' };
     }
 
-    try {
-        const results = await runFullMaintenance();
-        return NextResponse.json({
-            success: true,
-            timestamp: new Date().toISOString(),
-            results
-        });
-    } catch (e) {
-        return NextResponse.json({
-            success: false,
-            error: e.message
-        }, { status: 500 });
-    }
+    const results = await runFullMaintenance();
+    return {
+        success: true,
+        timestamp: new Date().toISOString(),
+        results
+    };
 }
 
-// Support POST for traditional cron services
-export async function POST(request) {
-    return GET(request);
-}
-
+export const GET = withTitan({ handler: handleMaintenance });
+export const POST = withTitan({ handler: handleMaintenance });

@@ -1,16 +1,16 @@
 import { loadSystemState } from '@/core/database/connection';
 import { withTitan } from '@/core/api/handler';
 
+/**
+ * Fix #7: Changed from auth:true + manual role check → admin:true directly.
+ * Eliminates the redundant double-check pattern.
+ */
 export const GET = withTitan({
-    auth: true,
-    handler: async (req, session) => {
-        if (session.role !== 'admin') {
-            throw { status: 403, message: 'Forbidden' };
-        }
-
+    admin: true,
+    handler: async () => {
         const state = await loadSystemState('crawler_state');
         const mirrorHealth = state?.mirrorHealth || {};
-        
+
         return {
             success: true,
             timestamp: Date.now(),
@@ -18,4 +18,3 @@ export const GET = withTitan({
         };
     }
 });
-
