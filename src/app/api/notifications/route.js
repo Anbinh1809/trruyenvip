@@ -25,7 +25,6 @@ export const GET = withTitan({
         }
     }
 });
-
 /**
  * PATCH: Mark notifications as read
  */
@@ -48,4 +47,3 @@ export const PATCH = withTitan({
         }
     }
 });
-

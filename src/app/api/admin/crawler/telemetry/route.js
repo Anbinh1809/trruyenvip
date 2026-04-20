@@ -1,18 +1,13 @@
-import { NextResponse } from 'next/server';
-import { getSession } from '@/core/security/auth';
+import { withTitan } from '@/core/api/handler';
 import { loadSystemState } from '@/core/database/connection';
 
-export async function GET() {
-    try {
-        const session = await getSession();
-        if (session?.role !== 'admin') {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-
+export const GET = withTitan({
+    admin: true,
+    handler: async () => {
         // Access the global state managed by crawler.js
         const state = global.crawlerState || {
             status: 'idle',
-            concurrencyLimit: BASE_CONCURRENCY || 10,
+            concurrencyLimit: 3, // FIX #4: BASE_CONCURRENCY=3 (from engine.js)
             activeWorkers: 0
         };
 
@@ -21,16 +16,12 @@ export async function GET() {
         const memory = process.memoryUsage();
         const memoryMB = Math.round(memory.rss / 1024 / 1024);
 
-        return NextResponse.json({
+        return {
             success: true,
             ...state,
             lastPulseAt,
             ramUsage: memoryMB,
             memoryMB
-        });
-    } catch (err) {
-        return NextResponse.json({ error: err.message }, { status: 500 });
+        };
     }
-}
-
-
+});

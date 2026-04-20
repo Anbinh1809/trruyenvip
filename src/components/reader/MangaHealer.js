@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { RefreshCw, Heart, Activity } from 'lucide-react';
@@ -58,7 +58,7 @@ export default function MangaHealer({ mangaId }) {
                 )}
             </div>
 
-            <style jsx>{`
+            <style>{`
                 .manga-healer-titan {
                     display: flex;
                     align-items: center;

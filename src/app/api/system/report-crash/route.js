@@ -9,10 +9,10 @@ export async function POST(request) {
 
         // Log to guardianreports table for visibility in Admin Dashboard
         await query(`
-            INSERT INTO guardianreports (type, message, details, severity)
-            VALUES ('CRASH', @message, @details, 'CRITICAL')
+            INSERT INTO guardianreports (manga_name, chapter_title, issue_type, details)
+            VALUES ('CRASH', @message, 'CLIENT_CRASH', @details)
         `, {
-            message: message || 'Web Crash',
+            message: (message || 'Web Crash').substring(0, 255),
             details: JSON.stringify({ 
                 stack, 
                 digest, 

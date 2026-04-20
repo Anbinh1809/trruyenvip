@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { RefreshCw, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
@@ -63,7 +63,7 @@ export default function DiscoveryTrigger({ slug }) {
                 <p className="discovery-msg">{message}</p>
             </div>
 
-            <style jsx>{`
+            <style>{`
                 .discovery-industrial {
                     background: var(--glass-bg);
                     backdrop-filter: blur(12px);

@@ -56,7 +56,7 @@ async function getChapterData(mangaId, chapterId) {
     }
 
     const internalMangaId = manga.id;
-    const chapterRes = await query('SELECT id, title, chapter_number, content FROM chapters WHERE id = @chapterId', { chapterId });
+    const chapterRes = await query('SELECT id, title, chapter_number, content, source_url FROM chapters WHERE id = @chapterId', { chapterId });
     const chapter = chapterRes.recordset[0];
     if (!chapter) {
         console.error(`[Reader Error] Chapter not found for ID: ${chapterId} in Manga: ${internalMangaId}`);
@@ -123,7 +123,7 @@ export default async function ChapterPage({ params }) {
                 {isCandidate ? <Sparkles size={80} color="var(--accent)" className="spin-titan" /> : <AlertTriangle size={80} color="var(--accent)" />}
             </div>
             <h2 className="error-title-industrial" style={{ textAlign: 'center' }}>
-                {isCandidate ? 'ĐANG KHOI TẠO NỘI DUNG' : 'LỖI TRUY XUẤT NỘI DUNG'}
+                {isCandidate ? 'ĐANG KHỞI TẠO NỘI DUNG' : 'LỖI TRUY XUẤT NỘI DUNG'}
             </h2>
             <p className="error-desc-industrial" style={{ textAlign: 'center', opacity: 0.7 }}>
                 {isCandidate 

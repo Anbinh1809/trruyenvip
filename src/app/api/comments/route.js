@@ -5,7 +5,7 @@ export const GET = withTitan({
     handler: async (req) => {
         const { searchParams } = new URL(req.url);
         const chapterId = searchParams.get('chapterId');
-        const userUuid = searchParams.get('userUuid') || ''; // For highlighting own likes
+        const userUuid = searchParams.get('userUuid') || '';
 
         if (!chapterId) {
             throw { status: 400, message: 'Missing chapterId' };
@@ -28,7 +28,6 @@ export const GET = withTitan({
 
 /**
  * TITAN XSS SHIELD: Encodes HTML characters to prevent script injection.
- * Industrial grade protection: Treats all user input as plain text.
  */
 function sanitizeContent(text) {
     if (!text) return '';
@@ -53,16 +52,15 @@ export const POST = withTitan({
 
         const sanitized = sanitizeContent(content);
         if (sanitized.length < 2) {
-            throw { status: 400, message: 'Nội dung b�nh luận qụ ng?n hoặc kh�ng h?p l?.' };
+            throw { status: 400, message: 'Nội dung bình luận quá ngắn hoặc không hợp lệ.' };
         }
 
         const userUuid = session.uuid;
         const userName = session.username || 'Khách ẩn danh';
 
-        // TITAN RATE LIMIT: Unify with core system infrastructure
-        const limiter = await checkRateLimit(`comment_${userUuid}`, 2, 30); // 2 comments / 30s
+        const limiter = await checkRateLimit(`comment_${userUuid}`, 2, 30);
         if (!limiter.success) {
-            throw { status: 429, message: 'Y�u c?u b�nh luận qụ nhanh. Vui l�ng đội th�m gịy l�t.' };
+            throw { status: 429, message: 'Yêu cầu bình luận quá nhanh. Vui lòng đợi thêm giây lát.' };
         }
 
         await query(`
@@ -70,7 +68,7 @@ export const POST = withTitan({
             VALUES (@chapterId, @userName, @content, @parentId, @userUuid)
         `, { chapterId, userName, content: sanitized, parentId, userUuid });
 
-        return { success: true, message: 'B�nh luận th�nh c�ng!' };
+        return { success: true, message: 'Bình luận thành công!' };
     }
 });
 
@@ -82,7 +80,6 @@ export const PATCH = withTitan({
 
         if (action === 'like') {
             try {
-                // PERSISTENT LIKE: Insert into pivot table, then increment counter
                 await query(`
                     INSERT INTO comment_likes (user_uuid, comment_id)
                     VALUES (@userUuid, @id)
@@ -91,8 +88,7 @@ export const PATCH = withTitan({
                 await query(`UPDATE comments SET likes = likes + 1 WHERE id = @id`, { id });
                 return { success: true };
             } catch (e) {
-                // If unique constraint fails, they already liked it
-                return { success: false, message: 'B?n d� th�ch b�nh luận n�y rồi.' };
+                return { success: false, message: 'Bạn đã thích bình luận này rồi.' };
             }
         }
         
@@ -108,23 +104,18 @@ export const DELETE = withTitan({
 
         if (!id) throw { status: 400, message: 'Missing ID' };
 
-        // Permission check
         const comment = await query(`SELECT user_uuid FROM comments WHERE id = @id`, { id });
-        if (!comment.recordset?.length) throw { status: 404, message: 'B�nh luận kh�ng tồn tại' };
+        if (!comment.recordset?.length) throw { status: 404, message: 'Bình luận không tồn tại' };
 
         const isOwner = comment.recordset?.[0]?.user_uuid === session.uuid;
         const isAdmin = session.role === 'admin';
 
         if (!isOwner && !isAdmin) {
-            throw { status: 403, message: 'B?n kh�ng c� quyộn x�a b�nh luận n�y' };
+            throw { status: 403, message: 'Bạn không có quyền xóa bình luận này' };
         }
 
-        // TITAN INTEGRITY: Clean up orphan likes before deleting the comment
         await query(`DELETE FROM comment_likes WHERE comment_id = @id`, { id });
-        
-        // Delete comment and its replies
         await query(`DELETE FROM comments WHERE id = @id OR parent_id = @id`, { id });
-        return { success: true, message: 'Đ� x�a b�nh luận' };
+        return { success: true, message: 'Đã xóa bình luận' };
     }
 });
-

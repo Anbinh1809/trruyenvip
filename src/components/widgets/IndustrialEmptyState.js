@@ -10,9 +10,21 @@ export default function IndustrialEmptyState({
     buttonText = 'QUAY LẠI TRANG CHỦ',
     buttonHref = '/'
 }) {
-    const defaultMessage = keyword 
-        ? `Từ khóa <strong class="text-accent-titan">${keyword}</strong> không có trong cơ sở dữ liệu. Vui lòng thử từ khóa khác.`
-        : `Hiện tại chưa có dữ liệu nào được cập nhật. Vui lòng quay lại sau.`;
+    // XSS Fix: Avoid dangerouslySetInnerHTML, use standard React rendering
+    const renderMessage = () => {
+        if (message) {
+            // If explicit message is passed, assume it's safe text (not HTML)
+            return <p className="empty-desc-industrial">{message}</p>;
+        }
+        if (keyword) {
+            return (
+                <p className="empty-desc-industrial">
+                    Từ khóa <strong className="text-accent-titan">{keyword}</strong> không có trong cơ sở dữ liệu. Vui lòng thử từ khóa khác.
+                </p>
+            );
+        }
+        return <p className="empty-desc-industrial">Hiện tại chưa có dữ liệu nào được cập nhật. Vui lòng quay lại sau.</p>;
+    };
 
     return (
         <div className="empty-state-titan fade-in industrial-p-80">
@@ -23,13 +35,13 @@ export default function IndustrialEmptyState({
             <h3 className="empty-title-industrial">
                 {title}
             </h3>
-            <p className="empty-desc-industrial" dangerouslySetInnerHTML={{ __html: message || defaultMessage }} />
+            {renderMessage()}
             
             <NextLink href={buttonHref} className="btn btn-primary empty-btn-industrial">
                 {buttonText}
             </NextLink>
 
-            <style jsx>{`
+            <style>{`
                 .industrial-p-80 {
                     padding: 100px 20px;
                     display: flex;
@@ -67,7 +79,7 @@ export default function IndustrialEmptyState({
                     50% { transform: translateY(-15px); }
                 }
             `}</style>
-            <style jsx global>{`
+            <style>{`
                 .text-accent-titan {
                     color: var(--accent);
                     font-weight: 950;

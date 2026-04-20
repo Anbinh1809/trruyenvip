@@ -19,7 +19,6 @@ export async function GET(request) {
             ORDER BY c.updated_at DESC
             LIMIT 50
         `);
-
         const chapters = result.recordset || [];
         const host = request.headers.get('host') || 'truyenvip.com';
         const protocol = request.headers.get('x-forwarded-proto') || (host.startsWith('localhost') ? 'http' : 'https');
@@ -50,7 +49,7 @@ export async function GET(request) {
 <channel>
     <title>TruyenVip - Mới Cập Nhật</title>
     <link>${origin}</link>
-    <description>Non tảng Ä‘oc truyện tranh online cao cấp, cập nhật chưÆ¡ng mo›i nhanh nhất.</description>
+    <description>Nền tảng đọc truyện tranh online cao cấp, cập nhật chương mới nhanh nhất.</description>
     <language>vi</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     <atom:link href="${origin}/api/rss" rel="self" type="application/rss+xml" />

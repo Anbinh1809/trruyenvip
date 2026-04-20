@@ -102,27 +102,25 @@ export function updateTelemetry(data) {
  */
 export async function logGuardianEvent(mangaId, chapterTitle, eventType, message) {
     try {
-        let cover = '';
         let mangaName = 'System';
         
         if (mangaId) {
-            const res = await query('SELECT title, cover FROM manga WHERE id = @mangaId LIMIT 1', { mangaId });
+            const res = await query('SELECT title FROM manga WHERE id = @mangaId LIMIT 1', { mangaId });
             const manga = res.recordset?.[0];
             if (manga) {
                 mangaName = manga.title;
-                cover = manga.cover;
             }
         }
 
         await query(`
-            INSERT INTO guardianreports (manga_name, chapter_title, event_type, message, cover, created_at)
-            VALUES (@name, @chap, @type, @msg, @cover, NOW())
+            INSERT INTO guardianreports (manga_id, manga_name, chapter_title, issue_type, details, created_at)
+            VALUES (@mangaId, @name, @chap, @type, @msg, NOW())
         `, {
+            mangaId: mangaId || null,
             name: mangaName,
             chap: chapterTitle || 'System',
             type: eventType,
-            msg: message,
-            cover: cover || ''
+            msg: message
         });
         
         console.log(`[Aegis:SYNC] ${eventType}: ${message}`);

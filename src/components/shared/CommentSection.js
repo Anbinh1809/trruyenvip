@@ -138,7 +138,7 @@ export default function CommentSection({ chapterId }) {
         </h3>
         {isAuthenticated && (
            <div className="active-user-hint">
-             Äang bà¬nh luáº­n báº±ng: <span className="active-user-name">{user.username}</span>
+             Đang bình luận bằng: <span className="active-user-name">{user.username}</span>
            </div>
         )}
       </div>
@@ -146,12 +146,12 @@ export default function CommentSection({ chapterId }) {
       {!isAuthenticated ? (
          <div className="user-tag-industrial">
             <p className="login-prompt-text">Vui lòng đăng nhập để tham gia thảo luận cùng cộng đồng.</p>
-            <Link href="/auth/login" className="btn btn-primary login-btn-wide">ÄÄƒng nháº­p ngay</Link>
+            <Link href="/auth/login" className="btn btn-primary login-btn-wide">Đăng nhập ngay</Link>
          </div>
       ) : (
         <form onSubmit={handleSubmit} className="comment-form-industrial">
             <textarea 
-                placeholder="Chia sẻ suy nghĩ của báº¡n vo chưÆ¡ng nà y..." 
+                placeholder="Chia sẻ suy nghĩ của bạn vào chương này..." 
                 value={newComment} 
                 onChange={(e) => setNewComment(e.target.value)}
                 className="comment-textarea-industrial"
@@ -159,7 +159,7 @@ export default function CommentSection({ chapterId }) {
             />
             <div className="form-actions-industrial">
                <button type="submit" className="btn btn-primary submit-btn-titan" disabled={submitting}>
-                    <Send size={18} /> {submitting ? 'ÄANG GỬI...' : 'GỬI BÌNH LUẬN'}
+                    <Send size={18} /> {submitting ? 'ĐANG GỬI...' : 'GỬI BÌNH LUẬN'}
                </button>
             </div>
         </form>
@@ -190,7 +190,7 @@ export default function CommentSection({ chapterId }) {
         )}
       </div>
 
-      <style jsx>{`
+      <style>{`
         .text-secondary-titan {
             opacity: 0.4;
             font-weight: 800;

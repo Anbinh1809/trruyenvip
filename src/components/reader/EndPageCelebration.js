@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { Home, Bookmark, ArrowRight } from 'lucide-react';
@@ -21,7 +21,7 @@ export default function EndPageCelebration() {
                 </Link>
             </div>
             
-            <style jsx>{`
+            <style>{`
                 .btn-glass {
                     background: var(--nebula-glass);
                     backdrop-filter: blur(10px);

@@ -1,13 +1,15 @@
-import { NextResponse } from 'next/server';
+import { withTitan } from '@/core/api/handler';
 import { query } from '@/core/database/connection';
 import { parseChapterNumber } from '@/core/crawler';
 
 /**
  * Maintenance tool to repair NULL 'chapter_number' values by parsing titles.
  * Usage: GET /api/admin/crawler/repair-chapter-numbers
+ * FIX #8: Added auth guard — previously anyone could call this endpoint.
  */
-export async function GET() {
-    try {
+export const GET = withTitan({
+    admin: true,
+    handler: async () => {
         console.log('[Maintenance] Starting Chapter Number Repair...');
         
         const chapters = await query(`
@@ -26,15 +28,11 @@ export async function GET() {
             }
         }
 
-        return NextResponse.json({
+        return {
             status: 'success',
             repairedChapters: repairedCount,
             totalChecked: chapters.recordset?.length || 0,
             message: `Successfully repaired ${repairedCount} chapter numbers from titles.`
-        });
-    } catch (e) {
-        console.error('[Repair] Error:', e.message);
-        return NextResponse.json({ error: e.message }, { status: 500 });
+        };
     }
-}
-
+});

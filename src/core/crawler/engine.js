@@ -27,23 +27,29 @@ function getConcurrentLimit() {
 }
 
 // Self-healing: prune stale in-progress locks and salvage failed tasks
-setInterval(async () => {
-    const TIMEOUT = 1000 * 60 * 30;
-    const now = Date.now();
-    for (const [id, time] of inProgressManga) if (now - time > TIMEOUT) inProgressManga.delete(id);
-    for (const [id, time] of inProgressChapters) if (now - time > TIMEOUT) inProgressChapters.delete(id);
-
-    try {
-        await query(`
-            UPDATE crawlertasks 
-            SET status = 'pending', priority = 8, attempts = 0, updated_at = NOW()
-            WHERE status = 'failed' AND updated_at < NOW() - INTERVAL '3 hours'
-        `);
-        await query("DELETE FROM crawllogs WHERE created_at < NOW() - INTERVAL '24 hours'");
-    } catch (e) {
-        console.error('[Rescue:Error]', e.message);
-    }
-}, 1000 * 60 * 60 * 3);
+// NOTE: Started lazily in bootstrapCrawler() to avoid side-effects on module import
+let selfHealIntervalStarted = false;
+function startSelfHealInterval() {
+    if (selfHealIntervalStarted) return;
+    selfHealIntervalStarted = true;
+    setInterval(async () => {
+        const TIMEOUT = 1000 * 60 * 30;
+        const now = Date.now();
+        for (const [id, time] of inProgressManga) if (now - time > TIMEOUT) inProgressManga.delete(id);
+        for (const [id, time] of inProgressChapters) if (now - time > TIMEOUT) inProgressChapters.delete(id);
+    
+        try {
+            await query(`
+                UPDATE crawlertasks 
+                SET status = 'pending', priority = 8, attempts = 0, updated_at = NOW()
+                WHERE status = 'failed' AND updated_at < NOW() - INTERVAL '3 hours'
+            `);
+            await query("DELETE FROM crawllogs WHERE created_at < NOW() - INTERVAL '24 hours'");
+        } catch (e) {
+            console.error('[Rescue:Error]', e.message);
+        }
+    }, 1000 * 60 * 60 * 3);
+}
 
 // Weight = resource cost per task type
 const TASK_WEIGHTS = { 'system_discovery': 10, 'manga_sync': 5, 'chapter_scrape': 1 };
@@ -154,7 +160,7 @@ export async function queueMangaSync(mangaId, url, source, earlyExit = false, pr
             status = CASE WHEN crawlertasks.status = 'failed' THEN 'pending' ELSE crawlertasks.status END
         WHERE crawlertasks.status = 'pending' OR crawlertasks.status = 'failed'
     `, { target, priority, mangaId });
-    processQueue();
+    processQueue().catch(e => console.error('[Queue] processQueue error:', e.message));
 }
 
 export async function queueDiscovery(source, pageCount = 3, startPage = 1, priority = 3) {
@@ -166,7 +172,7 @@ export async function queueDiscovery(source, pageCount = 3, startPage = 1, prior
         ON CONFLICT (target) DO UPDATE SET priority = GREATEST(crawlertasks.priority, @priority)
         WHERE crawlertasks.status = 'pending'
     `, { target, priority, mangaId });
-    processQueue();
+    processQueue().catch(e => console.error('[Queue] processQueue error:', e.message));
 }
 
 export async function ingestMangaBySlug(slug, source = 'nettruyen') {
@@ -233,8 +239,9 @@ export async function crawlFullMangaChapters(mangaId, url, source, earlyExit = f
 
         await query('UPDATE manga SET last_crawled = NOW() WHERE id = @mangaId', { mangaId });
     } catch (err) {
-        console.log('[DEBUG ENGINE] Swallowed Exception in crawlFullMangaChapters:', err.message);
+        console.log('[DEBUG ENGINE] Error in crawlFullMangaChapters:', err.message);
         try { updateMirrorHealth(new URL(url).hostname, false, err.message); } catch {}
+        throw err;
     } finally {
         inProgressManga.delete(mangaId);
     }
@@ -296,6 +303,7 @@ export async function crawlLatest(source = 'nettruyen', pageCount = 1, startPage
             }
         } catch (e) {
             try { updateMirrorHealth(new URL(base).hostname, false, e.message); } catch {}
+            throw e;
         }
     }
     updateTelemetry({ syncHealth: true });
@@ -329,7 +337,7 @@ export async function crawlChapterImages(chapId, url, source = 'nettruyen', forc
         updateTelemetry({ failCount: 1 });
         // Mark ghost after 5 consecutive failures
         query(`UPDATE chapters SET fail_count = fail_count + 1, status = CASE WHEN fail_count + 1 >= 5 THEN 'ghost' ELSE 'failed' END, updated_at = NOW() WHERE id = @chapId`, { chapId }).catch(() => {});
-        return 0;
+        throw err;
     } finally {
         inProgressChapters.delete(chapId);
     }
@@ -344,7 +352,7 @@ export async function queueChapterScrape(chapId, url, source, force = false, pri
             priority = GREATEST(crawlertasks.priority, @priority),
             status = CASE WHEN crawlertasks.status = 'failed' THEN 'pending' ELSE crawlertasks.status END
     `, { target, priority, chapId });
-    processQueue();
+    processQueue().catch(e => console.error('[Queue] processQueue error:', e.message));
 }
 
 export async function runGuardianAutopilot(oneShot = false) {
@@ -423,8 +431,9 @@ export async function rescueBrokenImages(batchSize = 10) {
 export async function bootstrapCrawler() {
     inProgressManga.clear();
     inProgressChapters.clear();
+    startSelfHealInterval(); // Start self-heal only after explicit bootstrap
     await query("UPDATE crawlertasks SET status = 'pending', updated_at = NOW() WHERE status = 'processing' AND updated_at < NOW() - INTERVAL '2 hours'");
-    processQueue();
+    processQueue().catch(e => console.error('[Queue] processQueue error:', e.message));
 }
 
 export async function runTitanWorker(oneShot = true) {

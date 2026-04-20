@@ -1,14 +1,9 @@
 import { query } from '@/core/database/connection';
-import { NextResponse } from 'next/server';
-import { getSession } from '@/core/security/auth';
+import { withTitan } from '@/core/api/handler';
 
-export async function GET(req) {
-    try {
-        const session = await getSession();
-        if (session?.role !== 'admin') {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-
+export const GET = withTitan({
+    admin: true,
+    handler: async (req) => {
         const { searchParams } = new URL(req.url);
         const limit = parseInt(searchParams.get('limit') || '50');
 
@@ -46,16 +41,12 @@ export async function GET(req) {
             )
         );
 
-        return NextResponse.json({
+        return {
             success: true,
             logs: logs.recordset || [],
             summary: summaryArr.recordset?.[0] || { total_logs: 0, success_logs: 0, error_logs: 0 },
             counts: countsArr.recordset?.[0] || { total_manga: 0, total_chapters: 0, total_reports: 0 },
             mirrorHealth: cleanMirrorHealth
-        });
-    } catch (err) {
-        return NextResponse.json({ error: err.message }, { status: 500 });
+        };
     }
-}
-
-
+});

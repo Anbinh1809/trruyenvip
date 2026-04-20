@@ -1,5 +1,6 @@
 import { queueDiscovery } from '@/core/crawler';
 import { withTitan } from '@/core/api/handler';
+import { getSession } from '@/core/security/auth';
 
 /**
  * POST: Manual/Cron Deep Scan Trigger
@@ -15,12 +16,10 @@ export const POST = withTitan({
         const secret = process.env.CRON_SECRET;
         
         // Allow if CRON_SECRET matches OR if it's an authenticated Admin session
-        // (withTitan already provides the session if available)
         const isCron = secret && authHeader === `Bearer ${secret}`;
         
-        // Note: we don't set 'admin: true' in withTitan because we want to allow 
-        // the machine-to-machine CRON_SECRET bypass. We handle authorization manually inside.
-        const session = await (require('@/core/security/auth').getSession());
+        // FIX #3: Replaced require() (invalid in ESM) with top-level import
+        const session = await getSession();
         const isAdmin = session?.role === 'admin';
 
         if (!isCron && !isAdmin) {
@@ -56,5 +55,3 @@ export const POST = withTitan({
         }
     }
 });
-
-

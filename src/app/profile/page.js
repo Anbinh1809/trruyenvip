@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
@@ -60,7 +60,7 @@ export default function ProfilePage() {
                 <Link href="/auth/login" className="btn btn-primary login-trigger-titan">ĐĂNG NHẬP NGAY</Link>
             </div>
             <Footer />
-            <style jsx>{`
+            <style>{`
                 .center-icon-titan { display: flex; justify-content: center; margin-bottom: 30px; }
                 .auth-required-subtitle { color: var(--text-muted); margin-bottom: 40px; font-weight: 700; font-size: 1.1rem; }
                 .login-trigger-titan { padding: 18px 60px; font-weight: 950; letter-spacing: 1px; }
@@ -162,7 +162,7 @@ export default function ProfilePage() {
         </div>
       </div>
       <Footer />
-      <style jsx>{`
+      <style>{`
         .avatar-update-btn { padding: 0 35px; font-weight: 950; font-size: 0.85rem; }
         .admin-portal-btn-titan { margin-top: 30px; padding: 14px 40px; font-weight: 950; letter-spacing: 1px; display: inline-flex; gap: 12px; }
         .accent-rank { color: var(--accent) !important; font-size: 1.4rem !important; }

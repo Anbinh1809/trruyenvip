@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
@@ -26,7 +26,7 @@ export default function NotFound() {
           </div>
       </div>
       <Footer />
-      <style jsx>{`
+      <style>{`
           .system-center-industrial {
               min-height: 80vh;
               display: flex;

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Bell, Check, Loader2, ExternalLink } from 'lucide-react';
@@ -114,7 +114,7 @@ export default function NotificationBell() {
                 </div>
             )}
 
-            <style jsx>{`
+            <style>{`
                 .notification-bell-titan { position: relative; }
                 .bell-badge-titan {
                     position: absolute;

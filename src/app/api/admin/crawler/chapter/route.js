@@ -1,29 +1,27 @@
 import { crawlChapterImages } from '@/core/crawler';
 import { query } from '@/core/database/connection';
-import { NextResponse } from 'next/server';
-import { getSession } from '@/core/security/auth';
+import { withTitan } from '@/core/api/handler';
 
-export async function POST(req) {
-  try {
-    const session = await getSession();
-    // Allow admin OR if in development mode for easy debugging
+export const POST = withTitan({
+  allowOptional: true, // Allow dev access bypass
+  handler: async (req, session) => {
     const isAdmin = session?.role === 'admin';
     const isDev = process.env.NODE_ENV === 'development';
     
     if (!isAdmin && !isDev) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw Object.assign(new Error('Unauthorized'), { status: 401 });
     }
 
     const { chapterId } = await req.json();
-    if (!chapterId) return NextResponse.json({ error: 'chapterId is required' }, { status: 400 });
+    if (!chapterId) throw Object.assign(new Error('chapterId is required'), { status: 400 });
 
     const chapData = await query('SELECT source_url FROM chapters WHERE id = @id', { id: chapterId });
     if (!chapData.recordset?.[0]) {
-      return NextResponse.json({ error: 'Chapter not found in database' }, { status: 404 });
+      throw Object.assign(new Error('Chapter not found in database'), { status: 404 });
     }
 
     const chap = chapData.recordset[0];
-    if (!chap.source_url) return NextResponse.json({ error: 'Chapter has no source URL' }, { status: 400 });
+    if (!chap.source_url) throw Object.assign(new Error('Chapter has no source URL'), { status: 400 });
     const source = chap.source_url?.includes('nettruyen') ? 'nettruyen' : 'truyenqq';
 
     await query('DELETE FROM chapterimages WHERE chapter_id = @id', { id: chapterId });
@@ -32,15 +30,10 @@ export async function POST(req) {
     const newImgs = await query('SELECT COUNT(*) as count FROM chapterimages WHERE chapter_id = @id', { id: chapterId });
     const count = newImgs.recordset?.[0]?.count || 0;
     
-    return NextResponse.json({ 
+    return { 
         success: true, 
         count: count,
-        message: `Äà£ cào xong ${count} ?nh.` 
-    });
-  } catch (err) {
-    console.error('Manual Crawl Error:', err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+        message: `Đã cào xong ${count} ảnh.`
+    };
   }
-}
-
-
+});

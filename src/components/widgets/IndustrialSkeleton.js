@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 /**
  * TITAN INDUSTRIAL SKELETON
@@ -35,7 +35,7 @@ export default function IndustrialSkeleton({
                 borderRadius: styles.borderRadius,
             }}
         >
-            <style jsx>{`
+            <style>{`
                 .skeleton-titan-shimmer {
                     background: var(--nebula-glass);
                     position: relative;

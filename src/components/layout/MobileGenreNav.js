@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -49,7 +49,7 @@ export default function MobileGenreNav({ genres }) {
                     </Link>
                 ))}
             </div>
-            <style jsx global>{`
+            <style>{`
                 .titan-mobile-genre-hud {
                     position: sticky;
                     top: var(--header-height);

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import { useEngagement } from '@/contexts/EngagementContext';
@@ -68,7 +68,7 @@ export default function DailyCheckIn() {
                 {msg && <p className={`checkin-msg-industrial ${isSuccess ? 'success' : 'error'}`}>{msg}</p>}
             </div>
         </div>
-        <style jsx>{`
+        <style>{`
             .checkin-info-industrial {
                 flex: 1;
                 min-width: 0;

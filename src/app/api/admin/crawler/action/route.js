@@ -17,16 +17,15 @@ export const POST = withTitan({
                 // Immediate priority discovery
                 await queueDiscovery('nettruyen', 5, 1, 10);
                 await queueDiscovery('truyenqq', 5, 1, 10);
-                return { success: true, message: 'L?nh Discovery (5 trang đầu) d đuoc đua vo hng đoi uu tin.' };
+                return { success: true, message: 'Lệnh Discovery (5 trang đầu) đã được đưa vào hàng đợi ưu tiên.' };
 
             case 'maintenance':
                 // Run DB cleanup
                 await runFullMaintenance();
-                return { success: true, message: 'Tiến tr�nh do�n d?p (Maintenance) d� ho�n tất th�nh c�ng.' };
+                return { success: true, message: 'Tiến trình dọn dẹp (Maintenance) đã hoàn tất thành công.' };
 
             default:
-                throw new Error('H�nh đo�ng kh�ng h?p l?: ' + action);
+                throw new Error('Hành động không hợp lệ: ' + action);
         }
     }
 });
-

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -58,7 +58,7 @@ export default function Hero({ manga }) {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .titan-hero-bg {
             background-image: var(--hero-cover);
         }

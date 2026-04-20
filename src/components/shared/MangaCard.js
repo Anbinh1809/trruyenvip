@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -112,16 +112,13 @@ function MangaCard({ manga, isNew = false, priority = false }) {
           {manga.title && /^[a-z0-9-]+$/.test(manga.title) ? manga.title.replace(/-[0-9]+$/, '').split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : manga.title}
       </h3>
       <p className="card-chapter-centered">
-        {manga.latest_chapter_number ? (
-            `Chương ${manga.latest_chapter_number}`
-        ) : (manga.last_chap_num && isNaN(manga.last_chap_num) ? 
-            manga.last_chap_num : 
-            (manga.last_chap_num && manga.last_chap_num !== '0' ? `Chương ${manga.last_chap_num}` : 'Đang cập nhật'))
-        }
+        {manga.last_chap_num ? (
+            `Chương ${manga.last_chap_num}`
+        ) : 'Đang cập nhật'}
       </p>
 
 
-      <style jsx>{`
+      <style>{`
         .card-stats-row {
             display: flex; 
             align-items: center; 

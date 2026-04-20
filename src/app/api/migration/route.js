@@ -70,8 +70,9 @@ export const POST = withTitan({
             if (mangaCheck.recordset.length === 0) {
                 const rawTitle = mangaSlug.replace(/-/g, ' ');
                 const capitalizeTitle = rawTitle.replace(/\b\w/g, l => l.toUpperCase());
-                await query('INSERT INTO manga (id, title, source_url, status) VALUES (@id, @title, @url, @status) ON CONFLICT DO NOTHING', 
-                    { id: mangaSlug, title: capitalizeTitle, url: url.split('/chap-')[0], status: 'Đang dịch chuyển...' });
+                const normalizedTitle = mangaSlug; // slug already normalized
+                await query('INSERT INTO manga (id, title, source_url, status, normalized_title) VALUES (@id, @title, @url, @status, @normalizedTitle) ON CONFLICT DO NOTHING', 
+                    { id: mangaSlug, title: capitalizeTitle, url: url.split('/chap-')[0], status: 'Đang dịch chuyển...', normalizedTitle });
             }
 
             // 2. Identify and Queue Sync

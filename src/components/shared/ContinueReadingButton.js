@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useHistory } from '@/contexts/HistoryContext';
 import Link from 'next/link';
@@ -22,7 +22,7 @@ export default function ContinueReadingButton({ mangaId, chapters }) {
             className="btn btn-primary cont-reading-btn-industrial"
         >
             <Play size={20} fill="currentColor" /> Đã�C TIẾP (Ch. {lastRead.chapterNumber || '?'})
-            <style jsx>{`
+            <style>{`
                 .cont-reading-btn-industrial {
                     display: flex;
                     align-items: center;
@@ -47,7 +47,7 @@ export default function ContinueReadingButton({ mangaId, chapters }) {
           <Link href={`/manga/${mangaId}/chapter/${chapters[0].id}`} className="btn btn-primary init-btn init-latest">
              <FastForward size={18} fill="currentColor" /> CHƯƠNG MỚI NHẤT
           </Link>
-          <style jsx>{`
+          <style>{`
             .reading-init-industrial {
                 display: flex; 
                 gap: 20px; 

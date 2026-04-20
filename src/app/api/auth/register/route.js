@@ -12,11 +12,11 @@ export const POST = withTitan({
             // 1. Rate Limit: 5 registrations / 1 hour
             const limiter = await checkRateLimit(`register_${ip}`, 5, 3600);
             if (!limiter.success) {
-                throw { status: 429, message: 'Báº¡n Ä‘Ã£ đăng ký quÃ¡ nhiá»u tÃ i khoáº£n. Vui lÃ²ng quay láº¡i sau 1 giá».' };
+                throw { status: 429, message: 'Bạn đã đăng ký quá nhiều tài khoản. Vui lòng quay lại sau 1 giờ.' };
             }
 
             if (!username || !password || !uuid || typeof uuid !== 'string' || uuid.length < 8) {
-                throw { status: 400, message: 'Thông tin đăng ký không hợp lệ hoáº·c thiếu dữ liệu thiết bị' };
+                throw { status: 400, message: 'Thông tin đăng ký không hợp lệ hoặc thiếu dữ liệu thiết bị' };
             }
 
             // --- GATEKEEPER VALIDATION: Infiltration Shield ---
@@ -25,7 +25,7 @@ export const POST = withTitan({
             const isValidUsername = /^[a-zA-Z0-9_\u00C0-\u1EF9\s]+$/.test(cleanUsername);
 
             if (!isValidUsername || cleanUsername.length < 3) {
-                throw { status: 400, message: 'TÃªn đăng nhập không hợp lệ hoáº·c quÃ¡ ngáº¯n (tá»‘i thiá»ƒu 3 ký tự, khÃ´ng dÃ¹ng ký tự đặc biệt)' };
+                throw { status: 400, message: 'Tên đăng nhập không hợp lệ hoặc quá ngắn (tối thiểu 3 ký tự, không dùng ký tự đặc biệt)' };
             }
 
             if (password.length < 6) {
@@ -33,7 +33,7 @@ export const POST = withTitan({
             }
 
             if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                 throw { status: 400, message: 'Email khÃ´ng đúng định dạng' };
+                 throw { status: 400, message: 'Email không đúng định dạng' };
             }
 
             const cleanEmail = email ? email.trim().toLowerCase() : null;
@@ -55,7 +55,7 @@ export const POST = withTitan({
             } catch (dbErr) {
                 // PostgreSQL Error 23505: Unique Violation
                 if (dbErr.code === '23505' || dbErr.message.toLowerCase().includes('unique constraint')) {
-                    throw { status: 400, message: 'TÃªn đăng nhập, Email hoáº·c Thiáº¿t bá»‹ nÃ y Ä‘Ã£ Ä‘Æ°á»£c sá»­ dá»¥ng.' };
+                    throw { status: 400, message: 'Tên đăng nhập, Email hoặc Thiết bị này đã được sử dụng.' };
                 }
                 throw dbErr; // Rethrow other DB errors to the withTitan catch block
             }
@@ -65,7 +65,7 @@ export const POST = withTitan({
             await setSessionCookie(token);
 
             return {
-                message: 'ÄÄƒng kÃ½ thành công',
+                message: 'Đăng ký thành công',
                 user: { username: cleanUsername, uuid, xp: 0, vipCoins: 0, role: 'user' }
             };
 
@@ -76,6 +76,3 @@ export const POST = withTitan({
         }
     }
 });
-
-
-

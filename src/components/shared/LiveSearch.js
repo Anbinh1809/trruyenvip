@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
@@ -184,7 +184,7 @@ export default function LiveSearch({ onSelect }) {
                 </div>
             </div>
         )}
-        <style jsx>{`
+        <style>{`
             .titan-search-container {
                 position: relative;
                 width: 100%;

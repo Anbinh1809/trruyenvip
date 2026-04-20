@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useEngagement } from '@/contexts/EngagementContext';
@@ -122,7 +122,7 @@ export default function MissionPanel() {
         </div>
       )}
 
-      <style jsx global>{`
+      <style>{`
         .mission-dot-industrial {
             position: absolute;
             top: -2px;

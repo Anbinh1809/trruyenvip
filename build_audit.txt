@@ -1,0 +1,98 @@
+﻿Γû▓ Next.js 16.2.2 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 5.1s
+  Running TypeScript ...
+  Finished TypeScript in 146ms ...
+  Collecting page data using 11 workers ...
+  Generating static pages using 11 workers (0/67) ...
+  Generating static pages using 11 workers (16/67) 
+  Generating static pages using 11 workers (33/67) 
+  Generating static pages using 11 workers (50/67) 
+Γ£ô Generating static pages using 11 workers (67/67) in 1472ms
+  Finalizing page optimization ...
+
+Route (app)                                    Revalidate  Expire
+Γöî Γùï /                                                  5m      1y
+Γö£ Γùï /_not-found
+Γö£ Γùï /admin
+Γö£ Γùï /admin/crawler
+Γö£ Γùï /admin/guardian
+Γö£ Γùï /admin/rewards
+Γö£ ╞Æ /api/admin/crawler/action
+Γö£ ╞Æ /api/admin/crawler/chapter
+Γö£ ╞Æ /api/admin/crawler/deep-scan
+Γö£ ╞Æ /api/admin/crawler/heal
+Γö£ ╞Æ /api/admin/crawler/health
+Γö£ ╞Æ /api/admin/crawler/repair-chapter-gaps
+Γö£ ╞Æ /api/admin/crawler/repair-chapter-numbers
+Γö£ ╞Æ /api/admin/crawler/repair-links
+Γö£ ╞Æ /api/admin/crawler/stats
+Γö£ ╞Æ /api/admin/crawler/telemetry
+Γö£ ╞Æ /api/admin/deep-scan
+Γö£ ╞Æ /api/admin/guardian/history
+Γö£ ╞Æ /api/admin/stats
+Γö£ ╞Æ /api/admin/tasks
+Γö£ ╞Æ /api/auth/heartbeat
+Γö£ ╞Æ /api/auth/login
+Γö£ ╞Æ /api/auth/logout
+Γö£ ╞Æ /api/auth/me
+Γö£ ╞Æ /api/auth/register
+Γö£ ╞Æ /api/auth/update-stats
+Γö£ ╞Æ /api/chapter-images/[chapterId]
+Γö£ ╞Æ /api/comments
+Γö£ ╞Æ /api/comments/report
+Γö£ ╞Æ /api/crawl
+Γö£ ╞Æ /api/crawl/on-demand
+Γö£ ╞Æ /api/crawler/jit-sync
+Γö£ ╞Æ /api/cron
+Γö£ ╞Æ /api/cron/maintenance
+Γö£ ╞Æ /api/favorites
+Γö£ ╞Æ /api/health
+Γö£ Γùï /api/leaderboard                                   5m      1y
+Γö£ ╞Æ /api/logs
+Γö£ ╞Æ /api/manga/[id]/heal
+Γö£ ╞Æ /api/manga/trending
+Γö£ ╞Æ /api/migration
+Γö£ ╞Æ /api/notifications
+Γö£ ╞Æ /api/notifications/unread-count
+Γö£ ╞Æ /api/proxy
+Γö£ ╞Æ /api/push/subscribe
+Γö£ ╞Æ /api/reader/chapter-images
+Γö£ ╞Æ /api/recommendations
+Γö£ ╞Æ /api/redemption
+Γö£ ╞Æ /api/rss
+Γö£ ╞Æ /api/search/live
+Γö£ ╞Æ /api/sitemap.xml
+Γö£ ╞Æ /api/sitemap/chapters
+Γö£ ╞Æ /api/sitemap/manga
+Γö£ ╞Æ /api/system/report-crash
+Γö£ ╞Æ /api/system/time
+Γö£ ╞Æ /api/user/checkin
+Γö£ ╞Æ /api/user/profile
+Γö£ Γùï /auth/login
+Γö£ Γùï /auth/register
+Γö£ Γùï /copyright
+Γö£ Γùï /favorites
+Γö£ ╞Æ /genres
+Γö£ Γùï /history
+Γö£ Γùï /leaderboard
+Γö£ ╞Æ /manga/[id]
+Γö£ ╞Æ /manga/[id]/chapter/[chapterId]
+Γö£ Γùï /manifest.webmanifest
+Γö£ Γùï /privacy
+Γö£ Γùï /profile
+Γö£ Γùï /rewards
+Γö£ Γùï /robots.txt
+Γö£ ╞Æ /search
+Γö£ ╞Æ /sitemap.xml
+Γö£ Γùï /terms
+Γöö Γùï /transfer
+
+
+╞Æ Proxy (Middleware)
+
+Γùï  (Static)   prerendered as static content
+╞Æ  (Dynamic)  server-rendered on demand
+

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { Ghost, Compass } from 'lucide-react';
@@ -23,7 +23,7 @@ export default function EmptyState({ title, subtitle, actionText = 'TIẾP TỤC
         {actionText}
       </Link>
 
-      <style jsx>{`
+      <style>{`
         .industrial-p-80 {
             padding: 100px 20px;
             display: flex;

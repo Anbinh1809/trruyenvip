@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 
@@ -26,7 +26,7 @@ export default function ReadingProgressBar() {
         style={{ '--progress': `${progress}%` }}
       ></div>
       <div className="reading-progress-shimmer-industrial"></div>
-      <style jsx>{`
+      <style>{`
         .reading-progress-container-industrial {
             position: fixed;
             top: 0;

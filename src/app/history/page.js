@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Header from '@/components/layout/Header';
 import { useHistory } from '@/contexts/HistoryContext';
@@ -69,7 +69,7 @@ export default function HistoryPage() {
                     />
                 )}
             </div>
-            <style jsx>{`
+            <style>{`
                 .header-left-industrial { flex: 1; }
                 .history-node-titan { animation: fadeUp 0.8s both var(--delay); }
                 @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }

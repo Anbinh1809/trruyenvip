@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useHistory } from '@/contexts/HistoryContext';
 import { useState, useEffect } from 'react';
@@ -75,7 +75,7 @@ export default function RecommendedForYou() {
         </div>
       )}
 
-      <style jsx>{`
+      <style>{`
         .shimmer-grid-titan {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));

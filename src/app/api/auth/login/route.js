@@ -13,16 +13,16 @@ export const POST = withTitan({
             // 1. Rate Limit: 10 attempts / 1 minute
             const limiter = await checkRateLimit(`login_${ip}`, 10, 60);
             if (!limiter.success) {
-                throw { status: 429, message: 'QuÃ¡ nhiá»u láº§n thá»­. Vui lÃ²ng quay láº¡i sau Ã­t phÃºt.' };
+                throw { status: 429, message: 'Quá nhiều lần thử. Vui lòng quay lại sau ít phút.' };
             }
 
             if (!username || !password) {
-                throw { status: 400, message: 'Thiáº¿u thÃ´ng tin đăng nhập' };
+                throw { status: 400, message: 'Thiếu thông tin đăng nhập' };
             }
 
             // --- LOGIN GUARD ---
             if (username.length > 100 || password.length > 100) {
-                throw { status: 400, message: 'Thông tin đăng nhập quÃ¡ dÃ i' };
+                throw { status: 400, message: 'Thông tin đăng nhập quá dài' };
             }
 
             // Fetch user: Universal login (Username or Email)
@@ -36,7 +36,7 @@ export const POST = withTitan({
             if (!user) {
                 // IRONCLAD DEFENSE: 1s delay to deter brute force
                 await new Promise(r => setTimeout(r, 1000));
-                throw { status: 400, message: 'NgÆ°á»i dÃ¹ng khÃ´ng tá»“n táº¡i' };
+                throw { status: 400, message: 'Người dùng không tồn tại' };
             }
 
             // Verify password
@@ -44,7 +44,7 @@ export const POST = withTitan({
             if (!isMatch) {
                 // IRONCLAD DEFENSE: 1s delay to deter brute force
                 await new Promise(r => setTimeout(r, 1000));
-                throw { status: 401, message: 'Mật khẩu khÃ´ng chÃ­nh xÃ¡c' };
+                throw { status: 401, message: 'Mật khẩu không chính xác' };
             }
 
             // Sign token
@@ -60,7 +60,7 @@ export const POST = withTitan({
             if (elapsed < 1500) await new Promise(r => setTimeout(r, 1500 - elapsed));
 
             return {
-                message: 'ÄÄƒng nháº­p thành công',
+                message: 'Đăng nhập thành công',
                 user: { 
                     username: user.username, 
                     uuid: user.uuid, 
@@ -81,6 +81,3 @@ export const POST = withTitan({
         }
     }
 });
-
-
-

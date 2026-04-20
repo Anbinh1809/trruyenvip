@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import RecrawlButton from '@/components/shared/RecrawlButton';
@@ -169,7 +169,7 @@ export default function ChapterContent({ mangaId, chapter, nextChapterId, prevCh
                 </div>
                 <p className="error-text-industrial">{error}</p>
                 <button className="btn btn-primary err-retry-btn" onClick={startSync}>Thử lại ngay</button>
-                <style jsx>{`
+                <style>{`
                     .error-icon-box {
                         color: var(--accent);
                         margin-bottom: 25px;
@@ -215,7 +215,7 @@ export default function ChapterContent({ mangaId, chapter, nextChapterId, prevCh
                     </div>
                 </div>
             )}
-            <style jsx>{`
+            <style>{`
                 .mt-30 { margin-top: 30px; }
             `}</style>
         </div>
@@ -255,7 +255,7 @@ function ReaderImage({ src, idx, isSkimming }) {
                 <button onClick={() => { setError(false); setRetryCount(c => c + 1); }} className="btn btn-outline btn-small mt-20">
                     <RefreshCw size={14} /> Thử lại
                 </button>
-                <style jsx>{`
+                <style>{`
                     .min-h-300 { min-height: 300px; padding: 40px; }
                     .mt-20 { margin-top: 20px; font-weight: 800; }
                 `}</style>
@@ -279,7 +279,7 @@ function ReaderImage({ src, idx, isSkimming }) {
                     onError={() => setError(true)}
                 />
             )}
-            <style jsx>{`
+            <style>{`
                 .reader-img-titan {
                     opacity: 0;
                     margin: 0 auto;

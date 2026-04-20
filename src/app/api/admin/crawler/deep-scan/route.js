@@ -3,7 +3,7 @@ import { getSession } from '@/core/security/auth';
 import { queueDiscovery } from '@/core/crawler';
 
 /**
- * Titan Deep Scan api
+ * Titan Deep Scan API
  * Allows administrators to trigger mass-discovery tasks across multiple pages.
  */
 export async function POST(req) {
@@ -17,21 +17,17 @@ export async function POST(req) {
 
         console.log(`[DeepScan] Manual Archival Triggered: ${source} (Next ${pages} pages starting from ${startPage})`);
 
-        // We queue individual page discovery tasks to keep the workers granular
         for (let i = 0; i < pages; i++) {
             const page = startPage + i;
-            // We use a high priority (7) for manual requests
             await queueDiscovery(source, 1, page, 7);
         }
 
         return NextResponse.json({ 
             success: true, 
-            message: `Quy trà¬nh 'Äà o sà¢u' (Deep Scan) dã Ä‘uo£c kà­ch hoáº¡t cho ${pages} trang c?a ngu?n ${source}. Káº¿t qu? sáº½ dáº§n xuáº¥t hi?n trong B?ng Ä‘iou khioƒn.` 
+            message: `Quy trình 'Đào sâu' (Deep Scan) đã được kích hoạt cho ${pages} trang của nguồn ${source}. Kết quả sẽ dần xuất hiện trong Bảng điều khiển.`
         });
     } catch (err) {
-        console.error('[DeepScan api] Error:', err.message);
+        console.error('[DeepScan API] Error:', err.message);
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
-
-

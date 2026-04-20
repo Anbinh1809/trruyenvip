@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import { Sparkles } from 'lucide-react';
@@ -54,7 +54,7 @@ export default function LevelUpOverlay({ level, rank, onComplete }) {
             </div>
         </div>
       </div>
-      <style jsx>{`
+      <style>{`
         .titan-level-toast-industrial {
             position: fixed;
             bottom: 30px;

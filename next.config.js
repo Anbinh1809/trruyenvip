@@ -6,9 +6,7 @@ const nextConfig = {
     unoptimized: true, 
   },
   experimental: {
-     // Limit workers to prevent ENOBUFS database connection overload
-     cpus: 2,
-     workerThreads: false,
+    // instrumentationHook: true, // enabled by default in Next.js 16
   }
 };
 

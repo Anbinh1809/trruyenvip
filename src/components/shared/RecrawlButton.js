@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { RefreshCw, Search } from 'lucide-react';
@@ -50,7 +50,7 @@ export default function RecrawlButton({ chapterId }) {
         {loading ? 'ĐANG ĐỒNG BỘ...' : 'CÀO DỮ LIỆU NGAY'}
       </button>
 
-      <style jsx>{`
+      <style>{`
         .empty-icon-box-industrial {
             display: flex;
             justify-content: center;

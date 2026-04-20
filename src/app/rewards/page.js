@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -216,7 +216,7 @@ export default function RewardsPage() {
         </div>
       </div>
       <Footer />
-      <style jsx>{`
+      <style>{`
         .rewards-container {
             padding-top: 140px;
             padding-bottom: 100px;

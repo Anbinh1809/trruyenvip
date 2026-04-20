@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
@@ -146,7 +146,7 @@ export default function ChapterList({ mangaId, chapters }) {
         </>
       )}
 
-      <style jsx>{`
+      <style>{`
         .chapter-list-linear-industrial {
             display: flex;
             flex-direction: column;

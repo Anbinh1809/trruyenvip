@@ -14,7 +14,7 @@ const RATE_LIMIT_MAP = new Map();
 const LIMIT_WINDOW = 60 * 1000; // 1 minute
 const MAX_REQUESTS = 120; // Increased for high-traffic scalability
 
-export default async function middleware(request) {
+export default async function proxy(request) {
   const { pathname } = request.nextUrl;
   const ip = request.headers.get('x-forwarded-for') || '127.0.0.1';
 
@@ -50,8 +50,8 @@ export default async function middleware(request) {
   if (pathname === '/api/cron') {
     const authHeader = request.headers.get('authorization');
     if (!CRON_SECRET || authHeader !== `Bearer ${CRON_SECRET}`) {
-       console.warn(`[Security Alert] Unauthorized access attempt to CRON service from ${request.ip}`);
-       return new NextResponse('Unauthorized', { status: 401 });
+       console.warn(`[Security Alert] Unauthorized access attempt to CRON service from ${ip}`);
+       return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
     }
     return NextResponse.next();
   }

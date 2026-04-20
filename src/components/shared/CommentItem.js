@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useEngagement } from '@/contexts/EngagementContext';
@@ -164,7 +164,7 @@ const CommentItem = ({ comment, isReply = false, chapterId, userName, fetchComme
                 <CommentItem key={reply.id} comment={reply} isReply={true} chapterId={chapterId} userName={userName} fetchComments={fetchComments} comments={comments} handleLike={handleLike} />
             ))}
 
-            <style jsx>{`
+            <style>{`
                 .comment-group-wrapper {
                     margin-bottom: 25px;
                 }

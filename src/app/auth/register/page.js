@@ -56,7 +56,7 @@ export default function RegisterPage() {
       
       <div className="auth-wrapper-industrial">
         <div className="auth-card-titan shadow-titan fade-up">
-            <div className="auth-badge-titan">JOIN THE ELITE ELITE COMMUNITY</div>
+            <div className="auth-badge-titan">JOIN THE ELITE COMMUNITY</div>
             <h1 className="auth-title-industrial">ĐĂNG KÝ</h1>
             <p className="auth-subtitle-industrial">Khởi tạo hành trình đọc truyện không giới hạn của bạn.</p>
 
@@ -134,7 +134,7 @@ export default function RegisterPage() {
             <div className="auth-footer-industrial">
                 Đã có tài khoản? 
                 <Link href="/auth/login" className="auth-link-titan">
-                    Đăng nhập ngay <ArrowRight size={16} />
+                    Đăng nhập <ArrowRight size={16} />
                 </Link>
             </div>
         </div>
@@ -144,4 +144,3 @@ export default function RegisterPage() {
     </main>
   );
 }
-

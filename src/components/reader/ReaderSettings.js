@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useTransition } from 'react';
 import { Settings, Eye, EyeOff, Layout, Palette, Monitor } from 'lucide-react';
@@ -178,7 +178,7 @@ export default function ReaderSettings() {
         </div>
       )}
 
-      <style jsx global>{`
+      <style>{`
         .settings-icon-wrapper {
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;

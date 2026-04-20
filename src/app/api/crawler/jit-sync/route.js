@@ -26,7 +26,7 @@ export const POST = withTitan({
             const remaining = Math.ceil((cooldown - (Date.now() - lastSync)) / 1000);
             throw {  
                 status: 429,
-                message: `H? th?ng dang x? l�, vui l�ng cho� ${remaining}s...`,
+                message: `Hệ thống đang xử lý, vui lòng chờ ${remaining}s...`,
                 isCooldown: true
             };
         }
@@ -53,7 +53,7 @@ export const POST = withTitan({
         let errorStatus = 'UNKNOWN';
 
         try {
-            const crawlPromise = crawlChapterImages(chapterId, chapter.source_url, source, true, true);
+            const crawlPromise = crawlChapterImages(chapterId, chapter.source_url, source, true);
             const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT_LIMIT')), CRAWL_TIMEOUT));
             crawlResult = await Promise.race([crawlPromise, timeoutPromise]);
         } catch (err) {
@@ -77,7 +77,7 @@ export const POST = withTitan({
 
         throw {  
             status: 503,
-            message: 'Ngu?nn ?nh bo� chặn hoặc kh�ng ph?n h?i. Đang th? k�ch hoạt Aegis Auto-Repair...',
+            message: 'Nguồn ảnh bị chặn hoặc không phản hồi. Đang thử kích hoạt Aegis Auto-Repair...',
             telemetry: {
                 chapterId,
                 source,

@@ -1,14 +1,9 @@
 import { query } from '@/core/database/connection';
-import { getSession } from '@/core/security/auth';
-import { NextResponse } from 'next/server';
+import { withTitan } from '@/core/api/handler';
 
-export async function GET() {
-    try {
-        const session = await getSession();
-        if (!session || session.role !== 'admin') {
-            return new Response('Unauthorized', { status: 401 });
-        }
-
+export const GET = withTitan({
+    admin: true,
+    handler: async () => {
         const taskCounts = await query(`
             SELECT 
                 status, 
@@ -38,42 +33,31 @@ export async function GET() {
             LIMIT 5
         `);
 
-        return NextResponse.json({
+        return {
             counts: taskCounts.recordset,
             failures: recentFailures.recordset,
             heatmap: errorHeatmap.recordset
-        });
-    } catch (err) {
-        console.error('Admin Tasks Error:', err);
-        return new Response('Error fetching tasks', { status: 500 });
+        };
     }
-}
+});
 
-export async function POST(request) {
-    try {
-        const session = await getSession();
-        if (!session || session.role !== 'admin') {
-            return new Response('Unauthorized', { status: 401 });
-        }
-
+export const POST = withTitan({
+    admin: true,
+    handler: async (request, session) => {
         const { action } = await request.json();
 
         if (action === 'retry_failed') {
-            await query("UPDATE CrawlerTasks SET status = 'pending', attempts = 0 WHERE status = 'failed'");
-            await query("INSERT INTO AuditLogs (admin_uuid, action, details) VALUES (@uuid, 'RETRY_FAILED_TASKS', 'Admin triggered bulk retry for all failed tasks')", { uuid: session.uuid });
-            return NextResponse.json({ message: 'Retrying failed tasks' });
+            await query("UPDATE crawlertasks SET status = 'pending', attempts = 0 WHERE status = 'failed'");
+            await query("INSERT INTO crawllogs (message, status) VALUES (@msg, 'success')", { msg: `Admin ${session.uuid} triggered bulk retry for all failed tasks` });
+            return { message: 'Retrying failed tasks' };
         }
 
         if (action === 'purge_completed') {
-            await query("DELETE FROM CrawlerTasks WHERE status = 'completed'");
-            await query("INSERT INTO AuditLogs (admin_uuid, action, details) VALUES (@uuid, 'PURGE_COMPLETED_TASKS', 'Admin purged all completed crawler task records')", { uuid: session.uuid });
-            return NextResponse.json({ message: 'Purged completed tasks' });
+            await query("DELETE FROM crawlertasks WHERE status = 'completed'");
+            await query("INSERT INTO crawllogs (message, status) VALUES (@msg, 'success')", { msg: `Admin ${session.uuid} purged all completed crawler task records` });
+            return { message: 'Purged completed tasks' };
         }
 
-        return new Response('Invalid action', { status: 400 });
-    } catch (err) {
-        return new Response('Error', { status: 500 });
+        throw Object.assign(new Error('Invalid action'), { status: 400 });
     }
-}
-
-
+});

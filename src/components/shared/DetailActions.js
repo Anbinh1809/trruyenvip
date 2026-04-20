@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useRef, useMemo } from 'react';
 import Link from 'next/link';
@@ -102,7 +102,7 @@ export default function DetailActions({ mangaId, firstChapterId, mangaTitle, man
                 <Share2 size={18} /> Chia sẻ truyện
             </button>
 
-            <style jsx>{`
+            <style>{`
                 .detail-actions-traditional {
                     display: flex;
                     flex-direction: column;

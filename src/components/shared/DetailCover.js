@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import Image from 'next/image';
@@ -25,7 +25,7 @@ export default function DetailCover({ src, alt }) {
                     }
                 }}
             />
-            <style jsx>{`
+            <style>{`
                 .detail-cover-container-industrial {
                     position: relative;
                     width: 100%;

@@ -3,7 +3,5 @@ import { clearSessionCookie } from '@/core/security/auth';
 
 export async function POST() {
     await clearSessionCookie();
-    return NextResponse.json({ message: 'Äà£ Ä‘Äƒng xuáº¥t' });
+    return NextResponse.json({ message: 'Đã đăng xuất' });
 }
-
-

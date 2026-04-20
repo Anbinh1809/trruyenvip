@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -23,19 +23,19 @@ export default function FavoritesPage() {
         <section className="favorites-content-industrial">
           <header className="favorites-header-industrial fade-up">
             <div className="header-left-industrial">
-              <div className="library-badge-titan">B? SƯU TẬP Co�A BẠN</div>
-              <h1 className="favorites-title-industrial">TRUY?N Y�U TH�CH</h1>
+              <div className="library-badge-titan">BỘ SƯU TẬP CỦA BẠN</div>
+              <h1 className="favorites-title-industrial">TRUYỆN YÊU THÍCH</h1>
               <p className="favorites-subtitle">
                 {!mounted 
-                    ? 'Đang truy xuất d? li?u bo� suu tập...' 
+                    ? 'Đang truy xuất dữ liệu bộ sưu tập...' 
                     : favorites.length > 0 
-                        ? `Luu gi? ${favorites.length} tuy?t ph?m tinh hoa` 
-                        : 'B?t d?u x�y d?ng danh bạ truy?n c?a ri�ng bạn.'}
+                        ? `Lưu giữ ${favorites.length} tuyệt phẩm tinh hoa` 
+                        : 'Bắt đầu xây dựng danh bạ truyện của riêng bạn.'}
               </p>
             </div>
             {!isAuthenticated && mounted && (
                 <div className="login-prompt-titan shadow-titan">
-                    <Lock size={16} /> Đăng nhập đo� đ?nng bo� vinh vi?n
+                    <Lock size={16} /> Đăng nhập để đồng bộ vĩnh viễn
                 </div>
             )}
           </header>
@@ -50,23 +50,23 @@ export default function FavoritesPage() {
             <div className="manga-grid-titan">
               {favorites.map(manga => {
                 const historyEntry = history.find(h => h.mangaId === manga.id);
-                const isNew = manga.latest_chapter_number && (!historyEntry || manga.latest_chapter_number > historyEntry.chapterNumber);
+                const isNew = manga.last_chap_num && (!historyEntry || manga.last_chap_num > historyEntry.chapterNumber);
                 
                 return <MangaCard key={manga.id} manga={manga} isNew={isNew} />;
               })}
             </div>
           ) : (
             <EmptyState 
-              title="KHO TRUY?N C�N TRo�NG"
-              subtitle="H�y c�ng kh�m ph� h�ng ng�n bo� truy?n hấp dẫn tại trang ch? ngay!"
-              actionText="KH�M PH� NGAY"
+              title="KHO TRUYỆN CÒN TRỐNG"
+              subtitle="Hãy cùng khám phá hàng ngàn bộ truyện hấp dẫn tại trang chủ ngay!"
+              actionText="KHÁM PHÁ NGAY"
               actionUrl="/"
             />
           )}
         </section>
       </div>
       <Footer />
-      <style jsx>{`
+      <style>{`
         .header-left-industrial { flex: 1; }
         .login-prompt-titan { background: rgba(255, 62, 62, 0.1); border: 1px solid rgba(255, 62, 62, 0.2); pointer-events: none; padding: 12px 25px; border-radius: 12px; font-size: 0.85rem; font-weight: 850; color: var(--accent); display: flex; align-items: center; gap: 10px; letter-spacing: 0.5px; }
         .skeleton-card-industrial { height: 400px; background: rgba(255,255,255,0.02); border-radius: 20px; animation: pulse 2s infinite; }
@@ -75,4 +75,3 @@ export default function FavoritesPage() {
     </main>
   );
 }
-

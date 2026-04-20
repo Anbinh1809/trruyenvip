@@ -1,20 +1,14 @@
-import { getSession } from '@/core/security/auth';
+import { withTitan } from '@/core/api/handler';
 import { query } from '@/core/database/connection';
-import { NextResponse } from 'next/server';
 import { SOURCES } from '@/core/crawler/mirrors';
 
 /**
  * Maintenance tool to repair 404/Relative links in the database.
  * Usage: GET /api/admin/crawler/repair-links
  */
-export async function GET() {
-    try {
-        const session = await getSession();
-        if (session?.role !== 'admin') {
-            return new Response('Unauthorized', { status: 401 });
-        }
-        
-
+export const GET = withTitan({
+    admin: true,
+    handler: async () => {
         const relativeChapters = await query(`
             SELECT id, source_url FROM chapters 
             WHERE source_url LIKE '/%'
@@ -38,15 +32,12 @@ export async function GET() {
         // (Simplified: Just delete logs and let the scheduler retry)
         await query('DELETE FROM crawllogs WHERE status = \'error\'');
 
-        return NextResponse.json({
+        return {
             status: 'success',
             repairedChapters: repairedCount,
             message: `Repaired ${repairedCount} relative URLs and cleared error logs for retry.`
-        });
-    } catch (e) {
-        console.error('[Repair] Error:', e.message);
-        return NextResponse.json({ error: e.message }, { status: 500 });
+        };
     }
-}
+});
 
 

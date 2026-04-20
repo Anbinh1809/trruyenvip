@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useTransition, useCallback } from 'react';
 import Header from '@/components/layout/Header';
@@ -147,7 +147,7 @@ export default function AdminGuardianPage() {
       </div>
 
       <Footer />
-      <style jsx>{`
+      <style>{`
         .rotate-hover-titan:hover :global(svg) { transform: rotate(180deg); }
         .rotate-hover-titan :global(svg) { transition: transform 0.5s; }
         .empty-log-cell { text-align: center; padding: 60px; color: rgba(255,255,255,0.2); font-weight: 800; font-style: italic; }

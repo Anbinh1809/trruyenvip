@@ -4,8 +4,12 @@ import { cookies } from 'next/headers';
 import { cache } from 'react';
  
 const secretString = process.env.JWT_SECRET;
-if (!secretString && process.env.NODE_ENV === 'production') {
-  throw new Error('FATAL: JWT_SECRET environment variable is missing in production!');
+if (!secretString) {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('FATAL: JWT_SECRET environment variable is missing!');
+  } else {
+    console.warn('[SECURITY WARNING] JWT_SECRET is missing! Using insecure default secret. Set JWT_SECRET in your .env file.');
+  }
 }
  
 const secret = new TextEncoder().encode(

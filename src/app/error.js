@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -79,7 +79,7 @@ export default function Error({ error, reset }) {
                 </div>
             </div>
             
-            <style jsx>{`
+            <style>{`
                 .system-action-group-vertical {
                     display: flex;
                     flex-direction: column;

@@ -36,7 +36,7 @@ async function getData(currentSlug) {
     if (currentSlug) {
         // Optimized for Scale: TOP 36 instead of all
         const mangaRes = await query(`
-            SELECT DISTINCT m.id, m.title, m.cover, m.latest_chapter_number, m.rating, m.views, m.author, m.status, m.last_crawled, m.views_at_source, m.normalized_title
+            SELECT DISTINCT m.id, m.title, m.cover, m.last_chap_num, m.rating, m.views, m.author, m.status, m.last_crawled, m.views_at_source, m.normalized_title
             FROM manga m
             JOIN mangagenres mg ON m.id = mg.manga_id
             JOIN genres g ON mg.genre_id = g.id

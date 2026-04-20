@@ -73,13 +73,13 @@ export default function TransferPage() {
         <main className="main-wrapper titan-bg">
             <Header />
             <div className="container transfer-container fade-up">
-                <header className="section-header-industrial">
+                <div className="section-header-industrial">
                     <div className="transfer-header-badge">DI CẢN TIẾP NỐI</div>
                     <h1 className="transfer-title">Dịch Chuyển Nội Dung</h1>
                     <p className="transfer-subtitle">
                         Hệ thống giúp bạn chuyển dữ liệu từ nguồn ngoài về TruyenVip nhanh chóng và ổn định. Mỗi một liên kết là một hành trình mới.
                     </p>
-                </header>
+                </div>
 
                 <div className="transfer-form-card">
                     <div className="card-header-industrial">
@@ -140,7 +140,7 @@ export default function TransferPage() {
                 </div>
             </div>
             <Footer />
-            <style jsx>{`
+            <style>{`
                 .transfer-container {
                     padding-top: 140px;
                     padding-bottom: 100px;

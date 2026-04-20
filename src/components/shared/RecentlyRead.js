@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useHistory } from '@/contexts/HistoryContext';
 import Link from 'next/link';
@@ -18,7 +18,7 @@ export default function RecentlyRead() {
   return (
     <section className="recently-read-titan fade-in">
       <div className="recent-section-header-industrial">
-          <h2 className="title-titan section-title-industrial">TIẾP TỤC ÄoŒC</h2>
+          <h2 className="title-titan section-title-industrial">TIẾP TỤC ĐỌC</h2>
           <Link href="/history" className="view-all-link-industrial">XEM TẤT CẢ</Link>
       </div>
 
@@ -30,15 +30,15 @@ export default function RecentlyRead() {
           />
           <div className="banner-content-titan">
             <div className="banner-label-titan">
-                <span className="pulse-dot-industrial" /> ÄANG ÄoŒC DỞ
+                <span className="pulse-dot-industrial" /> ĐANG ĐỌC DỞ
             </div>
             <h3 className="banner-title-titan truncate-1">{mostRecent.mangaTitle}</h3>
-            <p className="banner-sub-titan">Chương {mostRecent.chapterNumber} • {mostRecent.mangaAuthor || 'Äang c?p nh?t'}</p>
+            <p className="banner-sub-titan">Chương {mostRecent.chapterNumber} • {mostRecent.mangaAuthor || 'Đang cập nhật'}</p>
             <Link 
               href={`/manga/${mostRecent.mangaNormalizedTitle || mostRecent.mangaId}/chapter/${mostRecent.chapterId}`} 
               className="btn btn-primary banner-btn-titan-industrial"
             >
-              TIẾP TỤC ÄoŒC
+              TIẾP TỤC ĐỌC
             </Link>
           </div>
         </div>

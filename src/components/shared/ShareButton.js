@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Share2, Check } from 'lucide-react';
 import { useState } from 'react';
@@ -51,7 +51,7 @@ export default function ShareButton({ title, text, url, className = "" }) {
                     <Share2 size={16} /> <span>Chia sẻ</span>
                 </>
             )}
-            <style jsx>{`
+            <style>{`
                 .btn-share-industrial {
                     display: inline-flex;
                     align-items: center;

@@ -41,7 +41,7 @@ export default function AdminDashboard() {
         }
     } catch (err) {
         console.error('[TITAN ERROR] Failed to fetch admin stats:', err.message);
-        if (!silent) addToast('Kh�ng thộ t?i d? li?u quản trị�.', 'error');
+        if (!silent) addToast('Không thể tải dữ liệu quản trị.', 'error');
     }
   }, [isAuthenticated, user?.role, addToast]);
 
@@ -58,13 +58,15 @@ export default function AdminDashboard() {
         const data = await res.json();
         
         if (res.ok) {
-            addToast(data.message || 'Đ� k�ch hoạt tiến tr�nh qụt d? li?u t?c động!', 'success');
+            addToast(data.message || 'Đã kích hoạt tiến trình quét dữ liệu tức động!', 'success');
             setTimeout(() => fetchStats(true), 2000);
+        } else if (res.status === 401 || res.status === 403) {
+            addToast('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error');
         } else {
-            addToast(data.error || 'K�ch hoạt thất bại. Vui l�ng kiộm tra log.', 'error');
+            addToast(data.error || 'Kích hoạt thất bại. Vui lòng kiểm tra log.', 'error');
         }
     } catch (e) {
-        addToast('Lỗi kết nối m�y ch?.', 'error');
+        addToast('Lỗi kết nối máy chủ.', 'error');
     } finally {
         setCrawlLoading(false);
     }
@@ -76,7 +78,7 @@ export default function AdminDashboard() {
             <Header />
             <div className="system-center-industrial">
                 <div className="titan-loader-pulse"></div>
-                <p className="loading-status-hint">Đang x�c thực quyộn quản trị�...</p>
+                <p className="loading-status-hint">Đang xác thực quyền quản trị...</p>
             </div>
         </div>
     );
@@ -88,9 +90,9 @@ export default function AdminDashboard() {
             <Header />
             <div className="system-center-industrial">
                 <Lock size={60} color="var(--accent)" />
-                <h1 className="system-title-industrial">BẢO MẬT TộI CAO</h1>
-                <p className="system-desc-industrial">Khu vực n�y chộ d�nh cho c�c quản trị� vịn c?p cao c?a hệ thống.</p>
-                <Link href="/" className="btn btn-primary">QUAY LẠI TRANG CHộ</Link>
+                <h1 className="system-title-industrial">BẢO MẬT TỐI CAO</h1>
+                <p className="system-desc-industrial">Khu vực này chỉ dành cho các quản trị viên cấp cao của hệ thống.</p>
+                <Link href="/" className="btn btn-primary">QUAY LẠI TRANG CHỦ</Link>
             </div>
         </div>
     );
@@ -108,11 +110,11 @@ export default function AdminDashboard() {
                 <div className="library-badge-titan">SYSTEM OVERWATCH</div>
                 <h1 className="admin-title-industrial">DASHBOARD QUẢN TRỊ</h1>
                 <div className="admin-meta-info-titan">
-                    <p className="admin-subtitle">Chỉ số vận h�nh hệ thống thời gian thực.</p>
+                    <p className="admin-subtitle">Chỉ số vận hành hệ thống thời gian thực.</p>
                     {stats?.lastFetched && (
                         <div className="last-sync-tag-titan fade-in">
                             <Database size={12} className="opacity-0-5" />
-                            D? li?u v?a c?p nh?t: {stats.lastFetched.toLocaleTimeString('vi-VN')}
+                            Dữ liệu vừa cập nhật: {stats.lastFetched.toLocaleTimeString('vi-VN')}
                         </div>
                     )}
                 </div>
@@ -125,7 +127,7 @@ export default function AdminDashboard() {
                     }}
                     className="btn-icon-titan" 
                     disabled={isPending}
-                    title="L�m mội d? li?u"
+                    title="Làm mới dữ liệu"
                 >
                     <RefreshCcw size={18} className={isPending || !stats ? 'spin-titan' : ''} />
                 </button>
@@ -134,37 +136,37 @@ export default function AdminDashboard() {
 
         <section className="admin-stats-grid-industrial">
             <div className="admin-stat-node-industrial fade-in" style={{ '--delay': '0s' }}>
-                <div className="admin-stat-label-industrial"><Users size={14} /> TộNG NGƯộI D�NG</div>
+                <div className="admin-stat-label-industrial"><Users size={14} /> TỔNG NGƯỜI DÙNG</div>
                 <div className="admin-stat-value-industrial">
                     {stats ? (stats.totalUsers ?? 0).toLocaleString() : <span className="skeleton-text-titan">...</span>}
                 </div>
             </div>
             <div className="admin-stat-node-industrial fade-in" style={{ '--delay': '0.05s' }}>
-                <div className="admin-stat-label-industrial"><BookOpen size={14} /> TộNG ĐẦU TRUY?N</div>
+                <div className="admin-stat-label-industrial"><BookOpen size={14} /> TỔNG ĐẦU TRUYỆN</div>
                 <div className="admin-stat-value-industrial">
                     {stats ? (stats.totalManga ?? 0).toLocaleString() : <span className="skeleton-text-titan">...</span>}
                 </div>
             </div>
             <div className="admin-stat-node-industrial fade-in" style={{ '--delay': '0.1s' }}>
-                <div className="admin-stat-label-industrial"><Layers size={14} /> TộNG CHƯƠNG</div>
+                <div className="admin-stat-label-industrial"><Layers size={14} /> TỔNG CHƯƠNG</div>
                 <div className="admin-stat-value-industrial">
                     {stats ? (stats.totalChapters ?? 0).toLocaleString() : <span className="skeleton-text-titan">...</span>}
                 </div>
             </div>
             <div className="admin-stat-node-industrial accent-node fade-in" style={{ '--delay': '0.15s' }}>
-                <div className="admin-stat-label-industrial"><Gift size={14} /> ĐANG ĐộI ĐộI QU�</div>
+                <div className="admin-stat-label-industrial"><Gift size={14} /> ĐANG ĐỢI DUYỆT QUÀ</div>
                 <div className="admin-stat-value-industrial">
                     {stats ? (stats.pendingRewards ?? 0).toLocaleString() : <span className="skeleton-text-titan">...</span>}
                 </div>
                 <Link href="/admin/rewards" className="stat-action-link-titan">
-                    Qu?n l� ngay <ArrowRight size={14} />
+                    Quản lý ngay <ArrowRight size={14} />
                 </Link>
             </div>
         </section>
 
         <section className="admin-action-grid-industrial">
             <div className="admin-card-industrial shadow-titan fade-up">
-                <h2 className="admin-card-title-industrial"><Activity size={20} color="var(--accent)" /> QUẢN L� VẬN H�NH</h2>
+                <h2 className="admin-card-title-industrial"><Activity size={20} color="var(--accent)" /> QUẢN LÝ VẬN HÀNH</h2>
                 
                 <div className="monitored-task-box-industrial">
                     <div className="task-stat-line">
@@ -194,14 +196,14 @@ export default function AdminDashboard() {
                         className="btn btn-primary full-width-titan"
                     >
                         {crawlLoading ? <RefreshCcw className="spin-titan" size={18} /> : <Zap size={18} />}
-                        K�CH HOẠT QU�T DộCH Vộ
+                        KÍCH HOẠT QUÉT DỊCH VỤ
                     </button>
-                    <div className="action-hint-titan">Thao t�c n�y sẽ �p buộc Guardian Autopilot khội chạy ngay lập tộc.</div>
+                    <div className="action-hint-titan">Thao tác này sẽ ép buộc Guardian Autopilot khởi chạy ngay lập tức.</div>
                 </div>
             </div>
 
             <div className="admin-card-industrial shadow-titan fade-up">
-                <h2 className="admin-card-title-industrial"><ShieldAlert size={20} color="#f87171" /> NHẬT KÝ� LộI H? THộNG</h2>
+                <h2 className="admin-card-title-industrial"><ShieldAlert size={20} color="#f87171" /> NHẬT KÝ LỖI HỆ THỐNG</h2>
                 
                 <div className="failure-log-mini-industrial">
                     <div className="failure-log-title">RECENT_SYNC_FAILURES:</div>
@@ -210,7 +212,7 @@ export default function AdminDashboard() {
                             <span className="err-type-tag">[{f.type || 'ERR'}]</span> {f.last_error?.toString()?.substring(0, 70) || 'Unknown error details'}...
                         </div>
                     )) : (
-                        <div className="empty-log-titan">Hoạt động b�nh thuộng.</div>
+                        <div className="empty-log-titan">Hoạt động bình thường.</div>
                     )}
                 </div>
 
@@ -231,4 +233,3 @@ export default function AdminDashboard() {
     </main>
   );
 }
-

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -125,7 +125,7 @@ export default function LeaderboardPage() {
                 </div>
             </div>
             <Footer />
-            <style jsx>{`
+            <style>{`
                 .leaderboard-container { padding-top: 60px; }
                 .leaderboard-header { text-align: center; margin-bottom: 60px; }
                 .leaderboard-badge-titan {

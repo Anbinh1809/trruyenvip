@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useRouter } from 'next/navigation';
 
@@ -26,7 +26,7 @@ export default function ChapterSelector({ mangaId, chapters, currentId }) {
                     </option>
                 ))}
             </select>
-            <style jsx>{`
+            <style>{`
                 .select-titan-industrial {
                     background: var(--nebula-glass);
                     border: 1px solid var(--glass-border);

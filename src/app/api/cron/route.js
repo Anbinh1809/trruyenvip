@@ -11,7 +11,7 @@ export async function GET(request) {
  
   try {
     // 1. PERFORM SYSTEM MAINTENANCE FIRST (Unified Titan Engine)
-    await runFullMaintenance();
+    const maintenanceResult = await runFullMaintenance();
 
     // 2. TITAN ARCHITECTURE: Queue heavy discovery tasks
     // Page 1 is always the latest updates
@@ -21,7 +21,7 @@ export async function GET(request) {
     return Response.json({ 
         success: true, 
         message: 'Cron triggered: Maintenance complete and tasks queued.',
-        maintenance: maintenance.results
+        maintenance: maintenanceResult.results
     }, { status: 200 });
   } catch (error) {
     console.error('[CRON API] Trigger Error:', error.message);

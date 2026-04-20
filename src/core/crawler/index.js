@@ -78,7 +78,8 @@ export async function fetchWithRetry(url, options = {}, retries = 2) {
         try {
             return await tryMirror(mirror);
         } catch (err) {
-            console.warn(`[Crawler:Mirror] Failed for ${mirror}: ${err.message}`);
+            const errMsg = err?.message || err?.code || JSON.stringify(err);
+            console.warn(`[Crawler:Mirror] Failed for ${mirror}: ${errMsg}`);
             continue;
         }
     }
@@ -110,7 +111,8 @@ export {
     queueDiscovery,
     processQueue,
     runTitanWorker,
-    crawlLatest
+    crawlLatest,
+    runGuardianAutopilot
 } from './engine.js';
 
 export { 

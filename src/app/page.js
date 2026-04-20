@@ -3,7 +3,6 @@ import RecentlyRead from '@/components/shared/RecentlyRead';
 import MangaCard from '@/components/shared/MangaCard';
 import Footer from '@/components/layout/Footer';
 import { query, MANGA_CARD_FIELDS } from '@/core/database/connection';
-import { getSignedProxyUrl } from '@/core/security/crypto';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import { Sparkles, Zap, ChevronRight, Play } from 'lucide-react';
@@ -39,7 +38,7 @@ async function getManga() {
 export default async function Home() {
   const mangaList = await getManga();
   const trendingManga = mangaList.slice(0, 12);
-  const recentManga = mangaList;
+  const recentManga = mangaList.slice(12);
 
   return (
     <main className="main-wrapper titan-bg home-page">

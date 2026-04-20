@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 
@@ -60,7 +60,7 @@ export default function Footer() {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .titan-footer-glass {
             background: rgba(2, 6, 23, 0.95);
             border-top: 1px solid var(--glass-border);

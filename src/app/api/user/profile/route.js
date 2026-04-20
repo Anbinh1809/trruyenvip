@@ -8,15 +8,25 @@ export const PATCH = withTitan({
             const body = await request.json();
             const { avatar } = body;
 
-            // Validation: Simple URL check or length limit
-            if (avatar && avatar.length > 500) {
-                throw { status: 400, message: 'URL too long' };
+            // Validation: Ensure valid HTTP/HTTPS URL only (prevent XSS/SSRF via javascript:/data: URIs)
+            if (avatar) {
+                if (avatar.length > 500) {
+                    throw { status: 400, message: 'URL quá dài' };
+                }
+                try {
+                    const parsed = new URL(avatar);
+                    if (!['http:', 'https:'].includes(parsed.protocol)) {
+                        throw new Error('invalid protocol');
+                    }
+                } catch {
+                    throw { status: 400, message: 'URL avatar không hợp lệ (chỉ chấp nhận http/https)' };
+                }
             }
 
             // TITAN RATE LIMIT: Prevent profile spamming
             const limiter = await checkRateLimit(`profile_${session.uuid}`, 2, 60); // 2 updates / minute
             if (!limiter.success) {
-                throw { status: 429, message: 'B?n đang c?p nh?t qu nhanh. Vui lng đoi 1 pht.' };
+                throw { status: 429, message: 'Bạn đang cập nhật quá nhanh. Vui lòng đợi 1 phút.' };
             }
 
             await query('UPDATE users SET avatar = @avatar WHERE uuid = @uuid', { 
