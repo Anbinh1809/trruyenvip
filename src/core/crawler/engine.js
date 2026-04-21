@@ -117,19 +117,10 @@ export async function processQueue() {
 
     const needed = Math.max(1, limit - activeWorkers);
     const pickRes = await query(`
-        WITH favorite_counts AS (
-            SELECT manga_id, COUNT(*) as fav_count FROM favorites GROUP BY manga_id
-        ),
-        selected_tasks AS (
-            SELECT TOP(@needed) t.id, t.type, t.target, t.status, t.updated_at
-            FROM crawlertasks t WITH (UPDLOCK, READPAST)
-            LEFT JOIN favorite_counts f ON t.manga_id = f.manga_id
-            WHERE t.status = 'pending'
-            ORDER BY (t.priority + COALESCE(f.fav_count, 0) * 3) DESC, t.created_at ASC
-        )
-        UPDATE selected_tasks 
+        UPDATE TOP(@needed) crawlertasks WITH (UPDLOCK, READPAST)
         SET status = 'processing', updated_at = GETDATE()
-        OUTPUT inserted.id, inserted.type, inserted.target;
+        OUTPUT inserted.id, inserted.type, inserted.target
+        WHERE status = 'pending'
     `, { needed });
 
     const tasks = pickRes.recordset || [];
@@ -222,9 +213,13 @@ export async function crawlFullMangaChapters(mangaId, url, source, earlyExit = f
         (await query("SELECT id, source_url FROM chapters WHERE manga_id = @mangaId", { mangaId })).recordset
             .forEach(r => { existingIds.add(r.id); existingUrls.add(r.source_url); });
 
+        let stopEarly = false;
         // Process in chunks of 5 for DB and mirror stability
         for (let i = 0; i < chapterRows.length; i += 5) {
+            if (stopEarly) break;
+            
             await Promise.all(chapterRows.slice(i, i + 5).map(async (el) => {
+                if (stopEarly) return;
                 try {
                     const a = $(el).is('a') ? $(el) : $(el).find('a').first();
                     let chapUrl = a.attr('href');
@@ -234,7 +229,11 @@ export async function crawlFullMangaChapters(mangaId, url, source, earlyExit = f
                     const chapTitle = a.text().trim() || $(el).find('.chapter-name').text().trim();
                     const chapSlug = chapUrl.split('/').pop()?.split('?')[0];
                     const chapId = `${mangaId}_${chapSlug}`;
-                    if (existingIds.has(chapId) || existingUrls.has(chapUrl)) return;
+                    
+                    if (existingIds.has(chapId) || existingUrls.has(chapUrl)) {
+                        if (earlyExit) stopEarly = true;
+                        return;
+                    }
 
                     await query(`
                         IF NOT EXISTS (SELECT 1 FROM chapters WHERE id = @chapId)

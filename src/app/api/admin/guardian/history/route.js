@@ -8,20 +8,17 @@ export const GET = withTitan({
         const limit = Math.min(parseInt(searchParams.get('limit') || '100'), 500);
 
         const reports = await query(`
-            SELECT TOP(@limit) gr.*, m.title as manga_name_from_join, m.cover, c.fail_count
+            SELECT TOP(@limit) gr.*
             FROM guardianreports gr
-            LEFT JOIN manga m ON gr.manga_id = m.id
-            LEFT JOIN chapters c ON gr.chapter_title = c.title AND gr.manga_id = c.manga_id
             ORDER BY gr.created_at DESC
-            
         `, { limit });
 
         // Get daily metrics
         const metricsArr = await query(`
             SELECT 
                 COUNT(*) as total_fixes,
-                SUM(CASE WHEN issue_type = 'FIX_GAP' THEN 1 ELSE 0 END) as gaps_filled,
-                SUM(CASE WHEN issue_type = 'FIX_IMAGE' THEN 1 ELSE 0 END) as images_rescued
+                SUM(CASE WHEN event_type = 'FIX_GAP' THEN 1 ELSE 0 END) as gaps_filled,
+                SUM(CASE WHEN event_type = 'FIX_IMAGE' THEN 1 ELSE 0 END) as images_rescued
             FROM guardianreports
             WHERE created_at > DATEADD(day, -1, GETDATE())
         `);

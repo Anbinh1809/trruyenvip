@@ -20,8 +20,8 @@ export const GET = withTitan({
 
             return result.recordset || [];
         } catch (e) {
-            console.error('Leaderboard error:', e);
-            throw e;
+            console.error('Leaderboard fetch failed (fallback to empty):', e.message);
+            return []; // Return empty instead of crashing build
         }
     }
 });

@@ -1,17 +1,27 @@
 import sql from 'mssql';
 import 'dotenv/config';
 
-const connectionString = process.env.DATABASE_URL || 'Server=localhost;Database=truyenvip;User Id=sa;Password=123456;TrustServerCertificate=true;';
+const rawUrl = process.env.DATABASE_URL;
+const connectionString = (rawUrl && rawUrl !== 'undefined' && rawUrl.trim() !== '') 
+    ? rawUrl 
+    : 'Server=localhost;Database=truyenvip;User Id=sa;Password=123456;TrustServerCertificate=true;';
 
 const pool = new sql.ConnectionPool(connectionString);
-const poolConnect = pool.connect();
+const poolConnect = pool.connect().catch(err => {
+    console.error('[TITAN-DB-CRITICAL] Failed to connect to SQL Server:', err.message);
+    // Do not throw globally to prevent node process death during build
+    return null;
+});
 
 pool.on('error', err => {
     console.warn('[SQL] Pool error:', err);
 });
 
 export async function query(sqlString, params = {}, client = null, retryCount = 0) {
-    await poolConnect;
+    const connection = await poolConnect;
+    if (!connection && !client) {
+        throw new Error('DATABASE_CONNECTION_UNAVAILABLE');
+    }
     
     try {
         const executor = client ? client : pool.request();

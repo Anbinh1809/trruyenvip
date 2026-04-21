@@ -2,6 +2,20 @@ import { query } from '@/core/database/connection';
 
 export const dynamic = 'force-dynamic';
 
+function escapeXml(unsafe) {
+    if (!unsafe) return '';
+    return unsafe.replace(/[<>&'"]/g, (c) => {
+        switch (c) {
+            case '<': return '&lt;';
+            case '>': return '&gt;';
+            case '&': return '&amp;';
+            case '\'': return '&apos;';
+            case '"': return '&quot;';
+            default: return c;
+        }
+    });
+}
+
 export async function GET(request) {
     try {
         const result = await query(`
@@ -32,8 +46,8 @@ export async function GET(request) {
             return `
                 <item>
                     <title><![CDATA[${chap.manga_title} - ${chap.chapter_title}]]></title>
-                    <link>${chapUrl}</link>
-                    <guid isPermaLink="false">${chap.chapter_id}</guid>
+                    <link>${escapeXml(chapUrl)}</link>
+                    <guid isPermaLink="false">${escapeXml(chap.chapter_id.toString())}</guid>
                     <pubDate>${new Date(chap.updated_at).toUTCString()}</pubDate>
                     <description><![CDATA[
                         <img src="${coverUrl}" width="200" style="margin-bottom: 10px;" /><br/>

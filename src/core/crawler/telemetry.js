@@ -113,10 +113,9 @@ export async function logGuardianEvent(mangaId, chapterTitle, eventType, message
         }
 
         await query(`
-            INSERT INTO guardianreports (manga_id, manga_name, chapter_title, issue_type, details, created_at)
-            VALUES (@mangaId, @name, @chap, @type, @msg, GETDATE())
+            INSERT INTO guardianreports (manga_name, chapter_title, event_type, message, created_at)
+            VALUES (@name, @chap, @type, @msg, GETDATE())
         `, {
-            mangaId: mangaId || null,
             name: mangaName,
             chap: chapterTitle || 'System',
             type: eventType,

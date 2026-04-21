@@ -30,7 +30,8 @@ export async function healData() {
                     .replace(/[^a-z0-9]/g, '-')
                     .replace(/-+/g, '-')
                     .replace(/^-|-$/g, '');
-                await query("UPDATE manga SET normalized_title = @slug WHERE id = @id", { slug, id: m.id });
+                const finalSlug = slug || m.id || `unknown-${Date.now()}`;
+                await query("UPDATE manga SET normalized_title = @slug WHERE id = @id", { slug: finalSlug, id: m.id });
             }
         }
 

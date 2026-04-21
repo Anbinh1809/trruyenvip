@@ -60,7 +60,7 @@ export async function GET(request) {
             const lastMod = manga.last_crawled ? new Date(manga.last_crawled).toISOString() : new Date().toISOString();
             xml += `
   <url>
-    <loc>${origin}/manga/${manga.id}</loc>
+    <loc>${origin}/manga/${escapeXml(manga.id)}</loc>
     <lastmod>${lastMod}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>

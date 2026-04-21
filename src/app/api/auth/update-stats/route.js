@@ -31,8 +31,8 @@ export const POST = withTitan({
             return { success: true };
         }
 
-        // Sanity check: Max 500 XP and 100 Coins per heartbeat
-        if (deltaXp > 500 || deltaCoins > 100) {
+        // Sanity check: Lifted max limits to account for Supreme Chests (10,000 Coins) and Streaks
+        if (deltaXp > 15000 || deltaCoins > 15000) {
             throw { status: 400, message: 'Dữ liệu bất thường (Deltas excessive)' };
         }
 

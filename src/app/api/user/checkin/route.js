@@ -28,7 +28,7 @@ export const POST = withTitan({
                     tx
                 );
 
-                if (todayCheck.rowCount > 0) {
+                if (todayCheck.recordset?.length > 0) {
                     throw new Error('Bạn đã điểm danh hôm nay rồi.');
                 }
 
@@ -40,7 +40,7 @@ export const POST = withTitan({
                 );
 
                 let newStreak = 1;
-                if (yesterdayCheck.rowCount > 0) {
+                if (yesterdayCheck.recordset?.length > 0) {
                     newStreak = parseInt(yesterdayCheck.recordset?.[0]?.streak || 0) + 1;
                 }
 
