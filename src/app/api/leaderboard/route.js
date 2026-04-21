@@ -13,10 +13,9 @@ export const GET = withTitan({
         try {
             // SELECT only public-safe fields
             const result = await query(`
-                SELECT username, xp, avatar
+                SELECT TOP(100) username, xp, avatar
                 FROM users
                 ORDER BY xp DESC
-                LIMIT 100
             `);
 
             return result.recordset || [];

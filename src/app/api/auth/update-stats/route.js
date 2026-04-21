@@ -52,10 +52,10 @@ export const POST = withTitan({
             SET xp = xp + @xp, 
                 vipcoins = vipcoins + @coins,
                 mission_data = CASE 
-                    WHEN @missionData IS NOT NULL THEN @missionData::jsonb
+                    WHEN @missionData IS NOT NULL THEN @missionData
                     ELSE mission_data 
                 END,
-                last_stats_update = NOW()
+                last_stats_update = GETDATE()
             WHERE uuid = @uuid
         `, {
             xp: deltaXp,

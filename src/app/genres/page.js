@@ -36,13 +36,12 @@ async function getData(currentSlug) {
     if (currentSlug) {
         // Optimized for Scale: TOP 36 instead of all
         const mangaRes = await query(`
-            SELECT DISTINCT m.id, m.title, m.cover, m.last_chap_num, m.rating, m.views, m.author, m.status, m.last_crawled, m.views_at_source, m.normalized_title
+            SELECT DISTINCT TOP(36) m.id, m.title, m.cover, m.last_chap_num, m.rating, m.views, m.author, m.status, m.last_crawled, m.views_at_source, m.normalized_title
             FROM manga m
             JOIN mangagenres mg ON m.id = mg.manga_id
             JOIN genres g ON mg.genre_id = g.id
             WHERE g.slug = @slug
             ORDER BY m.views_at_source DESC, m.last_crawled DESC
-            LIMIT 36
         `, { slug: currentSlug });
 
         manga = (mangaRes.recordset || []).map(item => ({
@@ -52,7 +51,7 @@ async function getData(currentSlug) {
 
         activeGenre = allGenres.find(g => g.slug === currentSlug);
     } else {
-        const mangaRes = await query(`SELECT ${MANGA_CARD_FIELDS} FROM manga ORDER BY last_crawled DESC LIMIT 36`);
+        const mangaRes = await query(`SELECT TOP(36) ${MANGA_CARD_FIELDS} FROM manga ORDER BY last_crawled DESC`);
         manga = (mangaRes.recordset || []).map(item => ({
             ...item,
             cover: item.cover ? getSignedProxyUrl(item.cover, 400, 75) : '/placeholder-manga.svg'
@@ -154,7 +153,11 @@ export default async function GenresPage({ searchParams }) {
                 ) : (
                     <IndustrialEmptyState 
                         title="DỮ LIỆU ĐANG CẬP NHẬT"
-                        message={`Hiện tại thư viện <span class="text-accent-titan">${activeGenre?.name || 'này'}</span> chưa có bản ghi nào được lưu trữ. Vui lòng quay lại sau.`}
+                        message={
+                            <>
+                                Hiện tại thư viện <span className="text-accent-titan">{activeGenre?.name || 'này'}</span> chưa có bản ghi nào được lưu trữ. Vui lòng quay lại sau.
+                            </>
+                        }
                         buttonText="Quay Lại Trang Chủ"
                     />
                 )}

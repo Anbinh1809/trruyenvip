@@ -9,10 +9,9 @@ export async function GET(request) {
 
   try {
     const chapRes = await query(`
-      SELECT id, manga_id, updated_at 
+      SELECT TOP(10000) id, manga_id, updated_at 
       FROM chapters 
       ORDER BY updated_at DESC
-      LIMIT 10000
     `);
 
     const chapters = chapRes.recordset || [];

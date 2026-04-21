@@ -8,7 +8,7 @@ import { query } from './connection.js';
 export async function rotateLogs(days = 7) {
     try {
         console.log(`[Maintenance] Pruning logs older than ${days} days...`);
-        const res = await query("DELETE FROM crawllogs WHERE created_at < NOW() - INTERVAL '1 day' * @days", { days });
+        const res = await query("DELETE FROM crawllogs WHERE created_at < DATEADD(day, -@days, GETDATE())", { days });
         return { success: true, count: res.rowCount };
     } catch (e) {
         console.error('[Maintenance] rotateLogs failed:', e.message);
@@ -21,7 +21,7 @@ export async function healData() {
         console.log('[Maintenance] Healing broken titles and slugs...');
         
         // Fix missing slugs
-        const missing = await query("SELECT id, title FROM manga WHERE normalized_title IS NULL OR normalized_title = '' LIMIT 100");
+        const missing = await query("SELECT TOP(100) id, title FROM manga WHERE normalized_title IS NULL OR normalized_title = ''");
         if (missing.recordset?.length > 0) {
             for (const m of missing.recordset) {
                 const slug = m.title.toLowerCase()
@@ -62,10 +62,10 @@ export async function purgeOrphans() {
         `);
 
         // Old notifications
-        await query("DELETE FROM notifications WHERE is_read = TRUE AND created_at < NOW() - INTERVAL '30 days'");
+        await query("DELETE FROM notifications WHERE is_read = 1 AND created_at < DATEADD(day, -30, GETDATE())");
         
         // Old rate limits
-        await query("DELETE FROM ratelimits WHERE reset_at < NOW()");
+        await query("DELETE FROM ratelimits WHERE reset_at < GETDATE()");
 
         return { success: true };
     } catch (e) {

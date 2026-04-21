@@ -21,7 +21,7 @@ function isDiscoveryCandidate(slug) {
 export async function generateMetadata({ params }) {
   const { id } = await params;
   const cleanId = id?.toString().trim();
-  const res = await query('SELECT title, description, cover FROM manga WHERE id = @id OR LOWER(normalized_title) = LOWER(@id) LIMIT 1', { id: cleanId });
+  const res = await query('SELECT TOP(1) title, description, cover FROM manga WHERE id = @id OR LOWER(normalized_title) = LOWER(@id)', { id: cleanId });
   const manga = res.recordset?.[0];
 
   if (!manga) return { title: 'Manga Not Found | TruyenVip' };
@@ -58,10 +58,9 @@ async function getManga(id) {
 
     // TITAN SMART LOOKUP 2.0: Check both id and normalized_title simultaneously
     let res = await query(`
-        SELECT ${MANGA_CARD_FIELDS}, description
+        SELECT TOP(1) ${MANGA_CARD_FIELDS}, description
         FROM manga 
         WHERE id = @id OR LOWER(id) = LOWER(@id) OR LOWER(normalized_title) = LOWER(@id)
-        LIMIT 1
     `, { id: cleanId });
 
     let manga = res.recordset?.[0];
@@ -70,10 +69,9 @@ async function getManga(id) {
     if (!manga) {
         const pattern = `%${cleanId.replace(/-/g, ' ')}%`;
         res = await query(`
-            SELECT ${MANGA_CARD_FIELDS}, description
+            SELECT TOP(1) ${MANGA_CARD_FIELDS}, description
             FROM manga 
-            WHERE title ILIKE @pattern OR alternative_titles ILIKE @pattern
-            LIMIT 1
+            WHERE title LIKE @pattern OR alternative_titles LIKE @pattern
         `, { pattern });
         manga = res.recordset?.[0];
     }

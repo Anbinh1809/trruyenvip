@@ -31,10 +31,9 @@ async function getChapterData(mangaId, chapterId) {
 
     // TITAN SMART LOOKUP 2.0: Check both id and normalized_title simultaneously
     let mangaRes = await query(`
-        SELECT id, title, cover 
+        SELECT TOP(1) id, title, cover 
         FROM manga 
-        WHERE id = @id OR normalized_title = @id OR normalized_title ILIKE @id 
-        LIMIT 1
+        WHERE id = @id OR normalized_title = @id OR normalized_title LIKE @id 
     `, { id: cleanMangaId });
     
     let manga = mangaRes.recordset?.[0];
@@ -43,9 +42,8 @@ async function getChapterData(mangaId, chapterId) {
     if (!manga) {
         const pattern = `%${mangaId.replace(/-/g, '%')}%`;
         mangaRes = await query(`
-            SELECT id, title FROM manga 
-            WHERE title ILIKE @pattern OR alternative_titles ILIKE @pattern
-            LIMIT 1
+            SELECT TOP(1) id, title FROM manga 
+            WHERE title LIKE @pattern OR alternative_titles LIKE @pattern
         `, { pattern });
         manga = mangaRes.recordset?.[0];
     }

@@ -20,7 +20,7 @@ export async function GET(request) {
         const protocol = host.startsWith('localhost') ? 'http' : 'https';
         const origin = `${protocol}://${host}`;
 
-        const mangaRes = await query("SELECT id, last_crawled FROM manga ORDER BY last_crawled DESC LIMIT 10000");
+        const mangaRes = await query("SELECT TOP(10000) id, last_crawled FROM manga ORDER BY last_crawled DESC");
         const mangaList = mangaRes.recordset;
         const genreRes = await query("SELECT slug FROM genres ORDER BY slug ASC");
         const genreList = genreRes.recordset;

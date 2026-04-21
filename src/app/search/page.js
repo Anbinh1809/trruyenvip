@@ -27,7 +27,7 @@ async function searchManga(q, page = 1) {
     const countRes = await query(`
       SELECT COUNT(*) as total 
       FROM manga 
-      WHERE normalized_title LIKE @slug OR title ILIKE @q OR author ILIKE @q
+      WHERE normalized_title LIKE @slug OR title LIKE @q OR author LIKE @q
     `, { slug: `%${searchSlug}%`, q: `%${sanitizedQ}%` });
     
     const total = countRes.recordset[0]?.total || 0;
@@ -35,11 +35,11 @@ async function searchManga(q, page = 1) {
     const result = await query(`
       SELECT ${MANGA_CARD_FIELDS}
       FROM manga 
-      WHERE normalized_title LIKE @slug OR title ILIKE @q OR author ILIKE @q 
+      WHERE normalized_title LIKE @slug OR title LIKE @q OR author LIKE @q
       ORDER BY 
       CASE WHEN normalized_title LIKE @slug THEN 0 ELSE 1 END,
       last_crawled DESC
-      LIMIT @pageSize OFFSET @offset
+      OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY
     `, { slug: `%${searchSlug}%`, q: `%${sanitizedQ}%`, offset, pageSize });
 
     const manga = result.recordset.map(m => {

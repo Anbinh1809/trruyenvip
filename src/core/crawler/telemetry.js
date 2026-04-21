@@ -105,7 +105,7 @@ export async function logGuardianEvent(mangaId, chapterTitle, eventType, message
         let mangaName = 'System';
         
         if (mangaId) {
-            const res = await query('SELECT title FROM manga WHERE id = @mangaId LIMIT 1', { mangaId });
+            const res = await query('SELECT TOP(1) title FROM manga WHERE id = @mangaId', { mangaId });
             const manga = res.recordset?.[0];
             if (manga) {
                 mangaName = manga.title;
@@ -114,7 +114,7 @@ export async function logGuardianEvent(mangaId, chapterTitle, eventType, message
 
         await query(`
             INSERT INTO guardianreports (manga_id, manga_name, chapter_title, issue_type, details, created_at)
-            VALUES (@mangaId, @name, @chap, @type, @msg, NOW())
+            VALUES (@mangaId, @name, @chap, @type, @msg, GETDATE())
         `, {
             mangaId: mangaId || null,
             name: mangaName,

@@ -14,11 +14,11 @@ export const GET = withTitan({
 
         // Get recent failures for diagnostics
         const recentFailures = await query(`
-            SELECT id, type, last_error, attempts, updated_at
+            SELECT TOP(10) id, type, last_error, attempts, updated_at
             FROM CrawlerTasks
             WHERE status = 'failed'
             ORDER BY updated_at DESC
-            LIMIT 10
+            
         `);
 
         // ERROR HEATmap: Group errors by signature
@@ -30,7 +30,7 @@ export const GET = withTitan({
             WHERE status = 'failed'
             GROUP BY LEFT(last_error, 50)
             ORDER BY count DESC
-            LIMIT 5
+            
         `);
 
         return {

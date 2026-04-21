@@ -9,7 +9,7 @@ export const GET = withTitan({
     admin: true,
     handler: async () => {
         try {
-            const res = await query('SELECT * FROM crawllogs ORDER BY created_at DESC LIMIT 50');
+            const res = await query('SELECT TOP(50) * FROM crawllogs ORDER BY created_at DESC');
             return res.recordset || [];
         } catch (e) {
             console.error('Logs error:', e);

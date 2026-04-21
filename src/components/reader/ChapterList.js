@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
@@ -117,7 +117,7 @@ export default function ChapterList({ mangaId, chapters }) {
                                             <Loader2 size={12} className="animate-spin" /> ĐANG TẢI
                                         </span>
                                     )}
-                                    {((new Date() - new Date(chapter.updated_at)) < (48 * 60 * 60 * 1000)) && (
+                                    {(mounted && (new Date() - new Date(chapter.updated_at)) < (48 * 60 * 60 * 1000)) && (
                                         <span className="badge-new-v2">MỚI</span>
                                     )}
                                 </div>
@@ -125,7 +125,7 @@ export default function ChapterList({ mangaId, chapters }) {
 
                             <div className="chapter-row-right">
                                 <span className="chapter-date-v2">
-                                    {new Date(chapter.updated_at || chapter.created_at).toLocaleDateString('vi-VN')}
+                                    {mounted ? new Date(chapter.updated_at || chapter.created_at).toLocaleDateString('vi-VN') : ''}
                                 </span>
                             </div>
                         </Link>

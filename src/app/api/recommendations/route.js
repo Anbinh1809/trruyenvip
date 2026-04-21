@@ -21,10 +21,9 @@ export const GET = withTitan({
 
         if (!mangaId) {
             const trending = await query(`
-                SELECT ${MANGA_CARD_FIELDS}
+                SELECT TOP(4) ${MANGA_CARD_FIELDS}
                 FROM manga
                 ORDER BY views DESC, last_crawled DESC
-                LIMIT 4
             `);
             return (trending.recordset || []).map(mapCover);
         }
@@ -35,9 +34,9 @@ export const GET = withTitan({
 
         if (!genresRes.recordset?.length) {
             const trending = await query(`
-                SELECT ${MANGA_CARD_FIELDS}
+                SELECT TOP(4) ${MANGA_CARD_FIELDS}
                 FROM manga
-                ORDER BY last_crawled DESC LIMIT 4
+                ORDER BY last_crawled DESC
             `);
             return (trending.recordset || []).map(mapCover);
         }
@@ -45,12 +44,11 @@ export const GET = withTitan({
         const genreId = genresRes.recordset[0].genre_id;
 
         const recommendationRes = await query(`
-            SELECT ${MANGA_CARD_FIELDS.split(', ').map(f => `m.${f.trim()}`).join(', ')}
+            SELECT TOP(4) ${MANGA_CARD_FIELDS.split(', ').map(f => `m.${f.trim()}`).join(', ')}
             FROM manga m
             JOIN mangagenres mg ON m.id = mg.manga_id
             WHERE mg.genre_id = @genreId AND m.id != @mangaId
             ORDER BY m.last_crawled DESC
-            LIMIT 4
         `, { genreId, mangaId });
 
         return (recommendationRes.recordset || []).map(mapCover);

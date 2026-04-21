@@ -6,9 +6,10 @@ export const GET = withTitan({
     handler: async () => {
         try {
             const trending = await query(`
-                SELECT m.id, m.title, m.cover, m.normalized_title
+                SELECT TOP(5) m.id, m.title, m.cover, m.normalized_title
                 FROM manga m LEFT JOIN chapters c ON m.id = c.manga_id
-                GROUP BY m.id ORDER BY m.views DESC, COUNT(c.id) DESC LIMIT 5
+                GROUP BY m.id, m.title, m.cover, m.normalized_title, m.views 
+                ORDER BY m.views DESC, COUNT(c.id) DESC
             `);
 
             return (trending.recordset || []).map(m => {

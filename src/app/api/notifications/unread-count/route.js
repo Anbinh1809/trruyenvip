@@ -9,7 +9,7 @@ export async function GET() {
 
         const res = await query(`
             SELECT COUNT(*) as count FROM notifications 
-            WHERE user_uuid = @uuid AND is_read = FALSE
+            WHERE user_uuid = @uuid AND is_read = 0
         `, { uuid: session.uuid });
 
         return NextResponse.json({ count: Number(res.recordset?.[0]?.count || 0) });

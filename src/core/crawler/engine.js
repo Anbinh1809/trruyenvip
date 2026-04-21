@@ -41,10 +41,10 @@ function startSelfHealInterval() {
         try {
             await query(`
                 UPDATE crawlertasks 
-                SET status = 'pending', priority = 8, attempts = 0, updated_at = NOW()
-                WHERE status = 'failed' AND updated_at < NOW() - INTERVAL '3 hours'
+                SET status = 'pending', priority = 8, attempts = 0, updated_at = GETDATE()
+                WHERE status = 'failed' AND updated_at < DATEADD(hour, -3, GETDATE())
             `);
-            await query("DELETE FROM crawllogs WHERE created_at < NOW() - INTERVAL '24 hours'");
+            await query("DELETE FROM crawllogs WHERE created_at < DATEADD(hour, -24, GETDATE())");
         } catch (e) {
             console.error('[Rescue:Error]', e.message);
         }
@@ -75,7 +75,7 @@ async function executeTask(taskRow) {
         switch (taskRow.type) {
             case 'chapter_scrape': {
                 const { chapId, url, force } = payload;
-                const r = await query("SELECT c.title, m.title as m_title FROM chapters c JOIN manga m ON c.manga_id = m.id WHERE c.id = @chapId LIMIT 1", { chapId });
+                const r = await query("SELECT TOP(1) c.title, m.title as m_title FROM chapters c JOIN manga m ON c.manga_id = m.id WHERE c.id = @chapId", { chapId });
                 const t = r.recordset?.[0];
                 updateTelemetry({ status: 'scraping_images', currentManga: t?.m_title || chapId.split('_')[0], currentChapter: t?.title || chapId });
                 await crawlChapterImages(chapId, url, source, force);
@@ -83,7 +83,7 @@ async function executeTask(taskRow) {
             }
             case 'manga_sync': {
                 const { mangaId, url, earlyExit } = payload;
-                const r = await query("SELECT title FROM manga WHERE id = @mangaId LIMIT 1", { mangaId });
+                const r = await query("SELECT TOP(1) title FROM manga WHERE id = @mangaId", { mangaId });
                 updateTelemetry({ status: 'manga_sync', currentManga: r.recordset?.[0]?.title || mangaId, currentChapter: 'Full Metadata' });
                 await crawlFullMangaChapters(mangaId, url, source, earlyExit);
                 break;
@@ -95,12 +95,12 @@ async function executeTask(taskRow) {
                 break;
             }
         }
-        await query("UPDATE crawlertasks SET status = 'completed', updated_at = NOW() WHERE id = @id", { id: taskRow.id });
+        await query("UPDATE crawlertasks SET status = 'completed', updated_at = GETDATE() WHERE id = @id", { id: taskRow.id });
     } catch (e) {
         await query(`
             UPDATE crawlertasks 
             SET status = CASE WHEN attempts >= 3 THEN 'failed' ELSE 'pending' END, 
-                attempts = attempts + 1, last_error = @err, updated_at = NOW() 
+                attempts = attempts + 1, last_error = @err, updated_at = GETDATE() 
             WHERE id = @id
         `, { id: taskRow.id, err: e.message });
     } finally {
@@ -121,15 +121,15 @@ export async function processQueue() {
             SELECT manga_id, COUNT(*) as fav_count FROM favorites GROUP BY manga_id
         ),
         selected_tasks AS (
-            SELECT t.id FROM crawlertasks t
+            SELECT TOP(@needed) t.id, t.type, t.target, t.status, t.updated_at
+            FROM crawlertasks t WITH (UPDLOCK, READPAST)
             LEFT JOIN favorite_counts f ON t.manga_id = f.manga_id
             WHERE t.status = 'pending'
             ORDER BY (t.priority + COALESCE(f.fav_count, 0) * 3) DESC, t.created_at ASC
-            LIMIT @needed FOR UPDATE OF t SKIP LOCKED
         )
-        UPDATE crawlertasks SET status = 'processing', updated_at = NOW()
-        FROM selected_tasks WHERE crawlertasks.id = selected_tasks.id
-        RETURNING crawlertasks.id, crawlertasks.type, crawlertasks.target;
+        UPDATE selected_tasks 
+        SET status = 'processing', updated_at = GETDATE()
+        OUTPUT inserted.id, inserted.type, inserted.target;
     `, { needed });
 
     const tasks = pickRes.recordset || [];
@@ -148,17 +148,19 @@ function stringifySorted(obj) {
 
 export async function queueMangaSync(mangaId, url, source, earlyExit = false, priority = 5, force = false) {
     if (!force) {
-        const res = await query("SELECT last_crawled FROM manga WHERE id = @mangaId AND last_crawled > NOW() - INTERVAL '6 hours'", { mangaId });
+        const res = await query("SELECT last_crawled FROM manga WHERE id = @mangaId AND last_crawled > DATEADD(hour, -6, GETDATE())", { mangaId });
         if (res.rowCount > 0) return;
     }
     const target = stringifySorted({ mangaId, url, source, earlyExit });
     await query(`
-        INSERT INTO crawlertasks (type, target, priority, manga_id) 
-        VALUES ('manga_sync', @target, @priority, @mangaId)
-        ON CONFLICT (target) DO UPDATE SET 
-            priority = GREATEST(crawlertasks.priority, @priority),
-            status = CASE WHEN crawlertasks.status = 'failed' THEN 'pending' ELSE crawlertasks.status END
-        WHERE crawlertasks.status = 'pending' OR crawlertasks.status = 'failed'
+        MERGE crawlertasks AS target
+        USING (SELECT @target AS t_target) AS source
+        ON target.target = source.t_target
+        WHEN MATCHED AND (target.status = 'pending' OR target.status = 'failed') THEN UPDATE SET 
+            priority = CASE WHEN target.priority > @priority THEN target.priority ELSE @priority END,
+            status = CASE WHEN target.status = 'failed' THEN 'pending' ELSE target.status END
+        WHEN NOT MATCHED THEN INSERT (type, target, priority, manga_id) 
+        VALUES ('manga_sync', @target, @priority, @mangaId);
     `, { target, priority, mangaId });
     processQueue().catch(e => console.error('[Queue] processQueue error:', e.message));
 }
@@ -167,10 +169,13 @@ export async function queueDiscovery(source, pageCount = 3, startPage = 1, prior
     const target = stringifySorted({ source, pageCount, startPage });
     const mangaId = `system_discovery_${source}`;
     await query(`
-        INSERT INTO crawlertasks (type, target, priority, manga_id) 
-        VALUES ('system_discovery', @target, @priority, @mangaId)
-        ON CONFLICT (target) DO UPDATE SET priority = GREATEST(crawlertasks.priority, @priority)
-        WHERE crawlertasks.status = 'pending'
+        MERGE crawlertasks AS target
+        USING (SELECT @target AS t_target) AS source
+        ON target.target = source.t_target
+        WHEN MATCHED AND target.status = 'pending' THEN UPDATE SET 
+            priority = CASE WHEN target.priority > @priority THEN target.priority ELSE @priority END
+        WHEN NOT MATCHED THEN INSERT (type, target, priority, manga_id) 
+        VALUES ('system_discovery', @target, @priority, @mangaId);
     `, { target, priority, mangaId });
     processQueue().catch(e => console.error('[Queue] processQueue error:', e.message));
 }
@@ -180,7 +185,10 @@ export async function ingestMangaBySlug(slug, source = 'nettruyen') {
         ? safeJoinUrl(SOURCES.NETTRUYEN, `/truyen-tranh/${slug}`)
         : safeJoinUrl(SOURCES.TRUYENQQ, `/truyen-tranh/${slug}.html`);
 
-    await query(`INSERT INTO manga (id, title, status, normalized_title) VALUES (@slug, @slug, 'Chờ đồng bộ', @slug) ON CONFLICT (id) DO NOTHING`, { slug });
+    await query(`
+        IF NOT EXISTS (SELECT 1 FROM manga WHERE id = @slug)
+        INSERT INTO manga (id, title, status, normalized_title) VALUES (@slug, @slug, N'Chờ đồng bộ', @slug)
+    `, { slug });
     await queueMangaSync(slug, url, source, false, 10);
     return slug;
 }
@@ -228,8 +236,10 @@ export async function crawlFullMangaChapters(mangaId, url, source, earlyExit = f
                     const chapId = `${mangaId}_${chapSlug}`;
                     if (existingIds.has(chapId) || existingUrls.has(chapUrl)) return;
 
-                    await query(`INSERT INTO chapters (id, manga_id, title, source_url, chapter_number) VALUES (@chapId, @mangaId, @title, @url, @chapNum) ON CONFLICT (id) DO NOTHING`,
-                        { chapId, mangaId, title: chapTitle, url: chapUrl, chapNum: parseChapterNumber(chapTitle) });
+                    await query(`
+                        IF NOT EXISTS (SELECT 1 FROM chapters WHERE id = @chapId)
+                        INSERT INTO chapters (id, manga_id, title, source_url, chapter_number) VALUES (@chapId, @mangaId, @title, @url, @chapNum)
+                    `, { chapId, mangaId, title: chapTitle, url: chapUrl, chapNum: parseChapterNumber(chapTitle) });
 
                     triggerChapterNotifications(mangaId, chapTitle, chapId).catch(() => {});
                     queueChapterScrape(chapId, chapUrl, source).catch(() => {});
@@ -237,7 +247,7 @@ export async function crawlFullMangaChapters(mangaId, url, source, earlyExit = f
             }));
         }
 
-        await query('UPDATE manga SET last_crawled = NOW() WHERE id = @mangaId', { mangaId });
+        await query('UPDATE manga SET last_crawled = GETDATE() WHERE id = @mangaId', { mangaId });
     } catch (err) {
         console.log('[DEBUG ENGINE] Error in crawlFullMangaChapters:', err.message);
         try { updateMirrorHealth(new URL(url).hostname, false, err.message); } catch {}
@@ -249,7 +259,7 @@ export async function crawlFullMangaChapters(mangaId, url, source, earlyExit = f
 
 export async function triggerChapterNotifications(mangaId, chapTitle, chapId) {
     try {
-        const mangaRes = await query('SELECT title FROM manga WHERE id = @mangaId LIMIT 1', { mangaId });
+        const mangaRes = await query('SELECT TOP(1) title FROM manga WHERE id = @mangaId', { mangaId });
         const mangaTitle = mangaRes.recordset?.[0]?.title || 'Truyện';
         const subscribers = await query('SELECT user_uuid FROM favorites WHERE manga_id = @mangaId', { mangaId });
         if (!subscribers.recordset.length) return;
@@ -300,9 +310,12 @@ export async function crawlLatest(source = 'nettruyen', pageCount = 1, startPage
             // Single batch query instead of N queries
             const slugList = candidates.map(c => c.rawSlug);
             const normalizedList = candidates.map(c => c.normalizedTitle);
+            const params = {};
+            const slugParams = slugList.map((s, i) => { params[`s${i}`] = s; return `@s${i}`; });
+            const normParams = normalizedList.map((s, i) => { params[`n${i}`] = s; return `@n${i}`; });
             const existingRes = await query(
-                `SELECT id, normalized_title FROM manga WHERE id = ANY(@slugList) OR normalized_title = ANY(@normalizedList)`,
-                { slugList, normalizedList }
+                `SELECT id, normalized_title FROM manga WHERE id IN (${slugParams.join(',')}) OR normalized_title IN (${normParams.join(',')})`,
+                params
             );
             const existingById = new Map();
             const existingByNorm = new Map();
@@ -317,8 +330,10 @@ export async function crawlLatest(source = 'nettruyen', pageCount = 1, startPage
                 if (existingSlug) {
                     slug = existingSlug;
                 } else {
-                    await query(`INSERT INTO manga (id, title, cover, source_url, normalized_title) VALUES (@slug, @title, @cover, @mangaUrl, @normalizedTitle) ON CONFLICT (id) DO NOTHING`,
-                        { slug, title: c.title, cover: c.cover, mangaUrl: c.mangaUrl, normalizedTitle: c.normalizedTitle });
+                    await query(`
+                        IF NOT EXISTS (SELECT 1 FROM manga WHERE id = @slug)
+                        INSERT INTO manga (id, title, cover, source_url, normalized_title) VALUES (@slug, @title, @cover, @mangaUrl, @normalizedTitle)
+                    `, { slug, title: c.title, cover: c.cover, mangaUrl: c.mangaUrl, normalizedTitle: c.normalizedTitle });
                     newMangaCount++;
                 }
                 await queueMangaSync(slug, c.mangaUrl, source, true, 4);
@@ -350,7 +365,7 @@ export async function crawlChapterImages(chapId, url, source = 'nettruyen', forc
         await withTransaction(async (tx) => {
             if (force) await query("DELETE FROM chapterimages WHERE chapter_id = @chapId", { chapId }, tx);
             await bulkInsert('chapterimages', images.map((img, i) => ({ chapter_id: chapId, image_url: img, order: i })), tx);
-            await query("UPDATE chapters SET updated_at = NOW(), status = 'active', fail_count = 0 WHERE id = @chapId", { chapId }, tx);
+            await query("UPDATE chapters SET updated_at = GETDATE(), status = 'active', fail_count = 0 WHERE id = @chapId", { chapId }, tx);
         });
 
         updateTelemetry({ successCount: 1, imagesFound: images.length });
@@ -358,7 +373,7 @@ export async function crawlChapterImages(chapId, url, source = 'nettruyen', forc
     } catch (err) {
         updateTelemetry({ failCount: 1 });
         // Mark ghost after 5 consecutive failures
-        query(`UPDATE chapters SET fail_count = fail_count + 1, status = CASE WHEN fail_count + 1 >= 5 THEN 'ghost' ELSE 'failed' END, updated_at = NOW() WHERE id = @chapId`, { chapId }).catch(() => {});
+        query(`UPDATE chapters SET fail_count = fail_count + 1, status = CASE WHEN fail_count + 1 >= 5 THEN 'ghost' ELSE 'failed' END, updated_at = GETDATE() WHERE id = @chapId`, { chapId }).catch(() => {});
         throw err;
     } finally {
         inProgressChapters.delete(chapId);
@@ -368,11 +383,14 @@ export async function crawlChapterImages(chapId, url, source = 'nettruyen', forc
 export async function queueChapterScrape(chapId, url, source, force = false, priority = 1) {
     const target = stringifySorted({ chapId, url, source, force });
     await query(`
-        INSERT INTO crawlertasks (type, target, priority, manga_id) 
-        SELECT 'chapter_scrape', @target, @priority, manga_id FROM chapters WHERE id = @chapId
-        ON CONFLICT (target) DO UPDATE SET 
-            priority = GREATEST(crawlertasks.priority, @priority),
-            status = CASE WHEN crawlertasks.status = 'failed' THEN 'pending' ELSE crawlertasks.status END
+        MERGE crawlertasks AS target
+        USING (SELECT 'chapter_scrape' as type, @target as target, @priority as priority, manga_id FROM chapters WHERE id = @chapId) AS source
+        ON target.target = source.target
+        WHEN MATCHED THEN UPDATE SET 
+            priority = CASE WHEN target.priority > source.priority THEN target.priority ELSE source.priority END,
+            status = CASE WHEN target.status = 'failed' THEN 'pending' ELSE target.status END
+        WHEN NOT MATCHED THEN INSERT (type, target, priority, manga_id) 
+        VALUES (source.type, source.target, source.priority, source.manga_id);
     `, { target, priority, chapId });
     processQueue().catch(e => console.error('[Queue] processQueue error:', e.message));
 }
@@ -441,7 +459,7 @@ export async function runGuardianAutopilot(oneShot = false) {
 }
 
 export async function healChapterGaps(batchSize = 20) {
-    const res = await query(`SELECT id, source_url FROM manga WHERE last_crawled < NOW() - INTERVAL '6 hours' ORDER BY last_crawled ASC LIMIT @batchSize`, { batchSize });
+    const res = await query(`SELECT TOP(@batchSize) id, source_url FROM manga WHERE last_crawled < DATEADD(hour, -6, GETDATE()) ORDER BY last_crawled ASC`, { batchSize });
     for (const m of res.recordset) {
         if (!m.source_url) continue;
         // Fix #8: Added await
@@ -451,11 +469,10 @@ export async function healChapterGaps(batchSize = 20) {
 
 export async function rescueBrokenImages(batchSize = 10) {
     const res = await query(`
-        SELECT c.id, c.source_url, m.source_url as manga_url FROM chapters c
+        SELECT TOP(@batchSize) c.id, c.source_url, m.source_url as manga_url FROM chapters c
         JOIN manga m ON c.manga_id = m.id
         LEFT JOIN chapterimages ci ON c.id = ci.chapter_id
-        WHERE ci.id IS NULL AND c.updated_at < NOW() - INTERVAL '2 minutes'
-        LIMIT @batchSize
+        WHERE ci.id IS NULL AND c.updated_at < DATEADD(minute, -2, GETDATE())
     `, { batchSize });
     for (const c of res.recordset) {
         if (!c.source_url || !c.manga_url) continue;
@@ -468,7 +485,7 @@ export async function bootstrapCrawler() {
     inProgressManga.clear();
     inProgressChapters.clear();
     startSelfHealInterval(); // Start self-heal only after explicit bootstrap
-    await query("UPDATE crawlertasks SET status = 'pending', updated_at = NOW() WHERE status = 'processing' AND updated_at < NOW() - INTERVAL '2 hours'");
+    await query("UPDATE crawlertasks SET status = 'pending', updated_at = GETDATE() WHERE status = 'processing' AND updated_at < DATEADD(hour, -2, GETDATE())");
     processQueue().catch(e => console.error('[Queue] processQueue error:', e.message));
 }
 

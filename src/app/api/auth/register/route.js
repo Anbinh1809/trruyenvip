@@ -53,8 +53,8 @@ export const POST = withTitan({
                     password_hash
                 });
             } catch (dbErr) {
-                // PostgreSQL Error 23505: Unique Violation
-                if (dbErr.code === '23505' || dbErr.message.toLowerCase().includes('unique constraint')) {
+                // SQL Server Error 2601/2627: Unique Violation
+                if (dbErr.number === 2601 || dbErr.number === 2627 || dbErr.message.toLowerCase().includes('unique constraint') || dbErr.message.toLowerCase().includes('duplicate key')) {
                     throw { status: 400, message: 'Tên đăng nhập, Email hoặc Thiết bị này đã được sử dụng.' };
                 }
                 throw dbErr; // Rethrow other DB errors to the withTitan catch block

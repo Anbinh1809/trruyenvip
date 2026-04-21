@@ -13,7 +13,7 @@ export async function GET(request, { params }) {
             SELECT image_url 
             FROM chapterimages 
             WHERE chapter_id = @chapterId 
-            ORDER BY "order" ASC
+            ORDER BY [order] ASC
         `, { chapterId });
         
         // Sign each image URL so the proxy accepts it

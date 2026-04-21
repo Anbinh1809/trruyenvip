@@ -11,7 +11,7 @@ export const POST = withTitan({
 
         if (!id) throw { status: 400, message: 'Thiếu định danh truyện.' };
 
-        const res = await query('SELECT id, source_url FROM manga WHERE id = @id OR normalized_title = @id LIMIT 1', { id });
+        const res = await query('SELECT TOP(1) id, source_url FROM manga WHERE id = @id OR normalized_title = @id', { id });
         const manga = res.recordset?.[0];
 
         if (!manga) throw { status: 404, message: 'Không tìm thấy bộ truyện' };

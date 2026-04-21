@@ -9,10 +9,10 @@ export const GET = withTitan({
 
         // 1. Get Latest Logs
         const logs = await query(`
-            SELECT id, message, status, created_at 
+            SELECT TOP(@limit) id, message, status, created_at 
             FROM crawllogs 
             ORDER BY created_at DESC
-            LIMIT @limit
+            
         `, { limit });
 
         // 2. Get Today's Summary
@@ -21,9 +21,9 @@ export const GET = withTitan({
                 COUNT(*) as total_logs,
                 SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as success_logs,
                 SUM(CASE WHEN status = 'error' THEN 1 ELSE 0 END) as error_logs,
-                (SELECT COUNT(*) FROM chapterimages WHERE created_at >= CURRENT_DATE) as total_images_today
+                (SELECT COUNT(*) FROM chapterimages WHERE created_at >= CAST(GETDATE() AS DATE)) as total_images_today
             FROM crawllogs
-            WHERE created_at >= CURRENT_DATE
+            WHERE created_at >= CAST(GETDATE() AS DATE)
         `);
 
         // 3. Get Manga Stats

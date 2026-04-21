@@ -14,7 +14,7 @@ export const GET = withTitan({
         const res = await query(`
             SELECT c.id, c.chapter_id, c.user_name, c.content, c.parent_id, c.likes, c.created_at,
                    u.xp as user_xp, u.role as user_role, c.user_uuid,
-                   (CASE WHEN cl.user_uuid IS NOT NULL THEN TRUE ELSE FALSE END) as has_liked
+                   (CASE WHEN cl.user_uuid IS NOT NULL THEN 1 ELSE 0 END) as has_liked
             FROM comments c
             LEFT JOIN users u ON c.user_uuid = u.uuid
             LEFT JOIN comment_likes cl ON c.id = cl.comment_id AND cl.user_uuid = @userUuid

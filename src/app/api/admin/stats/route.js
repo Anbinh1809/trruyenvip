@@ -25,25 +25,23 @@ export const GET = withTitan({
                     (SELECT COUNT(*) FROM ${hasRewards ? 'redemptionrequests' : 'crawlertasks WHERE 1=0'}) as "pendingRewards",
                     (SELECT COUNT(*) FROM crawlertasks WHERE status = 'pending') as "taskPending",
                     (SELECT COUNT(*) FROM crawlertasks WHERE status = 'failed') as "taskFailed",
-                    (SELECT COUNT(*) FROM chapters WHERE updated_at > NOW() - INTERVAL '1 hour') as "syncsLastHour",
-                    COALESCE((SELECT MAX(created_at) FROM crawllogs), NOW()) as "lastCrawl"
+                    (SELECT COUNT(*) FROM chapters WHERE updated_at > DATEADD(hour, -1, GETDATE())) as "syncsLastHour",
+                    COALESCE((SELECT MAX(created_at) FROM crawllogs), GETDATE()) as "lastCrawl"
             `);
     
             const recentFailures = await query(`
-                SELECT id, type, LEFT(last_error, 100) as "last_error"
+                SELECT TOP(5) id, type, LEFT(last_error, 100) as "last_error"
                 FROM crawlertasks 
                 WHERE status = 'failed' 
                 ORDER BY updated_at DESC 
-                LIMIT 5
             `);
     
             const heatmap = await query(`
-                SELECT LEFT(last_error, 50) as "signature", COUNT(*) as "count"
+                SELECT TOP(5) LEFT(last_error, 50) as "signature", COUNT(*) as "count"
                 FROM crawlertasks
-                WHERE status = 'failed' AND updated_at > NOW() - INTERVAL '24 hours'
-                GROUP BY "signature"
+                WHERE status = 'failed' AND updated_at > DATEADD(hour, -24, GETDATE())
+                GROUP BY LEFT(last_error, 50)
                 ORDER BY "count" DESC
-                LIMIT 5
             `);
     
             // Key Normalizer: Handles Postgres lowercase response keys

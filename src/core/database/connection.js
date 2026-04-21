@@ -1,60 +1,44 @@
-import pg from 'pg';
+import sql from 'mssql';
 import 'dotenv/config';
 
-if (!process.env.DATABASE_URL) throw new Error('FATAL: DATABASE_URL missing!');
+const connectionString = process.env.DATABASE_URL || 'Server=localhost;Database=truyenvip;User Id=sa;Password=123456;TrustServerCertificate=true;';
 
-let connectionString = process.env.DATABASE_URL;
+const pool = new sql.ConnectionPool(connectionString);
+const poolConnect = pool.connect();
 
-// Strip Neon-specific params that pg.Pool doesn't support
-connectionString = connectionString.replace(/[&?]channel_binding=[^&]*/g, '');
-
-if (connectionString?.includes('sslmode=') && !connectionString.includes('uselibpqcompat=true')) {
-    connectionString += (connectionString.includes('?') ? '&' : '?') + 'uselibpqcompat=true';
-}
-
-const isCloudDB = ['supabase', 'neon', '.aivencloud.com'].some(d => connectionString?.includes(d));
-
-const pool = new pg.Pool({ 
-    connectionString,
-    connectionTimeoutMillis: 30000,
-    idleTimeoutMillis: 30000,
-    max: 10, 
-    allowExitOnIdle: true,
-    ssl: isCloudDB ? { rejectUnauthorized: false } : false
+pool.on('error', err => {
+    console.warn('[SQL] Pool error:', err);
 });
 
-pool.on('error', (err) => console.warn('[PG] Idle error:', err.message));
-
-function mapNamedParams(sql, params = {}) {
-    let count = 1;
-    const values = [];
-    const pMap = new Map();
-
-    const mappedSql = sql.replace(/@(\w+)\b/g, (match, name) => {
-        if (!params.hasOwnProperty(name)) return match;
-        if (!pMap.has(name)) {
-            pMap.set(name, count++);
-            values.push(params[name]);
-        }
-        return `$${pMap.get(name)}`;
-    });
-
-    return { sql: mappedSql, values };
-}
-
 export async function query(sqlString, params = {}, client = null, retryCount = 0) {
-    const { sql, values } = mapNamedParams(sqlString, params);
+    await poolConnect;
     
     try {
-        const executor = client || pool;
-        const res = await executor.query(sql, values);
-        const rows = res.rows || [];
-        return { recordset: rows, recordsets: [rows], rowsAffected: [res.rowCount || 0], rowCount: res.rowCount || 0 };
+        const executor = client ? client : pool.request();
+        
+        let req = executor;
+        if (!client || !client._isTransactionRequest) {
+            // If it's the raw pool request or we just created it
+            for (const [key, value] of Object.entries(params)) {
+                req.input(key, value);
+            }
+        } else {
+             // For transaction requests, we need a fresh request per query so parameters do not conflict
+             req = new sql.Request(client.transaction);
+             for (const [key, value] of Object.entries(params)) {
+                 req.input(key, value);
+             }
+        }
+
+        const res = await req.query(sqlString);
+        return { 
+            recordset: res.recordset || [], 
+            recordsets: res.recordsets || [res.recordset || []], 
+            rowsAffected: res.rowsAffected || [0], 
+            rowCount: res.rowsAffected?.[0] || 0 
+        };
     } catch (err) {
-        const msg = err.message.toLowerCase();
-        const isTermination = msg.includes('terminated') || msg.includes('timeout') || msg.includes('reset') || ['ECONNRESET', '57P01', '57P03'].includes(err.code);
-            
-        if (isTermination && retryCount < 3 && !client) {
+        if (retryCount < 3 && err.name === 'ConnectionError' && !client) {
             await new Promise(r => setTimeout(r, 1000 * Math.pow(2, retryCount)));
             return query(sqlString, params, client, retryCount + 1);
         }
@@ -63,10 +47,13 @@ export async function query(sqlString, params = {}, client = null, retryCount = 
 }
 
 export async function withTransaction(callback) {
-    let client, attempt = 0;
+    await poolConnect;
+    const transaction = new sql.Transaction(pool);
+    
+    let attempt = 0;
     while (attempt <= 2) {
         try {
-            client = await pool.connect();
+            await transaction.begin();
             break;
         } catch (e) {
             if (attempt === 2) throw e;
@@ -75,42 +62,73 @@ export async function withTransaction(callback) {
     }
 
     try {
-        await client.query('BEGIN');
+        // Pass a mock client that uses this transaction
+        const client = {
+            transaction: transaction,
+            _isTransactionRequest: true,
+            query: async (sqlString, params = {}) => {
+                const req = new sql.Request(transaction);
+                for (const [key, value] of Object.entries(params)) {
+                    req.input(key, value);
+                }
+                const res = await req.query(sqlString);
+                return { 
+                    recordset: res.recordset || [], 
+                    rowCount: res.rowsAffected?.[0] || 0 
+                };
+            }
+        };
+
         const res = await callback(client);
-        await client.query('COMMIT');
+        await transaction.commit();
         return res;
     } catch (err) {
-        if (client) await client.query('ROLLBACK');
+        await transaction.rollback();
         throw err;
-    } finally {
-        if (client) client.release();
     }
 }
 
 export async function bulkInsert(tableName, rows, client = null) {
     if (!rows?.length) return;
     
-    const dbClient = client || await pool.connect();
+    await poolConnect;
+    // TITAN SECURITY: Strict Table Allow-list
+    const allowedTables = ['notifications', 'chapterimages', 'crawlertasks', 'mangagenres', 'crawllogs', 'guardianreports'];
+    if (!allowedTables.includes(tableName.replace(/[\[\]"]/g, '').toLowerCase())) {
+        throw new Error(`SECURITY ALERT: Non-whitelisted table: ${tableName}`);
+    }
+
+    const cols = Object.keys(rows[0]);
+    if (!cols.every(c => /^[a-zA-Z_0-9]+$/.test(c))) {
+        throw new Error(`SECURITY ALERT: Invalid column names in bulkInsert`);
+    }
+
+    const transaction = client?.transaction || new sql.Transaction(pool);
+    if (!client) await transaction.begin();
+
     try {
-        // TITAN SECURITY: Strict Table Allow-list
-        if (!['notifications', 'chapterimages', 'crawlertasks', 'mangagenres', 'crawllogs', 'guardianreports'].includes(tableName.replace(/[\[\]"]/g, '').toLowerCase())) {
-            throw new Error(`SECURITY ALERT: Non-whitelisted table: ${tableName}`);
+        // T-SQL doesn't support ON CONFLICT DO NOTHING natively in INSERT.
+        // For allowed tables (logs, reports), we can just catch duplicate warnings,
+        // or use MERGE for specific tables if there are unique constraints.
+        // Alternatively, bulk insert via table-valued parameters or batch processing.
+        // A simple batch insert approach since data size is small:
+        
+        for (const row of rows) {
+            try {
+                const req = new sql.Request(transaction);
+                for (let i = 0; i < cols.length; i++) {
+                    req.input(`param${i}`, row[cols[i]]);
+                }
+                const placeholders = cols.map((_, i) => `@param${i}`).join(', ');
+                const colsFormatted = cols.map(c => `[${c}]`).join(', ');
+                await req.query(`BEGIN TRY INSERT INTO [${tableName}] (${colsFormatted}) VALUES (${placeholders}) END TRY BEGIN CATCH END CATCH`);
+            } catch (ignore) { }
         }
-
-        const cols = Object.keys(rows[0]);
-        // TITAN SECURITY: Validate column names to prevent SQL injection
-        if (!cols.every(c => /^[a-zA-Z_0-9]+$/.test(c))) {
-            throw new Error(`SECURITY ALERT: Invalid column names in bulkInsert`);
-        }
-        const vals = [];
-        const placeholders = rows.map((r, i) => `(${cols.map((_, j) => {
-            vals.push(r[cols[j]]);
-            return `$${i * cols.length + j + 1}`;
-        }).join(', ')})`).join(', ');
-
-        await (client || dbClient).query(`INSERT INTO ${tableName} (${cols.map(c => `"${c.toLowerCase()}"`).join(', ')}) VALUES ${placeholders} ON CONFLICT DO NOTHING`, vals);
-    } finally {
-        if (!client) dbClient.release();
+        
+        if (!client) await transaction.commit();
+    } catch (err) {
+        if (!client) await transaction.rollback();
+        throw err;
     }
 }
 
@@ -120,31 +138,43 @@ export async function checkRateLimit(key, limit, windowSeconds) {
     try {
         const resetAt = new Date(Date.now() + windowSeconds * 1000);
         const res = await query(`
-            INSERT INTO ratelimits (key, count, reset_at)
-            VALUES (@key, 1, @resetAt)
-            ON CONFLICT (key) DO UPDATE 
-            SET count = CASE WHEN ratelimits.reset_at < NOW() THEN 1 ELSE ratelimits.count + 1 END,
-                reset_at = CASE WHEN ratelimits.reset_at < NOW() THEN @resetAt ELSE ratelimits.reset_at END
-            RETURNING count, reset_at
+            MERGE ratelimits AS target
+            USING (SELECT @key AS keycol) AS source
+            ON target.[key] = source.keycol
+            WHEN MATCHED THEN
+                UPDATE SET 
+                    count = CASE WHEN target.reset_at < GETDATE() THEN 1 ELSE target.count + 1 END,
+                    reset_at = CASE WHEN target.reset_at < GETDATE() THEN @resetAt ELSE target.reset_at END
+            WHEN NOT MATCHED THEN
+                INSERT ([key], count, reset_at) VALUES (@key, 1, @resetAt)
+            OUTPUT inserted.count, inserted.reset_at;
         `, { key, resetAt });
 
-        const { count, reset_at } = res.recordset[0];
+        const count = res.recordset[0].count;
+        const reset_at = res.recordset[0].reset_at;
         return { success: count <= limit, count, limit, remaining: Math.max(0, limit - count), reset: new Date(reset_at).getTime() };
-    } catch {
+    } catch (err) {
         return { success: true, count: 0, limit, remaining: limit, reset: Date.now() };
     }
 }
 
 export async function saveSystemState(key, value) {
     try {
-        await query(`INSERT INTO system_config (key, value, updated_at) VALUES (@key, @value, NOW()) ON CONFLICT (key) DO UPDATE SET value = @value, updated_at = NOW()`, { key, value: JSON.stringify(value) });
+        await query(`
+            MERGE system_config AS target
+            USING (SELECT @key AS keycol) AS source
+            ON target.[key] = source.keycol
+            WHEN MATCHED THEN UPDATE SET value = @value, updated_at = GETDATE()
+            WHEN NOT MATCHED THEN INSERT ([key], value, updated_at) VALUES (@key, @value, GETDATE());
+        `, { key, value: JSON.stringify(value) });
     } catch {}
 }
 
 export async function loadSystemState(key) {
     try {
-        const res = await query('SELECT value FROM system_config WHERE key = @key', { key });
-        return res.recordset?.[0]?.value || null;
+        const res = await query('SELECT value FROM system_config WHERE [key] = @key', { key });
+        const val = res.recordset?.[0]?.value;
+        return val ? JSON.parse(val) : null;
     } catch { return null; }
 }
 

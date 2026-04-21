@@ -90,12 +90,11 @@ export const GET = withTitan({
         try {
             const today = new Date().toISOString().split('T')[0];
             const res = await query(`
-                SELECT streak, 
+                SELECT TOP(1) streak, 
                        (SELECT COUNT(*) FROM dailycheckins WHERE user_uuid = @uuid AND checkin_date = @today) as done_today
                 FROM dailycheckins 
                 WHERE user_uuid = @uuid 
                 ORDER BY checkin_date DESC 
-                LIMIT 1
             `, { uuid: session.uuid, today });
 
             const stats = res.recordset[0] || { streak: 0, done_today: 0 };

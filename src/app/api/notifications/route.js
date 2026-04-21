@@ -10,12 +10,11 @@ export const GET = withTitan({
     handler: async (req, session) => {
         try {
             const res = await query(`
-                SELECT n.*, m.cover 
+                SELECT TOP(20) n.*, m.cover 
                 FROM notifications n
                 LEFT JOIN manga m ON n.manga_id = m.id
                 WHERE n.user_uuid = @uuid
                 ORDER BY n.created_at DESC
-                LIMIT 20
             `, { uuid: session.uuid });
 
             return res.recordset || [];
@@ -35,9 +34,9 @@ export const PATCH = withTitan({
             const { id, all } = await req.json();
 
             if (all) {
-                await query('UPDATE notifications SET is_read = TRUE WHERE user_uuid = @uuid', { uuid: session.uuid });
+                await query('UPDATE notifications SET is_read = 1 WHERE user_uuid = @uuid', { uuid: session.uuid });
             } else if (id) {
-                await query('UPDATE notifications SET is_read = TRUE WHERE id = @id AND user_uuid = @uuid', { id, uuid: session.uuid });
+                await query('UPDATE notifications SET is_read = 1 WHERE id = @id AND user_uuid = @uuid', { id, uuid: session.uuid });
             }
 
             return { success: true };

@@ -19,10 +19,9 @@ export const metadata = {
 async function getManga() {
   try {
         const result = await query(`
-            SELECT ${MANGA_CARD_FIELDS}
+            SELECT TOP(60) ${MANGA_CARD_FIELDS}
             FROM manga 
             ORDER BY last_crawled DESC
-            LIMIT 60
         `);
 
     return (result.recordset || []).map(m => ({

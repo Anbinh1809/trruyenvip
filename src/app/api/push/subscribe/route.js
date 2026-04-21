@@ -30,10 +30,12 @@ export const POST = withTitan({
         }
 
         await query(`
-            INSERT INTO pushsubscriptions (manga_id, endpoint, p256dh, auth)
-            VALUES (@mangaId, @endpoint, @p256dh, @auth)
-            ON CONFLICT (manga_id, endpoint) DO UPDATE 
-            SET p256dh = EXCLUDED.p256dh, auth = EXCLUDED.auth
+            MERGE pushsubscriptions AS target
+            USING (SELECT @mangaId AS t_manga_id, @endpoint AS t_endpoint) AS source
+            ON target.manga_id = source.t_manga_id AND target.endpoint = source.t_endpoint
+            WHEN MATCHED THEN UPDATE SET p256dh = @p256dh, auth = @auth
+            WHEN NOT MATCHED THEN INSERT (manga_id, endpoint, p256dh, auth) 
+            VALUES (@mangaId, @endpoint, @p256dh, @auth);
         `, { mangaId, endpoint, p256dh, auth });
 
         return { success: true, message: 'Subscribed successfully' };

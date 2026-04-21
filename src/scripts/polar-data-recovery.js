@@ -22,7 +22,7 @@ async function performPolarRecovery() {
         
         // 4. Reset stuck tasks
         console.log('[4/4] Resetting stuck crawler tasks...');
-        await query("UPDATE crawlertasks SET status = 'pending' WHERE status = 'processing' AND updated_at < NOW() - INTERVAL '30 minutes'");
+        await query("UPDATE crawlertasks SET status = 'pending' WHERE status = 'processing' AND updated_at < DATEADD(minute, -30, GETDATE())");
 
         console.log('--- Data Recovery Completed Successfully ---');
         process.exit(0);

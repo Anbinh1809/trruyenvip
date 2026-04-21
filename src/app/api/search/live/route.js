@@ -28,32 +28,14 @@ export async function GET(request) {
 
     try {
         let res;
-        try {
-            // PRIMARY: Trigram similarity match
-            res = await query(`
-                SELECT ${MANGA_CARD_FIELDS}
-                FROM manga 
-                WHERE normalized_title % @q 
-                OR normalized_title LIKE CONCAT('%', @q, '%')
-                OR alternative_titles % @q
-                ORDER BY 
-                    similarity(normalized_title, @q) DESC,
-                    views_at_source DESC,
-                    last_crawled DESC
-                LIMIT 6
-            `, { q: cleanQ });
-        } catch {
-            // FALLBACK: LIKE search if pg_trgm not available
-            res = await query(`
-                SELECT ${MANGA_CARD_FIELDS}
-                FROM manga 
-                WHERE normalized_title LIKE CONCAT('%', @q, '%')
-                OR alternative_titles LIKE CONCAT('%', @q, '%')
-                ORDER BY views_at_source DESC, last_crawled DESC
-                LIMIT 6
-            `, { q: cleanQ });
-        }
-
+        // MATCH: LIKE search (SQL Server native)
+        res = await query(`
+            SELECT TOP(6) ${MANGA_CARD_FIELDS}
+            FROM manga 
+            WHERE normalized_title LIKE CONCAT('%', @q, '%')
+            OR alternative_titles LIKE CONCAT('%', @q, '%')
+            ORDER BY views_at_source DESC, last_crawled DESC
+        `, { q: cleanQ });
         const results = (res.recordset || []).map(m => {
             const w = 100;
             const qv = 75;
