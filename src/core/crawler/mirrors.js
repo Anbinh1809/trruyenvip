@@ -4,16 +4,21 @@
  */
 
 export const SOURCES = {
-    NETTRUYEN: 'https://nettruyeno.com/',
+    NETTRUYEN: 'https://nettruyenonl.com/',
     NETTRUYEN_MIRRORS: [
+        'https://nettruyenup.com/',
+        'https://nettruyenonl.com/',
         'https://nettruyeno.com/',
         'https://nettruyenviet10.com/',
         'https://nettruyenqq.net/',
+        'https://nettruyenking.com/',
     ],
-    TRUYENQQ: 'https://truyenqqno.com/',
+    TRUYENQQ: 'https://truyenqqviet.com/',
     TRUYENQQ_MIRRORS: [
+        'https://truyenqqviet.com/',
         'https://truyenqqno.com/',
         'https://truyenqqq.com/',
+        'https://truyenqqvn.com/',
     ]
 };
 

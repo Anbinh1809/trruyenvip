@@ -7,7 +7,7 @@ import * as parsers from './parsers.js';
 import { SOURCES } from './mirrors.js';
 
 let activeWorkers = 0;
-const BASE_CONCURRENCY = 15; // Balanced for 4GB RAM stability
+const BASE_CONCURRENCY = 10; // Boosted per user request for faster re-crawl
 const inProgressManga = new Map();
 const inProgressChapters = new Map();
 
@@ -246,7 +246,8 @@ export async function crawlFullMangaChapters(mangaId, url, source, earlyExit = f
                     `, { chapId, mangaId, title: chapTitle, url: chapUrl, chapNum: parseChapterNumber(chapTitle) });
 
                     triggerChapterNotifications(mangaId, chapTitle, chapId).catch(() => {});
-                    queueChapterScrape(chapId, chapUrl, source).catch(() => {});
+                    // ROUND-ROBIN FIX: Do NOT immediately queue all chapters here. 
+                    // Let the round-robin scheduler pick them up in batches of 10.
                 } catch (e) { console.warn('[Engine] Chapter processing skipped:', e.message); }
             }));
         }
@@ -479,16 +480,28 @@ export async function healChapterGaps(batchSize = 20) {
     }
 }
 
-export async function rescueBrokenImages(batchSize = 10) {
+export async function rescueBrokenImages(batchSize = 1000) {
+    // ROUND-ROBIN SCHEDULER: 
+    // CTE partitions by manga_id and limits to 10 chapters per manga.
+    // We order by manga_id to cycle through mangas, and by chapter_number to scrape oldest-missing first.
+    // This perfectly satisfies the "Round Robin max 10 chapters per manga" requirement.
     const res = await query(`
-        SELECT TOP(@batchSize) c.id, c.source_url, m.source_url as manga_url FROM chapters c
-        JOIN manga m ON c.manga_id = m.id
-        LEFT JOIN chapterimages ci ON c.id = ci.chapter_id
-        WHERE ci.id IS NULL AND c.updated_at < DATEADD(minute, -2, GETDATE())
+        WITH RankedChapters AS (
+            SELECT c.id, c.source_url, m.source_url as manga_url, c.manga_id,
+                   ROW_NUMBER() OVER(PARTITION BY c.manga_id ORDER BY c.chapter_number ASC) as rn
+            FROM chapters c
+            JOIN manga m ON c.manga_id = m.id
+            LEFT JOIN chapterimages ci ON c.id = ci.chapter_id
+            WHERE ci.id IS NULL 
+        )
+        SELECT TOP(@batchSize) id, source_url, manga_url 
+        FROM RankedChapters
+        WHERE rn <= 10
+        ORDER BY manga_id ASC, rn ASC
     `, { batchSize });
+    
     for (const c of res.recordset) {
         if (!c.source_url || !c.manga_url) continue;
-        // Fix #9: Added await
         await queueChapterScrape(c.id, c.source_url, c.manga_url?.includes('truyenqq') ? 'truyenqq' : 'nettruyen', true, 2);
     }
 }

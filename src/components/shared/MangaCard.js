@@ -111,7 +111,7 @@ function MangaCard({ manga, isNew = false, priority = false }) {
       </h3>
       <p className="card-chapter-centered">
         {manga.last_chap_num ? (
-            `Chương ${manga.last_chap_num}`
+            manga.last_chap_num.toString().startsWith('Chương') ? manga.last_chap_num : `Chương ${manga.last_chap_num}`
         ) : 'Đang cập nhật'}
       </p>
 

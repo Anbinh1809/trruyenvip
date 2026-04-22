@@ -185,6 +185,43 @@ export default function AdminCrawlerPage() {
         </section>
 
         <section className="crawler-stats-grid fade-in">
+            <div className="telemetry-card-titan shadow-titan" style={{ gridColumn: '1 / -1' }}>
+                <div className="telemetry-label-titan"><Database size={14} /> TASK QUEUE STATUS</div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginTop: '10px' }}>
+                    <div style={{ padding: '15px', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', borderLeft: '3px solid var(--accent)' }}>
+                        <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', marginBottom: '5px' }}>Đang xử lý (Processing)</div>
+                        <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--text-primary)' }}>
+                            {telemetry?.taskCounts?.processing || 0} <span style={{ fontSize: '12px', fontWeight: 'normal', color: 'rgba(255,255,255,0.5)' }}>tác vụ</span>
+                        </div>
+                        <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '5px' }}>Đang chạy song song trên các luồng.</div>
+                    </div>
+                    
+                    <div style={{ padding: '15px', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', borderLeft: '3px solid #f39c12' }}>
+                        <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', marginBottom: '5px' }}>Đang chờ (Pending)</div>
+                        <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#f39c12' }}>
+                            {telemetry?.taskCounts?.pending || 0} <span style={{ fontSize: '12px', fontWeight: 'normal', color: 'rgba(255,255,255,0.5)' }}>tác vụ</span>
+                        </div>
+                        <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '5px' }}>Batch lô Round-Robin chờ tải.</div>
+                    </div>
+
+                    <div style={{ padding: '15px', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', borderLeft: '3px solid #2ecc71' }}>
+                        <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', marginBottom: '5px' }}>Đã hoàn thành (Completed)</div>
+                        <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#2ecc71' }}>
+                            {telemetry?.taskCounts?.completed || 0} <span style={{ fontSize: '12px', fontWeight: 'normal', color: 'rgba(255,255,255,0.5)' }}>tác vụ</span>
+                        </div>
+                        <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '5px' }}>Tải ảnh thành công.</div>
+                    </div>
+
+                    <div style={{ padding: '15px', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', borderLeft: '3px solid #e74c3c' }}>
+                        <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', marginBottom: '5px' }}>Lỗi / Bị chặn (Failed)</div>
+                        <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#e74c3c' }}>
+                            {telemetry?.taskCounts?.failed || 0} <span style={{ fontSize: '12px', fontWeight: 'normal', color: 'rgba(255,255,255,0.5)' }}>tác vụ</span>
+                        </div>
+                        <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '5px' }}>Bị chặn bởi Cloudflare/Bot detect.</div>
+                    </div>
+                </div>
+            </div>
+
             <div className="telemetry-card-titan shadow-titan">
                 <div className="telemetry-label-titan"><Activity size={14} /> DISCOVERY ENGINE</div>
                 <div className="telemetry-flex">

@@ -52,14 +52,16 @@ export async function purgeOrphans() {
         
         // Orphaned images
         await query(`
-            DELETE FROM chapterimages 
-            WHERE chapter_id NOT IN (SELECT id FROM chapters)
+            DELETE ci FROM chapterimages ci 
+            LEFT JOIN chapters c ON ci.chapter_id = c.id
+            WHERE c.id IS NULL
         `);
 
         // Orphaned genre links
         await query(`
-            DELETE FROM mangagenres 
-            WHERE manga_id NOT IN (SELECT id FROM manga)
+            DELETE mg FROM mangagenres mg
+            LEFT JOIN manga m ON mg.manga_id = m.id
+            WHERE m.id IS NULL
         `);
 
         // Old notifications
