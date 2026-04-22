@@ -66,7 +66,7 @@ export const POST = withTitan({
 
                 // 5. Grant Reward
                 await query(
-                    'UPDATE users SET vipcoins = vipcoins + @reward, xp = xp + 5 WHERE uuid = @userUuid',
+                    'UPDATE users SET [vipCoins] = [vipCoins] + @reward, xp = xp + 5 WHERE uuid = @userUuid',
                     { reward, userUuid },
                     tx
                 );

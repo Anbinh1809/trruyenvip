@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -23,17 +23,21 @@ export default function LeaderboardPage() {
 
   useEffect(() => {
     const fetchLeaders = async () => {
-        try {
-            const res = await fetch('/api/leaderboard');
-            if (res.ok) {
-                const data = await res.json();
-                setLeaders(data);
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
+            
+            try {
+                const res = await fetch('/api/leaderboard', { signal: controller.signal });
+                if (res.ok) {
+                    const data = await res.json();
+                    setLeaders(Array.isArray(data) ? data : []);
+                }
+            } catch (e) {
+                console.error('Failed to fetch leaderboard', e);
+            } finally {
+                clearTimeout(timeoutId);
+                setLoading(false);
             }
-        } catch (e) {
-            console.error('Failed to fetch leaderboard', e);
-        } finally {
-            setLoading(false);
-        }
     };
     
     fetchLeaders();
@@ -109,17 +113,10 @@ export default function LeaderboardPage() {
                                 </div>
                             </div>
 
-                            <div className="rank-values-group-titan">
                                 <div className="rank-xp-industrial">
-                                    <div className="xp-value-industrial">{new Intl.NumberFormat().format(player.xp)}</div>
+                                    <div className="xp-value-industrial">{new Intl.NumberFormat().format(player.xp || 0)}</div>
                                     <div className="xp-label-industrial">TỔNG XP</div>
                                 </div>
-                                <div className="v-divider-titan" />
-                                <div className="rank-coins-industrial">
-                                    <div className="coin-value-industrial">{new Intl.NumberFormat().format(leaders.find(l => l.username === player.name)?.vipcoins || 0)}</div>
-                                    <div className="coin-label-industrial">VIPCOINS</div>
-                                </div>
-                            </div>
                         </div>
                     ))}
                 </div>

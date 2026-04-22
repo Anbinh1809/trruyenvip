@@ -35,8 +35,8 @@
   --shadow-accent: 0 0 20px -5px var(--accent-glow);
 
   --border-radius: 14px;
-  --font-body: var(--font-inter), 'Inter', system-ui, sans-serif;
-  --font-heading: var(--font-inter), 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', var(--font-inter), system-ui, sans-serif;
+  --font-heading: 'Outfit', var(--font-outfit), system-ui, sans-serif;
   
   /* Z-Index Architecture */
   --z-header: 1000;

@@ -1,8 +1,8 @@
 import sharp from 'sharp';
 import { query } from '@/core/database/connection';
 
-// RAM OPTIMIZATION: Enable Sharp cache with a 50MB limit to balance speed vs memory
-sharp.cache({ memory: 50, items: 100, files: 20 });
+// RAM OPTIMIZATION: Ultra-lean cache for 4GB stability
+sharp.cache({ memory: 25, items: 50, files: 10 });
 
 import { generateProxySignature } from '@/core/security/crypto';
 
@@ -33,14 +33,14 @@ export async function GET(request) {
   const allowedDomains = [
     // PRIMARY MIRRORS & CDN
     'nettruyenplus.com', 'nettruyenfull.com', 'nettruyentop.com', 'nettruyenviet.com', 'nettruyen.us.com', 'nettruyenus.com', 'nettruyennew.com', 'nettruyenon.com',
-    'nettruyentv.com', 'nettruyenv.com', 'nettruyenmax.com', 'nettruyenpro.com',
-    'nettruyenco.vn', 'nettruyenio.com', 'truyenqqplus.com', 'truyenqqno.com', 'truyenqq.top',
-    'truyenqq.info', 'truyenqq.nu', 'truyenqqvn.com', 'truyenqqio.com', 'truyenqqq.com',
+    'nettruyentv.com', 'nettruyenv.com', 'nettruyenmax.com', 'nettruyenpro.com', 'nettruyeno.com', 'nettruyenco.com', 'nettruyenoo.com', 'nettruyenbb.com',
+    'nettruyenco.vn', 'nettruyenio.com', 'truyenqqplus.com', 'truyenqqno.com', 'truyenqq.top', 'nettruyenviet10.com', 'nettruyenviet1.com',
+    'truyenqq.info', 'truyenqq.nu', 'truyenqqvn.com', 'truyenqqio.com', 'truyenqqq.com', 'ye2030.co.uk',
     
     // IMAGE SERVERS & CDNs
-    'nt-cdn.xyz', 'nt-cdn.com', 'nt-cdn1.xyz', 'nt-cdn2.xyz',
+    'nt-cdn.xyz', 'nt-cdn.com', 'nt-cdn1.xyz', 'nt-cdn2.xyz', 'nt-cdn3.xyz', 'nt-cdn4.xyz', 'nt-cdn5.xyz',
     'imagetruyen.com', 'st.nettruyen.com', 'st.nettruyennew.com',
-    'st.nhattruyen.com', 'hinhhinh.com', 'truyenvua.com'
+    'st.nhattruyen.com', 'hinhhinh.com', 'truyenvua.com', 'nhattruyenvv.com'
   ];
   
   try {

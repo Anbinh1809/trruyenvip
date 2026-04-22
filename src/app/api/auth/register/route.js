@@ -45,7 +45,7 @@ export const POST = withTitan({
             // Create user (Hardened: Atomic insertion with unique violation catch)
             try {
                 await query(`
-                    INSERT INTO users (uuid, username, email, password_hash, xp, vipcoins, role)
+                    INSERT INTO users (uuid, username, email, password_hash, xp, [vipCoins], role)
                     VALUES (@uuid, @username, @email, @password_hash, 0, 0, 'user')
                 `, {
                     uuid: uuid,

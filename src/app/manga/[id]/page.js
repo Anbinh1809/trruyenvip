@@ -148,7 +148,7 @@ export default async function MangaDetailPage({ params }) {
         '@type': 'ComicSeries',
         'name': manga.title,
         'description': manga.description,
-        'image': `https://truyenvip.com${getSignedProxyUrl(manga.rawCover || manga.cover, 800, 75)}`,
+        'image': `https://truyenvip.com${getSignedProxyUrl(manga.rawCover || manga.cover || '', 800, 75)}`,
         'author': {
           '@type': 'Person',
           'name': manga.author || 'Đang cập nhật'

@@ -14,8 +14,7 @@ export const GET = withTitan({
       }
 
       // FETCH FULL RECORD to ensure the freshest stats and mission data
-      const res = await query(`
-        SELECT uuid, username, email, role, avatar, xp, vipcoins, mission_data 
+        SELECT uuid, username, email, role, avatar, xp, [vipCoins], mission_data 
         FROM users 
         WHERE uuid = @uuid
       `, { uuid: session.uuid });
@@ -36,7 +35,7 @@ export const GET = withTitan({
           role: user.role,
           avatar: user.avatar,
           xp: user.xp,
-          vipCoins: user.vipcoins, // Mapping DB naming to camelCase
+          vipCoins: user.vipCoins, // Fixed: Use exact DB case
           missionData: user.mission_data
         }
       };

@@ -64,8 +64,8 @@ export async function register() {
             // - Bảo trì DB lúc 3:00 SA: dọn log cũ, tối ưu index
             cron.schedule('0 3 * * *', () => runFullMaintenance().catch(e => console.error('[Cron] Maintenance error:', e.message)), { timezone: 'Asia/Ho_Chi_Minh' });
 
-            // 5. Chạy light pulse ngay khi khởi động để có dữ liệu mới nhất
-            runPulse('light').catch(() => {});
+            // 5. Disabled auto-pulse to avoid startup OOM/Hangs
+            // runPulse('light').catch(() => {});
 
             console.log('[Guardian] 🚀 Titan Crawler Scheduler ACTIVATED.');
             console.log('[Guardian]    ⚡ Light pulse  : every 4 hours');

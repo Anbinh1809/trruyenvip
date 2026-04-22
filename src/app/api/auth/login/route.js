@@ -68,7 +68,7 @@ export const POST = withTitan({
                     username: user.username, 
                     uuid: user.uuid, 
                     xp: user.xp, 
-                    vipCoins: user.vipcoins, 
+                    vipCoins: user.vipCoins, 
                     role: user.role 
                 }
             };

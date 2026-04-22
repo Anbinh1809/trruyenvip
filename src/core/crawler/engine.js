@@ -7,7 +7,7 @@ import * as parsers from './parsers.js';
 import { SOURCES } from './mirrors.js';
 
 let activeWorkers = 0;
-const BASE_CONCURRENCY = 25;
+const BASE_CONCURRENCY = 15; // Balanced for 4GB RAM stability
 const inProgressManga = new Map();
 const inProgressChapters = new Map();
 

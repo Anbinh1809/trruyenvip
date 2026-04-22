@@ -16,6 +16,8 @@ export const metadata = {
   keywords: ['đọc truyện tranh', 'nettruyen', 'truyenqq', 'manga online', 'truyenvip', 'truyện hot'],
 };
 
+import { getSignedProxyUrl } from '@/core/security/crypto';
+
 async function getManga() {
   try {
         const result = await query(`
@@ -26,7 +28,7 @@ async function getManga() {
 
     return (result.recordset || []).map(m => ({
       ...m,
-      cover: m.cover || '/placeholder-manga.svg',
+      cover: m.cover ? getSignedProxyUrl(m.cover, 300, 450) : '/placeholder-manga.svg',
     }));
   } catch (err) {
     console.error('DB Fetch Error:', err.message);

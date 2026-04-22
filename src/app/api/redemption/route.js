@@ -63,13 +63,13 @@ export const POST = withTitan({
             return await withTransaction(async (client) => {
                 // TITAN ATOMICITY: Check and Deduct in one operation to prevent double-spending race conditions
                 const updateRes = await query(
-                    'UPDATE users SET vipcoins = vipcoins - @cost WHERE uuid = @uuid AND vipcoins >= @cost',
+                    'UPDATE users SET [vipCoins] = [vipCoins] - @cost WHERE uuid = @uuid AND [vipCoins] >= @cost',
                     { cost, uuid: session.uuid },
                     client
                 );
      
                 if (updateRes.rowCount === 0) {
-                    const userRes = await query('SELECT vipcoins FROM users WHERE uuid = @uuid', { uuid: session.uuid }, client);
+                    const userRes = await query('SELECT [vipCoins] FROM users WHERE uuid = @uuid', { uuid: session.uuid }, client);
                     if (!userRes.recordset?.[0]) throw new Error('Người dùng không tồn tại.');
                     throw new Error('Số dư VipCoins không đủ.');
                 }
@@ -124,7 +124,7 @@ export const PATCH = withTitan({
 
                     // Refund coins (card_value * 1000 is the original cost)
                     const refundAmount = (record.card_value || 0) * 1000;
-                    await query('UPDATE users SET vipcoins = vipcoins + @refund WHERE uuid = @uuid',
+                    await query('UPDATE users SET [vipCoins] = [vipCoins] + @refund WHERE uuid = @uuid',
                         { refund: refundAmount, uuid: record.user_uuid }, tx
                     );
                     await query('UPDATE redemptionrequests SET status = @status WHERE id = @id',

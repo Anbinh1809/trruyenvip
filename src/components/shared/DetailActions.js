@@ -107,7 +107,7 @@ export default function DetailActions({ mangaId, firstChapterId, mangaTitle, man
                     display: flex;
                     flex-direction: column;
                     gap: 15px;
-                    margin-top: 20px;
+                    margin-top: 30px;
                 }
                 .action-row-main {
                     display: grid;
@@ -118,39 +118,42 @@ export default function DetailActions({ mangaId, firstChapterId, mangaTitle, man
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    gap: 10px;
-                    padding: 12px 20px;
-                    border-radius: 6px;
+                    gap: 12px;
+                    padding: 16px 24px;
+                    border-radius: 14px;
                     font-size: 0.95rem;
-                    font-weight: 800;
-                    color: var(--text-primary);
+                    font-weight: 950;
+                    color: white;
                     text-decoration: none;
                     border: none;
                     cursor: pointer;
-                    transition: all 0.2s;
-                    text-transform: none;
+                    transition: all 0.4s var(--ease-titan);
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
                 }
                 .btn-green {
-                    background-color: var(--accent);
-                    box-shadow: 0 4px 15px rgba(255, 62, 62, 0.2);
+                    background: var(--accent-gradient);
+                    box-shadow: 0 10px 20px rgba(255, 62, 62, 0.2);
                 }
                 .btn-green:hover {
-                    filter: brightness(1.1);
-                    transform: translateY(-2px);
-                    box-shadow: 0 8px 25px rgba(255, 62, 62, 0.3);
+                    transform: translateY(-4px) scale(1.02);
+                    box-shadow: 0 20px 40px rgba(255, 62, 62, 0.4);
                 }
                 .btn-purple {
-                    background-color: var(--bg-secondary);
+                    background: var(--nebula-glass);
                     color: var(--text-primary);
                     border: 1px solid var(--glass-border);
+                    backdrop-filter: blur(10px);
                 }
                 .btn-purple:hover {
-                    background-color: var(--nebula-glass);
-                    transform: translateY(-2px);
+                    background: var(--glass-border);
+                    transform: translateY(-4px);
+                    border-color: var(--accent);
                 }
                 .disabled-mirror {
                     opacity: 0.5;
                     cursor: not-allowed;
+                    filter: grayscale(1);
                 }
                 @media (max-width: 480px) {
                     .action-row-main {

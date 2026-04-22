@@ -79,7 +79,7 @@ export const POST = withTitan({
             await query(`
                 UPDATE users 
                 SET xp = xp + @xp, 
-                    vipcoins = vipcoins + @coins,
+                    [vipCoins] = [vipCoins] + @coins,
                     mission_data = @missionData,
                     last_stats_update = GETDATE()
                 WHERE uuid = @uuid

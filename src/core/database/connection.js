@@ -6,7 +6,21 @@ const connectionString = (rawUrl && rawUrl !== 'undefined' && rawUrl.trim() !== 
     ? rawUrl 
     : 'Server=localhost;Database=truyenvip;User Id=sa;Password=123456;TrustServerCertificate=true;';
 
-const pool = new sql.ConnectionPool(connectionString);
+const config = connectionString.includes(';') 
+    ? {
+        server: connectionString.match(/Server=([^;]+)/)?.[1] || 'localhost',
+        database: connectionString.match(/Database=([^;]+)/)?.[1] || 'truyenvip',
+        user: connectionString.match(/User Id=([^;]+)/)?.[1] || 'sa',
+        password: connectionString.match(/Password=([^;]+)/)?.[1] || '123456',
+        options: {
+            trustServerCertificate: true,
+            encrypt: false
+        },
+        pool: { max: 50, min: 0, idleTimeoutMillis: 30000 }
+    }
+    : connectionString; // Assume it's already a config object or URL
+
+const pool = new sql.ConnectionPool(config);
 let poolConnect;
 
 function getPoolConnect() {
