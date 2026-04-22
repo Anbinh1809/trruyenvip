@@ -49,8 +49,9 @@ export function cleanTitleForSearch(title) {
 export function parseChapterNumber(title) {
     if (!title) return null;
     
-    // Support for: Chương, Chapter, Chap, Ch, C, Hồi
-    const standardMatch = title.match(/(?:chương|chapter|chap|ch|c|hồi|hoi|[\s])\s*(\d+(?:\.\d+)?)/i);
+    // Support for: Chương, Chapter, Chap, Ch, Hồi
+    // N2 FIX: Removed [\s] wildcard that caused false positives (e.g. "ABC 2024" → 2024)
+    const standardMatch = title.match(/(?:chương|chapter|chap|ch\.|hồi|hoi)\s*(\d+(?:\.\d+)?)/i);
     if (standardMatch) {
         let num = parseFloat(standardMatch[1]);
         

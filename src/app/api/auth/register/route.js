@@ -22,7 +22,8 @@ export const POST = withTitan({
             // --- GATEKEEPER VALIDATION: Infiltration Shield ---
             // Allow Vietnamese characters, alphanumeric and underscore. Strip HTML.
             const cleanUsername = username.replace(/<[^>]*>?/gm, '').trim();
-            const isValidUsername = /^[a-zA-Z0-9_\u00C0-\u1EF9\s]+$/.test(cleanUsername);
+            // N5 FIX: Removed \s — spaces should not be allowed in usernames
+            const isValidUsername = /^[a-zA-Z0-9_\u00C0-\u1EF9]+$/.test(cleanUsername);
 
             if (!isValidUsername || cleanUsername.length < 3) {
                 throw { status: 400, message: 'Tên đăng nhập không hợp lệ hoặc quá ngắn (tối thiểu 3 ký tự, không dùng ký tự đặc biệt)' };

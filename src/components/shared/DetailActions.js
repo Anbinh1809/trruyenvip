@@ -1,10 +1,10 @@
-﻿'use client';
+'use client';
 
 import { useState, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import { BookOpen, Share2, Play, Heart } from 'lucide-react';
 import FavoriteButton from './FavoriteButton';
-import { getSignedProxyUrl } from '@/core/security/crypto';
+
 import { useHistory } from '@/contexts/HistoryContext';
 import { useToast } from '@/components/widgets/ToastProvider';
 
@@ -37,7 +37,7 @@ export default function DetailActions({ mangaId, firstChapterId, mangaTitle, man
                             const link = document.createElement('link');
                             link.rel = 'prefetch';
                             link.as = 'image';
-                            link.href = getSignedProxyUrl(img.image_url, w, q);
+                            link.href = img;
                             document.head.appendChild(link);
                         });
                         setPreloaded(true);

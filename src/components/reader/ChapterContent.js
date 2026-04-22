@@ -1,10 +1,10 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import RecrawlButton from '@/components/shared/RecrawlButton';
 import { Link as LinkIcon, AlertCircle, RefreshCw, Eye } from 'lucide-react';
 import { useReaderKeys } from '@/hooks/useReaderKeys';
-import { getSignedProxyUrl } from '@/core/security/crypto';
+
 import { useHistory } from '@/contexts/HistoryContext';
 
 export default function ChapterContent({ mangaId, chapter, nextChapterId, prevChapterId, initialImages = [] }) {
@@ -82,9 +82,7 @@ export default function ChapterContent({ mangaId, chapter, nextChapterId, prevCh
                         if (isHiFi) { w = 1800; q = 95; }
                         else if (isTurbo) { w = 800; q = 60; }
 
-                        setImages(data.images.map(img => 
-                            getSignedProxyUrl(img.image_url, w, q)
-                        ));
+                        setImages(data.images);
                         setIsSyncing(false);
                         stopPolling();
                     }
@@ -122,9 +120,7 @@ export default function ChapterContent({ mangaId, chapter, nextChapterId, prevCh
                             if (isHiFi) { w = 1800; q = 95; }
                             else if (isTurbo) { w = 800; q = 60; }
 
-                            setImages(imgData.images.map(img =>
-                                getSignedProxyUrl(img.image_url, w, q)
-                            ));
+                            setImages(imgData.images);
                             setIsSyncing(false);
                             return;
                         }

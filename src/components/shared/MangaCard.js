@@ -7,12 +7,10 @@ import { useFavorites } from '@/contexts/FavoritesContext';
 import { Bookmark, Star, Eye } from 'lucide-react';
 import { useIsMounted } from '@/hooks/useIsMounted';
 
-import { getSignedProxyUrl } from '@/core/security/crypto';
+// Pre-signed Proxy URLs are provided by Server Component / API
 
 function MangaCard({ manga, isNew = false, priority = false }) {
-  const coverUrl = manga.cover 
-    ? (manga.cover.includes('/api/proxy') ? manga.cover : getSignedProxyUrl(manga.cover, 400, 75)) 
-    : '/placeholder-manga.svg';
+  const coverUrl = manga.cover || '/placeholder-manga.svg';
     
   const [imgSrc, setImgSrc] = useState(coverUrl);
   const [isLoaded, setIsLoaded] = useState(false);

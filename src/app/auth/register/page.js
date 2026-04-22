@@ -32,7 +32,7 @@ export default function RegisterPage() {
     // TITAN IDENTITY: Ensure device UUID is present
     let uuid = localStorage.getItem('truyenvip_user_uuid');
     if (!uuid) {
-        uuid = 'user-' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        uuid = 'user-' + crypto.randomUUID();
         localStorage.setItem('truyenvip_user_uuid', uuid);
     }
     

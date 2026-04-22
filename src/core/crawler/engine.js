@@ -116,11 +116,17 @@ export async function processQueue() {
     if (activeWorkers >= limit) return;
 
     const needed = Math.max(1, limit - activeWorkers);
+    // N1 FIX: Use subquery with ORDER BY to ensure high-priority tasks are picked first
+    // SQL Server UPDATE TOP doesn't guarantee order without this pattern
     const pickRes = await query(`
-        UPDATE TOP(@needed) crawlertasks WITH (UPDLOCK, READPAST)
+        UPDATE crawlertasks
         SET status = 'processing', updated_at = GETDATE()
         OUTPUT inserted.id, inserted.type, inserted.target
-        WHERE status = 'pending'
+        WHERE id IN (
+            SELECT TOP(@needed) id FROM crawlertasks WITH (UPDLOCK, READPAST)
+            WHERE status = 'pending'
+            ORDER BY priority DESC, created_at ASC
+        )
     `, { needed });
 
     const tasks = pickRes.recordset || [];
@@ -190,7 +196,7 @@ export async function crawlFullMangaChapters(mangaId, url, source, earlyExit = f
 
     try {
         const response = await fetchWithRetry(url, { isDiscovery: true });
-        try { updateMirrorHealth(new URL(url).hostname, true); } catch {}
+        try { updateMirrorHealth(new URL(url).hostname, true); } catch (e) { console.warn('[Engine] Mirror health update failed:', e.message); }
         
         const html = response.data;
         const metadata = source === 'nettruyen' ? parsers.parseNetTruyenManga(html, url) : parsers.parseTruyenQQManga(html, url);
@@ -242,7 +248,7 @@ export async function crawlFullMangaChapters(mangaId, url, source, earlyExit = f
 
                     triggerChapterNotifications(mangaId, chapTitle, chapId).catch(() => {});
                     queueChapterScrape(chapId, chapUrl, source).catch(() => {});
-                } catch {}
+                } catch (e) { console.warn('[Engine] Chapter processing skipped:', e.message); }
             }));
         }
 
@@ -271,7 +277,7 @@ export async function triggerChapterNotifications(mangaId, chapTitle, chapId) {
             link: `/manga/${mangaId}/chapter/${chapId}`,
             manga_id: mangaId
         })));
-    } catch {}
+    } catch (e) { console.warn('[Engine] Notification trigger failed:', e.message); }
 }
 
 export async function crawlLatest(source = 'nettruyen', pageCount = 1, startPage = 1) {

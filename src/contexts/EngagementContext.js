@@ -198,7 +198,7 @@ export function EngagementProvider({ children }) {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const savedXp = parseInt(localStorage.getItem('truyenvip_xp') || '0');
+    const savedXpStr = localStorage.getItem('truyenvip_xp');
     setMounted(true);
 
     const handleStorageChange = (e) => {
@@ -341,49 +341,59 @@ export function EngagementProvider({ children }) {
     }
 
     dispatch({ type: 'CHECK_IN', today, nextStreak });
-    const xpReward = 50 + (nextStreak * 10);
-    const coinReward = 100 + (nextStreak * 20);
+    // N3 FIX: Aligned rewards with server-side API (checkin/route.js)
+    // Server gives: 10 coins base + 5 XP, with 100 coin bonus on 7-day streak
+    const xpReward = 5;
+    const coinReward = 10;
     addXp(xpReward, true);
     addCoins(coinReward, true);
 
-    let msg = `Điểm danh thành công! Nhận ${xpReward} XP & ${coinReward} VipCoins.`;
-    if (nextStreak === 7) {
-        addCoins(1000, true);
-        msg += " CHÚC MỪNG: Thưởng chuỗi 7 ngày +1000 VipCoins!";
+    let msg = `Điểm danh thành công! Nhận ${coinReward} xu & ${xpReward} XP.`;
+    if (nextStreak % 7 === 0) {
+        addCoins(100, true);
+        msg += " CHÚC MỪNG: Thưởng chuỗi 7 ngày +100 xu!";
     }
     if (addToast) addToast(msg, 'success');
     return { success: true, msg };
   }, [state.lastCheckIn, state.checkInStreak, addXp, addCoins, addToast]);
 
-  const openChest = useCallback((missionId) => {
+  const openChest = useCallback(async (missionId) => {
     const m = state.dailyMissions.missions.find(mi => mi.id === missionId);
-    if (!m || m.claimed || m.current < m.target) return;
+    if (!m || m.claimed || m.current < m.target) return null;
 
-    const currentRank = [...RANKS].reverse().find(r => state.level >= r.lv);
-    const chestType = currentRank ? currentRank.chest : 'Wood';
-    const chest = CHEST_DATA[chestType];
-    const rand = Math.random() * 100;
-    let accumulated = 0;
-    let prize = null;
+    try {
+        const res = await fetch('/api/user/chest', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                missionId, 
+                missionData: state.dailyMissions 
+            })
+        });
 
-    for (const item of chest.loot) {
-        accumulated += item.weight;
-        if (rand <= accumulated) {
-            const amount = Math.floor(Math.random() * (item.range[1] - item.range[0] + 1)) + item.range[0];
-            prize = { type: item.type, amount, name: chest.name };
-            break;
+        if (res.ok) {
+            const data = await res.json();
+            const prize = data.prize;
+            
+            // Note: Since server already updated DB, we just update local state
+            dispatch({ type: 'CLAIM_MISSION', missionId });
+            
+            if (prize.type === 'xp') addXp(prize.amount, true);
+            else addCoins(prize.amount, true);
+            
+            if (addToast) addToast(`Mở ${prize.name}: +${prize.amount} ${prize.type === 'xp' ? 'XP' : 'VipCoins'}`, prize.type === 'xp' ? 'xp' : 'coin');
+            
+            return { ...prize, chestName: prize.name || 'Rương Thưởng' };
+        } else {
+            const err = await res.json();
+            if (addToast) addToast(err.error || 'Có lỗi xảy ra khi mở rương', 'error');
+            return null;
         }
+    } catch (e) {
+        if (addToast) addToast('Lỗi mạng khi liên kết với kho bạc Titan.', 'error');
+        return null;
     }
-
-    if (prize) {
-        dispatch({ type: 'CLAIM_MISSION', missionId });
-        if (prize.type === 'xp') addXp(prize.amount, true);
-        else addCoins(prize.amount, true);
-        if (addToast) addToast(`Mở ${prize.name}: +${prize.amount} ${prize.type === 'xp' ? 'XP' : 'VipCoins'}`, prize.type === 'xp' ? 'xp' : 'coin');
-        return { ...prize, chestName: chest.name };
-    }
-    return null;
-  }, [state.dailyMissions, state.level, addXp, addCoins, addToast]);
+  }, [state.dailyMissions, addXp, addCoins, addToast]);
 
   const getRankInfo = useCallback((currentXp) => {
     const calculatedLevel = Math.floor(currentXp / 100) + 1;

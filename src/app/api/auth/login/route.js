@@ -33,10 +33,13 @@ export const POST = withTitan({
             `, { id: idLower });
             const user = res.recordset?.[0];
 
+            // M5 FIX: Unified error messages to prevent user enumeration attacks
+            const GENERIC_LOGIN_ERROR = 'Tên đăng nhập hoặc mật khẩu không chính xác';
+
             if (!user) {
                 // IRONCLAD DEFENSE: 1s delay to deter brute force
                 await new Promise(r => setTimeout(r, 1000));
-                throw { status: 400, message: 'Người dùng không tồn tại' };
+                throw { status: 401, message: GENERIC_LOGIN_ERROR };
             }
 
             // Verify password
@@ -44,7 +47,7 @@ export const POST = withTitan({
             if (!isMatch) {
                 // IRONCLAD DEFENSE: 1s delay to deter brute force
                 await new Promise(r => setTimeout(r, 1000));
-                throw { status: 401, message: 'Mật khẩu không chính xác' };
+                throw { status: 401, message: GENERIC_LOGIN_ERROR };
             }
 
             // Sign token

@@ -143,7 +143,9 @@ async function init() {
                 user_uuid NVARCHAR(255) REFERENCES users(uuid) ON DELETE CASCADE,
                 manga_id NVARCHAR(255) REFERENCES manga(id) ON DELETE CASCADE,
                 chapter_id NVARCHAR(255) REFERENCES chapters(id),
-                updated_at DATETIME2 DEFAULT GETDATE()
+                updated_at DATETIME2 DEFAULT GETDATE(),
+                -- M4 FIX: UNIQUE constraint to prevent duplicate history records
+                CONSTRAINT uq_readhistory_user_manga UNIQUE(user_uuid, manga_id)
             );
         `);
 
@@ -185,13 +187,13 @@ async function init() {
 
         await query(`
             IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='guardianreports' and xtype='U')
+            -- C2 FIX: Removed unused 'cover' column, aligned with telemetry.js INSERT columns
             CREATE TABLE guardianreports (
                 id INT IDENTITY(1,1) PRIMARY KEY,
                 manga_name NVARCHAR(255),
                 chapter_title NVARCHAR(255),
                 event_type NVARCHAR(50),
                 message NVARCHAR(MAX),
-                cover NVARCHAR(MAX),
                 created_at DATETIME2 DEFAULT GETDATE()
             );
         `);

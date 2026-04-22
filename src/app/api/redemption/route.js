@@ -109,8 +109,33 @@ export const PATCH = withTitan({
                 throw { status: 400, message: 'Trạng thái không hợp lệ' };
             }
 
+            const parsedId = parseInt(id);
+
+            // M1 FIX: Refund VipCoins when rejecting a redemption request
+            if (status === 'Rejected') {
+                await withTransaction(async (tx) => {
+                    const reqRes = await query(
+                        'SELECT user_uuid, card_value, status as current_status FROM redemptionrequests WHERE id = @id',
+                        { id: parsedId }, tx
+                    );
+                    const record = reqRes.recordset?.[0];
+                    if (!record) throw { status: 404, message: 'Không tìm thấy bản ghi' };
+                    if (record.current_status === 'Rejected') throw { status: 400, message: 'Bản ghi này đã bị từ chối trước đó' };
+
+                    // Refund coins (card_value * 1000 is the original cost)
+                    const refundAmount = (record.card_value || 0) * 1000;
+                    await query('UPDATE users SET vipcoins = vipcoins + @refund WHERE uuid = @uuid',
+                        { refund: refundAmount, uuid: record.user_uuid }, tx
+                    );
+                    await query('UPDATE redemptionrequests SET status = @status WHERE id = @id',
+                        { status, id: parsedId }, tx
+                    );
+                });
+                return { success: true, message: 'Đã từ chối và hoàn tiền cho người dùng' };
+            }
+
             const res = await query(`UPDATE redemptionrequests SET status = @status WHERE id = @id`, { 
-                id: parseInt(id), 
+                id: parsedId, 
                 status 
             });
             

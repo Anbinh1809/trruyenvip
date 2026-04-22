@@ -17,12 +17,19 @@ export const GET = withTitan({
             const hasUsers = existingTables.includes('users');
             const hasRewards = existingTables.includes('redemptionrequests');
 
+            // C3 FIX: Avoid template literal table names — use safe conditional queries
+            const userCountQuery = hasUsers ? 'SELECT COUNT(*) as cnt FROM users' : 'SELECT 0 as cnt';
+            const rewardCountQuery = hasRewards ? 'SELECT COUNT(*) as cnt FROM redemptionrequests' : 'SELECT 0 as cnt';
+
+            const [userCountRes, rewardCountRes] = await Promise.all([
+                query(userCountQuery),
+                query(rewardCountQuery)
+            ]);
+
             const statsRes = await query(`
                 SELECT 
-                    (SELECT COUNT(*) FROM ${hasUsers ? 'users' : 'profiles'}) as "totalUsers",
                     (SELECT COUNT(*) FROM manga) as "totalManga",
                     (SELECT COUNT(*) FROM chapters) as "totalChapters",
-                    (SELECT COUNT(*) FROM ${hasRewards ? 'redemptionrequests' : 'crawlertasks WHERE 1=0'}) as "pendingRewards",
                     (SELECT COUNT(*) FROM crawlertasks WHERE status = 'pending') as "taskPending",
                     (SELECT COUNT(*) FROM crawlertasks WHERE status = 'failed') as "taskFailed",
                     (SELECT COUNT(*) FROM chapters WHERE updated_at > DATEADD(hour, -1, GETDATE())) as "syncsLastHour",
@@ -44,15 +51,14 @@ export const GET = withTitan({
                 ORDER BY "count" DESC
             `);
     
-            // Key Normalizer: Handles Postgres lowercase response keys
             const row = statsRes.recordset?.[0] || {};
             const normalize = (key) => row[key] ?? row[key.toLowerCase()] ?? 0;
 
             const baseStats = {
-                totalUsers: normalize('totalUsers'),
+                totalUsers: userCountRes.recordset?.[0]?.cnt ?? 0,
                 totalManga: normalize('totalManga'),
                 totalChapters: normalize('totalChapters'),
-                pendingRewards: normalize('pendingRewards'),
+                pendingRewards: rewardCountRes.recordset?.[0]?.cnt ?? 0,
                 taskPending: normalize('taskPending'),
                 taskFailed: normalize('taskFailed'),
                 syncsLastHour: normalize('syncsLastHour'),

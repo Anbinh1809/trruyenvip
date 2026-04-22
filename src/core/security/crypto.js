@@ -4,7 +4,7 @@
  * IMPORTANT: generateProxySignature and verifyProxySignature use Node.js `crypto`
  * and must only be called in server-side code (API routes, server components).
  *
- * getSignedProxyUrl is CLIENT-SAFE: uses a simple hash that works in browsers.
+ * getSignedProxyUrl MUST ONLY BE CALLED ON THE SERVER.
  */
 
 import crypto from 'crypto';
@@ -42,33 +42,13 @@ export function verifyProxySignature(url, w, q, sig) {
     }
 }
 
-// ── Client-safe proxy URL builder ────────────────────────────────────────────
-/**
- * Simple djb2-like hash — deterministic, no Node APIs, works in browsers.
- * Produces a 8-char hex string used as the proxy sig when called client-side.
- */
-export function simpleHash(str) {
-    let hash = 5381;
-    for (let i = 0; i < str.length; i++) {
-        hash = ((hash << 5) + hash) ^ str.charCodeAt(i);
-        hash = hash >>> 0; // Keep unsigned 32-bit
-    }
-    // TITAN PUBLIC SALT: Standardized for client/server consistency
-    const PUBLIC_SALT = 'titan-proxy-public-salt-8822';
-    for (let i = 0; i < PUBLIC_SALT.length; i++) {
-        hash = ((hash << 3) + hash) ^ PUBLIC_SALT.charCodeAt(i);
-        hash = hash >>> 0;
-    }
-    return hash.toString(16).padStart(8, '0');
-}
 
 /**
- * CLIENT-SAFE: Builds a signed proxy URL.
- * Uses simpleHash — works in browsers and on the server.
- * The proxy route accepts both HMAC sigs (16 chars) and simple sigs (8 chars).
+ * Server-Side Proxy URL Builder
+ * Generates an HMAC-signed proxy URL.
  */
 export function getSignedProxyUrl(url, w = 0, q = 75) {
     if (!url) return '/placeholder-manga.svg';
-    const sig = simpleHash(`${url}|${w}|${q}`);
+    const sig = generateProxySignature(url, w, q);
     return `/api/proxy?url=${encodeURIComponent(url)}&w=${w}&q=${q}&sig=${sig}`;
 }

@@ -35,7 +35,7 @@ export const metadata = {
     title: "TruyenVip - Đọc Truyện Tranh Cao Cấp",
     description: "Trải nghiệm đọc truyện đỉnh cao tại TruyenVip",
   },
-  manifest: '/manifest.json',
+  manifest: '/manifest.webmanifest',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
@@ -46,8 +46,8 @@ export const metadata = {
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  maximumScale: 5,
+  userScalable: true,  // L5 FIX: Allow zoom for accessibility (WCAG 2.1)
   viewportFit: 'cover',
   themeColor: '#ff3e3e',
 };

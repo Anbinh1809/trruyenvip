@@ -22,18 +22,18 @@ export const POST = withTitan({
             }
         }
 
-        const { xpDelta, coinDelta, missionData } = body;
+        const { xpDelta, missionData } = body;
         const deltaXp = parseInt(xpDelta || 0);
-        const deltaCoins = parseInt(coinDelta || 0);
 
         // Return early if no changes
-        if (deltaXp === 0 && deltaCoins === 0 && !missionData) {
+        if (deltaXp === 0 && !missionData) {
             return { success: true };
         }
 
-        // Sanity check: Lifted max limits to account for Supreme Chests (10,000 Coins) and Streaks
-        if (deltaXp > 15000 || deltaCoins > 15000) {
-            throw { status: 400, message: 'Dữ liệu bất thường (Deltas excessive)' };
+        // C4 FIX: Also reject negative deltas to prevent XP/Coins zeroing exploit
+        // Hardened: STRICT XP CAP. Clients can NEVER add VipCoins directly anymore.
+        if (deltaXp > 250 || deltaXp < -250) {
+            throw { status: 400, message: 'Dữ liệu bất thường (Delta XP excessive)' };
         }
 
         // Rate limit: 1 update per 3 seconds
@@ -50,7 +50,6 @@ export const POST = withTitan({
         await query(`
             UPDATE users 
             SET xp = xp + @xp, 
-                vipcoins = vipcoins + @coins,
                 mission_data = CASE 
                     WHEN @missionData IS NOT NULL THEN @missionData
                     ELSE mission_data 
@@ -59,7 +58,6 @@ export const POST = withTitan({
             WHERE uuid = @uuid
         `, {
             xp: deltaXp,
-            coins: deltaCoins,
             missionData: missionData ? JSON.stringify(missionData) : null,
             uuid: session.uuid
         });

@@ -4,7 +4,7 @@ import { query } from '@/core/database/connection';
 // RAM OPTIMIZATION: Enable Sharp cache with a 50MB limit to balance speed vs memory
 sharp.cache({ memory: 50, items: 100, files: 20 });
 
-import { generateProxySignature, simpleHash } from '@/core/security/crypto';
+import { generateProxySignature } from '@/core/security/crypto';
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -17,17 +17,15 @@ export async function GET(request) {
     return new Response('Missing URL', { status: 400 });
   }
 
-  // TITAN SECURITY: Dual-mode Signature Verification
+  // TITAN SECURITY: 
   // - 16-char HMAC: generated server-side via generateProxySignature()
-  // - 8-char simpleHash: generated client-side via getSignedProxyUrl() in MangaCard etc.
 
   const q = parseInt(quality);
   const w = parseInt(width);
 
   const expectedHmac = generateProxySignature(imageUrl, w, q);
-  const expectedSimple = simpleHash(`${imageUrl}|${w}|${q}`);
   
-  if (!sig || (sig !== expectedHmac && sig !== expectedSimple)) {
+  if (!sig || sig !== expectedHmac) {
     return new Response('Forbidden: Invalid Signature', { status: 403 });
   }
 
@@ -166,7 +164,8 @@ export async function GET(request) {
             }
 
             // SMART COMPRESSION: Use the requested quality (q) or default to 75 (Standard)
-            const finalQuality = Math.min(Math.max(quality, 30), 96);
+            // M3 FIX: Use parsed integer `q` instead of string `quality`
+            const finalQuality = Math.min(Math.max(q, 30), 96);
             const isTurbo = finalQuality <= 65;
             
             // SHARPENING: Improve crispness of manga text and line art (compensates for compression)

@@ -11,8 +11,11 @@ export const POST = withTitan({
     handler: async (request, session) => {
         try {
             const userUuid = session.uuid;
-            const today = new Date().toISOString().split('T')[0];
-            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+            // M8 FIX: Use Vietnam timezone (UTC+7) consistent with client-side
+            const vnNow = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }));
+            const today = vnNow.toISOString().split('T')[0];
+            const vnYesterday = new Date(vnNow.getTime() - 86400000);
+            const yesterday = vnYesterday.toISOString().split('T')[0];
 
             // TITAN RATE LIMIT: Prevent rapid clicking / duplicate trigger bypass attempts
             const limiter = await checkRateLimit(`checkin_${userUuid}`, 1, 10); // 1 request / 10s

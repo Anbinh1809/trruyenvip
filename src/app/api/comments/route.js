@@ -117,8 +117,11 @@ export const DELETE = withTitan({
             throw { status: 403, message: 'Bạn không có quyền xóa bình luận này' };
         }
 
-        await query(`DELETE FROM comment_likes WHERE comment_id = @id`, { id });
-        await query(`DELETE FROM comments WHERE id = @id OR parent_id = @id`, { id });
+        // M2 FIX: Wrap in transaction to prevent partial deletion (data inconsistency)
+        await withTransaction(async (tx) => {
+            await query(`DELETE FROM comment_likes WHERE comment_id = @id`, { id }, tx);
+            await query(`DELETE FROM comments WHERE id = @id OR parent_id = @id`, { id }, tx);
+        });
         return { success: true, message: 'Đã xóa bình luận' };
     }
 });
