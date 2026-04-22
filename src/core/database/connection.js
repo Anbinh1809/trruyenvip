@@ -2,23 +2,36 @@ import sql from 'mssql';
 import 'dotenv/config';
 
 const rawUrl = process.env.DATABASE_URL;
-const connectionString = (rawUrl && rawUrl !== 'undefined' && rawUrl.trim() !== '') 
-    ? rawUrl 
-    : 'Server=localhost;Database=truyenvip;User Id=sa;Password=123456;TrustServerCertificate=true;';
 
-const config = connectionString.includes(';') 
-    ? {
-        server: connectionString.match(/Server=([^;]+)/)?.[1] || 'localhost',
-        database: connectionString.match(/Database=([^;]+)/)?.[1] || 'truyenvip',
-        user: connectionString.match(/User Id=([^;]+)/)?.[1] || 'sa',
-        password: connectionString.match(/Password=([^;]+)/)?.[1] || '123456',
+function parseConfig(url) {
+    if (!url || typeof url !== 'string' || url.trim() === '') return null;
+    if (url.startsWith('mssql://')) return url;
+    if (!url.toLowerCase().includes('server=')) return null;
+
+    return {
+        server: url.match(/Server=([^;]+)/i)?.[1] || 'localhost',
+        database: url.match(/Database=([^;]+)/i)?.[1] || 'truyenvip',
+        user: url.match(/User Id=([^;]+)/i)?.[1] || url.match(/uid=([^;]+)/i)?.[1] || 'sa',
+        password: url.match(/Password=([^;]+)/i)?.[1] || url.match(/pwd=([^;]+)/i)?.[1] || '123456',
         options: {
-            trustServerCertificate: true,
-            encrypt: false
+            trustServerCertificate: url.toLowerCase().includes('trustservercertificate=true'),
+            encrypt: url.toLowerCase().includes('encrypt=true')
         },
         pool: { max: 50, min: 0, idleTimeoutMillis: 30000 }
-    }
-    : connectionString; // Assume it's already a config object or URL
+    };
+}
+
+const config = parseConfig(rawUrl) || {
+    server: process.env.DB_SERVER || 'localhost',
+    database: process.env.DB_NAME || 'TruyenVip',
+    user: process.env.DB_USER || 'sa',
+    password: process.env.DB_PASSWORD || '123456',
+    options: {
+        trustServerCertificate: true,
+        encrypt: false
+    },
+    pool: { max: 50, min: 0, idleTimeoutMillis: 30000 }
+};
 
 const pool = new sql.ConnectionPool(config);
 let poolConnect;
