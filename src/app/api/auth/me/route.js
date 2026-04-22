@@ -14,6 +14,7 @@ export const GET = withTitan({
       }
 
       // FETCH FULL RECORD to ensure the freshest stats and mission data
+      const res = await query(`
         SELECT uuid, username, email, role, avatar, xp, [vipCoins], mission_data 
         FROM users 
         WHERE uuid = @uuid
