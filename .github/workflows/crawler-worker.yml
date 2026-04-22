@@ -2,18 +2,28 @@ name: Titan Crawler Worker
 
 on:
   schedule:
-    - cron: '*/10 * * * *'
+    # BUDGET STRATEGY: 3 tiers to fit in 2000 free minutes/month
+    # - Light pulse: every 4h (6/day × 30 = 180 runs × 4min ≈ 720 min)
+    # - Deep archival: once per day (30 runs × 8min = 240 min)
+    # Total: ~960 min/month → well under 2000 limit
+    - cron: '0 */4 * * *'   # Light pulse: every 4 hours
+    - cron: '0 2 * * *'     # Deep archival: 2:00 AM UTC daily (9AM VNT)
   workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Run mode: light | deep'
+        required: false
+        default: 'light'
 
 concurrency:
   group: crawler-worker
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   crawl:
     name: Run Autonomous Crawler
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 12
 
     steps:
       - name: Checkout repository
@@ -28,10 +38,35 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run Titan Worker
+      - name: Determine run mode
+        id: mode
+        run: |
+          # Deep archival: runs at 02:00 UTC daily
+          HOUR=$(date -u +%H)
+          if [ "${{ github.event.inputs.mode }}" = "deep" ]; then
+            echo "mode=deep" >> $GITHUB_OUTPUT
+          elif [ "$HOUR" = "02" ]; then
+            echo "mode=deep" >> $GITHUB_OUTPUT
+          else
+            echo "mode=light" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run Titan Worker (Light Pulse - 4 min)
+        if: steps.mode.outputs.mode == 'light'
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
           PROXY_SECRET: ${{ secrets.PROXY_SECRET }}
           NODE_TLS_REJECT_UNAUTHORIZED: '0'
+          TITAN_MODE: 'light'
+        run: node scripts/titan-worker.js
+
+      - name: Run Titan Worker (Deep Archival - 8 min)
+        if: steps.mode.outputs.mode == 'deep'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          PROXY_SECRET: ${{ secrets.PROXY_SECRET }}
+          NODE_TLS_REJECT_UNAUTHORIZED: '0'
+          TITAN_MODE: 'deep'
         run: node scripts/titan-worker.js

@@ -223,8 +223,8 @@ export function EngagementProvider({ children }) {
     };
   }, []);
 
-  const uXp = user?.xp ?? 0;
-  const uCoins = user?.vipCoins ?? 0;
+  const uXp = parseInt(user?.xp) || 0;
+  const uCoins = parseInt(user?.vipCoins) || 0;
   const uUuid = user?.uuid ?? '';
   const missionData = user?.missionData;
 

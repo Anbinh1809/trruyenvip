@@ -7,7 +7,7 @@ import * as parsers from './parsers.js';
 import { SOURCES } from './mirrors.js';
 
 let activeWorkers = 0;
-const BASE_CONCURRENCY = 3;
+const BASE_CONCURRENCY = 25;
 const inProgressManga = new Map();
 const inProgressChapters = new Map();
 
@@ -20,10 +20,9 @@ export async function waitForWorkers(timeoutMs = 60000) {
     process.stdout.write('\n');
 }
 
-// Halve concurrency during Vietnam peak hours (18:00–00:00 VNT)
+// MAX SPEED: User requested high resource usage
 function getConcurrentLimit() {
-    const vntHour = (new Date().getUTCHours() + 7) % 24;
-    return vntHour >= 18 ? Math.floor(BASE_CONCURRENCY / 2) : BASE_CONCURRENCY;
+    return BASE_CONCURRENCY;
 }
 
 // Self-healing: prune stale in-progress locks and salvage failed tasks
@@ -252,7 +251,12 @@ export async function crawlFullMangaChapters(mangaId, url, source, earlyExit = f
             }));
         }
 
-        await query('UPDATE manga SET last_crawled = GETDATE() WHERE id = @mangaId', { mangaId });
+        await query(`
+            UPDATE manga 
+            SET last_crawled = GETDATE(), 
+                last_chap_num = COALESCE((SELECT TOP(1) title FROM chapters WHERE manga_id = @mangaId ORDER BY chapter_number DESC, updated_at DESC), last_chap_num)
+            WHERE id = @mangaId
+        `, { mangaId });
     } catch (err) {
         console.log('[DEBUG ENGINE] Error in crawlFullMangaChapters:', err.message);
         try { updateMirrorHealth(new URL(url).hostname, false, err.message); } catch {}
@@ -286,7 +290,8 @@ export async function crawlLatest(source = 'nettruyen', pageCount = 1, startPage
     
     for (let p = startPage; p < startPage + pageCount; p++) {
         try {
-            const url = source === 'nettruyen' ? `${base}?page=${p}` : `${base}/truyen-moi-cap-nhat/trang-${p}`;
+            const baseUrl = base.endsWith('/') ? base.slice(0, -1) : base;
+            const url = source === 'nettruyen' ? `${baseUrl}?page=${p}` : `${baseUrl}/truyen-moi-cap-nhat/trang-${p}`;
             const response = await fetchWithRetry(url, { isDiscovery: true });
             const $ = cheerio.load(response.data);
             
@@ -338,6 +343,8 @@ export async function crawlLatest(source = 'nettruyen', pageCount = 1, startPage
                     await query(`
                         IF NOT EXISTS (SELECT 1 FROM manga WHERE id = @slug)
                         INSERT INTO manga (id, title, cover, source_url, normalized_title) VALUES (@slug, @title, @cover, @mangaUrl, @normalizedTitle)
+                        ELSE
+                        UPDATE manga SET source_url = @mangaUrl, updated_at = GETDATE() WHERE id = @slug AND source_url != @mangaUrl
                     `, { slug, title: c.title, cover: c.cover, mangaUrl: c.mangaUrl, normalizedTitle: c.normalizedTitle });
                     newMangaCount++;
                 }
@@ -444,8 +451,8 @@ export async function runGuardianAutopilot(oneShot = false) {
 
             nothingNewStreak = newFound === 0 ? Math.min(nothingNewStreak + 1, 9) : 0;
 
-            await rescueBrokenImages(50);
-            await healChapterGaps(30);
+            await rescueBrokenImages(1000);
+            await healChapterGaps(500);
 
             // Adaptive backoff: 60s–600s to prevent mirror bans
             const waitTime = Math.max(10000, 60000 * (nothingNewStreak + 1));
@@ -458,7 +465,7 @@ export async function runGuardianAutopilot(oneShot = false) {
             await new Promise(r => setTimeout(r, waitTime));
         } catch (e) {
             console.error('[Guardian] Engine Stalled:', e.message);
-            await new Promise(r => setTimeout(r, 60000));
+            await new Promise(r => setTimeout(r, Math.floor(Math.random() * 200) + 100));
         }
     }
 }
@@ -494,12 +501,27 @@ export async function bootstrapCrawler() {
     processQueue().catch(e => console.error('[Queue] processQueue error:', e.message));
 }
 
-export async function runTitanWorker(oneShot = true) {
+export async function runTitanWorker(oneShot = true, mode = 'deep') {
     if (oneShot) global.isOneShotExitRequested = true;
     await bootstrapCrawler();
+
     if (oneShot) {
-        await runGuardianAutopilot(true);
-        await waitForWorkers();
+        if (mode === 'light') {
+            // LIGHT PULSE: Only crawl latest chapters from each source (fast, ~3 min)
+            console.log('[Titan] Light pulse: crawling latest chapters only.');
+            for (const source of ['nettruyen', 'truyenqq']) {
+                try { await crawlLatest(source, 3); } catch (e) {
+                    console.warn(`[Titan:Light] ${source} failed: ${e.message}`);
+                }
+            }
+            await waitForWorkers(180000); // wait up to 3 min for images to queue
+        } else {
+            // DEEP ARCHIVAL: Full autopilot with gap healing and image rescue (~7.5 min)
+            console.log('[Titan] Deep archival: running full autopilot.');
+            await runGuardianAutopilot(true);
+            await waitForWorkers(450000); // wait up to 7.5 min
+        }
+        updateTelemetry({ syncHealth: true });
     } else {
         runGuardianAutopilot().catch(e => console.error('[Titan] Autopilot failure:', e.message));
     }

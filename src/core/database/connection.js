@@ -7,18 +7,25 @@ const connectionString = (rawUrl && rawUrl !== 'undefined' && rawUrl.trim() !== 
     : 'Server=localhost;Database=truyenvip;User Id=sa;Password=123456;TrustServerCertificate=true;';
 
 const pool = new sql.ConnectionPool(connectionString);
-const poolConnect = pool.connect().catch(err => {
-    console.error('[TITAN-DB-CRITICAL] Failed to connect to SQL Server:', err.message);
-    // Do not throw globally to prevent node process death during build
-    return null;
-});
+let poolConnect;
+
+function getPoolConnect() {
+    if (!poolConnect) {
+        poolConnect = pool.connect().catch(err => {
+            console.error('[TITAN-DB-CRITICAL] Failed to connect to SQL Server:', err.message);
+            poolConnect = null;
+            return null;
+        });
+    }
+    return poolConnect;
+}
 
 pool.on('error', err => {
     console.warn('[SQL] Pool error:', err);
 });
 
 export async function query(sqlString, params = {}, client = null, retryCount = 0) {
-    const connection = await poolConnect;
+    const connection = await getPoolConnect();
     if (!connection && !client) {
         throw new Error('DATABASE_CONNECTION_UNAVAILABLE');
     }
@@ -30,13 +37,15 @@ export async function query(sqlString, params = {}, client = null, retryCount = 
         if (!client || !client._isTransactionRequest) {
             // If it's the raw pool request or we just created it
             for (const [key, value] of Object.entries(params)) {
-                req.input(key, value);
+                if (typeof value === 'string') req.input(key, sql.NVarChar, value);
+                else req.input(key, value);
             }
         } else {
              // For transaction requests, we need a fresh request per query so parameters do not conflict
              req = new sql.Request(client.transaction);
              for (const [key, value] of Object.entries(params)) {
-                 req.input(key, value);
+                 if (typeof value === 'string') req.input(key, sql.NVarChar, value);
+                 else req.input(key, value);
              }
         }
 
@@ -57,7 +66,7 @@ export async function query(sqlString, params = {}, client = null, retryCount = 
 }
 
 export async function withTransaction(callback) {
-    await poolConnect;
+    await getPoolConnect();
     const transaction = new sql.Transaction(pool);
     
     let attempt = 0;
@@ -79,7 +88,8 @@ export async function withTransaction(callback) {
             query: async (sqlString, params = {}) => {
                 const req = new sql.Request(transaction);
                 for (const [key, value] of Object.entries(params)) {
-                    req.input(key, value);
+                    if (typeof value === 'string') req.input(key, sql.NVarChar, value);
+                    else req.input(key, value);
                 }
                 const res = await req.query(sqlString);
                 return { 
@@ -99,9 +109,9 @@ export async function withTransaction(callback) {
 }
 
 export async function bulkInsert(tableName, rows, client = null) {
-    if (!rows?.length) return;
+    if (!rows?.length || Object.keys(rows[0]).length === 0) return;
     
-    await poolConnect;
+    await getPoolConnect();
     // TITAN SECURITY: Strict Table Allow-list
     const allowedTables = ['notifications', 'chapterimages', 'crawlertasks', 'mangagenres', 'crawllogs', 'guardianreports'];
     if (!allowedTables.includes(tableName.replace(/[\[\]"]/g, '').toLowerCase())) {
@@ -127,7 +137,9 @@ export async function bulkInsert(tableName, rows, client = null) {
             try {
                 const req = new sql.Request(transaction);
                 for (let i = 0; i < cols.length; i++) {
-                    req.input(`param${i}`, row[cols[i]]);
+                    const val = row[cols[i]];
+                    if (typeof val === 'string') req.input(`param${i}`, sql.NVarChar, val);
+                    else req.input(`param${i}`, val);
                 }
                 const placeholders = cols.map((_, i) => `@param${i}`).join(', ');
                 const colsFormatted = cols.map(c => `[${c}]`).join(', ');
@@ -160,8 +172,8 @@ export async function checkRateLimit(key, limit, windowSeconds) {
             OUTPUT inserted.count, inserted.reset_at;
         `, { key, resetAt });
 
-        const count = res.recordset[0].count;
-        const reset_at = res.recordset[0].reset_at;
+        const count = res.recordset?.[0]?.count ?? 1;
+        const reset_at = res.recordset?.[0]?.reset_at ?? resetAt;
         return { success: count <= limit, count, limit, remaining: Math.max(0, limit - count), reset: new Date(reset_at).getTime() };
     } catch (err) {
         return { success: true, count: 0, limit, remaining: limit, reset: Date.now() };

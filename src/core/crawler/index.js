@@ -25,13 +25,13 @@ export async function fetchWithRetry(url, options = {}, retries = 2) {
     const searchReferer = SEARCH_REFERERS[Math.floor(Math.random() * SEARCH_REFERERS.length)];
     
     // Random jitter to avoid fingerprinting
-    await new Promise(r => setTimeout(r, Math.floor(Math.random() * 2000) + 1000));
+    await new Promise(r => setTimeout(r, Math.floor(Math.random() * 600) + 200));
 
     const tryMirror = async (mirrorUrl, delay = 0) => {
         if (delay > 0) await new Promise(r => setTimeout(r, delay));
         
         let finalUrl = url;
-        if (url.includes('nettruyen') || url.includes('truyenqq') || url.includes('nettruyeno') || url.includes('nettruyenqq')) {
+        if (url.startsWith('/') || url.includes('nettruyen') || url.includes('truyenqq') || url.includes('nettruyeno') || url.includes('ye2030.co.uk') || url.includes('truyenqqno.com') || url.includes('truyenqqq.com')) {
             try {
                 const parsedUrl = new URL(url);
                 finalUrl = safeJoinUrl(mirrorUrl, parsedUrl.pathname + parsedUrl.search);

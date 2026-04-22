@@ -76,11 +76,13 @@ export function inferAlternativeMirrors(mirrorUrl) {
     if (!mirrorUrl) return [];
     try {
         const url = new URL(mirrorUrl);
-        const domain = url.hostname;
-        const base = domain.split('.').slice(0, -1).join('.');
+        const parts = url.hostname.split('.');
+        if (parts.length < 2) return [];
+        
+        const base = (parts[0] === 'www' || parts[0] === 'm') ? parts[1] : parts[0];
         
         // Common TLD evolution patterns in Vietnam
-        const tlds = ['tv', 'com', 'us', 'win', 'pro', 'me', 'info', 'asia'];
+        const tlds = ['tv', 'com', 'us', 'win', 'pro', 'me', 'info', 'asia', 'net', 'io'];
         return tlds
             .map(tld => `${url.protocol}//${base}.${tld}/`)
             .filter(m => m !== mirrorUrl);

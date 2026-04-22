@@ -7,11 +7,13 @@ export const SOURCES = {
     NETTRUYEN: 'https://nettruyeno.com/',
     NETTRUYEN_MIRRORS: [
         'https://nettruyeno.com/',
+        'https://nettruyenviet10.com/',
         'https://nettruyenqq.net/',
     ],
-    TRUYENQQ: 'https://truyenqq.com.vn/',
+    TRUYENQQ: 'https://truyenqqno.com/',
     TRUYENQQ_MIRRORS: [
-        'https://truyenqq.com.vn/',
+        'https://truyenqqno.com/',
+        'https://truyenqqq.com/',
     ]
 };
 
@@ -45,8 +47,11 @@ export function getOptimizedMirrors(sourceUrl) {
     let sourceMirrors = [];
     if (sourceUrl.includes('nettruyen') || sourceUrl.includes('nettruyeno') || sourceUrl.includes('nettruyenqq')) {
         sourceMirrors = SOURCES.NETTRUYEN_MIRRORS;
-    } else if (sourceUrl.includes('truyenqq')) {
+    } else if (sourceUrl.includes('truyenqq') || sourceUrl.includes('ye2030.co.uk') || sourceUrl.includes('truyenqqno.com') || sourceUrl.includes('truyenqqq.com')) {
         sourceMirrors = SOURCES.TRUYENQQ_MIRRORS;
+    } else if (sourceUrl.startsWith('/')) {
+        // Relative path — default to NetTruyen if ambiguous, or check for specific prefixes
+        sourceMirrors = SOURCES.NETTRUYEN_MIRRORS; 
     } else {
         return [sourceUrl];
     }

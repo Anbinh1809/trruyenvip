@@ -1,4 +1,4 @@
-import { query } from '../core/connection.js';
+import { query } from '../core/database/connection.js';
 
 async function performPolarRecovery() {
     console.log('--- Operation Polaris: Data Recovery & Sanitization ---');
