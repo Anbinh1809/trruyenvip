@@ -68,6 +68,10 @@ export async function fetchWithRetry(url, options = {}, retries = 2) {
             updateTelemetry({ currentLatency: latency });
             return response;
         } catch (err) {
+            // Do not quarantine a healthy mirror just because the specific chapter URL is 404
+            if (err.response && err.response.status === 404) {
+                throw { code: 'CONTENT_NOT_FOUND', message: 'Chapter or Manga deleted from source (404)' };
+            }
             quarantineMirror(mirrorUrl);
             throw err;
         }
@@ -78,6 +82,9 @@ export async function fetchWithRetry(url, options = {}, retries = 2) {
         try {
             return await tryMirror(mirror);
         } catch (err) {
+            if (err.code === 'CONTENT_NOT_FOUND') {
+                throw new Error(`CONTENT_NOT_FOUND: ${url}`);
+            }
             const errMsg = err?.message || err?.code || JSON.stringify(err);
             console.warn(`[Crawler:Mirror] Failed for ${mirror}: ${errMsg}`);
             continue;

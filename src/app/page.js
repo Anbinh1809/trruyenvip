@@ -45,7 +45,7 @@ export default async function Home() {
     <main className="main-wrapper titan-bg home-page">
       <Header />
       
-      <div className="home-spacer" style={{ height: '30px' }}></div>
+      <div className="home-spacer" style={{ height: '100px' }}></div>
 
       <div className="container relative-z-100">
         

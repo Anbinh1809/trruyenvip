@@ -109,7 +109,7 @@ function MangaCard({ manga, isNew = false, priority = false }) {
       <h3 className="card-title-centered truncate-1" itemProp="name">
           {manga.title && /^[a-z0-9-]+$/.test(manga.title) ? manga.title.replace(/-[0-9]+$/, '').split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : manga.title}
       </h3>
-      <p className="card-chapter-centered">
+      <p className="card-chapter-centered card-chapter-muted">
         {manga.last_chap_num ? (
             manga.last_chap_num.toString().startsWith('Chương') ? manga.last_chap_num : `Chương ${manga.last_chap_num}`
         ) : 'Đang cập nhật'}
@@ -139,10 +139,21 @@ function MangaCard({ manga, isNew = false, priority = false }) {
         }
         .card-img-titan {
             opacity: 0;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.4s ease;
+            animation: img-reveal 0.8s ease forwards;
+        }
+        @keyframes img-reveal {
+            0%   { opacity: 0; }
+            60%  { opacity: 0; }
+            100% { opacity: 1; }
         }
         .card-img-titan.is-loaded {
             opacity: 1;
+            animation: none;
+        }
+        .card-chapter-muted {
+            color: var(--text-muted) !important;
+            font-size: 0.8rem;
         }
 
 

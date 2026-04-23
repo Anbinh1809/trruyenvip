@@ -7,10 +7,8 @@ import {
     User, 
     LogOut, 
     Heart, 
-    Award, 
     Menu,
     X,
-    LayoutDashboard,
     Zap
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';

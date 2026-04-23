@@ -74,6 +74,32 @@ export default async function SearchPage({ searchParams }) {
       
       <div className="content container search-results-container fade-in">
         <section className="section-industrial">
+          {!q ? (
+            <div className="search-landing-state" style={{ textAlign: 'center', padding: '60px 20px' }}>
+              <div className="search-icon-box" style={{ display: 'inline-flex', background: 'var(--accent)', borderRadius: '20px', padding: '20px', marginBottom: '24px' }}>
+                <Search size={48} color="#fff" />
+              </div>
+              <h1 style={{ fontSize: '2rem', fontWeight: 900, marginBottom: '12px' }}>TÌM KIẾM TRUYỆN</h1>
+              <p style={{ color: 'var(--text-muted)', marginBottom: '32px' }}>Nhập tên truyện, tác giả hoặc thể loại bạn muốn tìm.</p>
+              <form method="GET" action="/search" style={{ display: 'flex', gap: '12px', maxWidth: '500px', margin: '0 auto' }}>
+                <input 
+                  name="q" 
+                  type="text" 
+                  placeholder="Tìm kiếm truyện tranh..." 
+                  autoFocus
+                  style={{ 
+                    flex: 1, padding: '14px 18px', borderRadius: '12px', 
+                    background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)',
+                    color: 'var(--text-primary)', fontSize: '1rem', outline: 'none'
+                  }} 
+                />
+                <button type="submit" className="btn btn-primary" style={{ padding: '14px 24px', borderRadius: '12px', whiteSpace: 'nowrap' }}>
+                  TÌM NGAY
+                </button>
+              </form>
+            </div>
+          ) : (
+          <>
           <div className="search-header-row">
               <div className="search-icon-box">
                 <Search size={40} />
@@ -130,6 +156,7 @@ export default async function SearchPage({ searchParams }) {
                 />
             </div>
           )}
+          </>) /* closes q ternary */}
         </section>
       </div>
 

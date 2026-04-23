@@ -40,7 +40,10 @@ export async function GET(request) {
     // IMAGE SERVERS & CDNs
     'nt-cdn.xyz', 'nt-cdn.com', 'nt-cdn1.xyz', 'nt-cdn2.xyz', 'nt-cdn3.xyz', 'nt-cdn4.xyz', 'nt-cdn5.xyz',
     'imagetruyen.com', 'st.nettruyen.com', 'st.nettruyennew.com',
-    'st.nhattruyen.com', 'hinhhinh.com', 'truyenvua.com', 'nhattruyenvv.com'
+    'st.nhattruyen.com', 'hinhhinh.com', 'truyenvua.com', 'nhattruyenvv.com',
+    // OTRUYEN CDN (used by NetTruyen mirrors)
+    'otruyencdn.com', 'sv1.otruyencdn.com', 'sv2.otruyencdn.com', 'sv3.otruyencdn.com',
+    'cdn.otruyenapi.com', 'otruyenapi.com'
   ];
   
   try {

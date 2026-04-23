@@ -12,7 +12,7 @@ CREATE TABLE users (
     email NVARCHAR(100),
     password_hash NVARCHAR(MAX) NOT NULL,
     xp BIGINT DEFAULT 0,
-    vipcoins BIGINT DEFAULT 0,
+    [vipCoins] BIGINT DEFAULT 0,
     mission_data NVARCHAR(MAX) DEFAULT '{}',
     last_mission_reset DATETIME2 DEFAULT GETDATE(),
     role NVARCHAR(20) DEFAULT 'user',
@@ -39,6 +39,7 @@ CREATE TABLE manga (
     views_at_source BIGINT DEFAULT 0,
     migration_count INT DEFAULT 0,
     last_chap_num NVARCHAR(255) DEFAULT N'Đang cập nhật',
+    normalized_title NVARCHAR(500),
     last_crawled DATETIME2 DEFAULT GETDATE()
 );
 
@@ -199,11 +200,11 @@ CREATE TABLE crawllogs (
     created_at DATETIME2 DEFAULT GETDATE()
 );
 
--- C2 FIX: Schema now matches telemetry.js INSERT columns (event_type, message)
+-- Schema matches live DB and telemetry.js INSERT columns
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='guardianreports' and xtype='U')
 CREATE TABLE guardianreports (
     id INT IDENTITY(1,1) PRIMARY KEY,
-    manga_name NVARCHAR(255),
+    manga_id NVARCHAR(255),
     chapter_title NVARCHAR(255),
     event_type NVARCHAR(50),
     message NVARCHAR(MAX),

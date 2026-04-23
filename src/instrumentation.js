@@ -25,6 +25,12 @@ export async function register() {
             const { default: cron } = await import('node-cron');
 
             // 1. Bootstrap: dọn task bị treo, khởi động processQueue
+            // Auto-reset any tasks stuck in 'processing' from a previous crashed session
+            await query(`
+                UPDATE crawlertasks 
+                SET status = 'pending', attempts = 0, updated_at = GETDATE()
+                WHERE status = 'processing' AND updated_at < DATEADD(minute, -15, GETDATE())
+            `).catch(() => {});
             await bootstrapCrawler().catch(e => console.error('[Guardian] Bootstrap failed:', e.message));
 
             // 2. Seed lần đầu nếu queue rỗng
@@ -64,8 +70,9 @@ export async function register() {
             // - Bảo trì DB lúc 3:00 SA: dọn log cũ, tối ưu index
             cron.schedule('0 3 * * *', () => runFullMaintenance().catch(e => console.error('[Cron] Maintenance error:', e.message)), { timezone: 'Asia/Ho_Chi_Minh' });
 
-            // 5. Disabled auto-pulse to avoid startup OOM/Hangs
-            // runPulse('light').catch(() => {});
+            // 5. Run a light pulse immediately on startup to begin crawling chapters
+            console.log('[Guardian] 🚀 Triggering immediate startup pulse...');
+            setTimeout(() => runPulse('light').catch(() => {}), 3000);
 
             console.log('[Guardian] 🚀 Titan Crawler Scheduler ACTIVATED.');
             console.log('[Guardian]    ⚡ Light pulse  : every 4 hours');

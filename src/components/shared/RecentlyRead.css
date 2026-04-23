@@ -4,6 +4,7 @@
    ========================================================================== */
 
 .recently-read-titan {
+    margin-top: 30px;
     margin-bottom: 60px;
     width: 100%;
 }
@@ -41,7 +42,7 @@
     min-height: 220px;
     border-radius: var(--border-radius);
     overflow: hidden;
-    background: #000;
+    background: #111;
     display: flex;
     align-items: center;
     border: 1px solid var(--glass-border);
@@ -96,14 +97,14 @@
     margin-bottom: 10px;
     letter-spacing: -1.5px;
     line-height: 1.1;
-    color: var(--text-primary);
-    text-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    color: #ffffff;
+    text-shadow: 0 5px 15px rgba(0,0,0,0.8);
 }
 
 .banner-sub-titan {
     font-size: 1rem;
     font-weight: 600;
-    color: var(--text-secondary);
+    color: rgba(255,255,255,0.8);
     margin-bottom: 25px;
 }
 

@@ -125,7 +125,10 @@ export default function ChapterList({ mangaId, chapters }) {
 
                             <div className="chapter-row-right">
                                 <span className="chapter-date-v2">
-                                    {mounted ? new Date(chapter.updated_at || chapter.created_at).toLocaleDateString('vi-VN') : ''}
+                                    {mounted && chapter.updated_at ? (() => {
+                                        const d = new Date(chapter.updated_at);
+                                        return isNaN(d.getTime()) ? '' : d.toLocaleDateString('vi-VN');
+                                    })() : ''}
                                 </span>
                             </div>
                         </Link>

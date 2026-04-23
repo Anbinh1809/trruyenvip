@@ -163,7 +163,6 @@ export async function queueMangaSync(mangaId, url, source, earlyExit = false, pr
 
 export async function queueDiscovery(source, pageCount = 3, startPage = 1, priority = 3) {
     const target = stringifySorted({ source, pageCount, startPage });
-    const mangaId = `system_discovery_${source}`;
     await query(`
         MERGE crawlertasks AS target
         USING (SELECT @target AS t_target) AS source
@@ -171,8 +170,8 @@ export async function queueDiscovery(source, pageCount = 3, startPage = 1, prior
         WHEN MATCHED AND target.status = 'pending' THEN UPDATE SET 
             priority = CASE WHEN target.priority > @priority THEN target.priority ELSE @priority END
         WHEN NOT MATCHED THEN INSERT (type, target, priority, manga_id) 
-        VALUES ('system_discovery', @target, @priority, @mangaId);
-    `, { target, priority, mangaId });
+        VALUES ('system_discovery', @target, @priority, NULL);
+    `, { target, priority });
     processQueue().catch(e => console.error('[Queue] processQueue error:', e.message));
 }
 
@@ -345,7 +344,7 @@ export async function crawlLatest(source = 'nettruyen', pageCount = 1, startPage
                         IF NOT EXISTS (SELECT 1 FROM manga WHERE id = @slug)
                         INSERT INTO manga (id, title, cover, source_url, normalized_title) VALUES (@slug, @title, @cover, @mangaUrl, @normalizedTitle)
                         ELSE
-                        UPDATE manga SET source_url = @mangaUrl, updated_at = GETDATE() WHERE id = @slug AND source_url != @mangaUrl
+                        UPDATE manga SET source_url = @mangaUrl, last_crawled = GETDATE() WHERE id = @slug AND source_url != @mangaUrl
                     `, { slug, title: c.title, cover: c.cover, mangaUrl: c.mangaUrl, normalizedTitle: c.normalizedTitle });
                     newMangaCount++;
                 }

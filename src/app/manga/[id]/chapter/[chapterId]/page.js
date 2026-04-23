@@ -54,7 +54,7 @@ async function getChapterData(mangaId, chapterId) {
     }
 
     const internalMangaId = manga.id;
-    const chapterRes = await query('SELECT id, title, chapter_number, content, source_url FROM chapters WHERE id = @chapterId', { chapterId });
+    const chapterRes = await query('SELECT id, title, chapter_number, source_url FROM chapters WHERE id = @chapterId', { chapterId });
     const chapter = chapterRes.recordset[0];
     if (!chapter) {
         console.error(`[Reader Error] Chapter not found for ID: ${chapterId} in Manga: ${internalMangaId}`);

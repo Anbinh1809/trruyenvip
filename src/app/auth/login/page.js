@@ -22,11 +22,11 @@ export default function LoginPage() {
     setError('');
     
     try {
-      const success = await login(username, password);
-      if (success) {
+      const response = await login(username, password);
+      if (response.success) {
         router.push('/');
       } else {
-        setError('Tên đăng nhập hoặc mật khẩu không chính xác.');
+        setError(response.error || 'Tên đăng nhập hoặc mật khẩu không chính xác.');
       }
     } catch (err) {
       setError('Đã xảy ra lỗi kết nối. Vui lòng thử lại.');

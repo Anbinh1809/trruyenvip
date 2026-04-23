@@ -13,12 +13,14 @@ export const SOURCES = {
         'https://nettruyenqq.net/',
         'https://nettruyenking.com/',
     ],
-    TRUYENQQ: 'https://truyenqqviet.com/',
+    TRUYENQQ: 'https://truyenqq.com.vn/',
     TRUYENQQ_MIRRORS: [
+        'https://truyenqq.com.vn/',
+        'https://truyenqqto.com/',
+        'https://truyenqqpro.com/',
+        'https://truyenqqvip.com/',
         'https://truyenqqviet.com/',
-        'https://truyenqqno.com/',
-        'https://truyenqqq.com/',
-        'https://truyenqqvn.com/',
+        'https://truyenqqq.com/'
     ]
 };
 

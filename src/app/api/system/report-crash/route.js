@@ -19,8 +19,8 @@ export const POST = withTitan({
         const { message, stack, digest, url } = body;
 
         await query(`
-            INSERT INTO guardianreports (manga_name, chapter_title, event_type, message)
-            VALUES ('CRASH', @message, 'CLIENT_CRASH', @details)
+            INSERT INTO guardianreports (manga_id, chapter_title, event_type, message)
+            VALUES (NULL, @message, 'CLIENT_CRASH', @details)
         `, {
             message: (message || 'Web Crash').substring(0, 255),
             details: JSON.stringify({
